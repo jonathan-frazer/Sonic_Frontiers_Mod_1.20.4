@@ -8,6 +8,7 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
+import net.sonicrushxii.beyondthehorizon.network.sync.SyncThirstS2C;
 import net.sonicrushxii.beyondthehorizon.network.test.TestPacket;
 
 public class PacketHandler {
@@ -19,7 +20,31 @@ public class PacketHandler {
 
     public static void register() {
         System.out.println("REGISTERED PACKET HANDLER");
-        INSTANCE.messageBuilder(TestPacket.class, NetworkDirection.PLAY_TO_SERVER).encoder(TestPacket::encode).decoder(TestPacket::new).consumerMainThread(TestPacket::handle).add();
+
+        //Sync Packets
+        {
+            INSTANCE.messageBuilder(SyncThirstS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(SyncThirstS2C::encode).decoder(SyncThirstS2C::new).consumerMainThread(SyncThirstS2C::handle).add();
+        }
+
+        //Base form
+        {
+            INSTANCE.messageBuilder(TestPacket.class, NetworkDirection.PLAY_TO_SERVER).encoder(TestPacket::encode).decoder(TestPacket::new).consumerMainThread(TestPacket::handle).add();
+        }
+
+        //Super form
+        {
+
+        }
+
+        //Starfall form
+        {
+
+        }
+
+        //Hyper form
+        {
+
+        }
     }
 
     public static void sendToServer(Object msg) {
