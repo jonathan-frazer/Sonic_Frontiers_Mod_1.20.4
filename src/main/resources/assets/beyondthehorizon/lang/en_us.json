@@ -1,0 +1,44 @@
+{
+  "item.beyondthehorizon.sonic_baseform_armor_chestplate": "Sonic Chestplate",
+  "item.beyondthehorizon.sonic_baseform_armor_leggings": "Sonic Leggings",
+  "item.beyondthehorizon.sonic_baseform_armor_boots": "Sonic Shoes",
+
+  "item.beyondthehorizon.sonic_baseform_lightspeed_chestplate": "Sonic Chestplate(Lightspeed)",
+  "item.beyondthehorizon.sonic_baseform_lightspeed_leggings": "Sonic Leggings(Lightspeed)",
+  "item.beyondthehorizon.sonic_baseform_lightspeed_boots": "Sonic Shoes(Lightspeed)",
+
+  "sounds.sonic.baseform.double_jump": "Double Jump(Sonic Frontiers)",
+  "sounds.sonic.baseform.danger_sense": "Danger Sense(Sonic Frontiers)",
+  "sounds.sonic.baseform.air_boost": "Air Boost(Sonic Frontiers)",
+  "sounds.sonic.baseform.max_boost": "Max Boost(Sonic Frontiers)",
+  "sounds.sonic.baseform.light_speed_charge": "Light Speed Charge(Sonic Frontiers)",
+
+  "item.beyondthehorizon.sonic_superform_armor_chestplate": "Sonic Chestplate(Super)",
+  "item.beyondthehorizon.sonic_superform_armor_leggings": "Sonic Leggings(Super)",
+  "item.beyondthehorizon.sonic_superform_armor_boots": "Sonic Shoes(Super)",
+
+  "item.beyondthehorizon.sonic_starfall_armor_chestplate": "Sonic Chestplate(Starfall)",
+  "item.beyondthehorizon.sonic_starfall_armor_leggings": "Sonic Leggings(Starfall)",
+  "item.beyondthehorizon.sonic_starfall_armor_boots": "Sonic Shoes(Starfall)",
+
+  "item.beyondthehorizon.sonic_hyperform_armor_chestplate": "Sonic Chestplate(Hyper)",
+  "item.beyondthehorizon.sonic_hyperform_armor_leggings": "Sonic Leggings(Hyper)",
+  "item.beyondthehorizon.sonic_hyperform_armor_boots": "Sonic Shoes(Hyper)",
+
+  "key.categories.beyondthehorizon": "Sonic Frontiers",
+  "key.beyondthehorizon.DoubleJump": "Double Jump(Should be same as Jump)",
+  "key.beyondthehorizon.SideStepLeft": "Strafe Left",
+  "key.beyondthehorizon.SideStepRight": "Strafe Right",
+  "key.beyondthehorizon.ToggleDangerSense": "Toggle Danger Sense: Ctrl + Shift +",
+  "key.beyondthehorizon.FrontiersSlot": "Ability Slot Scroll",
+
+  "key.beyondthehorizon.FrontiersSlot_1": "Use Ability Slot 1",
+  "key.beyondthehorizon.FrontiersSlot_2": "Use Ability Slot 2",
+  "key.beyondthehorizon.FrontiersSlot_3": "Use Ability Slot 3",
+  "key.beyondthehorizon.FrontiersSlot_4": "Use Ability Slot 4",
+  "key.beyondthehorizon.FrontiersSlot_5": "Use Ability Slot 5",
+  "key.beyondthehorizon.FrontiersSlot_6": "Use Ability Slot 6",
+  "key.beyondthehorizon.FrontiersSlot_Single": "Use Single Ability",
+
+  "creativetab.sonic_tab" : "Sonic Frontiers"
+}
