@@ -2,9 +2,7 @@ package net.sonicrushxii.beyondthehorizon.network.sync;
 
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerThirstProvider;
 import net.sonicrushxii.beyondthehorizon.client.ClientThirstData;
 
 public class SyncThirstS2C {

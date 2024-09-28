@@ -12,7 +12,7 @@ import net.sonicrushxii.beyondthehorizon.network.sync.SyncThirstS2C;
 import net.sonicrushxii.beyondthehorizon.network.test.TestPacket;
 
 public class PacketHandler {
-    private static int PROTOCOL_VERSION = 1;
+    private static final int PROTOCOL_VERSION = 1;
     private static final SimpleChannel INSTANCE = ChannelBuilder
             .named(new ResourceLocation(BeyondTheHorizon.MOD_ID, "main"))
             .networkProtocolVersion(PROTOCOL_VERSION)

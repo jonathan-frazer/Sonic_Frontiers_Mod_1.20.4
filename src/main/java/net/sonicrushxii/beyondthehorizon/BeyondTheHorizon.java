@@ -50,8 +50,6 @@ public class BeyondTheHorizon
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
-
-
     @SubscribeEvent
     public void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         event.register(PlayerThirst.class);
