@@ -1,12 +1,15 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.sonicrushxii.beyondthehorizon.KeyBindings;
-import net.sonicrushxii.beyondthehorizon.client.ClientThirstData;
-import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.test.TestPacket;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
+import net.sonicrushxii.beyondthehorizon.capabilities.hyperform.HyperformHandler;
+import net.sonicrushxii.beyondthehorizon.capabilities.starfall.StarfallFormHandler;
+import net.sonicrushxii.beyondthehorizon.capabilities.superform.SuperformHandler;
+import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 
 
 public class PlayerTickHandler {
@@ -17,26 +20,67 @@ public class PlayerTickHandler {
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent.Pre event) {
         if (event.player == null) return;
-        if (!event.player.level().isClientSide()) return;
+        if(event.player.level().isClientSide) localPlayerTick((LocalPlayer) event.player);
+        else serverPlayerTick((ServerPlayer) event.player);
+    }
 
-        LocalPlayer player = (LocalPlayer) event.player;
-
-        // Check if the player is valid and fully initialized
-        if (!player.isAlive()) {
+    private void localPlayerTick(LocalPlayer player)
+    {
+        if (!player.isAlive())
             return;
+
+        switch(ClientFormData.getPlayerForm())
+        {
+            case BASEFORM -> BaseformHandler.performBaseformClientTick(player);
+            case SUPERFORM -> SuperformHandler.performSuperformClientTick(player);
+            case STARFALLFORM -> StarfallFormHandler.performStarfallformClientTick(player);
+            case HYPERFORM -> HyperformHandler.performHyperformClientTick(player);
         }
 
-        //Helps Run OnClientSecond
+        //Play Second
+        if(tickCounter == 0)
+            localPlayerSecond(player);
+    }
+
+    private void localPlayerSecond(LocalPlayer player)
+    {
+        switch(ClientFormData.getPlayerForm())
+        {
+            case BASEFORM -> BaseformHandler.performBaseformClientSecond(player);
+            case SUPERFORM -> SuperformHandler.performSuperformClientSecond(player);
+            case STARFALLFORM -> StarfallFormHandler.performStarfallformClientSecond(player);
+            case HYPERFORM -> HyperformHandler.performHyperformClientSecond(player);
+        }
+    }
+
+    private void serverPlayerTick(ServerPlayer player)
+    {
+        if (!player.isAlive())
+            return;
+
+        switch(ClientFormData.getPlayerForm())
+        {
+            case BASEFORM -> BaseformHandler.performBaseformServerTick(player);
+            case SUPERFORM -> SuperformHandler.performSuperformServerTick(player);
+            case STARFALLFORM -> StarfallFormHandler.performStarfallformServerTick(player);
+            case HYPERFORM -> HyperformHandler.performHyperformServerTick(player);
+        }
+
         ++tickCounter;
         if (tickCounter >= TICKS_PER_SECOND) {
             tickCounter = 0;
-            System.out.println(ClientThirstData.getPlayerThirst());
+            serverPlayerSecond(player);
         }
+    }
 
-        //Test Sending a Packet
-        if(KeyBindings.INSTANCE.useAbility1.consumeClick()){
-            PacketHandler.sendToServer(new TestPacket());
-
+    private void serverPlayerSecond(ServerPlayer player)
+    {
+        switch(ClientFormData.getPlayerForm())
+        {
+            case BASEFORM -> BaseformHandler.performBaseformServerSecond(player);
+            case SUPERFORM -> SuperformHandler.performSuperformServerSecond(player);
+            case STARFALLFORM -> StarfallFormHandler.performStarfallformServerSecond(player);
+            case HYPERFORM -> HyperformHandler.performHyperformServerSecond(player);
         }
     }
 }

@@ -15,10 +15,16 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerThirst;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
+import net.sonicrushxii.beyondthehorizon.event_handler.LoginHandler;
 import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
 import net.sonicrushxii.beyondthehorizon.event_handler.ServerTickHandler;
+import net.sonicrushxii.beyondthehorizon.modded.ModCreativeModeTabs;
+import net.sonicrushxii.beyondthehorizon.modded.ModItems;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -40,11 +46,19 @@ public class BeyondTheHorizon
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new PlayerTickHandler());
+        MinecraftForge.EVENT_BUS.register(new LoginHandler());
         MinecraftForge.EVENT_BUS.register(new ServerTickHandler());
+        MinecraftForge.EVENT_BUS.register(new PlayerTickHandler());
+        MinecraftForge.EVENT_BUS.register(new Scheduler());
+        MinecraftForge.EVENT_BUS.register(new EquipmentChangeHandler());
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
+
+        // Register Stuff
+        ModCreativeModeTabs.register(modEventBus);
+        ModItems.register(modEventBus);
+        ModSounds.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -52,7 +66,7 @@ public class BeyondTheHorizon
 
     @SubscribeEvent
     public void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-        event.register(PlayerThirst.class);
+        event.register(PlayerSonicForm.class);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)

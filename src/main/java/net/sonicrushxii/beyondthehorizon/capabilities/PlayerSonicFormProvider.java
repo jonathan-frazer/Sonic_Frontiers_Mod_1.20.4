@@ -11,22 +11,22 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class PlayerThirstProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
-    public static Capability<PlayerThirst> PLAYER_THIRST = CapabilityManager.get(new CapabilityToken<PlayerThirst>() {});
+public class PlayerSonicFormProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
+    public static Capability<PlayerSonicForm> PLAYER_SONIC_FORM = CapabilityManager.get(new CapabilityToken<PlayerSonicForm>() {});
 
-    private PlayerThirst thirst = null;
-    private final LazyOptional<PlayerThirst> optional = LazyOptional.of(this::createPlayerThirst);
+    private PlayerSonicForm playerSonicForm = null;
+    private final LazyOptional<PlayerSonicForm> optional = LazyOptional.of(this::createPlayerSonicForm);
 
-    private PlayerThirst createPlayerThirst() {
-        if(this.thirst == null)
-            this.thirst = new PlayerThirst();
+    private PlayerSonicForm createPlayerSonicForm() {
+        if(this.playerSonicForm == null)
+            this.playerSonicForm = new PlayerSonicForm();
 
-        return this.thirst;
+        return this.playerSonicForm;
     }
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction direction) {
-        if(capability == PLAYER_THIRST)
+        if(capability == PLAYER_SONIC_FORM)
         {
             return optional.cast();
         }
@@ -36,12 +36,12 @@ public class PlayerThirstProvider implements ICapabilityProvider, INBTSerializab
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag nbt = new CompoundTag();
-        createPlayerThirst().saveNBTData(nbt);
+        createPlayerSonicForm().saveNBTData(nbt);
         return nbt;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        createPlayerThirst().loadNBTData(nbt);
+        createPlayerSonicForm().loadNBTData(nbt);
     }
 }

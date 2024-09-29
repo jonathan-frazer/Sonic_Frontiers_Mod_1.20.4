@@ -8,7 +8,7 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
-import net.sonicrushxii.beyondthehorizon.network.sync.SyncThirstS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.test.TestPacket;
 
 public class PacketHandler {
@@ -23,7 +23,7 @@ public class PacketHandler {
 
         //Sync Packets
         {
-            INSTANCE.messageBuilder(SyncThirstS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(SyncThirstS2C::encode).decoder(SyncThirstS2C::new).consumerMainThread(SyncThirstS2C::handle).add();
+            INSTANCE.messageBuilder(SyncPlayerFormS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(SyncPlayerFormS2C::encode).decoder(SyncPlayerFormS2C::new).consumerMainThread(SyncPlayerFormS2C::handle).add();
         }
 
         //Base form

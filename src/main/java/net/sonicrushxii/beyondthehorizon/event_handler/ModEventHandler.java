@@ -8,7 +8,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerThirstProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 
 @Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID)
 public class ModEventHandler {
@@ -16,8 +16,9 @@ public class ModEventHandler {
     public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event)
     {
         if(event.getObject() instanceof Player){
-            if(!event.getObject().getCapability(PlayerThirstProvider.PLAYER_THIRST).isPresent()){
-                event.addCapability(new ResourceLocation(BeyondTheHorizon.MOD_ID, "properties"), new PlayerThirstProvider());
+            //Add Other Capabilities from here
+            if(!event.getObject().getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).isPresent()){
+                event.addCapability(new ResourceLocation(BeyondTheHorizon.MOD_ID, "properties"), new PlayerSonicFormProvider());
             }
         }
     }
@@ -25,8 +26,9 @@ public class ModEventHandler {
     @SubscribeEvent
     public static void onPlayerCloned(PlayerEvent.Clone event){
         if(event.isWasDeath()){
-            event.getOriginal().getCapability(PlayerThirstProvider.PLAYER_THIRST).ifPresent(oldStore->{
-                event.getOriginal().getCapability(PlayerThirstProvider.PLAYER_THIRST).ifPresent(newStore->{
+            //Add Other Capabilities from here
+            event.getOriginal().getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(oldStore->{
+                event.getOriginal().getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(newStore->{
                     newStore.copyFrom(oldStore);
                 });
             });
