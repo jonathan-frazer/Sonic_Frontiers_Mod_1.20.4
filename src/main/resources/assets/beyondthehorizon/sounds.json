@@ -1,0 +1,32 @@
+{
+  "double_jump": {
+    "subtitles": "sounds.sonic.baseform.double_jump",
+    "sounds": [
+      "beyondthehorizon:baseform/double_jump_sfx"
+    ]
+  },
+  "danger_sense": {
+    "subtitles": "sounds.sonic.baseform.danger_sense",
+    "sounds": [
+      "beyondthehorizon:baseform/danger_sense_sfx"
+    ]
+  },
+  "air_boost": {
+    "subtitles": "sounds.sonic.baseform.air_boost",
+    "sounds": [
+      "beyondthehorizon:baseform/air_boost_sfx"
+    ]
+  },
+  "max_boost": {
+    "subtitles": "sounds.sonic.baseform.max_boost",
+    "sounds": [
+      "beyondthehorizon:baseform/max_boost_sfx"
+    ]
+  },
+  "light_speed_charge": {
+    "subtitles": "sounds.sonic.baseform.light_speed_charge",
+    "sounds": [
+       "beyondthehorizon:baseform/light_speed_charge_sfx"
+    ]
+  }
+}
