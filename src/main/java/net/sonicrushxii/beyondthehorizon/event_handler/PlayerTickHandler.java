@@ -1,7 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.Component;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -29,9 +29,10 @@ public class PlayerTickHandler {
         if (!player.isAlive())
             return;
 
+        CompoundTag playerNBT = player.serializeNBT();
         switch(ClientFormData.getPlayerForm())
         {
-            case BASEFORM -> BaseformHandler.performBaseformClientTick(player);
+            case BASEFORM -> BaseformHandler.performBaseformClientTick(player,playerNBT);
             case SUPERFORM -> SuperformHandler.performSuperformClientTick(player);
             case STARFALLFORM -> StarfallFormHandler.performStarfallformClientTick(player);
             case HYPERFORM -> HyperformHandler.performHyperformClientTick(player);
@@ -39,14 +40,14 @@ public class PlayerTickHandler {
 
         //Play Second
         if(tickCounter == 0)
-            localPlayerSecond(player);
+            localPlayerSecond(player,playerNBT);
     }
 
-    private void localPlayerSecond(LocalPlayer player)
+    private void localPlayerSecond(LocalPlayer player, CompoundTag playerNBT)
     {
         switch(ClientFormData.getPlayerForm())
         {
-            case BASEFORM -> BaseformHandler.performBaseformClientSecond(player);
+            case BASEFORM -> BaseformHandler.performBaseformClientSecond(player,playerNBT);
             case SUPERFORM -> SuperformHandler.performSuperformClientSecond(player);
             case STARFALLFORM -> StarfallFormHandler.performStarfallformClientSecond(player);
             case HYPERFORM -> HyperformHandler.performHyperformClientSecond(player);
@@ -58,9 +59,10 @@ public class PlayerTickHandler {
         if (!player.isAlive())
             return;
 
+        CompoundTag playerNBT = player.serializeNBT();
         switch(ClientFormData.getPlayerForm())
         {
-            case BASEFORM -> BaseformHandler.performBaseformServerTick(player);
+            case BASEFORM -> BaseformHandler.performBaseformServerTick(player,playerNBT);
             case SUPERFORM -> SuperformHandler.performSuperformServerTick(player);
             case STARFALLFORM -> StarfallFormHandler.performStarfallformServerTick(player);
             case HYPERFORM -> HyperformHandler.performHyperformServerTick(player);
@@ -69,15 +71,15 @@ public class PlayerTickHandler {
         ++tickCounter;
         if (tickCounter >= TICKS_PER_SECOND) {
             tickCounter = 0;
-            serverPlayerSecond(player);
+            serverPlayerSecond(player,playerNBT);
         }
     }
 
-    private void serverPlayerSecond(ServerPlayer player)
+    private void serverPlayerSecond(ServerPlayer player, CompoundTag playerNBT)
     {
         switch(ClientFormData.getPlayerForm())
         {
-            case BASEFORM -> BaseformHandler.performBaseformServerSecond(player);
+            case BASEFORM -> BaseformHandler.performBaseformServerSecond(player,playerNBT);
             case SUPERFORM -> SuperformHandler.performSuperformServerSecond(player);
             case STARFALLFORM -> StarfallFormHandler.performStarfallformServerSecond(player);
             case HYPERFORM -> HyperformHandler.performHyperformServerSecond(player);

@@ -16,10 +16,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
-import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
-import net.sonicrushxii.beyondthehorizon.event_handler.LoginHandler;
-import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
-import net.sonicrushxii.beyondthehorizon.event_handler.ServerTickHandler;
+import net.sonicrushxii.beyondthehorizon.event_handler.*;
 import net.sonicrushxii.beyondthehorizon.modded.ModCreativeModeTabs;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
@@ -47,6 +44,7 @@ public class BeyondTheHorizon
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new LoginHandler());
+        MinecraftForge.EVENT_BUS.register(new FallDamageHandler());
         MinecraftForge.EVENT_BUS.register(new ServerTickHandler());
         MinecraftForge.EVENT_BUS.register(new PlayerTickHandler());
         MinecraftForge.EVENT_BUS.register(new Scheduler());

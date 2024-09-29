@@ -9,7 +9,7 @@ public class BaseformProperties extends FormProperties {
     public BaseformProperties()
     {
         super();
-        hasDoubleJump = false;
+        hasDoubleJump = true;
     }
 
     public BaseformProperties(CompoundTag nbt)

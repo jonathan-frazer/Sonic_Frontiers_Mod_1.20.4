@@ -16,10 +16,11 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJumpEnd;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 public class BaseformHandler
 {
@@ -82,25 +83,34 @@ public class BaseformHandler
         }
     }
 
-    public static void performBaseformClientTick(LocalPlayer player)
-    {if(ClientFormData.getPlayerFormDetails() instanceof BaseformProperties baseformProperties)
+    public static void performBaseformClientTick(LocalPlayer player, CompoundTag playerNBT)
     {
-        //Test KeyPress
-        if(KeyBindings.INSTANCE.useAbility1.consumeClick())
+        BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
+        //Passive Abilities
+        //Double Jump
         {
-            System.out.println(baseformProperties.hasDoubleJump);
+            if (KeyBindings.INSTANCE.doubleJump.consumeClick()
+                    && !player.onGround() && !player.isSpectator()
+                    && baseformProperties.hasDoubleJump
+                    && playerNBT.getCompound("abilities").getByte("flying") == 0) {
+                PacketHandler.sendToServer(new DoubleJump());
+            }
+
+            if (!baseformProperties.hasDoubleJump && player.onGround()) {
+                PacketHandler.sendToServer(new DoubleJumpEnd());
+            }
         }
-    }}
+    }
 
-    public static void performBaseformClientSecond(LocalPlayer player) {}
+    public static void performBaseformClientSecond(LocalPlayer player, CompoundTag playerNBT) {}
 
 
-    public static void performBaseformServerTick(ServerPlayer player)
+    public static void performBaseformServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
 
     }
 
-    public static void performBaseformServerSecond(ServerPlayer player) {}
+    public static void performBaseformServerSecond(ServerPlayer player, CompoundTag playerNBT) {}
 
     public static void performBaseformDeactivation(ServerPlayer player)
     {
