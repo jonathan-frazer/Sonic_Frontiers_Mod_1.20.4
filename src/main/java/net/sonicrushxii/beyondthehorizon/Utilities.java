@@ -1,8 +1,13 @@
 package net.sonicrushxii.beyondthehorizon;
 
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -13,6 +18,48 @@ import java.util.Random;
 public class Utilities {
 
     static Random random = new Random();
+
+    static CompoundTag baseformArmorNBTTag; static {
+        baseformArmorNBTTag = new CompoundTag();
+        ListTag enchantmentList = new ListTag();
+        CompoundTag enchantment = new CompoundTag();
+        enchantment.putString("id", "minecraft:binding_curse");
+        enchantment.putShort("lvl", (short) 1);
+        enchantmentList.add(enchantment);
+        baseformArmorNBTTag.put("Enchantments", enchantmentList);
+        baseformArmorNBTTag.putInt("HideFlags", 127);
+        baseformArmorNBTTag.putByte("Unbreakable", (byte) 1);
+        baseformArmorNBTTag.putByte("BeyondTheHorizon", (byte) 1);
+    }
+    static ItemStack baseformSonicHead; static {
+        baseformSonicHead = new ItemStack(Items.PLAYER_HEAD);
+        CompoundTag nbt = new CompoundTag();
+
+        // Custom NBT data
+        nbt.putByte("BeyondTheHorizon", (byte) 2);
+
+        // SkullOwner tag
+        CompoundTag skullOwner = new CompoundTag();
+        CompoundTag properties = new CompoundTag();
+        ListTag textures = new ListTag();
+        CompoundTag texture = new CompoundTag();
+        texture.putString("Value", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTBjN2NlZWNjODliNTY0MjNhOWU4YWFiMTE3NjRkZTI5MDIyNjU4MzA5YTUyNjY2M2JmMzQyNGY0N2NhZDlmOCJ9fX0=");
+        textures.add(texture);
+        properties.put("textures", textures);
+        skullOwner.put("Properties", properties);
+        skullOwner.putIntArray("Id", new int[]{512370214, -95272899, -2003262887, 1067375885});
+        nbt.put("SkullOwner", skullOwner);
+
+        // Display tag
+        CompoundTag display = new CompoundTag();
+        ListTag lore = new ListTag();
+        lore.add(StringTag.valueOf("{\"text\":\"Adapted from Sonic Frontiers\",\"color\": \"light_purple\"}"));
+        display.put("Lore", lore);
+        display.putString("Name", "{\"text\":\"Sonic Head\",\"color\": \"blue\",\"italic\": false}");
+        nbt.put("display", display);
+
+        baseformSonicHead.setTag(nbt);
+    }
 
     public static final HashSet<String> passableBlocks =
             new HashSet<>(Arrays.asList(

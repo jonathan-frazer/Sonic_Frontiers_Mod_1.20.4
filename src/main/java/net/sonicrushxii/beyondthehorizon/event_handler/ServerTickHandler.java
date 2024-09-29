@@ -3,7 +3,6 @@ package net.sonicrushxii.beyondthehorizon.event_handler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -17,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
 
 import java.lang.reflect.Field;
 
@@ -92,36 +92,8 @@ public class ServerTickHandler {
                                             crafted = true;
                                             //Spawn Head
                                             {
-                                                ItemStack sonicHead = new ItemStack(Items.PLAYER_HEAD);
-                                                CompoundTag nbt = new CompoundTag();
-
-                                                // Custom NBT data
-                                                nbt.putByte("BeyondTheHorizon", (byte) 2);
-
-                                                // SkullOwner tag
-                                                CompoundTag skullOwner = new CompoundTag();
-                                                CompoundTag properties = new CompoundTag();
-                                                ListTag textures = new ListTag();
-                                                CompoundTag texture = new CompoundTag();
-                                                texture.putString("Value", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTBjN2NlZWNjODliNTY0MjNhOWU4YWFiMTE3NjRkZTI5MDIyNjU4MzA5YTUyNjY2M2JmMzQyNGY0N2NhZDlmOCJ9fX0=");
-                                                textures.add(texture);
-                                                properties.put("textures", textures);
-                                                skullOwner.put("Properties", properties);
-                                                skullOwner.putIntArray("Id", new int[]{512370214, -95272899, -2003262887, 1067375885});
-                                                nbt.put("SkullOwner", skullOwner);
-
-                                                // Display tag
-                                                CompoundTag display = new CompoundTag();
-                                                ListTag lore = new ListTag();
-                                                lore.add(StringTag.valueOf("{\"text\":\"Adapted from Sonic Frontiers\",\"color\": \"light_purple\"}"));
-                                                display.put("Lore", lore);
-                                                display.putString("Name", "{\"text\":\"Sonic Head\",\"color\": \"blue\",\"italic\": false}");
-                                                nbt.put("display", display);
-
-                                                sonicHead.setTag(nbt);
-
                                                 //Instead of Killing it, Transform the Beacon into the sonic head
-                                                itemEntity.setItem(sonicHead);
+                                                itemEntity.setItem(BaseformHandler.baseformSonicHead);
                                                 itemEntity.setDeltaMovement(0,0.1,0);
                                             }
                                             //Spawn Fireworks

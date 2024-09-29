@@ -27,7 +27,7 @@ public class DoubleJumpEnd {
                     if(player != null) {
                         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
                             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
-                            baseformProperties.hasDoubleJump = true;
+                            baseformProperties.restoreDoubleJump();
                             PacketHandler.sendToPlayer(player,
                                     new SyncPlayerFormS2C(
                                             playerSonicForm.getCurrentForm(),

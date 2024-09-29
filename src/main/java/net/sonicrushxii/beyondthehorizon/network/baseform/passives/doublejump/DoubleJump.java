@@ -36,7 +36,7 @@ public class DoubleJump {
                             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
                             //Modify Tags
-                            baseformProperties.hasDoubleJump = false;
+                            baseformProperties.consumeDoubleJump();
                             PacketHandler.sendToPlayer(player,
                                     new SyncPlayerFormS2C(
                                             playerSonicForm.getCurrentForm(),

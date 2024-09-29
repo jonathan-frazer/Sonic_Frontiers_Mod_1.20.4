@@ -4,6 +4,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -11,6 +12,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
@@ -24,36 +26,67 @@ import java.util.Iterator;
 
 public class BaseformHandler
 {
+    public static CompoundTag baseformArmorNBTTag; static {
+    baseformArmorNBTTag = new CompoundTag();
+    ListTag enchantmentList = new ListTag();
+    CompoundTag enchantment = new CompoundTag();
+    enchantment.putString("id", "minecraft:binding_curse");
+    enchantment.putShort("lvl", (short) 1);
+    enchantmentList.add(enchantment);
+    baseformArmorNBTTag.put("Enchantments", enchantmentList);
+    baseformArmorNBTTag.putInt("HideFlags", 127);
+    baseformArmorNBTTag.putByte("Unbreakable", (byte) 1);
+    baseformArmorNBTTag.putByte("BeyondTheHorizon", (byte) 1);
+}
+    public static ItemStack baseformSonicHead; static {
+    baseformSonicHead = new ItemStack(Items.PLAYER_HEAD);
+    CompoundTag nbt = new CompoundTag();
+
+    // Custom NBT data
+    nbt.putByte("BeyondTheHorizon", (byte) 2);
+
+    // SkullOwner tag
+    CompoundTag skullOwner = new CompoundTag();
+    CompoundTag properties = new CompoundTag();
+    ListTag textures = new ListTag();
+    CompoundTag texture = new CompoundTag();
+    texture.putString("Value", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTBjN2NlZWNjODliNTY0MjNhOWU4YWFiMTE3NjRkZTI5MDIyNjU4MzA5YTUyNjY2M2JmMzQyNGY0N2NhZDlmOCJ9fX0=");
+    textures.add(texture);
+    properties.put("textures", textures);
+    skullOwner.put("Properties", properties);
+    skullOwner.putIntArray("Id", new int[]{512370214, -95272899, -2003262887, 1067375885});
+    nbt.put("SkullOwner", skullOwner);
+
+    // Display tag
+    CompoundTag display = new CompoundTag();
+    ListTag lore = new ListTag();
+    lore.add(StringTag.valueOf("{\"text\":\"Adapted from Sonic Frontiers\",\"color\": \"light_purple\"}"));
+    display.put("Lore", lore);
+    display.putString("Name", "{\"text\":\"Sonic Head\",\"color\": \"blue\",\"italic\": false}");
+    nbt.put("display", display);
+
+    baseformSonicHead.setTag(nbt);
+}
+
     public static void performBaseformActivation(ServerPlayer player)
     {
         //Equip Armor
         //SET ARMOR NBT DATA(COMMON)
         {
-            CompoundTag nbtData = new CompoundTag();
-            ListTag enchantmentList = new ListTag();
-            CompoundTag enchantment = new CompoundTag();
-            enchantment.putString("id", "minecraft:binding_curse");
-            enchantment.putShort("lvl", (short) 1);
-            enchantmentList.add(enchantment);
-            nbtData.put("Enchantments", enchantmentList);
-            nbtData.putInt("HideFlags", 127);
-            nbtData.putByte("Unbreakable", (byte) 1);
-            nbtData.putByte("BeyondTheHorizon", (byte) 1);
-
             Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
             if (armorItems.next().isEmpty()) {
                 ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_BOOTS.get());
-                itemToPlace.setTag(nbtData);
+                itemToPlace.setTag(baseformArmorNBTTag);
                 player.setItemSlot(EquipmentSlot.FEET, itemToPlace);
             }
             if (armorItems.next().isEmpty()) {
                 ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_LEGGINGS.get());
-                itemToPlace.setTag(nbtData);
+                itemToPlace.setTag(baseformArmorNBTTag);
                 player.setItemSlot(EquipmentSlot.LEGS, itemToPlace);
             }
             if (armorItems.next().isEmpty()) {
                 ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_CHESTPLATE.get());
-                itemToPlace.setTag(nbtData);
+                itemToPlace.setTag(baseformArmorNBTTag);
                 player.setItemSlot(EquipmentSlot.CHEST, itemToPlace);
             }
         }
@@ -91,12 +124,12 @@ public class BaseformHandler
         {
             if (KeyBindings.INSTANCE.doubleJump.consumeClick()
                     && !player.onGround() && !player.isSpectator()
-                    && baseformProperties.hasDoubleJump
+                    && baseformProperties.hasDoubleJump()
                     && playerNBT.getCompound("abilities").getByte("flying") == 0) {
                 PacketHandler.sendToServer(new DoubleJump());
             }
 
-            if (!baseformProperties.hasDoubleJump && player.onGround()) {
+            if (!baseformProperties.hasDoubleJump() && player.onGround()) {
                 PacketHandler.sendToServer(new DoubleJumpEnd());
             }
         }
@@ -116,39 +149,26 @@ public class BaseformHandler
     {
         //Remove Armor
         {
-            //SET ARMOR NBT DATA(COMMON)
-            CompoundTag nbtData = new CompoundTag();
-            ListTag enchantmentList = new ListTag();
-            CompoundTag enchantment = new CompoundTag();
-            enchantment.putString("id", "minecraft:binding_curse");
-            enchantment.putShort("lvl", (short) 1);
-            enchantmentList.add(enchantment);
-            nbtData.put("Enchantments", enchantmentList);
-            nbtData.putInt("HideFlags", 127);
-            nbtData.putByte("Unbreakable", (byte) 1);
-            nbtData.putByte("BeyondTheHorizon", (byte) 1);
-
             //Get Armor Items
             Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
 
             //Delete Boots
             ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_BOOTS.get());
-            itemToPlace.setTag(nbtData);
+            itemToPlace.setTag(baseformArmorNBTTag);
             if(ItemStack.isSameItemSameTags(armorItems.next(),itemToPlace))
                 player.setItemSlot(EquipmentSlot.FEET,ItemStack.EMPTY);
 
             //Delete Leggings
             itemToPlace = new ItemStack(ModItems.BASEFORM_LEGGINGS.get());
-            itemToPlace.setTag(nbtData);
+            itemToPlace.setTag(baseformArmorNBTTag);
             if(ItemStack.isSameItemSameTags(armorItems.next(),itemToPlace))
                 player.setItemSlot(EquipmentSlot.LEGS,ItemStack.EMPTY);
 
             //Delete Chestplate
             itemToPlace = new ItemStack(ModItems.BASEFORM_CHESTPLATE.get());
-            itemToPlace.setTag(nbtData);
+            itemToPlace.setTag(baseformArmorNBTTag);
             if(ItemStack.isSameItemSameTags(armorItems.next(),itemToPlace))
                 player.setItemSlot(EquipmentSlot.CHEST,ItemStack.EMPTY);
-
         }
 
         //Remove Tags
