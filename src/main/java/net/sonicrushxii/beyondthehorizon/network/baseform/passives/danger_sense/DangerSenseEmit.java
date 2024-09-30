@@ -74,7 +74,8 @@ public class DangerSenseEmit {
                     UUID aggro = null;
                     if (mob.getTarget() != null) aggro = mob.getTarget().getUUID();
                     if (aggro != null && aggro.equals(player.getUUID())) {
-                        if (baseformProperties.dangerSensePlaying == false) {
+                        if (!baseformProperties.dangerSensePlaying)
+                        {
                             //Play Sound
                             PacketHandler.sendToPlayer(player, new PlayerPlaySoundPacketS2C(
                                     ModSounds.DANGER_SENSE.get().getLocation())

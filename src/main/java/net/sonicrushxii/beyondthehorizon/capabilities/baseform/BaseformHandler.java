@@ -24,6 +24,7 @@ import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
@@ -32,6 +33,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.Ste
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJumpEnd;
+import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.VirtualSlotSyncS2C;
 
@@ -195,12 +197,20 @@ public class BaseformHandler
                     PacketHandler.sendToServer(new StepDownDouble());
             }
         }
+
         //Danger Sense
+        //Server Second
+
+        //Hunger
+        //Server Second
 
 
     }
 
-    public static void performBaseformClientSecond(LocalPlayer player, CompoundTag playerNBT) {}
+    public static void performBaseformClientSecond(LocalPlayer player, CompoundTag playerNBT)
+    {
+
+    }
 
 
     public static void performBaseformServerTick(ServerPlayer player, CompoundTag playerNBT)
@@ -209,7 +219,12 @@ public class BaseformHandler
     }
 
     public static void performBaseformServerSecond(ServerPlayer player, CompoundTag playerNBT) {
+        //Danger Sense
         DangerSenseEmit.performDangerSenseEmit(player);
+
+        //Subdue Hunger
+        if(player.getFoodData().getFoodLevel() <= 8)
+            player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
     }
 
     public static void performBaseformDeactivation(ServerPlayer player)
@@ -247,8 +262,17 @@ public class BaseformHandler
                 //Auto Step
                 player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(0.0);
 
-                //
+                //Danger Sense
+                PacketHandler.sendToPlayer(player, new PlayerStopSoundPacketS2C(
+                                ModSounds.DANGER_SENSE.get().getLocation()
+                        )
+                );
+
+                //Hunger
             }
+
+            //Slot 0
+
         }
         //Remove Data
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
