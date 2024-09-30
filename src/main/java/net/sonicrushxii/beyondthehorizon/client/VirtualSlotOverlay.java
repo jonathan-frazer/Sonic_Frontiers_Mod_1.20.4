@@ -115,7 +115,6 @@ public class VirtualSlotOverlay {
 
         BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
         byte[] cooldownArray = baseformProperties.getAllCooldowns();
-        byte cooldownIndex = 0;
 
         String slotName;
         List<Ability> iconTextures;

@@ -29,6 +29,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDownDouble;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJumpEnd;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -207,7 +208,9 @@ public class BaseformHandler
 
     }
 
-    public static void performBaseformServerSecond(ServerPlayer player, CompoundTag playerNBT) {}
+    public static void performBaseformServerSecond(ServerPlayer player, CompoundTag playerNBT) {
+        DangerSenseEmit.performDangerSenseEmit(player);
+    }
 
     public static void performBaseformDeactivation(ServerPlayer player)
     {

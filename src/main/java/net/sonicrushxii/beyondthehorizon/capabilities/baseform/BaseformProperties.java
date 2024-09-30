@@ -8,12 +8,14 @@ public class BaseformProperties extends FormProperties {
 
     public boolean hasDoubleJump;
     public boolean sprintFlag;
+    public boolean dangerSensePlaying;
 
     public BaseformProperties()
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
         hasDoubleJump = true;
         sprintFlag = false;
+        dangerSensePlaying = false;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -24,17 +26,21 @@ public class BaseformProperties extends FormProperties {
         //Sonic Info
         hasDoubleJump = nbt.getBoolean("hasDoubleJump");
         sprintFlag = nbt.getBoolean("isSprinting");
+        dangerSensePlaying = nbt.getBoolean("dangerSensePlaying");
     }
 
     @Override
-    public CompoundTag serialize() {
+    public CompoundTag serialize()
+    {
         CompoundTag nbt = new CompoundTag();
+
         //Cooldowns
         nbt.putByteArray("AbilityCooldowns",abilityCooldowns);
 
         //Sonic Info
         nbt.putBoolean("hasDoubleJump",hasDoubleJump);
         nbt.putBoolean("isSprinting",sprintFlag);
+        nbt.putBoolean("dangerSensePlaying",dangerSensePlaying);
 
         return nbt;
     }
