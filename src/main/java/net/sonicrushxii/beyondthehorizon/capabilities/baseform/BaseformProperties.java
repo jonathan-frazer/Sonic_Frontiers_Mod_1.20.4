@@ -5,12 +5,15 @@ import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
 
 public class BaseformProperties extends FormProperties {
     private byte[] abilityCooldowns;
-    private boolean hasDoubleJump;
+
+    public boolean hasDoubleJump;
+    public boolean sprintFlag;
 
     public BaseformProperties()
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
         hasDoubleJump = true;
+        sprintFlag = false;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -20,6 +23,7 @@ public class BaseformProperties extends FormProperties {
 
         //Sonic Info
         hasDoubleJump = nbt.getBoolean("hasDoubleJump");
+        sprintFlag = nbt.getBoolean("isSprinting");
     }
 
     @Override
@@ -30,6 +34,7 @@ public class BaseformProperties extends FormProperties {
 
         //Sonic Info
         nbt.putBoolean("hasDoubleJump",hasDoubleJump);
+        nbt.putBoolean("isSprinting",sprintFlag);
 
         return nbt;
     }
@@ -37,10 +42,6 @@ public class BaseformProperties extends FormProperties {
     //Get Cooldowns
     public byte[] getAllCooldowns() {return abilityCooldowns;}
 
-    //Double Jump
-    public boolean hasDoubleJump() {return hasDoubleJump;}
-    public void consumeDoubleJump() {hasDoubleJump=false;}
-    public void restoreDoubleJump() {hasDoubleJump=true;}
 
 
 }

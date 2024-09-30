@@ -1,7 +1,9 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -13,17 +15,28 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
+import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDownDouble;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJumpEnd;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.VirtualSlotSyncS2C;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class BaseformHandler
 {
@@ -91,7 +104,7 @@ public class BaseformHandler
                 player.setItemSlot(EquipmentSlot.CHEST, itemToPlace);
             }
         }
-        //Add Tag
+        //Add Data
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
             playerSonicForm.activateBaseForm();
             PacketHandler.sendToPlayer(player,
@@ -122,21 +135,66 @@ public class BaseformHandler
 
     public static void performBaseformClientTick(LocalPlayer player, CompoundTag playerNBT)
     {
+        Minecraft minecraft = Minecraft.getInstance();
+        Level level = player.level();
+
+        Vec3 playerDirCentre = Utilities.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
+        BlockPos centrePos = player.blockPosition().offset(
+                (int) Math.round(playerDirCentre.x),
+                (Math.round(player.getY()) > player.getY()) ? 1 : 0,
+                (int) Math.round(playerDirCentre.z)
+        );
+
         BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
+
         //Passive Abilities
+        //General Sprinting
+        {
+            //It handles Auto Step,
+            if(player.isSprinting() && baseformProperties.sprintFlag == false)
+                PacketHandler.sendToServer(new StartSprint());
+            if(!player.isSprinting() && baseformProperties.sprintFlag == true)
+                PacketHandler.sendToServer(new StopSprint());
+
+        }
         //Double Jump
         {
             if (KeyBindings.INSTANCE.doubleJump.consumeClick()
                     && !player.onGround() && !player.isSpectator()
-                    && baseformProperties.hasDoubleJump()
+                    && baseformProperties.hasDoubleJump
                     && playerNBT.getCompound("abilities").getByte("flying") == 0) {
                 PacketHandler.sendToServer(new DoubleJump());
             }
 
-            if (!baseformProperties.hasDoubleJump() && player.onGround()) {
+            if (!baseformProperties.hasDoubleJump && player.onGround()) {
                 PacketHandler.sendToServer(new DoubleJumpEnd());
             }
         }
+        //Auto Step
+        {
+            if(player.isSprinting())
+            {
+                List<String> blocksinFront = new ArrayList<>();
+                blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -3, 0)).getBlock()) + "");
+                blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -2, 0)).getBlock()) + "");
+                blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -1, 0)).getBlock()) + "");
+                blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos).getBlock()) + "");
+
+                if (Utilities.passableBlocks.contains(blocksinFront.get(3))
+                        && Utilities.passableBlocks.contains(blocksinFront.get(2))
+                        && !Utilities.passableBlocks.contains(blocksinFront.get(1))
+                        && player.onGround())
+                    PacketHandler.sendToServer(new StepDown());
+
+                if (Utilities.passableBlocks.contains(blocksinFront.get(3))
+                        && Utilities.passableBlocks.contains(blocksinFront.get(2))
+                        && Utilities.passableBlocks.contains(blocksinFront.get(1))
+                        && !Utilities.passableBlocks.contains(blocksinFront.get(0))
+                        && player.onGround())
+                    PacketHandler.sendToServer(new StepDownDouble());
+            }
+        }
+        //Danger Sense
 
 
     }
@@ -177,7 +235,19 @@ public class BaseformHandler
                 player.setItemSlot(EquipmentSlot.CHEST,ItemStack.EMPTY);
         }
 
-        //Remove Tags
+        //Clear Each Ability's Effects
+        {
+            //Passives
+            {
+                //Double Jump
+
+                //Auto Step
+                player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(0.0);
+
+                //
+            }
+        }
+        //Remove Data
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
             playerSonicForm.deactivateBaseForm();
             PacketHandler.sendToPlayer(player,

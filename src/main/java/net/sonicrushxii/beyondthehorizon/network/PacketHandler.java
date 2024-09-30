@@ -8,6 +8,10 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDownDouble;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.*;
 import net.sonicrushxii.beyondthehorizon.network.sync.*;
 
@@ -33,8 +37,19 @@ public class PacketHandler {
 
         //Base form
         {
-            INSTANCE.messageBuilder(DoubleJump.class, NetworkDirection.PLAY_TO_SERVER).encoder(DoubleJump::encode).decoder(DoubleJump::new).consumerMainThread(DoubleJump::handle).add();
-            INSTANCE.messageBuilder(DoubleJumpEnd.class, NetworkDirection.PLAY_TO_SERVER).encoder(DoubleJumpEnd::encode).decoder(DoubleJumpEnd::new).consumerMainThread(DoubleJumpEnd::handle).add();
+            //Passives
+            INSTANCE.messageBuilder(StartSprint.class, NetworkDirection.PLAY_TO_SERVER).encoder(StartSprint::encode).decoder(StartSprint::new).consumerMainThread(StartSprint::handle).add();
+            INSTANCE.messageBuilder(StopSprint.class, NetworkDirection.PLAY_TO_SERVER).encoder(StopSprint::encode).decoder(StopSprint::new).consumerMainThread(StopSprint::handle).add();
+
+                //Double Jump
+                INSTANCE.messageBuilder(DoubleJump.class, NetworkDirection.PLAY_TO_SERVER).encoder(DoubleJump::encode).decoder(DoubleJump::new).consumerMainThread(DoubleJump::handle).add();
+                INSTANCE.messageBuilder(DoubleJumpEnd.class, NetworkDirection.PLAY_TO_SERVER).encoder(DoubleJumpEnd::encode).decoder(DoubleJumpEnd::new).consumerMainThread(DoubleJumpEnd::handle).add();
+
+                //Auto Step
+                INSTANCE.messageBuilder(StepDown.class, NetworkDirection.PLAY_TO_SERVER).encoder(StepDown::encode).decoder(StepDown::new).consumerMainThread(StepDown::handle).add();
+                INSTANCE.messageBuilder(StepDownDouble.class, NetworkDirection.PLAY_TO_SERVER).encoder(StepDownDouble::encode).decoder(StepDownDouble::new).consumerMainThread(StepDownDouble::handle).add();
+
+
         }
 
         //Super form
