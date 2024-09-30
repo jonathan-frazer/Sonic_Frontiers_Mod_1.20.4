@@ -3,7 +3,9 @@ package net.sonicrushxii.beyondthehorizon;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -16,6 +18,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
 import net.sonicrushxii.beyondthehorizon.event_handler.*;
 import net.sonicrushxii.beyondthehorizon.modded.ModCreativeModeTabs;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
@@ -99,6 +102,13 @@ public class BeyondTheHorizon
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        }
+
+        @SubscribeEvent
+        public static void registerGUIOverlays(RegisterGuiOverlaysEvent event) {
+            event.registerBelow(VanillaGuiOverlay.DEBUG_TEXT.id(),
+                    "ability_hud",
+                    VirtualSlotOverlay.ABILITY_HUD);
         }
 
         @SubscribeEvent

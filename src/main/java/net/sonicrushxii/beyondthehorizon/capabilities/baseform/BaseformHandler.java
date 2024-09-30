@@ -21,6 +21,7 @@ import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJumpEnd;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.VirtualSlotSyncS2C;
 
 import java.util.Iterator;
 
@@ -100,6 +101,9 @@ public class BaseformHandler
                     ));
         });
 
+        //Initialize Virtual Slot Handler
+        PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)7));
+
         //Effects
         {
             player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
@@ -133,6 +137,8 @@ public class BaseformHandler
                 PacketHandler.sendToServer(new DoubleJumpEnd());
             }
         }
+
+
     }
 
     public static void performBaseformClientSecond(LocalPlayer player, CompoundTag playerNBT) {}
@@ -180,6 +186,9 @@ public class BaseformHandler
                             playerSonicForm.getFormProperties()
                     ));
         });
+
+        //Deinitialize Virtual Slot Handler
+        PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)0));
 
         //Effects
         player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.10000000149011612);

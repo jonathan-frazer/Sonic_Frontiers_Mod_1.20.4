@@ -4,46 +4,43 @@ import net.minecraft.nbt.CompoundTag;
 import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
 
 public class BaseformProperties extends FormProperties {
-    private final byte MAX_SLOT_COUNT = (byte)10;
-    private byte currAbilitySlot;
-
+    private byte[] abilityCooldowns;
     private boolean hasDoubleJump;
 
     public BaseformProperties()
     {
-        currAbilitySlot = 0;
+        abilityCooldowns = new byte[BaseformActiveAbility.values().length];
         hasDoubleJump = true;
     }
 
     public BaseformProperties(CompoundTag nbt)
     {
-        currAbilitySlot = nbt.getByte("currAbilitySlot");
+        //Cooldowns
+        abilityCooldowns = nbt.getByteArray("AbilityCooldowns");
+
+        //Sonic Info
         hasDoubleJump = nbt.getBoolean("hasDoubleJump");
     }
 
     @Override
     public CompoundTag serialize() {
         CompoundTag nbt = new CompoundTag();
-        //Current Slot
-        nbt.putByte("currAbilitySlot",currAbilitySlot);
+        //Cooldowns
+        nbt.putByteArray("AbilityCooldowns",abilityCooldowns);
 
+        //Sonic Info
         nbt.putBoolean("hasDoubleJump",hasDoubleJump);
+
         return nbt;
     }
 
-    //Virtual Slot Handling
-    public byte getCurrAbilitySlot(){return currAbilitySlot;}
-    public void incrementAbilitySlot(){
-        currAbilitySlot = (byte) ((currAbilitySlot+1)%MAX_SLOT_COUNT);
-    }
-    public void decrementAbilitySlot(){
-        if(currAbilitySlot == 0)  currAbilitySlot = (byte)(MAX_SLOT_COUNT-1);
-        else currAbilitySlot = (byte)(currAbilitySlot-1);
-    }
+    //Get Cooldowns
+    public byte[] getAllCooldowns() {return abilityCooldowns;}
 
     //Double Jump
     public boolean hasDoubleJump() {return hasDoubleJump;}
     public void consumeDoubleJump() {hasDoubleJump=false;}
     public void restoreDoubleJump() {hasDoubleJump=true;}
+
 
 }
