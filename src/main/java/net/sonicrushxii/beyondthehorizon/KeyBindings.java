@@ -17,21 +17,6 @@ public class KeyBindings {
             InputConstants.getKey(InputConstants.KEY_SPACE,-1),
             CATEGORY
     );
-
-    public final KeyMapping sidestepLeft = new KeyMapping(
-            "key."+ BeyondTheHorizon.MOD_ID+".SideStepLeft",
-            KeyConflictContext.IN_GAME,
-            InputConstants.getKey(InputConstants.KEY_A,-1),
-            CATEGORY
-    );
-
-    public final KeyMapping sidestepRight = new KeyMapping(
-            "key."+ BeyondTheHorizon.MOD_ID+".SideStepRight",
-            KeyConflictContext.IN_GAME,
-            InputConstants.getKey(InputConstants.KEY_D,-1),
-            CATEGORY
-    );
-
     public final KeyMapping toggleDangerSense = new KeyMapping(
             "key."+ BeyondTheHorizon.MOD_ID+".ToggleDangerSense",
             KeyConflictContext.IN_GAME,

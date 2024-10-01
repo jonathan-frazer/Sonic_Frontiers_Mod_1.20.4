@@ -8,9 +8,7 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Boost;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.ResetAirBoost;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.*;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
@@ -67,7 +65,9 @@ public class PacketHandler {
                 INSTANCE.messageBuilder(ResetAirBoost.class, NetworkDirection.PLAY_TO_SERVER).encoder(ResetAirBoost::encode).decoder(ResetAirBoost::new).consumerMainThread(ResetAirBoost::handle).add();
                 //Boost
                 INSTANCE.messageBuilder(Boost.class, NetworkDirection.PLAY_TO_SERVER).encoder(Boost::encode).decoder(Boost::new).consumerMainThread(Boost::handle).add();
-
+                //Quick Step
+                INSTANCE.messageBuilder(SidestepLeft.class, NetworkDirection.PLAY_TO_SERVER).encoder(SidestepLeft::encode).decoder(SidestepLeft::new).consumerMainThread(SidestepLeft::handle).add();
+                INSTANCE.messageBuilder(SidestepRight.class, NetworkDirection.PLAY_TO_SERVER).encoder(SidestepRight::encode).decoder(SidestepRight::new).consumerMainThread(SidestepRight::handle).add();
             }
         }
 

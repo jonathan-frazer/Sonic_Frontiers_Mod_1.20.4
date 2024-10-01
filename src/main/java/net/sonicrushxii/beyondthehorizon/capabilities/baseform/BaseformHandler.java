@@ -29,13 +29,12 @@ import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
+import net.sonicrushxii.beyondthehorizon.client.DoubleTapHandler;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Boost;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.ResetAirBoost;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.*;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
@@ -53,6 +52,10 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BaseformHandler
 {
@@ -67,7 +70,7 @@ public class BaseformHandler
     baseformArmorNBTTag.putInt("HideFlags", 127);
     baseformArmorNBTTag.putByte("Unbreakable", (byte) 1);
     baseformArmorNBTTag.putByte("BeyondTheHorizon", (byte) 1);
-}
+    }
     public static ItemStack baseformSonicHead; static {
     baseformSonicHead = new ItemStack(Items.PLAYER_HEAD);
     CompoundTag nbt = new CompoundTag();
@@ -96,7 +99,7 @@ public class BaseformHandler
     nbt.put("display", display);
 
     baseformSonicHead.setTag(nbt);
-}
+    }
 
     public static void performBaseformActivation(ServerPlayer player)
     {
@@ -256,6 +259,41 @@ public class BaseformHandler
                 //Air Boost
                 else
                     PacketHandler.sendToServer(new AirBoost());
+            }
+
+            //Quickstep
+            //Double Tap Left
+            if(InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_A) &&
+                    !DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft)
+                DoubleTapHandler.pressedLeft = true;
+            if(!InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_A) &&
+                    DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft) {
+                DoubleTapHandler.releasedLeft = true;
+                DoubleTapHandler.scheduleResetLeftPress();
+            }
+            if(InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_A) &&
+                    DoubleTapHandler.pressedLeft && DoubleTapHandler.releasedLeft)
+            {
+                if(baseformProperties.boostLvl >= 1 && player.isSprinting())
+                    PacketHandler.sendToServer(new SidestepLeft());
+                DoubleTapHandler.markDoubleLeftPress();
+            }
+
+            //Double Tap Right
+            if(InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_D) &&
+                    !DoubleTapHandler.pressedRight && !DoubleTapHandler.releasedRight)
+                DoubleTapHandler.pressedRight = true;
+            if(!InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_D) &&
+                    DoubleTapHandler.pressedRight && !DoubleTapHandler.releasedRight) {
+                DoubleTapHandler.releasedRight = true;
+                DoubleTapHandler.scheduleResetRightPress();
+            }
+            if(InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_D) &&
+                    DoubleTapHandler.pressedRight && DoubleTapHandler.releasedRight)
+            {
+                if(baseformProperties.boostLvl >= 1 && player.isSprinting())
+                    PacketHandler.sendToServer(new SidestepRight());
+                DoubleTapHandler.markDoubleRightPress();
             }
         }
     }
