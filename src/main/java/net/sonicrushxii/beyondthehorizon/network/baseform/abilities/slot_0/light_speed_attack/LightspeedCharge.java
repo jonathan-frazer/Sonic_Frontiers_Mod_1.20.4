@@ -14,8 +14,6 @@ import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
-import java.util.function.Supplier;
-
 public class LightspeedCharge {
 
     public LightspeedCharge() {}

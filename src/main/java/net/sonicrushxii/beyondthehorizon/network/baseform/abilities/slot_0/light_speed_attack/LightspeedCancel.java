@@ -14,8 +14,6 @@ import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
-import java.util.function.Supplier;
-
 public class LightspeedCancel {
     public LightspeedCancel() {}
 
