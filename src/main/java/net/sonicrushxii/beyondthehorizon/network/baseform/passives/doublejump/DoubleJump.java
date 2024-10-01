@@ -66,4 +66,3 @@ public class DoubleJump {
         ctx.setPacketHandled(true);
     }
 }
-

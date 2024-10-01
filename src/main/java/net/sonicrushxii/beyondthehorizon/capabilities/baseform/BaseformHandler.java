@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
@@ -7,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -33,6 +35,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDownDouble;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJumpEnd;
@@ -151,6 +154,11 @@ public class BaseformHandler
                 (int) Math.round(playerDirCentre.z)
         );
 
+        final boolean isCtrlDown = (InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_RCONTROL)
+                || InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_LCONTROL));
+        final boolean isShiftDown = (InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_RSHIFT)
+                || InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_LSHIFT));
+
         BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
 
         //Passive Abilities
@@ -202,7 +210,19 @@ public class BaseformHandler
             }
 
             //Danger Sense
-            //Server Second
+            {
+                //Danger Sense Toggle
+                if(KeyBindings.INSTANCE.toggleDangerSense.consumeClick() && isShiftDown && isCtrlDown)
+                {
+                    player.displayClientMessage(
+                            Component.nullToEmpty(
+                                    (baseformProperties.dangerSenseActive)
+                                            ?"Danger Sense Inhibited":"Danger Sense Activated"
+                            ),true);
+                    PacketHandler.sendToServer(new DangerSenseToggle());
+                }
+                //Danger Sense Emit-Server Second
+            }
 
             //Hunger
             //Server Second
@@ -220,7 +240,8 @@ public class BaseformHandler
                     VirtualSlotHandler.getCurrAbility() == 0) {
                 //Air Boost
                 if (!player.onGround())
-                    PacketHandler.sendToServer(new AirBoost());}
+                    PacketHandler.sendToServer(new AirBoost());
+            }
         }
     }
 
@@ -235,9 +256,15 @@ public class BaseformHandler
 
     }
 
-    public static void performBaseformServerSecond(ServerPlayer player, CompoundTag playerNBT) {
+    public static void performBaseformServerSecond(ServerPlayer player, CompoundTag playerNBT)
+    {
+        //Get Data From the Player
+        BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
+
         //Danger Sense
-        DangerSenseEmit.performDangerSenseEmit(player);
+        if(baseformProperties.dangerSenseActive) {
+            DangerSenseEmit.performDangerSenseEmit(player);
+        }
 
         //Subdue Hunger
         if(player.getFoodData().getFoodLevel() <= 8)

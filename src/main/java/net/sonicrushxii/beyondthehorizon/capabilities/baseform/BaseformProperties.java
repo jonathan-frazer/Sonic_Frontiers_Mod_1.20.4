@@ -9,6 +9,7 @@ public class BaseformProperties extends FormProperties {
     //Passives
     public boolean hasDoubleJump;
     public boolean sprintFlag;
+    public boolean dangerSenseActive;
     public boolean dangerSensePlaying;
 
     //Slot 1
@@ -21,6 +22,7 @@ public class BaseformProperties extends FormProperties {
         //Passives
         hasDoubleJump = true;
         sprintFlag = false;
+        dangerSenseActive = true;
         dangerSensePlaying = false;
 
         //Slot 1
@@ -35,6 +37,7 @@ public class BaseformProperties extends FormProperties {
         //Passives
         hasDoubleJump = nbt.getBoolean("hasDoubleJump");
         sprintFlag = nbt.getBoolean("isSprinting");
+        dangerSenseActive = nbt.getBoolean("dangerSenseActive");
         dangerSensePlaying = nbt.getBoolean("dangerSensePlaying");
 
         //Slot 1
@@ -52,6 +55,7 @@ public class BaseformProperties extends FormProperties {
         //Passives
         nbt.putBoolean("hasDoubleJump",hasDoubleJump);
         nbt.putBoolean("isSprinting",sprintFlag);
+        nbt.putBoolean("dangerSenseActive",dangerSenseActive);
         nbt.putBoolean("dangerSensePlaying",dangerSensePlaying);
 
         //Slot 1

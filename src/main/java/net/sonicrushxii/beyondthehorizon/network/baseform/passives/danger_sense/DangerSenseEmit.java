@@ -1,7 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense;
 
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
