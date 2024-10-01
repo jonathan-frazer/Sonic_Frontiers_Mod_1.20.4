@@ -48,7 +48,7 @@ public class AirBoost {
                 PacketHandler.sendToALLPlayers(new ParticleRaycastPacketS2C(
                         new DustParticleOptions(new Vector3f(0.000f,0.000f,1.000f), 2.0f),
                         playerPosition,
-                        playerPosition.add(player.getLookAngle().scale(2*player.getAttribute(Attributes.MOVEMENT_SPEED).getValue()))
+                        playerPosition.add(player.getLookAngle().scale(7*player.getAttribute(Attributes.MOVEMENT_SPEED).getValue()))
                 ));
                 PacketHandler.sendToPlayer(player,new ParticleAuraPacketS2C(
                         ParticleTypes.SONIC_BOOM,
@@ -58,7 +58,7 @@ public class AirBoost {
 
                 //Add Trajectory
                 player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
-                player.addDeltaMovement(player.getLookAngle());
+                player.addDeltaMovement(player.getLookAngle().scale(2*player.getAttribute(Attributes.MOVEMENT_SPEED).getValue()));
                 player.connection.send(new ClientboundSetEntityMotionPacket(player));
             }
 

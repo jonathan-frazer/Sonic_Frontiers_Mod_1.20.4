@@ -311,7 +311,7 @@ public class Utilities {
         Vec3 directionNormalized = direction.normalize();
 
         for (int i = 0; i <= (int) distance*2; i++) {
-            Vec3 point = pos1.add(directionNormalized.scale(i/2.0));
+            Vec3 point = pos1.add(directionNormalized.scale((i+1)/2.0));
             world.addParticle(particleType,
                     point.x, point.y, point.z,
                     0, 0, 0);
