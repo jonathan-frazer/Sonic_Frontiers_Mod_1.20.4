@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
 
 public class BaseformProperties extends FormProperties {
-    private byte[] abilityCooldowns;
+    private final byte[] abilityCooldowns;
 
     //Passives
     public boolean hasDoubleJump;
@@ -14,6 +14,8 @@ public class BaseformProperties extends FormProperties {
 
     //Slot 1
     public byte airBoosts;
+    public byte boostLvl;
+    public boolean isWaterBoosting;
 
     public BaseformProperties()
     {
@@ -24,9 +26,11 @@ public class BaseformProperties extends FormProperties {
         sprintFlag = false;
         dangerSenseActive = true;
         dangerSensePlaying = false;
+        isWaterBoosting = false;
 
         //Slot 1
         airBoosts = 3;
+        boostLvl = 0;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -42,6 +46,8 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 1
         airBoosts = nbt.getByte("AirBoosts");
+        boostLvl = nbt.getByte("BoostLvl");
+        isWaterBoosting = nbt.getBoolean("IsWaterBoosting");
     }
 
     @Override
@@ -60,6 +66,8 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 1
         nbt.putByte("AirBoosts",airBoosts);
+        nbt.putByte("BoostLvl",boostLvl);
+        nbt.putBoolean("IsWaterBoosting",isWaterBoosting);
 
         return nbt;
     }

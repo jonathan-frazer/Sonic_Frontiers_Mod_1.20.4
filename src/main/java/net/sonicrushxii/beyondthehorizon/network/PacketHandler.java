@@ -9,6 +9,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Boost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.ResetAirBoost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
@@ -61,8 +62,12 @@ public class PacketHandler {
 
             //Slot 1
             {
+                //Air Boost
                 INSTANCE.messageBuilder(AirBoost.class, NetworkDirection.PLAY_TO_SERVER).encoder(AirBoost::encode).decoder(AirBoost::new).consumerMainThread(AirBoost::handle).add();
                 INSTANCE.messageBuilder(ResetAirBoost.class, NetworkDirection.PLAY_TO_SERVER).encoder(ResetAirBoost::encode).decoder(ResetAirBoost::new).consumerMainThread(ResetAirBoost::handle).add();
+                //Boost
+                INSTANCE.messageBuilder(Boost.class, NetworkDirection.PLAY_TO_SERVER).encoder(Boost::encode).decoder(Boost::new).consumerMainThread(Boost::handle).add();
+
             }
         }
 

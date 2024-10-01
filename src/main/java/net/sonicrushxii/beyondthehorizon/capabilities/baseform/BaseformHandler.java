@@ -5,10 +5,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -18,6 +21,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -30,6 +34,7 @@ import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Boost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.ResetAirBoost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
@@ -39,9 +44,11 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJumpEnd;
+import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.VirtualSlotSyncS2C;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -227,6 +234,11 @@ public class BaseformHandler
             //Hunger
             //Server Second
 
+            //Can't swim
+            if(player.isInWater()) {
+                player.setSprinting(false);
+            }
+
         }
 
         //Slot 1
@@ -238,8 +250,11 @@ public class BaseformHandler
 
             if(KeyBindings.INSTANCE.useAbility1.consumeClick() &&
                     VirtualSlotHandler.getCurrAbility() == 0) {
+                //Boost
+                if (player.onGround())
+                    PacketHandler.sendToServer(new Boost());
                 //Air Boost
-                if (!player.onGround())
+                else
                     PacketHandler.sendToServer(new AirBoost());
             }
         }
@@ -253,6 +268,143 @@ public class BaseformHandler
 
     public static void performBaseformServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
+        Minecraft minecraft = Minecraft.getInstance();
+        Level level = player.level();
+
+        Vec3 playerDirCentre = Utilities.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
+        BlockPos centrePos = player.blockPosition().offset(
+                (int) Math.round(playerDirCentre.x),
+                (Math.round(player.getY()) > player.getY()) ? 1 : 0,
+                (int) Math.round(playerDirCentre.z)
+        );
+
+        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+            //Get Data From the Player
+            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+
+            //Passive Abilities
+            {
+                //Double Jump
+                //Auto Step
+                //Danger Sense
+                //Hunger
+
+            }
+
+            //Active Abilities
+            {
+                //Boost
+                {
+
+                    //Water Boost
+                    if(player.isSprinting() && !player.isInWater() &&
+                            baseformProperties.boostLvl>=1 && baseformProperties.boostLvl<=3)
+                    {
+                        try {
+                            if (ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
+                                    .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)))
+                            {
+                                //Get Motion
+                                Vec3 lookAngle = player.getLookAngle();
+                                Vec3 playerDirection = new Vec3(lookAngle.x(),0,lookAngle.z());
+
+                                if(baseformProperties.isWaterBoosting == false){
+                                    player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                                    baseformProperties.isWaterBoosting = true;
+
+                                    //Slight upward
+                                    playerDirection = new Vec3(lookAngle.x(), 0.01, lookAngle.z());
+                                }
+
+                                //Move Forward
+                                player.setDeltaMovement(playerDirection.scale(2));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                            }
+                        }
+                        catch(NullPointerException ignored) {}
+                    }
+
+                    //Undo Water Boost
+                    try {
+                        if (baseformProperties.isWaterBoosting)
+                            if (!ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
+                                    .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER))
+                                    ||
+                                    !(baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3)
+                                    ||
+                                    (player.getDeltaMovement().x < 0.5 && player.getDeltaMovement().y < 0.5 && player.getDeltaMovement().z < 0.5)
+                                    ||
+                                    player.isInWater())
+                            {
+                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                baseformProperties.isWaterBoosting = false;
+                            }
+                    }
+                    catch (NullPointerException ignored) {}
+
+                    if(player.isSprinting())
+                    {
+                        //Particles
+                        switch (baseformProperties.boostLvl) {
+                            case 1:
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                                        0.00, 0.05, 0.00,
+                                        0.001, 0.00f, 0.00f, 0.00f, 1,
+                                        true));
+                                break;
+                            case 2:
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        new DustParticleOptions(new Vector3f(1.000f,0.000f,0.000f), 2f),
+                                        0.00, 0.35, 0.00,
+                                        0.001, 0.25f, 0.25f, 0.25f, 4,
+                                        true)
+                                );
+                                break;
+                            case 3:
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        new DustParticleOptions(new Vector3f(0.0f,0.89f,1.00f),1),
+                                        0.00, 1.0, 0.00,
+                                        0.001, 0.35f,1f, 0.35f, 12,
+                                        true)
+                                );
+                                break;
+                            default:
+                        }
+                        if (ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock()).equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)))
+                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    ParticleTypes.FALLING_WATER,
+                                    0.00, 1.0, 0.00,
+                                    0.001, 0.35f,1f, 0.35f, 12,
+                                    true)
+                            );
+
+                        //Wall Boost
+                        if(!Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
+                                && player.getXRot() < -80.0
+                                && baseformProperties.boostLvl>=1 && baseformProperties.boostLvl<=3)
+                        {
+                            //Move Upward
+                            player.setSprinting(false);
+                            player.addDeltaMovement(new Vec3(0,player.getAttribute(Attributes.MOVEMENT_SPEED).getValue()*1.5,0));
+                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                        }
+                    }
+                }
+
+                //Light Speed Attack
+            }
+
+
+            PacketHandler.sendToPlayer(player,
+                    new SyncPlayerFormS2C(
+                            playerSonicForm.getCurrentForm(),
+                            baseformProperties
+                    ));
+
+
+        });
+
 
     }
 
@@ -261,14 +413,17 @@ public class BaseformHandler
         //Get Data From the Player
         BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
 
-        //Danger Sense
-        if(baseformProperties.dangerSenseActive) {
-            DangerSenseEmit.performDangerSenseEmit(player);
-        }
+        //Passive Abilities
+        {
+            //Danger Sense
+            if (baseformProperties.dangerSenseActive) {
+                DangerSenseEmit.performDangerSenseEmit(player);
+            }
 
-        //Subdue Hunger
-        if(player.getFoodData().getFoodLevel() <= 8)
-            player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
+            //Subdue Hunger
+            if (player.getFoodData().getFoodLevel() <= 8)
+                player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
+        }
     }
 
     public static void performBaseformDeactivation(ServerPlayer player)
@@ -317,6 +472,9 @@ public class BaseformHandler
 
             //Slot 1
             {
+                //Reset Boost and Water Boost
+                player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.50);
+                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
 
             }
 

@@ -1,12 +1,18 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.passives;
 
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepUp;
+import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 public class StartSprint {
@@ -19,6 +25,16 @@ public class StartSprint {
 
     public void encode(FriendlyByteBuf buffer){
 
+    }
+
+    public static void sonicBoomEffect(ServerPlayer player) {
+        Level world = player.level();
+        world.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.MAX_BOOST.get(), SoundSource.MASTER, 1.0f, 1.0f);
+
+        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(ParticleTypes.FLASH, 0.0, 1.0, 0.0,
+                0.001, 0.0f, 1, true));
+        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(ParticleTypes.SONIC_BOOM, 0.0, 1.0, 0.0,
+                0.001, 0.0f, 1, true));
     }
 
     public void handle(CustomPayloadEvent.Context ctx) {
@@ -36,10 +52,26 @@ public class StartSprint {
                                             playerSonicForm.getCurrentForm(),
                                             baseformProperties
                                     ));
+
+                            //Activate Auto Step
+                            StepUp.performStepUpActivate(player);
+
+                            //Apply Boost Levels
+                            switch(baseformProperties.boostLvl)
+                            {
+                                case 0: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
+                                    break;
+                                case 1: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.75);
+                                    break;
+                                case 2: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.00);
+                                    break;
+                                case 3: sonicBoomEffect(player);
+                                    player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
+                                    break;
+                            }
                         });
 
-                        //Activate Auto Step
-                        StepUp.performStepUpActivate(player);
+
 
                     }
                 });

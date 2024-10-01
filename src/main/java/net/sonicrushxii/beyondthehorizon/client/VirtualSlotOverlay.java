@@ -70,7 +70,7 @@ public class VirtualSlotOverlay {
             "textures/custom_gui/baseform/wildrush_slot.png");
 
     //Helper Methods and Records
-    private record Ability(ResourceLocation texture, byte cooldown) {}
+    private record Ability(ResourceLocation texture, String sideinfo, byte cooldown) {}
     private static void renderSlot(Ability SLOT_ABILITY, GuiGraphics guiComponent, int x, int y, int[] textureDimensions)
     {
         ResourceLocation SLOT_TEXTURE = SLOT_ABILITY.texture();
@@ -84,6 +84,11 @@ public class VirtualSlotOverlay {
         //Draw the Actual Texture
         guiComponent.blit(SLOT_TEXTURE,x,y,
                 0,0,textureDimensions[0],textureDimensions[1],textureDimensions[0],textureDimensions[1]);
+
+        //Additional Info
+        if(SLOT_ABILITY.sideinfo != null)
+            guiComponent.drawString(Minecraft.getInstance().font, SLOT_ABILITY.sideinfo,
+                    x+5*textureDimensions[0]/4,y+textureDimensions[1]/3,0xFFFFFF);
     }
     private static String shortenName(String currName)
     {
@@ -133,60 +138,60 @@ public class VirtualSlotOverlay {
             case 0 :
                 slotName = "Boost";
                 iconTextures = (Arrays.asList(
-                        new Ability(BOOST_SLOT,cooldownArray[BaseformActiveAbility.BOOST.ordinal()]),
-                        new Ability(LIGHT_SPEED_ATTACK_SLOT,cooldownArray[BaseformActiveAbility.LIGHT_SPEED_ATTACK.ordinal()]),
-                        new Ability(POWER_BOOST_SLOT,cooldownArray[BaseformActiveAbility.POWER_BOOST.ordinal()]))
+                        new Ability(BOOST_SLOT,"Lv. "+baseformProperties.boostLvl,cooldownArray[BaseformActiveAbility.BOOST.ordinal()]),
+                        new Ability(LIGHT_SPEED_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.LIGHT_SPEED_ATTACK.ordinal()]),
+                        new Ability(POWER_BOOST_SLOT,null,cooldownArray[BaseformActiveAbility.POWER_BOOST.ordinal()]))
                 );
                 break;
 
             case 1 :
                 slotName = "Combo";
                 iconTextures = (Arrays.asList(
-                        new Ability(HOMING_ATTACK_SLOT,cooldownArray[BaseformActiveAbility.HOMING_ATTACK.ordinal()]),
-                        new Ability(DODGE_SLOT,cooldownArray[BaseformActiveAbility.DODGE.ordinal()]),
-                        new Ability(MELEE_ATTACK_SLOT,cooldownArray[BaseformActiveAbility.MELEE_ATTACK.ordinal()]),
-                        new Ability(SPEED_BLITZ_SLOT,cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()]),
-                        new Ability(SMASH_HIT_SLOT,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()]))
+                        new Ability(HOMING_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_ATTACK.ordinal()]),
+                        new Ability(DODGE_SLOT,null,cooldownArray[BaseformActiveAbility.DODGE.ordinal()]),
+                        new Ability(MELEE_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.MELEE_ATTACK.ordinal()]),
+                        new Ability(SPEED_BLITZ_SLOT,null,cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()]),
+                        new Ability(SMASH_HIT_SLOT,null,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()]))
                 );
                 break;
 
             case 2 :
                 slotName = "Melee";
                 iconTextures = (Arrays.asList(
-                        new Ability(TORNADO_JUMP_SLOT,cooldownArray[BaseformActiveAbility.TORNADO_JUMP.ordinal()]),
-                        new Ability(SPINSLASH_SLOT,cooldownArray[BaseformActiveAbility.SPINSLASH.ordinal()]),
-                        new Ability(WILDRUSH_SLOT,cooldownArray[BaseformActiveAbility.WILDRUSH.ordinal()]),
-                        new Ability(LOOPKICK_SLOT,cooldownArray[BaseformActiveAbility.LOOPKICK.ordinal()]),
-                        new Ability(STOMP_SLOT,cooldownArray[BaseformActiveAbility.STOMP.ordinal()])
+                        new Ability(TORNADO_JUMP_SLOT,null,cooldownArray[BaseformActiveAbility.TORNADO_JUMP.ordinal()]),
+                        new Ability(SPINSLASH_SLOT,null,cooldownArray[BaseformActiveAbility.SPINSLASH.ordinal()]),
+                        new Ability(WILDRUSH_SLOT,null,cooldownArray[BaseformActiveAbility.WILDRUSH.ordinal()]),
+                        new Ability(LOOPKICK_SLOT,null,cooldownArray[BaseformActiveAbility.LOOPKICK.ordinal()]),
+                        new Ability(STOMP_SLOT,null,cooldownArray[BaseformActiveAbility.STOMP.ordinal()])
                 ));
                 if(player.isShiftKeyDown()){
-                    iconTextures.set(0,new Ability(MIRAGE_SLOT,cooldownArray[BaseformActiveAbility.MIRAGE.ordinal()]));
-                    iconTextures.set(1,new Ability(CYCLONE_KICK_SLOT,cooldownArray[BaseformActiveAbility.CYCLONE_KICK.ordinal()]));
+                    iconTextures.set(0,new Ability(MIRAGE_SLOT,null,cooldownArray[BaseformActiveAbility.MIRAGE.ordinal()]));
+                    iconTextures.set(1,new Ability(CYCLONE_KICK_SLOT,null,cooldownArray[BaseformActiveAbility.CYCLONE_KICK.ordinal()]));
                 }
                 break;
 
             case 3 :
                 slotName = "Ranged";
                 iconTextures = (Arrays.asList(
-                        new Ability(SONIC_BOOM_SLOT,cooldownArray[BaseformActiveAbility.SONIC_BOOM.ordinal()]),
-                        new Ability(CROSS_SLASH_SLOT,cooldownArray[BaseformActiveAbility.CROSS_SLASH.ordinal()]),
-                        new Ability(SONIC_WIND_SLOT,cooldownArray[BaseformActiveAbility.SONIC_WIND.ordinal()]),
-                        new Ability(HOMING_SHOT_SLOT,cooldownArray[BaseformActiveAbility.HOMING_SHOT.ordinal()]))
+                        new Ability(SONIC_BOOM_SLOT,null,cooldownArray[BaseformActiveAbility.SONIC_BOOM.ordinal()]),
+                        new Ability(CROSS_SLASH_SLOT,null,cooldownArray[BaseformActiveAbility.CROSS_SLASH.ordinal()]),
+                        new Ability(SONIC_WIND_SLOT,null,cooldownArray[BaseformActiveAbility.SONIC_WIND.ordinal()]),
+                        new Ability(HOMING_SHOT_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_SHOT.ordinal()]))
                 );
                 break;
 
             case 4 :
                 slotName = "Parry";
                 iconTextures = (Arrays.asList(
-                        new Ability(PARRY_SLOT,cooldownArray[BaseformActiveAbility.PARRY.ordinal()]),
-                        new Ability(GRAND_SLAM_SLOT,cooldownArray[BaseformActiveAbility.GRAND_SLAM.ordinal()]))
+                        new Ability(PARRY_SLOT,null,cooldownArray[BaseformActiveAbility.PARRY.ordinal()]),
+                        new Ability(GRAND_SLAM_SLOT,null,cooldownArray[BaseformActiveAbility.GRAND_SLAM.ordinal()]))
                 );
                 break;
 
             case 5 :
                 slotName = "Cyloop";
                 iconTextures = (Arrays.asList(
-                        new Ability(CYLOOP_SLOT,cooldownArray[BaseformActiveAbility.CYLOOP.ordinal()])
+                        new Ability(CYLOOP_SLOT,null,cooldownArray[BaseformActiveAbility.CYLOOP.ordinal()])
                 )
                 );
                 keyBindings.set(0,KeyBindings.INSTANCE.useSingleAbility.getKey());
@@ -195,7 +200,7 @@ public class VirtualSlotOverlay {
             case 6 :
                 slotName = "Ultimate";
                 iconTextures = (Arrays.asList(
-                        new Ability(PHANTOM_RUSH_SLOT,cooldownArray[BaseformActiveAbility.PHANTOM_RUSH.ordinal()])
+                        new Ability(PHANTOM_RUSH_SLOT,null,cooldownArray[BaseformActiveAbility.PHANTOM_RUSH.ordinal()])
                 ));
                 keyBindings.set(0,KeyBindings.INSTANCE.useSingleAbility.getKey());
                 break;
@@ -203,12 +208,12 @@ public class VirtualSlotOverlay {
             default:
                 slotName = "NULL";
                 iconTextures = (Arrays.asList(
-                        new Ability(EMPTY_SLOT,(byte)0),
-                        new Ability(EMPTY_SLOT,(byte)0),
-                        new Ability(EMPTY_SLOT,(byte)0),
-                        new Ability(EMPTY_SLOT,(byte)0),
-                        new Ability(EMPTY_SLOT,(byte)0),
-                        new Ability(EMPTY_SLOT,(byte)0))
+                        new Ability(EMPTY_SLOT,null,(byte)0),
+                        new Ability(EMPTY_SLOT,null,(byte)0),
+                        new Ability(EMPTY_SLOT,null,(byte)0),
+                        new Ability(EMPTY_SLOT,null,(byte)0),
+                        new Ability(EMPTY_SLOT,null,(byte)0),
+                        new Ability(EMPTY_SLOT,null,(byte)0))
                 );
         }
 

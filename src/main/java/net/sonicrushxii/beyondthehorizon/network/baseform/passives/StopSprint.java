@@ -2,6 +2,7 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.passives;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
@@ -30,6 +31,9 @@ public class StopSprint {
                         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
                             BaseformProperties baseformProperties =  (BaseformProperties) playerSonicForm.getFormProperties();
                             baseformProperties.sprintFlag = false;
+
+                            //Undo Boost
+                            player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.50);
 
                             PacketHandler.sendToPlayer(player,
                                     new SyncPlayerFormS2C(
