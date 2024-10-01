@@ -16,6 +16,7 @@ public class BaseformProperties extends FormProperties {
     public byte airBoosts;
     public byte boostLvl;
     public boolean isWaterBoosting;
+    public byte lightSpeedState;
 
     public BaseformProperties()
     {
@@ -26,11 +27,12 @@ public class BaseformProperties extends FormProperties {
         sprintFlag = false;
         dangerSenseActive = true;
         dangerSensePlaying = false;
-        isWaterBoosting = false;
 
         //Slot 1
         airBoosts = 3;
         boostLvl = 0;
+        isWaterBoosting = false;
+        lightSpeedState = 0;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -48,6 +50,7 @@ public class BaseformProperties extends FormProperties {
         airBoosts = nbt.getByte("AirBoosts");
         boostLvl = nbt.getByte("BoostLvl");
         isWaterBoosting = nbt.getBoolean("IsWaterBoosting");
+        lightSpeedState = nbt.getByte("LightSpeedState");
     }
 
     @Override
@@ -68,13 +71,13 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("AirBoosts",airBoosts);
         nbt.putByte("BoostLvl",boostLvl);
         nbt.putBoolean("IsWaterBoosting",isWaterBoosting);
+        nbt.putByte("LightSpeedState",lightSpeedState);
 
         return nbt;
     }
 
     //Get Cooldowns
     public byte[] getAllCooldowns() {return abilityCooldowns;}
-
-
-
+    public byte getCooldown(BaseformActiveAbility ability){return abilityCooldowns[ability.ordinal()];}
+    public void setCooldown(BaseformActiveAbility ability, byte seconds){abilityCooldowns[ability.ordinal()] = seconds;}
 }

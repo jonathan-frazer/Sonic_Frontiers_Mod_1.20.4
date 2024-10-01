@@ -35,6 +35,10 @@ import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.*;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCancel;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCharge;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
@@ -47,6 +51,8 @@ import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.VirtualSlotSyncS2C;
+import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
+import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -54,8 +60,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ScheduledFuture;
 
 public class BaseformHandler
 {
@@ -100,6 +105,8 @@ public class BaseformHandler
 
     baseformSonicHead.setTag(nbt);
     }
+
+    private static ScheduledTask lightSpeedCanceller = null;
 
     public static void performBaseformActivation(ServerPlayer player)
     {
@@ -296,6 +303,34 @@ public class BaseformHandler
                 DoubleTapHandler.markDoubleRightPress();
             }
         }
+
+        //Light Speed Attack
+        {
+            //Activate if Player Presses X when Sneaking
+            if(KeyBindings.INSTANCE.useAbility2.consumeClick() &&
+                    VirtualSlotHandler.getCurrAbility() == 0 &&
+                    player.isShiftKeyDown() &&
+                    baseformProperties.lightSpeedState == (byte)0 &&
+                    baseformProperties.getCooldown(BaseformActiveAbility.LIGHT_SPEED_ATTACK) == (byte)0)
+            {
+                PacketHandler.sendToServer(new LightspeedCharge());
+
+                lightSpeedCanceller = Scheduler.scheduleTask(()->{
+                    PacketHandler.sendToServer(new LightspeedEffect());
+                    Scheduler.scheduleTask(()->{
+                        PacketHandler.sendToServer(new LightspeedDecay());
+                    },300);
+                },66);
+            }
+
+            //Cancel Light Speed Attack
+            if(baseformProperties.lightSpeedState == (byte)1 &&
+                    lightSpeedCanceller != null &&
+                    !player.isShiftKeyDown()) {
+                lightSpeedCanceller.cancel();
+                PacketHandler.sendToServer(new LightspeedCancel());
+            }
+        }
     }
 
     public static void performBaseformClientSecond(LocalPlayer player, CompoundTag playerNBT)
@@ -431,6 +466,14 @@ public class BaseformHandler
                 }
 
                 //Light Speed Attack
+                //Particles
+                if(baseformProperties.lightSpeedState == (byte)1)
+                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                            new DustParticleOptions(new Vector3f(0.0f,1.2f,1.0f),1),
+                            0.00, 0.85, 0.00,
+                            1.0, 1.40f, 1.00f, 1.00f, 10,
+                            true)
+                    );
             }
 
 
@@ -439,8 +482,6 @@ public class BaseformHandler
                             playerSonicForm.getCurrentForm(),
                             baseformProperties
                     ));
-
-
         });
 
 
@@ -449,19 +490,35 @@ public class BaseformHandler
     public static void performBaseformServerSecond(ServerPlayer player, CompoundTag playerNBT)
     {
         //Get Data From the Player
-        BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
-
-        //Passive Abilities
-        {
-            //Danger Sense
-            if (baseformProperties.dangerSenseActive) {
-                DangerSenseEmit.performDangerSenseEmit(player);
+        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+            //Get Data From the Player
+            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+            //Cooldowns
+            {
+                byte[] allCooldowns = baseformProperties.getAllCooldowns();
+                for (int i = 0; i < allCooldowns.length; ++i)
+                    allCooldowns[i] = (byte) Math.max(0, allCooldowns[i] - 1);
             }
 
-            //Subdue Hunger
-            if (player.getFoodData().getFoodLevel() <= 8)
-                player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
-        }
+            //Passive Abilities
+            {
+                //Danger Sense
+                if (baseformProperties.dangerSenseActive) {
+                    DangerSenseEmit.performDangerSenseEmit(player);
+                }
+
+                //Subdue Hunger
+                if (player.getFoodData().getFoodLevel() <= 8)
+                    player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
+            }
+
+
+            PacketHandler.sendToPlayer(player,
+                    new SyncPlayerFormS2C(
+                            playerSonicForm.getCurrentForm(),
+                            baseformProperties
+                    ));
+        });
     }
 
     public static void performBaseformDeactivation(ServerPlayer player)

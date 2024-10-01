@@ -9,6 +9,10 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.*;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCancel;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCharge;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
@@ -68,6 +72,12 @@ public class PacketHandler {
                 //Quick Step
                 INSTANCE.messageBuilder(SidestepLeft.class, NetworkDirection.PLAY_TO_SERVER).encoder(SidestepLeft::encode).decoder(SidestepLeft::new).consumerMainThread(SidestepLeft::handle).add();
                 INSTANCE.messageBuilder(SidestepRight.class, NetworkDirection.PLAY_TO_SERVER).encoder(SidestepRight::encode).decoder(SidestepRight::new).consumerMainThread(SidestepRight::handle).add();
+
+                //Light Speed Attack
+                INSTANCE.messageBuilder(LightspeedCharge.class, NetworkDirection.PLAY_TO_SERVER).encoder(LightspeedCharge::encode).decoder(LightspeedCharge::new).consumerMainThread(LightspeedCharge::handle).add();
+                INSTANCE.messageBuilder(LightspeedEffect.class, NetworkDirection.PLAY_TO_SERVER).encoder(LightspeedEffect::encode).decoder(LightspeedEffect::new).consumerMainThread(LightspeedEffect::handle).add();
+                INSTANCE.messageBuilder(LightspeedDecay.class, NetworkDirection.PLAY_TO_SERVER).encoder(LightspeedDecay::encode).decoder(LightspeedDecay::new).consumerMainThread(LightspeedDecay::handle).add();
+                INSTANCE.messageBuilder(LightspeedCancel.class, NetworkDirection.PLAY_TO_SERVER).encoder(LightspeedCancel::encode).decoder(LightspeedCancel::new).consumerMainThread(LightspeedCancel::handle).add();
             }
         }
 

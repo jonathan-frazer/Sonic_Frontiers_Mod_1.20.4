@@ -77,8 +77,15 @@ public class VirtualSlotOverlay {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
 
         //Checks if On Cooldown or Not
-        if(SLOT_ABILITY.cooldown() != (byte)0)  RenderSystem.setShaderColor(0.1F, 0.1F, 0.1F, 0.2F);
-        else                                    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        if(SLOT_ABILITY.cooldown() == (byte)0) {
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+        else{
+            RenderSystem.setShaderColor(0.1F, 0.1F, 0.1F, 0.2F);
+            guiComponent.drawString(Minecraft.getInstance().font,
+                    (SLOT_ABILITY.cooldown<10)?"0"+SLOT_ABILITY.cooldown:""+SLOT_ABILITY.cooldown,
+                    x+3*textureDimensions[0]/10,y+2*textureDimensions[1]/5,0xFFFFFF);
+        }
         RenderSystem.setShaderTexture(0, SLOT_TEXTURE);
 
         //Draw the Actual Texture
