@@ -23,9 +23,12 @@ import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
+import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.ResetAirBoost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
@@ -151,60 +154,74 @@ public class BaseformHandler
         BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
 
         //Passive Abilities
-        //General Sprinting
         {
-            //It handles Auto Step,
-            if(player.isSprinting() && baseformProperties.sprintFlag == false)
-                PacketHandler.sendToServer(new StartSprint());
-            if(!player.isSprinting() && baseformProperties.sprintFlag == true)
-                PacketHandler.sendToServer(new StopSprint());
-
-        }
-        //Double Jump
-        {
-            if (KeyBindings.INSTANCE.doubleJump.consumeClick()
-                    && !player.onGround() && !player.isSpectator()
-                    && baseformProperties.hasDoubleJump
-                    && playerNBT.getCompound("abilities").getByte("flying") == 0) {
-                PacketHandler.sendToServer(new DoubleJump());
-            }
-
-            if (!baseformProperties.hasDoubleJump && player.onGround()) {
-                PacketHandler.sendToServer(new DoubleJumpEnd());
-            }
-        }
-        //Auto Step
-        {
-            if(player.isSprinting())
+            //General Sprinting
             {
-                List<String> blocksinFront = new ArrayList<>();
-                blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -3, 0)).getBlock()) + "");
-                blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -2, 0)).getBlock()) + "");
-                blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -1, 0)).getBlock()) + "");
-                blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos).getBlock()) + "");
+                //It handles Auto Step,
+                if (player.isSprinting() && baseformProperties.sprintFlag == false)
+                    PacketHandler.sendToServer(new StartSprint());
+                if (!player.isSprinting() && baseformProperties.sprintFlag == true)
+                    PacketHandler.sendToServer(new StopSprint());
 
-                if (Utilities.passableBlocks.contains(blocksinFront.get(3))
-                        && Utilities.passableBlocks.contains(blocksinFront.get(2))
-                        && !Utilities.passableBlocks.contains(blocksinFront.get(1))
-                        && player.onGround())
-                    PacketHandler.sendToServer(new StepDown());
-
-                if (Utilities.passableBlocks.contains(blocksinFront.get(3))
-                        && Utilities.passableBlocks.contains(blocksinFront.get(2))
-                        && Utilities.passableBlocks.contains(blocksinFront.get(1))
-                        && !Utilities.passableBlocks.contains(blocksinFront.get(0))
-                        && player.onGround())
-                    PacketHandler.sendToServer(new StepDownDouble());
             }
+            //Double Jump
+            {
+                if (KeyBindings.INSTANCE.doubleJump.consumeClick()
+                        && !player.onGround() && !player.isSpectator()
+                        && baseformProperties.hasDoubleJump
+                        && playerNBT.getCompound("abilities").getByte("flying") == 0) {
+                    PacketHandler.sendToServer(new DoubleJump());
+                }
+
+                if (!baseformProperties.hasDoubleJump && player.onGround()) {
+                    PacketHandler.sendToServer(new DoubleJumpEnd());
+                }
+            }
+            //Auto Step
+            {
+                if (player.isSprinting()) {
+                    List<String> blocksinFront = new ArrayList<>();
+                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -3, 0)).getBlock()) + "");
+                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -2, 0)).getBlock()) + "");
+                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -1, 0)).getBlock()) + "");
+                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos).getBlock()) + "");
+
+                    if (Utilities.passableBlocks.contains(blocksinFront.get(3))
+                            && Utilities.passableBlocks.contains(blocksinFront.get(2))
+                            && !Utilities.passableBlocks.contains(blocksinFront.get(1))
+                            && player.onGround())
+                        PacketHandler.sendToServer(new StepDown());
+
+                    if (Utilities.passableBlocks.contains(blocksinFront.get(3))
+                            && Utilities.passableBlocks.contains(blocksinFront.get(2))
+                            && Utilities.passableBlocks.contains(blocksinFront.get(1))
+                            && !Utilities.passableBlocks.contains(blocksinFront.get(0))
+                            && player.onGround())
+                        PacketHandler.sendToServer(new StepDownDouble());
+                }
+            }
+
+            //Danger Sense
+            //Server Second
+
+            //Hunger
+            //Server Second
+
         }
 
-        //Danger Sense
-        //Server Second
+        //Slot 1
+        {
+            //Air Boosts
+            if(baseformProperties.airBoosts < 3 && player.onGround()) {
+                PacketHandler.sendToServer(new ResetAirBoost());
+            }
 
-        //Hunger
-        //Server Second
-
-
+            if(KeyBindings.INSTANCE.useAbility1.consumeClick() &&
+                    VirtualSlotHandler.getCurrAbility() == 0) {
+                //Air Boost
+                if (!player.onGround())
+                    PacketHandler.sendToServer(new AirBoost());}
+        }
     }
 
     public static void performBaseformClientSecond(LocalPlayer player, CompoundTag playerNBT)
@@ -271,7 +288,10 @@ public class BaseformHandler
                 //Hunger
             }
 
-            //Slot 0
+            //Slot 1
+            {
+
+            }
 
         }
         //Remove Data

@@ -6,16 +6,25 @@ import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
 public class BaseformProperties extends FormProperties {
     private byte[] abilityCooldowns;
 
+    //Passives
     public boolean hasDoubleJump;
     public boolean sprintFlag;
     public boolean dangerSensePlaying;
 
+    //Slot 1
+    public byte airBoosts;
+
     public BaseformProperties()
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
+
+        //Passives
         hasDoubleJump = true;
         sprintFlag = false;
         dangerSensePlaying = false;
+
+        //Slot 1
+        airBoosts = 3;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -23,10 +32,13 @@ public class BaseformProperties extends FormProperties {
         //Cooldowns
         abilityCooldowns = nbt.getByteArray("AbilityCooldowns");
 
-        //Sonic Info
+        //Passives
         hasDoubleJump = nbt.getBoolean("hasDoubleJump");
         sprintFlag = nbt.getBoolean("isSprinting");
         dangerSensePlaying = nbt.getBoolean("dangerSensePlaying");
+
+        //Slot 1
+        airBoosts = nbt.getByte("AirBoosts");
     }
 
     @Override
@@ -37,10 +49,13 @@ public class BaseformProperties extends FormProperties {
         //Cooldowns
         nbt.putByteArray("AbilityCooldowns",abilityCooldowns);
 
-        //Sonic Info
+        //Passives
         nbt.putBoolean("hasDoubleJump",hasDoubleJump);
         nbt.putBoolean("isSprinting",sprintFlag);
         nbt.putBoolean("dangerSensePlaying",dangerSensePlaying);
+
+        //Slot 1
+        nbt.putByte("AirBoosts",airBoosts);
 
         return nbt;
     }
