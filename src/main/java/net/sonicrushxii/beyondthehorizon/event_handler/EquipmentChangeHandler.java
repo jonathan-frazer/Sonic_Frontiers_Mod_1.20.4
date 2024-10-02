@@ -40,7 +40,9 @@ public class EquipmentChangeHandler {
                 BaseformHandler.performBaseformActivation(player);
             }
 
-            if(ItemStack.isSameItemSameTags(event.getFrom(),BaseformHandler.baseformSonicHead)) {
+            if(ItemStack.isSameItemSameTags(event.getFrom(),BaseformHandler.baseformSonicHead)||
+                    ItemStack.isSameItemSameTags(event.getFrom(),BaseformHandler.baseformLSSonicHead)||
+                    ItemStack.isSameItemSameTags(event.getFrom(),BaseformHandler.baseformPBSonicHead)) {
                 BaseformHandler.performBaseformDeactivation(player);
             }
         }

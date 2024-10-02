@@ -37,7 +37,6 @@ public class LightspeedEffect {
     public static void performLightspeedEffect(ServerPlayer player)
     {
         //Equip Armor
-        //SET ARMOR NBT DATA(COMMON)
         {
             Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
             try {

@@ -43,6 +43,7 @@ public class LightspeedCharge {
         //Slow Down
         player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 66, 22, false, false));
 
+        //Sound
         Level world = player.level();
         world.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.LIGHT_SPEED_CHARGE.get(), SoundSource.MASTER, 1.0f, 1.0f);
     }

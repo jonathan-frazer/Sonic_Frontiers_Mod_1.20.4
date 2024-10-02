@@ -28,5 +28,11 @@
     "sounds": [
        "beyondthehorizon:baseform/light_speed_charge_sfx"
     ]
+  },
+  "power_boost": {
+    "subtitles": "sounds.sonic.baseform.power_boost",
+    "sounds": [
+      "beyondthehorizon:baseform/power_boost_sfx"
+    ]
   }
 }

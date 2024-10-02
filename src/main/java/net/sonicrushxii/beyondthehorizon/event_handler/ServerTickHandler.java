@@ -44,12 +44,26 @@ public class ServerTickHandler {
 
     public void onServerSecond(MinecraftServer server)
     {
-        //Floor Crafting
+        //Item Interactions
         {
             for (ServerLevel world : server.getAllLevels()) {
                 for (Entity entity : world.getEntities().getAll()) {
                     if (entity instanceof ItemEntity itemEntity) {
                         ItemStack itemInfo = itemEntity.getItem();
+
+                        //Item cleanup
+                        try {
+                            if(itemInfo.getTag().getByte("BeyondTheHorizon") == (byte) 1)
+                                itemEntity.remove(Entity.RemovalReason.KILLED);
+
+                            if(itemInfo.getItem() == Items.PLAYER_HEAD && itemInfo.getTag().getByte("BeyondTheHorizon") == (byte)2)
+                                itemEntity.setItem(BaseformHandler.baseformSonicHead);
+
+                        }catch(NullPointerException ignored) {
+                            continue;
+                        }
+
+                        //Floor Crafting
                         if (itemInfo.getItem() == Items.BEACON && itemInfo.getCount() == 1) {
                             boolean crafted = false;
                             for (ItemEntity itemEntity1 : world.getEntitiesOfClass(ItemEntity.class,
