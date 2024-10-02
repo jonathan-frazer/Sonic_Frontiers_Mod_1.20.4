@@ -10,9 +10,10 @@ import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import java.util.function.Supplier;
 
 public enum ModArmorMaterials implements ArmorMaterial {
-    BASEFORM_SONIC("baseform",134217727,new int[]{5,7,5,4}, 26,
+
+    BASEFORM_SONIC("baseform",134217727,new int[]{1,1,1,1}, 26,
             SoundEvents.ARMOR_EQUIP_LEATHER,1f,0f, null),
-    BASEFORM_LIGHTSPEED_SONIC("baseform_lightspeed",134217727,new int[]{5,7,5,4}, 26,
+    BASEFORM_LIGHTSPEED_SONIC("baseform_lightspeed",134217727,new int[]{1,1,1,1}, 26,
             SoundEvents.ARMOR_EQUIP_LEATHER,1f,0f, null),
     SUPERFORM_SONIC("superform",134217727,new int[]{5,7,5,4}, 26,
             SoundEvents.ARMOR_EQUIP_LEATHER,1f,0f, null),

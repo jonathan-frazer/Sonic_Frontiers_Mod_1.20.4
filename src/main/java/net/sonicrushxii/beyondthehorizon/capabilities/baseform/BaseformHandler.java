@@ -39,6 +39,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCharge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.SpeedMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
@@ -73,7 +74,6 @@ public class BaseformHandler
         baseformArmorNBTTag.putByte("Unbreakable", (byte) 1);
         baseformArmorNBTTag.putByte("BeyondTheHorizon", (byte) 1);
     }
-
     public static ItemStack baseformSonicHead; static {
         baseformSonicHead = new ItemStack(Items.PLAYER_HEAD);
         CompoundTag nbt = new CompoundTag();
@@ -103,7 +103,6 @@ public class BaseformHandler
 
         baseformSonicHead.setTag(nbt);
     }
-
     public static ItemStack baseformLSSonicHead; static {
         baseformLSSonicHead = new ItemStack(Items.PLAYER_HEAD);
         CompoundTag nbt = new CompoundTag();
@@ -175,6 +174,9 @@ public class BaseformHandler
         {
             player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
             player.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, -1, 3, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 1, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 2, false, false));
         }
 
         //Commands
@@ -281,82 +283,83 @@ public class BaseformHandler
 
         //Slot 1
         {
-            //Air Boosts
-            if(baseformProperties.airBoosts < 3 && player.onGround()) {
-                PacketHandler.sendToServer(new ResetAirBoost());
-            }
-
-            if(KeyBindings.INSTANCE.useAbility1.consumeClick() &&
-                    VirtualSlotHandler.getCurrAbility() == 0) {
-                //Boost
-                if (player.onGround())
-                    PacketHandler.sendToServer(new Boost());
-                //Air Boost
-                else
-                    PacketHandler.sendToServer(new AirBoost());
-            }
-
-            //Quickstep
-            //Double Tap Left
-            if(InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_A) &&
-                    !DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft)
-                DoubleTapHandler.pressedLeft = true;
-            if(!InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_A) &&
-                    DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft) {
-                DoubleTapHandler.releasedLeft = true;
-                DoubleTapHandler.scheduleResetLeftPress();
-            }
-            if(InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_A) &&
-                    DoubleTapHandler.pressedLeft && DoubleTapHandler.releasedLeft)
+            //Boost
             {
-                if(baseformProperties.boostLvl >= 1 && player.isSprinting())
-                    PacketHandler.sendToServer(new SidestepLeft());
-                DoubleTapHandler.markDoubleLeftPress();
-            }
+                //Air Boosts
+                if (baseformProperties.airBoosts < 3 && player.onGround()) {
+                    PacketHandler.sendToServer(new ResetAirBoost());
+                }
 
-            //Double Tap Right
-            if(InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_D) &&
-                    !DoubleTapHandler.pressedRight && !DoubleTapHandler.releasedRight)
-                DoubleTapHandler.pressedRight = true;
-            if(!InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_D) &&
-                    DoubleTapHandler.pressedRight && !DoubleTapHandler.releasedRight) {
-                DoubleTapHandler.releasedRight = true;
-                DoubleTapHandler.scheduleResetRightPress();
+                if (KeyBindings.INSTANCE.useAbility1.consumeClick() &&
+                        VirtualSlotHandler.getCurrAbility() == 0) {
+                    //Boost
+                    if (player.onGround())
+                        PacketHandler.sendToServer(new Boost());
+                        //Air Boost
+                    else
+                        PacketHandler.sendToServer(new AirBoost());
+                }
+
+                //Quickstep
+                //Double Tap Left
+                if (InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_A) &&
+                        !DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft)
+                    DoubleTapHandler.pressedLeft = true;
+                if (!InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_A) &&
+                        DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft) {
+                    DoubleTapHandler.releasedLeft = true;
+                    DoubleTapHandler.scheduleResetLeftPress();
+                }
+                if (InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_A) &&
+                        DoubleTapHandler.pressedLeft && DoubleTapHandler.releasedLeft) {
+                    if (baseformProperties.boostLvl >= 1 && player.isSprinting())
+                        PacketHandler.sendToServer(new SidestepLeft());
+                    DoubleTapHandler.markDoubleLeftPress();
+                }
+
+                //Double Tap Right
+                if (InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_D) &&
+                        !DoubleTapHandler.pressedRight && !DoubleTapHandler.releasedRight)
+                    DoubleTapHandler.pressedRight = true;
+                if (!InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_D) &&
+                        DoubleTapHandler.pressedRight && !DoubleTapHandler.releasedRight) {
+                    DoubleTapHandler.releasedRight = true;
+                    DoubleTapHandler.scheduleResetRightPress();
+                }
+                if (InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_D) &&
+                        DoubleTapHandler.pressedRight && DoubleTapHandler.releasedRight) {
+                    if (baseformProperties.boostLvl >= 1 && player.isSprinting())
+                        PacketHandler.sendToServer(new SidestepRight());
+                    DoubleTapHandler.markDoubleRightPress();
+                }
             }
-            if(InputConstants.isKeyDown(minecraft.getWindow().getWindow(),InputConstants.KEY_D) &&
-                    DoubleTapHandler.pressedRight && DoubleTapHandler.releasedRight)
+            //Light Speed Attack
             {
-                if(baseformProperties.boostLvl >= 1 && player.isSprinting())
-                    PacketHandler.sendToServer(new SidestepRight());
-                DoubleTapHandler.markDoubleRightPress();
-            }
-        }
+                //Activate if Player Presses X when Sneaking
+                if (KeyBindings.INSTANCE.useAbility2.consumeClick() &&
+                        VirtualSlotHandler.getCurrAbility() == 0 &&
+                        player.isShiftKeyDown() &&
+                        baseformProperties.lightSpeedState == (byte) 0 &&
+                        baseformProperties.getCooldown(BaseformActiveAbility.LIGHT_SPEED_ATTACK) == (byte) 0) {
+                    PacketHandler.sendToServer(new LightspeedCharge());
 
-        //Light Speed Attack
-        {
-            //Activate if Player Presses X when Sneaking
-            if(KeyBindings.INSTANCE.useAbility2.consumeClick() &&
-                    VirtualSlotHandler.getCurrAbility() == 0 &&
-                    player.isShiftKeyDown() &&
-                    baseformProperties.lightSpeedState == (byte)0 &&
-                    baseformProperties.getCooldown(BaseformActiveAbility.LIGHT_SPEED_ATTACK) == (byte)0)
+                    lightSpeedCanceller = Scheduler.scheduleTask(() -> {
+                        PacketHandler.sendToServer(new LightspeedEffect());
+                        Scheduler.scheduleTask(() -> PacketHandler.sendToServer(new LightspeedDecay()), 300);
+                    }, 66);
+                }
+
+                //Cancel Light Speed Attack
+                if (baseformProperties.lightSpeedState == (byte) 1 &&
+                        lightSpeedCanceller != null &&
+                        !player.isShiftKeyDown()) {
+                    lightSpeedCanceller.cancel();
+                    PacketHandler.sendToServer(new LightspeedCancel());
+                }
+            }
+            //Power Boost
             {
-                PacketHandler.sendToServer(new LightspeedCharge());
 
-                lightSpeedCanceller = Scheduler.scheduleTask(()->{
-                    PacketHandler.sendToServer(new LightspeedEffect());
-                    Scheduler.scheduleTask(()->{
-                        PacketHandler.sendToServer(new LightspeedDecay());
-                    },300);
-                },66);
-            }
-
-            //Cancel Light Speed Attack
-            if(baseformProperties.lightSpeedState == (byte)1 &&
-                    lightSpeedCanceller != null &&
-                    !player.isShiftKeyDown()) {
-                lightSpeedCanceller.cancel();
-                PacketHandler.sendToServer(new LightspeedCancel());
             }
         }
     }
@@ -396,7 +399,6 @@ public class BaseformHandler
             {
                 //Boost
                 {
-
                     //Water Boost
                     if(player.isSprinting() && !player.isInWater() &&
                             baseformProperties.boostLvl>=1 && baseformProperties.boostLvl<=3)
@@ -418,7 +420,7 @@ public class BaseformHandler
                                 }
 
                                 //Move Forward
-                                player.setDeltaMovement(playerDirection.scale(2));
+                                player.setDeltaMovement(playerDirection.scale(2*baseformProperties.boostLvl));
                                 player.connection.send(new ClientboundSetEntityMotionPacket(player));
                             }
                         }
@@ -443,6 +445,7 @@ public class BaseformHandler
                     }
                     catch (NullPointerException ignored) {}
 
+                    //Particles
                     if(player.isSprinting())
                     {
                         //Particles
@@ -502,6 +505,8 @@ public class BaseformHandler
                             1.0, 1.40f, 1.00f, 1.00f, 10,
                             true)
                     );
+
+                //Power Boost
             }
 
 
@@ -595,10 +600,14 @@ public class BaseformHandler
 
             //Slot 1
             {
-                //Reset Boost and Water Boost
-                player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.50);
+                //Reset Water Boost
                 player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
 
+                //Reset Light Speed Attack
+                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(SpeedMultipliers.LIGHTSPEED_MODE))
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(SpeedMultipliers.LIGHTSPEED_MODE.getId());
+
+                //Power Boost
             }
 
         }
@@ -615,9 +624,12 @@ public class BaseformHandler
         //Deinitialize Virtual Slot Handler
         PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)0));
 
-        //Effects
+        //Remove Effects
         player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.10000000149011612);
         player.removeEffect(MobEffects.JUMP);
+        player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
+        player.removeEffect(MobEffects.DAMAGE_BOOST);
+        player.removeEffect(MobEffects.DIG_SPEED);
 
         //Commands
         CommandSourceStack commandSourceStack = player.createCommandSourceStack().withPermission(4).withSuppressedOutput();
