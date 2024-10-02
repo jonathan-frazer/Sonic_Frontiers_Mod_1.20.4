@@ -39,7 +39,9 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCharge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.SpeedMultipliers;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostActivate;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
@@ -132,6 +134,35 @@ public class BaseformHandler
 
         baseformLSSonicHead.setTag(nbt);
     }
+    public static ItemStack baseformPBSonicHead; static {
+    baseformPBSonicHead = new ItemStack(Items.PLAYER_HEAD);
+    CompoundTag nbt = new CompoundTag();
+
+    // Custom NBT data
+    nbt.putByte("BeyondTheHorizon", (byte) 2);
+
+    // SkullOwner tag
+    CompoundTag skullOwner = new CompoundTag();
+    CompoundTag properties = new CompoundTag();
+    ListTag textures = new ListTag();
+    CompoundTag texture = new CompoundTag();
+    texture.putString("Value", "ewogICJ0aW1lc3RhbXAiIDogMTcyNjkyNzYxNjIxNSwKICAicHJvZmlsZUlkIiA6ICI2OTBmOTAwMTczZmQ0MDA5OGE2ZDc3Nzc2MWUwY2U4YiIsCiAgInByb2ZpbGVOYW1lIiA6ICJTb25pY1J1c2hYMTIiLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2QyNzZmMGExMTBkMGEzNzhiNzdlNzk3OTBiZDc0ZjNiOWEzMmNhNzgyYWQ2MTQ2NjhhYWE1ZmM4MDg5MWIwMCIKICAgIH0KICB9Cn0=");
+    textures.add(texture);
+    properties.put("textures", textures);
+    skullOwner.put("Properties", properties);
+    skullOwner.putIntArray("Id", new int[]{1762627585, 1945976841, -1972537481, 1642122891});
+    nbt.put("SkullOwner", skullOwner);
+
+    // Display tag
+    CompoundTag display = new CompoundTag();
+    ListTag lore = new ListTag();
+    lore.add(StringTag.valueOf("{\"text\":\"Power Boost\",\"color\": \"dark_blue\"}"));
+    display.put("Lore", lore);
+    display.putString("Name", "{\"text\":\"Sonic Head\",\"color\": \"blue\",\"italic\": false}");
+    nbt.put("display", display);
+
+    baseformPBSonicHead.setTag(nbt);
+}
 
     private static ScheduledTask lightSpeedCanceller = null;
 
@@ -359,7 +390,14 @@ public class BaseformHandler
             }
             //Power Boost
             {
-
+                //Activate if Player Presses Z while at Full HP
+                if(KeyBindings.INSTANCE.useAbility3.consumeClick() &&
+                VirtualSlotHandler.getCurrAbility() == 0 &&
+                baseformProperties.getCooldown(BaseformActiveAbility.POWER_BOOST) == (byte) 0)
+                {
+                    if(baseformProperties.powerBoost)   PacketHandler.sendToServer(new PowerBoostDeactivate());
+                    else                                PacketHandler.sendToServer(new PowerBoostActivate());
+                }
             }
         }
     }
@@ -529,8 +567,10 @@ public class BaseformHandler
             //Cooldowns
             {
                 byte[] allCooldowns = baseformProperties.getAllCooldowns();
-                for (int i = 0; i < allCooldowns.length; ++i)
-                    allCooldowns[i] = (byte) Math.max(0, allCooldowns[i] - 1);
+                for (int i = 0; i < allCooldowns.length; ++i) {
+                    if(allCooldowns[i] != (byte)-1)
+                        allCooldowns[i] = (byte) Math.max(0, allCooldowns[i] - 1);
+                }
             }
 
             //Passive Abilities
@@ -543,6 +583,11 @@ public class BaseformHandler
                 //Subdue Hunger
                 if (player.getFoodData().getFoodLevel() <= 8)
                     player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
+            }
+
+            //Slot 1
+            {
+
             }
 
 
@@ -604,10 +649,14 @@ public class BaseformHandler
                 player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
 
                 //Reset Light Speed Attack
-                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(SpeedMultipliers.LIGHTSPEED_MODE))
-                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(SpeedMultipliers.LIGHTSPEED_MODE.getId());
+                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.LIGHTSPEED_MODE))
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.LIGHTSPEED_MODE.getId());
 
-                //Power Boost
+                //Reset Power Boost
+                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.POWERBOOST_SPEED))
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.POWERBOOST_SPEED.getId());
+                if(player.getAttribute(Attributes.ARMOR).hasModifier(AttributeMultipliers.POWERBOOST_ARMOR))
+                    player.getAttribute(Attributes.ARMOR).removeModifier(AttributeMultipliers.POWERBOOST_ARMOR.getId());
             }
 
         }

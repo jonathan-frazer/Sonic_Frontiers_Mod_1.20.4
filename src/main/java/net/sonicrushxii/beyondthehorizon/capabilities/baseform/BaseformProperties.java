@@ -17,6 +17,7 @@ public class BaseformProperties extends FormProperties {
     public byte boostLvl;
     public boolean isWaterBoosting;
     public byte lightSpeedState;
+    public boolean powerBoost;
 
     public BaseformProperties()
     {
@@ -33,6 +34,7 @@ public class BaseformProperties extends FormProperties {
         boostLvl = 0;
         isWaterBoosting = false;
         lightSpeedState = 0;
+        powerBoost = false;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -51,6 +53,7 @@ public class BaseformProperties extends FormProperties {
         boostLvl = nbt.getByte("BoostLvl");
         isWaterBoosting = nbt.getBoolean("IsWaterBoosting");
         lightSpeedState = nbt.getByte("LightSpeedState");
+        powerBoost = nbt.getBoolean("PowerBoost");
     }
 
     @Override
@@ -72,6 +75,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("BoostLvl",boostLvl);
         nbt.putBoolean("IsWaterBoosting",isWaterBoosting);
         nbt.putByte("LightSpeedState",lightSpeedState);
+        nbt.putBoolean("PowerBoost",powerBoost);
 
         return nbt;
     }

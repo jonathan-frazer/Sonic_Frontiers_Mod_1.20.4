@@ -16,7 +16,7 @@ import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.SpeedMultipliers;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
@@ -78,8 +78,8 @@ public class LightspeedEffect {
         //Remove Slowdown
         player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
         //Add Speed Boost
-        if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(SpeedMultipliers.LIGHTSPEED_MODE))
-            player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(SpeedMultipliers.LIGHTSPEED_MODE);
+        if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.LIGHTSPEED_MODE))
+            player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.LIGHTSPEED_MODE);
 
         //Sound
         PacketHandler.sendToALLPlayers(new PlayerStopSoundPacketS2C(ModSounds.LIGHT_SPEED_CHARGE.get().getLocation()));

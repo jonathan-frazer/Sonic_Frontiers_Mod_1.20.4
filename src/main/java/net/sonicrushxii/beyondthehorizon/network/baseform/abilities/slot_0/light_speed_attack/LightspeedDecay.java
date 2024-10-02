@@ -15,11 +15,10 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformPropertie
 import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.SpeedMultipliers;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 import java.util.Iterator;
-import java.util.function.Supplier;
 
 public class LightspeedDecay {
 
@@ -76,9 +75,8 @@ public class LightspeedDecay {
         }
 
         //Remove Speed Boost
-        if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(SpeedMultipliers.LIGHTSPEED_MODE))
-            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(SpeedMultipliers.LIGHTSPEED_MODE.getId());
-
+        if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.LIGHTSPEED_MODE))
+            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.LIGHTSPEED_MODE.getId());
 
         //Decay Sound
         player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.MASTER, 1.0f, 1.0f);
