@@ -1,8 +1,5 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -11,9 +8,9 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
@@ -42,22 +39,11 @@ public class LightspeedEffect {
         //Equip Armor
         //SET ARMOR NBT DATA(COMMON)
         {
-            CompoundTag nbtData = new CompoundTag();
-            ListTag enchantmentList = new ListTag();
-            CompoundTag enchantment = new CompoundTag();
-            enchantment.putString("id", "minecraft:binding_curse");
-            enchantment.putShort("lvl", (short) 1);
-            enchantmentList.add(enchantment);
-            nbtData.put("Enchantments", enchantmentList);
-            nbtData.putInt("HideFlags", 127);
-            nbtData.putByte("Unbreakable", (byte) 1);
-            nbtData.putByte("BeyondTheHorizon", (byte) 1);
-
             Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
             try {
                 if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
                     ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_LIGHTSPEED_BOOTS.get());
-                    itemToPlace.setTag(nbtData);
+                    itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
                     player.setItemSlot(EquipmentSlot.FEET, itemToPlace);
                 }
             }
@@ -66,7 +52,7 @@ public class LightspeedEffect {
             try {
                 if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
                     ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_LIGHTSPEED_LEGGINGS.get());
-                    itemToPlace.setTag(nbtData);
+                    itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
                     player.setItemSlot(EquipmentSlot.LEGS, itemToPlace);
                 }
             }
@@ -75,7 +61,7 @@ public class LightspeedEffect {
             try {
                 if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
                     ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_LIGHTSPEED_CHESTPLATE.get());
-                    itemToPlace.setTag(nbtData);
+                    itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
                     player.setItemSlot(EquipmentSlot.CHEST, itemToPlace);
                 }
             }
@@ -83,37 +69,8 @@ public class LightspeedEffect {
 
             try{
                 if(armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 2){
-
-                    ItemStack sonicHead = new ItemStack(Items.PLAYER_HEAD);
-                    CompoundTag nbt = new CompoundTag();
-
-                    // Custom NBT data
-                    nbt.putByte("BeyondTheHorizon", (byte) 2);
-
-                    // SkullOwner tag
-                    CompoundTag skullOwner = new CompoundTag();
-                    CompoundTag properties = new CompoundTag();
-                    ListTag textures = new ListTag();
-                    CompoundTag texture = new CompoundTag();
-                    texture.putString("Value", "ewogICJ0aW1lc3RhbXAiIDogMTcyNjkyNzYxNjIxNSwKICAicHJvZmlsZUlkIiA6ICI2OTBmOTAwMTczZmQ0MDA5OGE2ZDc3Nzc2MWUwY2U4YiIsCiAgInByb2ZpbGVOYW1lIiA6ICJTb25pY1J1c2hYMTIiLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2QyNzZmMGExMTBkMGEzNzhiNzdlNzk3OTBiZDc0ZjNiOWEzMmNhNzgyYWQ2MTQ2NjhhYWE1ZmM4MDg5MWIwMCIKICAgIH0KICB9Cn0=");
-                    textures.add(texture);
-                    properties.put("textures", textures);
-                    skullOwner.put("Properties", properties);
-                    skullOwner.putIntArray("Id", new int[]{1762627585, 1945976841, -1972537481, 1642122891});
-                    nbt.put("SkullOwner", skullOwner);
-
-                    // Display tag
-                    CompoundTag display = new CompoundTag();
-                    ListTag lore = new ListTag();
-                    lore.add(StringTag.valueOf("{\"text\":\"Light Speed Mode\",\"color\": \"aqua\"}"));
-                    display.put("Lore", lore);
-                    display.putString("Name", "{\"text\":\"Sonic Head\",\"color\": \"blue\",\"italic\": false}");
-                    nbt.put("display", display);
-
-                    sonicHead.setTag(nbt);
-
                     EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
-                    player.setItemSlot(EquipmentSlot.HEAD, sonicHead);
+                    player.setItemSlot(EquipmentSlot.HEAD, BaseformHandler.baseformLSSonicHead);
                 }
             }
             catch(NullPointerException ignored){}
