@@ -11,7 +11,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -23,10 +22,10 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
-import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ServerTickHandler {
@@ -34,7 +33,8 @@ public class ServerTickHandler {
     private static final int TICKS_PER_SECOND = 20;
 
     private static AtomicBoolean noPowerBoostingPlayer = new AtomicBoolean(true);
-    private static boolean[] isPowerBoostOn;
+    private static List<Boolean> hasPowerBoostOn = new ArrayList<Boolean>();
+    private static int pwIdx;
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent.Post event)
@@ -44,24 +44,27 @@ public class ServerTickHandler {
         ServerLevel serverLevel = server.getLevel(Level.OVERWORLD); // or any other dimension
 
         for(ServerLevel world: server.getAllLevels())
+            hasPowerBoostOn.add(false);
 
-        isPowerBoostOn = new boolean[server.getAllLevels().length]
+
 
         //Time Slow/Checking
-        for (ServerLevel world : server.getAllLevels()) {
+        pwIdx = 0;
+        for (ServerLevel world : server.getAllLevels())
+        {
             noPowerBoostingPlayer.set(true);
+
             for (Entity entity : world.getEntities().getAll()) {
                 //Player interactions
                 if (entity instanceof ServerPlayer player) {
                     player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
                         if (playerSonicForm.getCurrentForm() == SonicForm.BASEFORM &&
                                 ((BaseformProperties) playerSonicForm.getFormProperties()).powerBoost) {
-                            System.out.println("Someone one has PowerBoost");
-                            if (isPowerBoostOn == false) {
+                            if (!hasPowerBoostOn.get(pwIdx)) {
                                 TickRateManager tickRateManager = world.tickRateManager();
                                 tickRateManager.setTickRate(tickRateManager.tickrate() / 2.5f);
                             }
-                            isPowerBoostOn = true;
+                            hasPowerBoostOn.set(pwIdx,true);
                             noPowerBoostingPlayer.set(false);
                         }
                     });
@@ -70,13 +73,13 @@ public class ServerTickHandler {
 
             if (noPowerBoostingPlayer.get())
             {
-                System.out.println("No one has PowerBoost");
-                if (isPowerBoostOn == true) {
+                if (hasPowerBoostOn.get(pwIdx)) {
                     TickRateManager tickRateManager = world.tickRateManager();
                     tickRateManager.setTickRate(tickRateManager.tickrate() * 2.5f);
                 }
-                isPowerBoostOn = false;
+                hasPowerBoostOn.set(pwIdx,false);
             }
+            pwIdx++;
         }
 
         if(serverLevel != null)
