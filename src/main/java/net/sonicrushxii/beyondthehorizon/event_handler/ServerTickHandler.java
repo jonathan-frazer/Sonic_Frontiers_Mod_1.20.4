@@ -46,8 +46,6 @@ public class ServerTickHandler {
         for(ServerLevel world: server.getAllLevels())
             hasPowerBoostOn.add(false);
 
-
-
         //Time Slow/Checking
         pwIdx = 0;
         for (ServerLevel world : server.getAllLevels())
