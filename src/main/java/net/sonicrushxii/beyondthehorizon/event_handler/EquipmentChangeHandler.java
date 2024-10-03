@@ -4,9 +4,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
+import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -36,15 +41,32 @@ public class EquipmentChangeHandler {
                 return;
             }
 
-            if(ItemStack.isSameItemSameTags(event.getTo(),BaseformHandler.baseformSonicHead)) {
-                BaseformHandler.performBaseformActivation(player);
-            }
+            player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
+                ItemStack headItem = player.getItemBySlot(EquipmentSlot.HEAD);
+                try {
+                    if (playerSonicForm.getCurrentForm() == SonicForm.PLAYER &&
+                            headItem.getItem() == Items.PLAYER_HEAD &&
+                            headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) {
+                        BaseformHandler.performBaseformActivation(player);
+                    }
+                }catch(NullPointerException ignored){}
 
-            if(ItemStack.isSameItemSameTags(event.getFrom(),BaseformHandler.baseformSonicHead)||
-                    ItemStack.isSameItemSameTags(event.getFrom(),BaseformHandler.baseformLSSonicHead)||
-                    ItemStack.isSameItemSameTags(event.getFrom(),BaseformHandler.baseformPBSonicHead)) {
-                BaseformHandler.performBaseformDeactivation(player);
-            }
+                try {
+                    if (playerSonicForm.getCurrentForm() == SonicForm.BASEFORM &&
+                            (headItem.getTag().getByte("BeyondTheHorizon") != (byte) 2)) {
+                        BaseformHandler.performBaseformDeactivation(player);
+                    }
+                }catch(NullPointerException ignored){
+                    BaseformHandler.performBaseformDeactivation(player);
+                }
+
+                PacketHandler.sendToPlayer(player,
+                        new SyncPlayerFormS2C(
+                                playerSonicForm.getCurrentForm(),
+                                playerSonicForm.getFormProperties()
+                        ));
+            });
+
         }
     }
 }

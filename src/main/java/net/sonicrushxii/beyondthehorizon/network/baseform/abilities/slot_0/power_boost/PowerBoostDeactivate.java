@@ -1,6 +1,9 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost;
 
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -54,7 +57,7 @@ public class PowerBoostDeactivate {
 
             //Power Boost
             baseformProperties.powerBoost = false;
-            baseformProperties.setCooldown(BaseformActiveAbility.POWER_BOOST,(byte)3);
+            baseformProperties.setCooldown(BaseformActiveAbility.POWER_BOOST,(byte)1);
 
             //Remove Speed Multiplier
             if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.POWERBOOST_SPEED))

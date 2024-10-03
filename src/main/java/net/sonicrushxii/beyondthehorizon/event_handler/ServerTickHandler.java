@@ -5,10 +5,13 @@ import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -16,13 +19,22 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ServerTickHandler {
     private static int tickCounter = 0;
     private static final int TICKS_PER_SECOND = 20;
+
+    private static AtomicBoolean noPowerBoostingPlayer = new AtomicBoolean(true);
+    private static boolean[] isPowerBoostOn;
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent.Post event)
@@ -30,6 +42,42 @@ public class ServerTickHandler {
         // Get the server instance
         MinecraftServer server = event.getServer(); // Get the level (world) you want to execute the command in
         ServerLevel serverLevel = server.getLevel(Level.OVERWORLD); // or any other dimension
+
+        for(ServerLevel world: server.getAllLevels())
+
+        isPowerBoostOn = new boolean[server.getAllLevels().length]
+
+        //Time Slow/Checking
+        for (ServerLevel world : server.getAllLevels()) {
+            noPowerBoostingPlayer.set(true);
+            for (Entity entity : world.getEntities().getAll()) {
+                //Player interactions
+                if (entity instanceof ServerPlayer player) {
+                    player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                        if (playerSonicForm.getCurrentForm() == SonicForm.BASEFORM &&
+                                ((BaseformProperties) playerSonicForm.getFormProperties()).powerBoost) {
+                            System.out.println("Someone one has PowerBoost");
+                            if (isPowerBoostOn == false) {
+                                TickRateManager tickRateManager = world.tickRateManager();
+                                tickRateManager.setTickRate(tickRateManager.tickrate() / 2.5f);
+                            }
+                            isPowerBoostOn = true;
+                            noPowerBoostingPlayer.set(false);
+                        }
+                    });
+                }
+            }
+
+            if (noPowerBoostingPlayer.get())
+            {
+                System.out.println("No one has PowerBoost");
+                if (isPowerBoostOn == true) {
+                    TickRateManager tickRateManager = world.tickRateManager();
+                    tickRateManager.setTickRate(tickRateManager.tickrate() * 2.5f);
+                }
+                isPowerBoostOn = false;
+            }
+        }
 
         if(serverLevel != null)
         {
@@ -44,10 +92,11 @@ public class ServerTickHandler {
 
     public void onServerSecond(MinecraftServer server)
     {
-        //Item Interactions
+
         {
             for (ServerLevel world : server.getAllLevels()) {
                 for (Entity entity : world.getEntities().getAll()) {
+                    //Item Interactions
                     if (entity instanceof ItemEntity itemEntity) {
                         ItemStack itemInfo = itemEntity.getItem();
 

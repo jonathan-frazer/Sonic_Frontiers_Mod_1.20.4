@@ -5,6 +5,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
@@ -21,6 +23,9 @@ public class LoginHandler {
     {
         System.out.println("Logged In");
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+            if(playerSonicForm.getCurrentForm() == SonicForm.BASEFORM)
+                BaseformHandler.performBaseformActivation(player);
+
             PacketHandler.sendToPlayer(player, new SyncPlayerFormS2C(
                     playerSonicForm.getCurrentForm(),
                     playerSonicForm.getFormProperties()
