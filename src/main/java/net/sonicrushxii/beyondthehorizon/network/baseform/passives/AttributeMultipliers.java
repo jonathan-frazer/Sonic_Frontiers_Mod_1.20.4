@@ -8,7 +8,7 @@ public class AttributeMultipliers {
     public static final AttributeModifier LIGHTSPEED_MODE = new AttributeModifier(new UUID(0x1234767890AB6DEFL, 0xFEBCBA09F7654C21L),
             "Lightspeed Mode", 1.0F, AttributeModifier.Operation.MULTIPLY_TOTAL);
     public static final AttributeModifier POWERBOOST_SPEED = new AttributeModifier(new UUID(0x1234767890AB7DEFL, 0xFEBCBA09F7654C21L),
-            "Power_boost", 0.1F, AttributeModifier.Operation.MULTIPLY_TOTAL);
+            "Power_boost", 0.60F, AttributeModifier.Operation.MULTIPLY_TOTAL);
     public static final AttributeModifier POWERBOOST_ARMOR = new AttributeModifier(new UUID(0x1234767890AB8DEFL, 0xFEBCBA09F7654C21L),
             "Power_boost", 3.67F, AttributeModifier.Operation.MULTIPLY_TOTAL);
 

@@ -19,11 +19,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ServerTickHandler {
+public class ServerTickHandler
+{
     private static int tickCounter = 0;
     private static final int TICKS_PER_SECOND = 20;
 
