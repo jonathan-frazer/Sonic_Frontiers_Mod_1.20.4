@@ -25,6 +25,7 @@ import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
+import net.sonicrushxii.beyondthehorizon.timehandler.TimeHandler;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -51,6 +52,7 @@ public class BeyondTheHorizon
         MinecraftForge.EVENT_BUS.register(new ServerTickHandler());
         MinecraftForge.EVENT_BUS.register(new PlayerTickHandler());
         MinecraftForge.EVENT_BUS.register(new Scheduler());
+        MinecraftForge.EVENT_BUS.register(new TimeHandler());
         MinecraftForge.EVENT_BUS.register(new EquipmentChangeHandler());
 
         // Register the item to a creative tab

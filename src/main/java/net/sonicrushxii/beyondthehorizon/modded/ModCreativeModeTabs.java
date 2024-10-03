@@ -74,9 +74,6 @@ public class ModCreativeModeTabs {
 
                             pOutput.accept(customPlayerHead);
                         }
-                        pOutput.accept(ModItems.BASEFORM_LIGHTSPEED_CHESTPLATE.get());
-                        pOutput.accept(ModItems.BASEFORM_LIGHTSPEED_LEGGINGS.get());
-                        pOutput.accept(ModItems.BASEFORM_LIGHTSPEED_BOOTS.get());
 
                     }))
                     .build());

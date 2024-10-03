@@ -1,9 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost;
 
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -14,11 +11,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
-import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
@@ -59,7 +54,6 @@ public class PowerBoostActivate {
 
             //Power Boost Data
             baseformProperties.powerBoost = true;
-            baseformProperties.setCooldown(BaseformActiveAbility.POWER_BOOST,(byte)1);
 
             //Add Speed Multiplier
             if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.POWERBOOST_SPEED))

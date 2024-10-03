@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -550,7 +549,7 @@ public class BaseformHandler
                 if(baseformProperties.powerBoost)
                 {
                     PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                            new DustParticleOptions(new Vector3f(0.0f, 0.0f, 1.0f), 1.5f),
+                            ParticleTypes.ENCHANTED_HIT,
                             0.00, 0.85, 0.00,
                             0.0, 0.80f, 1.00f, 0.80f, 1,
                             true)
@@ -613,6 +612,7 @@ public class BaseformHandler
     public static void performBaseformDeactivation(ServerPlayer player)
     {
         //Readd Head
+        if(player.isAlive())
         {
             ItemEntity sonicHeadItem = new ItemEntity(player.level(),
                     player.getX(),player.getY(),player.getZ(),BaseformHandler.baseformSonicHead);

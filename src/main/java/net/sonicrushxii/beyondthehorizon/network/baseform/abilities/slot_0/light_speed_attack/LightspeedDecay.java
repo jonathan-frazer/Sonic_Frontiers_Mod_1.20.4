@@ -34,58 +34,62 @@ public class LightspeedDecay {
 
     public static void performLightspeedDecay(ServerPlayer player)
     {
-        //Requip Armor
-        //SET ARMOR NBT DATA(COMMON)
-        {
-            Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
-            try {
-                if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
-                    ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_BOOTS.get());
-                    itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
-                    player.setItemSlot(EquipmentSlot.FEET, itemToPlace);
-                }
-            }
-            catch(NullPointerException ignored){}
 
-            try {
-                if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
-                    ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_LEGGINGS.get());
-                    itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
-                    player.setItemSlot(EquipmentSlot.LEGS, itemToPlace);
-                }
-            }
-            catch(NullPointerException ignored){}
-
-            try {
-                if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
-                    ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_CHESTPLATE.get());
-                    itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
-                    player.setItemSlot(EquipmentSlot.CHEST, itemToPlace);
-                }
-            }
-            catch(NullPointerException ignored){}
-
-            try{
-                if(armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 2){
-                    EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
-                    player.setItemSlot(EquipmentSlot.HEAD, BaseformHandler.baseformSonicHead);
-                }
-            }
-            catch(NullPointerException ignored){}
-        }
-
-        //Remove Speed Boost
-        if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.LIGHTSPEED_MODE))
-            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.LIGHTSPEED_MODE.getId());
-
-        //Decay Sound
-        player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.MASTER, 1.0f, 1.0f);
-
-        //Add Tag
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+            //Add Tag
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
             baseformProperties.lightSpeedState = (byte)0;
             baseformProperties.setCooldown(BaseformActiveAbility.LIGHT_SPEED_ATTACK, (byte) 60);
+
+            //Requip Armor
+            //SET ARMOR NBT DATA(COMMON)
+            {
+                Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
+                try {
+                    if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
+                        ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_BOOTS.get());
+                        itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
+                        player.setItemSlot(EquipmentSlot.FEET, itemToPlace);
+                    }
+                }
+                catch(NullPointerException ignored){}
+
+                try {
+                    if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
+                        ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_LEGGINGS.get());
+                        itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
+                        player.setItemSlot(EquipmentSlot.LEGS, itemToPlace);
+                    }
+                }
+                catch(NullPointerException ignored){}
+
+                try {
+                    if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
+                        ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_CHESTPLATE.get());
+                        itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
+                        player.setItemSlot(EquipmentSlot.CHEST, itemToPlace);
+                    }
+                }
+                catch(NullPointerException ignored){}
+
+                try{
+                    if(armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 2)
+                    {
+                        EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(), true);
+
+                        if(baseformProperties.powerBoost) player.setItemSlot(EquipmentSlot.HEAD, BaseformHandler.baseformPBSonicHead);
+                        else                              player.setItemSlot(EquipmentSlot.HEAD, BaseformHandler.baseformSonicHead);
+                    }
+                }
+                catch(NullPointerException ignored){}
+            }
+
+            //Remove Speed Boost
+            if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.LIGHTSPEED_MODE))
+                player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.LIGHTSPEED_MODE.getId());
+
+            //Decay Sound
+            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.MASTER, 1.0f, 1.0f);
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(
