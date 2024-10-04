@@ -111,6 +111,7 @@ public class ParticleAuraPacketS2C {
 
     public void handle(CustomPayloadEvent.Context ctx) {
         ctx.enqueueWork(() -> {
+            System.out.println("Client Particle Display");
             // This code is run on the client side
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
                 Minecraft mc = Minecraft.getInstance();

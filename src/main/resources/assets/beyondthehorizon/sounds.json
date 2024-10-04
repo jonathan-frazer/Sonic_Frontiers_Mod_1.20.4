@@ -34,5 +34,11 @@
     "sounds": [
       "beyondthehorizon:baseform/power_boost_sfx"
     ]
+  },
+  "depower_boost": {
+    "subtitles": "sounds.sonic.baseform.depower_boost",
+    "sounds": [
+      "beyondthehorizon:baseform/depower_boost_sfx"
+    ]
   }
 }

@@ -25,6 +25,8 @@ public class ModSounds {
             registerSoundEvents("light_speed_charge");
     public static final RegistryObject<SoundEvent> POWER_BOOST =
             registerSoundEvents("power_boost");
+    public static final RegistryObject<SoundEvent> DEPOWER_BOOST =
+            registerSoundEvents("depower_boost");
 
     private static RegistryObject<SoundEvent> registerSoundEvents(String soundName){
         return SOUND_EVENTS.register(soundName,

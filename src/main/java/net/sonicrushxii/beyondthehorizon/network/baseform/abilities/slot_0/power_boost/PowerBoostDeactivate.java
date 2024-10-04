@@ -14,6 +14,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -77,7 +78,7 @@ public class PowerBoostDeactivate {
             player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 2, false, false));
 
             //Decay Sound
-            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.MASTER, 0.75f, 0.75f);
+            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.DEPOWER_BOOST.get(), SoundSource.MASTER, 0.75f, 0.75f);
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(
