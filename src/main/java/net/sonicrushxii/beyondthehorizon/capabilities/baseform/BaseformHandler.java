@@ -14,13 +14,16 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
@@ -71,6 +74,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 public class BaseformHandler
 {
@@ -403,7 +407,7 @@ public class BaseformHandler
             //Power Boost
             {
                 //Activate if Player Presses Z
-                if(VirtualSlotHandler.getCurrAbility() == 0 &&
+                if(VirtualSlotHandler.getCurrAbility() == 0 && baseformProperties.getCooldown(BaseformActiveAbility.HOMING_ATTACK) == 0 &&
                 baseformProperties.getCooldown(BaseformActiveAbility.POWER_BOOST) == (byte) 0 &&
                 KeyBindings.INSTANCE.useAbility3.consumeClick())
                 {
@@ -420,10 +424,13 @@ public class BaseformHandler
                 //Charge Spindash
                 if (VirtualSlotHandler.getCurrAbility() == 1 && player.isShiftKeyDown() &&
                         player.getXRot() > 80.0 && baseformProperties.ballFormState == (byte) 0 &&
-                        KeyBindings.INSTANCE.useAbility1.consumeClick()) {
+                        KeyBindings.INSTANCE.useAbility1.isDown()) {
                     //Set Camera
                     player.setXRot(0.0f);
                     minecraft.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+
+                    //Let go of Z
+                    minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), KeyBindings.INSTANCE.useAbility1.getKey().getValue(), 0, GLFW.GLFW_RELEASE, 0);
 
                     //Send Packet
                     PacketHandler.sendToServer(new ChargeSpindash());
@@ -432,7 +439,7 @@ public class BaseformHandler
                 //Launch Spindash
                 if (!player.isShiftKeyDown() && baseformProperties.ballFormState == (byte)1)
                 {
-                    minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_PRESS, 0);
+                    //Force W Presses and lower Mouse Sens
                     double currentSens = minecraft.options.sensitivity().get();
                     minecraft.options.sensitivity().set(currentSens/2.5f);
                     PacketHandler.sendToServer(new LaunchSpindash());
@@ -443,18 +450,19 @@ public class BaseformHandler
                             mc.keyboardHandler.keyPress(mc.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_RELEASE, 0);
                         mc.options.sensitivity().set(currentSens);
                         PacketHandler.sendToServer(new RevertFromSpindash());
+
                     },Math.min(baseformProperties.spinDashChargeTime/2, 100));
                 }
-
                 //Keep going forward
-                if(baseformProperties.ballFormState == (byte)2)
+                if(baseformProperties.ballFormState == (byte)2) {
                     minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_PRESS, 0);
+                }
             }
 
             //Homing Attack
             {
                 if (VirtualSlotHandler.getCurrAbility() == 1 && (player.getXRot() <= 80.0 || !player.isShiftKeyDown()) &&
-                        KeyBindings.INSTANCE.useAbility1.consumeClick())
+                        KeyBindings.INSTANCE.useAbility1.consumeClick() && baseformProperties.ballFormState != (byte)1 && baseformProperties.homingAttackAirTime == 0)
                 {
                     System.out.println("Send Homing attack Packet");
                     PacketHandler.sendToServer(new HomingAttack());
@@ -473,6 +481,7 @@ public class BaseformHandler
     {
         Minecraft minecraft = Minecraft.getInstance();
         Level level = player.level();
+        ServerLevel serverLevel = player.serverLevel();
 
         Vec3 playerDirCentre = Utilities.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
         BlockPos centrePos = player.blockPosition().offset(
@@ -550,14 +559,14 @@ public class BaseformHandler
                                 case 1:
                                     PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                             ParticleTypes.CAMPFIRE_COSY_SMOKE,
-                                            0.00, 0.05, 0.00,
+                                            player.getX()+0.00, player.getY()+0.05, player.getZ()+0.00,
                                             0.001, 0.00f, 0.00f, 0.00f, 1,
                                             true));
                                     break;
                                 case 2:
                                     PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                             new DustParticleOptions(new Vector3f(1.000f, 0.000f, 0.000f), 2f),
-                                            0.00, 0.35, 0.00,
+                                            player.getX()+0.00, player.getY()+0.35, player.getZ()+0.00,
                                             0.001, 0.25f, 0.25f, 0.25f, 4,
                                             true)
                                     );
@@ -565,7 +574,7 @@ public class BaseformHandler
                                 case 3:
                                     PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                             new DustParticleOptions(new Vector3f(0.0f, 0.89f, 1.00f), 1),
-                                            0.00, 1.0, 0.00,
+                                            player.getX()+0.00, player.getY()+1.0, player.getZ()+0.00,
                                             0.001, 0.35f, 1f, 0.35f, 12,
                                             true)
                                     );
@@ -575,7 +584,7 @@ public class BaseformHandler
                             if (ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock()).equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)))
                                 PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                         ParticleTypes.FALLING_WATER,
-                                        0.00, 1.0, 0.00,
+                                        player.getX()+0.00, player.getY()+1.0, player.getZ()+0.00,
                                         0.001, 0.35f, 1f, 0.35f, 12,
                                         true)
                                 );
@@ -597,7 +606,7 @@ public class BaseformHandler
                     if (baseformProperties.lightSpeedState == (byte) 1)
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 new DustParticleOptions(new Vector3f(0.0f, 1.2f, 1.0f), 1),
-                                0.00, 0.85, 0.00,
+                                player.getX()+0.00, player.getY()+0.85, player.getZ()+0.00,
                                 1.0, 1.40f, 1.00f, 1.00f, 10,
                                 true)
                         );
@@ -606,7 +615,7 @@ public class BaseformHandler
                     if (baseformProperties.powerBoost) {
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 ParticleTypes.ENCHANTED_HIT,
-                                0.00, 0.85, 0.00,
+                                player.getX()+0.00, player.getY()+0.85, player.getZ()+0.00,
                                 0.0, 0.80f, 1.00f, 0.80f, 1,
                                 true)
                         );
@@ -624,21 +633,29 @@ public class BaseformHandler
 
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     ParticleTypes.CAMPFIRE_COSY_SMOKE,
-                                    -playerLookVector.x(), 0.05, -playerLookVector.z(),
+                                    player.getX()-playerLookVector.x(), player.getY()+0.05, player.getZ()-playerLookVector.z(),
                                     0.001, 0.00f, 0.00f, 0.00f, 1,
                                     true));
 
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1.5f),
-                                    0.00, 0.55, 0.00,
+                                    player.getX(), player.getY()+0.55, player.getZ(),
                                     1.0, 0.65f, 0.65f, 0.65f, 75,
                                     true)
                             );
                         }
                         if (baseformProperties.ballFormState == (byte) 2) {
+
+                            for(LivingEntity nearbyEntity : level.getEntitiesOfClass(LivingEntity.class,
+                                    new AABB(player.getX()+1.5,player.getY()+1.5,player.getZ()+1.5,
+                                            player.getX()-1.5,player.getY()-1.5,player.getZ()-1.5),
+                                    (nearbyEntity)->!nearbyEntity.is(player)))
+                                nearbyEntity.hurt(player.damageSources().playerAttack(player),
+                                        Math.min(22.0f,baseformProperties.spinDashChargeTime/4.0f));
+
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1.5f),
-                                    0.00, 0.55, 0.00,
+                                    player.getX(), player.getY()+0.55, player.getZ(),
                                     1.0, 0.65f, 0.65f, 0.65f, 75,
                                     true)
                             );
@@ -647,10 +664,71 @@ public class BaseformHandler
 
                     //Homing Attack
                     {
+                        if(baseformProperties.homingAttackAirTime > 0)
+                        {
+                            try {
+                                //Increment Counter
+                                baseformProperties.homingAttackAirTime += 1;
 
+                                //Get Target
+                                assert baseformProperties.homingTarget != null;
+                                LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.homingTarget);
+
+                                assert enemy != null;
+                                Vec3 playerPos = player.getPosition(0);
+                                Vec3 enemyPos = enemy.getPosition(0);
+                                double distanceFromEnemy = playerPos.distanceTo(enemyPos);
+
+
+                                //Homing
+                                if (baseformProperties.homingAttackAirTime < 45) {
+                                    player.setDeltaMovement(enemyPos.subtract(playerPos).normalize().scale(1.5));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                    //Fail
+                                    if (distanceFromEnemy > 16.0) {
+                                        //Homing Attack Data
+                                        baseformProperties.homingAttackAirTime = 44;
+                                        baseformProperties.selectiveInvul = false;
+                                    }
+
+                                    //Succeed
+                                    if (distanceFromEnemy < 1.5) {
+                                        //Homing Attack Data
+                                        baseformProperties.homingAttackAirTime = 44;
+
+                                        //Launch Up
+                                        player.setDeltaMovement(0.0, 0.8, 0.0);
+                                        player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                        //Damage Enemy
+                                        enemy.hurt(player.damageSources().playerAttack(player), 4.0f);
+                                    }
+
+                                }
+                                //Ending Segment
+                                else {
+                                    //Remove Gravity at point of impact
+                                    if (baseformProperties.homingAttackAirTime == 45)
+                                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+
+                                    //At the end return all data to normal
+                                    if (baseformProperties.homingAttackAirTime == 55) {
+                                        baseformProperties.homingAttackAirTime = 0;
+                                        baseformProperties.homingTarget = new UUID(0L, 0L);
+                                        baseformProperties.selectiveInvul = false;
+                                    }
+                                }
+                            } catch (NullPointerException e)
+                            {
+                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                baseformProperties.homingAttackAirTime = 0;
+                                baseformProperties.homingTarget = new UUID(0L, 0L);
+                                baseformProperties.selectiveInvul = false;
+                            }
+                        }
                     }
                 }
-
             }
 
             PacketHandler.sendToPlayer(player,

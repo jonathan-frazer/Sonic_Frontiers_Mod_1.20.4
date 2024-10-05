@@ -52,7 +52,7 @@ public class AirBoost {
                 ));
                 PacketHandler.sendToPlayer(player,new ParticleAuraPacketS2C(
                         ParticleTypes.SONIC_BOOM,
-                        0.0,1.0,0.0,
+                        player.getX(),player.getY()+1.0,player.getZ(),
                         0.0 ,0.0f,0.0f, 0.2f,1,true)
                 );
 

@@ -207,7 +207,8 @@ public class Utilities {
             );
 
     //User Defined Functions for things that should be available
-    public static Vec3 calculateViewVector(float pXRot, float pYRot) {
+    public static Vec3 calculateViewVector(float pXRot, float pYRot)
+    {
         float f = pXRot * ((float)Math.PI / 180F);
         float f1 = -pYRot * ((float)Math.PI / 180F);
         float f2 = Mth.cos(f1);
@@ -218,17 +219,14 @@ public class Utilities {
     }
 
     public static void displayParticle(Player player , ParticleOptions particleType,
-                                       double relX, double relY, double relZ,
+                                       double absX, double absY, double absZ,
                                        float radiusX, float radiusY, float radiusZ,
                                        double speedX, double speedY, double speedZ,
                                        int count, boolean force) {
         Level world = player.level();
 
-        double playerX = player.getX();
-        double playerY = player.getY();
-        double playerZ = player.getZ();
-
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++)
+        {
             double x = random.nextGaussian();
             double y = random.nextGaussian();
             double z = random.nextGaussian();
@@ -241,23 +239,19 @@ public class Utilities {
 
             // Spawn the particle effect
             world.addParticle(particleType, force,
-                    x + (playerX+relX),
-                    y + (playerY+relY),
-                    z + (playerZ+relZ),
+                    x + (absX),
+                    y + (absY),
+                    z + (absZ),
                     speedX, speedY, speedZ);
         }
     }
 
     public static void displayParticle(Player player , ParticleOptions particleType,
-                                       double relX, double relY, double relZ,
+                                       double absX, double absY, double absZ,
                                        float radiusX, float radiusY, float radiusZ,
                                        double speed,
                                        int count, boolean force) {
         Level world = player.level();
-
-        double playerX = player.getX();
-        double playerY = player.getY();
-        double playerZ = player.getZ();
 
         for (int i = 0; i < count; i++) {
 
@@ -272,9 +266,9 @@ public class Utilities {
             z = (z/nf)*radiusZ;
 
             // Calculate the particle's initial position
-            double particleX = x + (playerX+relX);
-            double particleY = y + (playerY+relY);
-            double particleZ = z + (playerZ+relZ);
+            double particleX = x + (absX);
+            double particleY = y + (absY);
+            double particleZ = z + (absZ);
 
             // Calculate the direction vector from the origin to the particle
             double dirX = particleX - x;

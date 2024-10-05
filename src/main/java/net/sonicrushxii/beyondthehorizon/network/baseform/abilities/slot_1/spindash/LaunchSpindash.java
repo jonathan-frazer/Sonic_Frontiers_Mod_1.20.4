@@ -31,6 +31,7 @@ public class LaunchSpindash {
 
                             //Set Data -> Charging
                             baseformProperties.ballFormState = (byte)2;
+                            baseformProperties.selectiveInvul = true;
 
                             //Launch
                             if (player.getAttribute(Attributes.MOVEMENT_SPEED).getModifier(new UUID(0x1234767890AB9DEFL, 0xFEBCBA09F7654C21L)) == null)

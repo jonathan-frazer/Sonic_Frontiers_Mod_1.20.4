@@ -18,7 +18,7 @@ import org.joml.Vector3f;
 
 public class ParticleAuraPacketS2C {
     private final String particleType;
-    private final double relX, relY, relZ;
+    private final double absX, absY, absZ;
     private final double speed;
     private final float radiusX,radiusY,radiusZ;
     private final short count;
@@ -26,12 +26,12 @@ public class ParticleAuraPacketS2C {
     private final float red, green, blue, scale; // Optional for DustParticleOptions
 
     public ParticleAuraPacketS2C(ParticleOptions particleType,
-                                 double relX, double relY, double relZ,
+                                 double absX, double absY, double absZ,
                                  double speed,
                                  float radiusX, float radiusY, float radiusZ,
                                  int count, boolean force) {
         this.particleType = ForgeRegistries.PARTICLE_TYPES.getKey(particleType.getType()).toString();
-        this.relX = relX;   this.relY = relY;   this.relZ = relZ;
+        this.absX = absX;   this.absY = absY;   this.absZ = absZ;
         this.speed = speed;
         this.radiusX = radiusX; this.radiusY = radiusY; this.radiusZ = radiusZ;
         this.count = (short) count;
@@ -49,14 +49,14 @@ public class ParticleAuraPacketS2C {
     }
 
     public ParticleAuraPacketS2C(ParticleOptions particleType,
-                                 double relX, double relY, double relZ,
+                                 double absX, double absY, double absZ,
                                  double speed,
                                  float radius,
                                  int count, boolean force) {
         this.particleType = ForgeRegistries.PARTICLE_TYPES.getKey(particleType.getType()).toString();
-        this.relX = relX;
-        this.relY = relY;
-        this.relZ = relZ;
+        this.absX = absX;
+        this.absY = absY;
+        this.absZ = absZ;
         this.speed = speed;
         this.radiusX = radius;
         this.radiusY = radius;
@@ -77,9 +77,9 @@ public class ParticleAuraPacketS2C {
 
     public ParticleAuraPacketS2C(FriendlyByteBuf buf) {
         this.particleType = buf.readUtf(1024);
-        this.relX = buf.readDouble();
-        this.relY = buf.readDouble();
-        this.relZ = buf.readDouble();
+        this.absX = buf.readDouble();
+        this.absY = buf.readDouble();
+        this.absZ = buf.readDouble();
         this.speed = buf.readDouble();
         this.radiusX = buf.readFloat();
         this.radiusY = buf.readFloat();
@@ -94,9 +94,9 @@ public class ParticleAuraPacketS2C {
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeUtf(this.particleType);
-        buf.writeDouble(this.relX);
-        buf.writeDouble(this.relY);
-        buf.writeDouble(this.relZ);
+        buf.writeDouble(this.absX);
+        buf.writeDouble(this.absY);
+        buf.writeDouble(this.absZ);
         buf.writeDouble(this.speed);
         buf.writeFloat(this.radiusX);
         buf.writeFloat(this.radiusY);
@@ -111,7 +111,6 @@ public class ParticleAuraPacketS2C {
 
     public void handle(CustomPayloadEvent.Context ctx) {
         ctx.enqueueWork(() -> {
-            System.out.println("Client Particle Display");
             // This code is run on the client side
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
                 Minecraft mc = Minecraft.getInstance();
@@ -129,7 +128,7 @@ public class ParticleAuraPacketS2C {
                     }
 
                     assert particleOptions != null;
-                    Utilities.displayParticle(player, particleOptions, this.relX, this.relY, this.relZ,
+                    Utilities.displayParticle(player, particleOptions, this.absX, this.absY, this.absZ,
                             this.radiusX, this.radiusY, this.radiusZ,
                             this.speed, this.count, this.force);
                 }

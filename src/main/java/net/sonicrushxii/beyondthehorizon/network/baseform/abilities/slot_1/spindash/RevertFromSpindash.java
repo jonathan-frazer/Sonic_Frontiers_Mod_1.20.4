@@ -35,6 +35,7 @@ public class RevertFromSpindash {
 
             //Remove Ballform
             baseformProperties.ballFormState = (byte)0;
+            baseformProperties.selectiveInvul = false;
 
             //Return to normal
             {

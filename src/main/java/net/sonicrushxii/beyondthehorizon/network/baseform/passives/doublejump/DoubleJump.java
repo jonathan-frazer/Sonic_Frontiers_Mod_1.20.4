@@ -51,10 +51,9 @@ public class DoubleJump {
                             //Particle
                             PacketHandler.sendToPlayer(player,new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(0.000f,0.969f,1.000f), 1.5f),
-                                    0.0,0.0,0.0,
+                                    player.getX(),player.getY(),player.getZ(),
                                     0.0 ,0.2f,0.01f, 0.2f,20,true)
                             );
-
 
                             //PlaySound
                             Level world = player.level();

@@ -33,6 +33,7 @@ public class ChargeSpindash {
 
                             //Initialize Counter
                             baseformProperties.spinDashChargeTime = 0;
+                            baseformProperties.selectiveInvul = true;
 
                             //Remove all Armor
                             EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);

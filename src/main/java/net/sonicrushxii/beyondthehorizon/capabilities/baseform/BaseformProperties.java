@@ -3,6 +3,8 @@ package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 import net.minecraft.nbt.CompoundTag;
 import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
 
+import java.util.UUID;
+
 public class BaseformProperties extends FormProperties {
     private final byte[] abilityCooldowns;
 
@@ -11,6 +13,7 @@ public class BaseformProperties extends FormProperties {
     public boolean sprintFlag;
     public boolean dangerSenseActive;
     public boolean dangerSensePlaying;
+    public boolean selectiveInvul;
 
     //Slot 1
     public byte airBoosts;
@@ -21,11 +24,14 @@ public class BaseformProperties extends FormProperties {
 
     //Slot 2
     public byte ballFormState;
-    public int spinDashChargeTime;
+    public short spinDashChargeTime;
+    public UUID homingTarget;
+    public short homingAttackAirTime;
 
     public BaseformProperties()
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
+        selectiveInvul = false;
 
         //Passives
         hasDoubleJump = true;
@@ -43,12 +49,15 @@ public class BaseformProperties extends FormProperties {
         //Slot 2
         ballFormState = (byte)0;
         spinDashChargeTime = 0;
+        homingTarget = new UUID(0L,0L);
+        homingAttackAirTime = 0;
     }
 
     public BaseformProperties(CompoundTag nbt)
     {
         //Cooldowns
         abilityCooldowns = nbt.getByteArray("AbilityCooldowns");
+        selectiveInvul = nbt.getBoolean("sonicInvul");
 
         //Passives
         hasDoubleJump = nbt.getBoolean("hasDoubleJump");
@@ -65,7 +74,9 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 2
         ballFormState = nbt.getByte("InBallForm");
-        spinDashChargeTime = nbt.getInt("Spindash");
+        spinDashChargeTime = nbt.getShort("Spindash");
+        homingTarget = nbt.getUUID("HomingTarget");
+        homingAttackAirTime = nbt.getShort("HomingTime");
     }
 
     @Override
@@ -75,6 +86,7 @@ public class BaseformProperties extends FormProperties {
 
         //Cooldowns
         nbt.putByteArray("AbilityCooldowns",abilityCooldowns);
+        nbt.putBoolean("sonicInvul",selectiveInvul);
 
         //Passives
         nbt.putBoolean("hasDoubleJump",hasDoubleJump);
@@ -91,7 +103,9 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 2
         nbt.putByte("InBallForm",ballFormState);
-        nbt.putInt("Spindash", spinDashChargeTime);
+        nbt.putShort("Spindash", spinDashChargeTime);
+        nbt.putUUID("HomingTarget",homingTarget);
+        nbt.putShort("HomingTime",homingAttackAirTime);
 
         return nbt;
     }
