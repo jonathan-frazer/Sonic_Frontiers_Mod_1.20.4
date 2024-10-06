@@ -40,5 +40,23 @@
     "sounds": [
       "beyondthehorizon:baseform/depower_boost_sfx"
     ]
+  },
+  "homing_attack": {
+    "subtitles": "sounds.sonic.baseform.homing_attack",
+    "sounds": [
+      "beyondthehorizon:baseform/homing_attack_sfx"
+    ]
+  },
+  "spindash_charge": {
+    "subtitles": "sounds.sonic.baseform.spindash_charge",
+    "sounds": [
+      "beyondthehorizon:baseform/spindash_charge_sfx"
+    ]
+  },
+  "spindash_release": {
+    "subtitles": "sounds.sonic.baseform.spindash_release",
+    "sounds": [
+      "beyondthehorizon:baseform/spindash_release_sfx"
+    ]
   }
 }

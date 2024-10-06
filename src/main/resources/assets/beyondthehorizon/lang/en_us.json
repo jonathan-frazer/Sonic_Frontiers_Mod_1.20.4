@@ -14,6 +14,9 @@
   "sounds.sonic.baseform.light_speed_charge": "Light Speed Charge(Sonic Frontiers)",
   "sounds.sonic.baseform.power_boost": "Power Boost(Sonic Frontiers)",
   "sounds.sonic.baseform.depower_boost": "De-Power Boost(Sonic Frontiers)",
+  "sounds.sonic.baseform.spindash_charge": "Spindash Charge(Sonic Frontiers)",
+  "sounds.sonic.baseform.spindash_release": "Spindash Release(Sonic Frontiers)",
+  "sounds.sonic.baseform.homing_attack": "Homing Attack(Sonic Frontiers)",
 
   "item.beyondthehorizon.sonic_superform_armor_chestplate": "Sonic Chestplate(Super)",
   "item.beyondthehorizon.sonic_superform_armor_leggings": "Sonic Leggings(Super)",

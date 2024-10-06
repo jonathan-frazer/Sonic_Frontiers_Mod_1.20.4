@@ -31,9 +31,9 @@ public class StartSprint {
         Level world = player.level();
         world.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.MAX_BOOST.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
-        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(ParticleTypes.FLASH, 0.0, 1.0, 0.0,
+        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(ParticleTypes.FLASH, player.getX()+0.0, player.getY()+1.0, player.getZ()+0.0,
                 0.001, 0.0f, 1, true));
-        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(ParticleTypes.SONIC_BOOM, 0.0, 1.0, 0.0,
+        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(ParticleTypes.SONIC_BOOM, player.getX()+0.0, player.getY()+1.0, player.getZ()+0.0,
                 0.001, 0.0f, 1, true));
     }
 

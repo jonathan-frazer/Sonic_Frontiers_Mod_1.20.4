@@ -73,7 +73,7 @@ public class RevertFromSpindash {
                 player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(0.0);
 
             //Set Invisibility
-            player.removeEffect(MobEffects.INVISIBILITY);
+            player.setInvisible(false);
 
             //PlaySound
 

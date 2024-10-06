@@ -2,14 +2,18 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spin
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
+import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 import java.util.UUID;
@@ -42,7 +46,9 @@ public class LaunchSpindash {
                             player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(1.5);
 
                             //PlaySound
-
+                            Level world = player.level();
+                            PacketHandler.sendToALLPlayers(new PlayerStopSoundPacketS2C(ModSounds.SPINDASH_CHARGE.get().getLocation()));
+                            world.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SPINDASH_RELEASE.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
                             PacketHandler.sendToPlayer(player,
                                     new SyncPlayerFormS2C(

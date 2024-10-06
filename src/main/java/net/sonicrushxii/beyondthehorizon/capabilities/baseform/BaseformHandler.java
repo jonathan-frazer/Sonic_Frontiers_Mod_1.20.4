@@ -387,7 +387,7 @@ public class BaseformHandler
                         player.isShiftKeyDown() &&
                         baseformProperties.lightSpeedState == (byte) 0 &&
                         baseformProperties.getCooldown(BaseformActiveAbility.LIGHT_SPEED_ATTACK) == (byte) 0 &&
-                        KeyBindings.INSTANCE.useAbility2.consumeClick()) {
+                        KeyBindings.INSTANCE.useAbility2.isDown()) {
                     PacketHandler.sendToServer(new LightspeedCharge());
 
                     lightSpeedCanceller = Scheduler.scheduleTask(() -> {
@@ -441,7 +441,7 @@ public class BaseformHandler
                 {
                     //Force W Presses and lower Mouse Sens
                     double currentSens = minecraft.options.sensitivity().get();
-                    minecraft.options.sensitivity().set(currentSens/2.5f);
+                    minecraft.options.sensitivity().set(currentSens/4.5f);
                     PacketHandler.sendToServer(new LaunchSpindash());
                     Scheduler.scheduleTask(()->
                     {
@@ -866,6 +866,12 @@ public class BaseformHandler
 
             }
 
+            //Slot 2
+            {
+                //SpinDash
+                player.setInvisible(false);
+            }
+
         }
         //Remove Data
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
@@ -886,7 +892,6 @@ public class BaseformHandler
         player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
         player.removeEffect(MobEffects.DAMAGE_BOOST);
         player.removeEffect(MobEffects.DIG_SPEED);
-        player.removeEffect(MobEffects.INVISIBILITY);
 
         //Commands
         CommandSourceStack commandSourceStack = player.createCommandSourceStack().withPermission(4).withSuppressedOutput();

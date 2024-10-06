@@ -1,15 +1,24 @@
 package net.sonicrushxii.beyondthehorizon.timehandler;
 
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+
+import java.util.HashSet;
+import java.util.UUID;
 
 public class TimeHandler {
+
+    private static HashSet<UUID> slowedProjectiles = new HashSet<>();
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent.Post event) {
@@ -25,7 +34,6 @@ public class TimeHandler {
 
             dimIdx= 0;
             //Iterate through every dimension
-
             for(ServerLevel world : server.getAllLevels())
             {
                 //Set a Flag Variable for the current tick
@@ -46,6 +54,24 @@ public class TimeHandler {
                                 //If Player has the given tag, then Continue
                                 if (!timeAffector.isContainedBy(playerSonicForm.getFormProperties()))
                                     return;
+
+                                //Slow Projectiles
+                                for(Projectile projectile : world.getEntitiesOfClass(Projectile.class,
+                                        new AABB(player.getX()+32,player.getY()+32,player.getZ()+32,
+                                                player.getX()-32,player.getY()-32,player.getZ()-32),
+                                        (projectile)->!slowedProjectiles.contains(projectile.getUUID())))
+                                {
+                                    System.out.println("Slowed Projectile");
+
+                                    //Remove Gravity, Lower Speed
+                                    projectile.setNoGravity(true);
+                                    projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.25));
+
+                                    PacketHandler.sendToALLPlayers(new TimeProjSync(projectile.getId(),
+                                            projectile.getDeltaMovement(),projectile.isNoGravity()));
+
+                                    slowedProjectiles.add(projectile.getUUID());
+                                }
 
                                 //Slow down Time
                                 if (!timeAffector.dimensionalUsers.get(DimIdx))
@@ -71,6 +97,28 @@ public class TimeHandler {
                     {
                         TickRateManager tickRateManager = world.tickRateManager();
                         tickRateManager.setTickRate(tickRateManager.tickrate() * timeAffector.getTimeFactor());
+
+                        //Remove Slow on the Projectiles
+                        for(UUID projectileUUID : slowedProjectiles)
+                        {
+                            try {
+                                Projectile projectile = (Projectile) world.getEntity(projectileUUID);
+                                projectile.setDeltaMovement(projectile.getDeltaMovement().scale(4));
+                                projectile.setNoGravity(false);
+                            }catch(NullPointerException|ClassCastException ignored){}
+                        }
+
+                        //Cleanup the hashset
+                        slowedProjectiles.removeIf((projectileUUID)->{
+                            try{
+                                Projectile projectile = (Projectile) world.getEntity(projectileUUID);
+                                return projectile != null;
+                            }catch (ClassCastException ignored)
+                            {
+                                return false;
+                            }
+                        });
+
                     }
                     //Set All users of this dimension to false
                     timeAffector.dimensionalUsers.set(dimIdx,false);

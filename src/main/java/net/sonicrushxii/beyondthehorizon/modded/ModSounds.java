@@ -27,6 +27,12 @@ public class ModSounds {
             registerSoundEvents("power_boost");
     public static final RegistryObject<SoundEvent> DEPOWER_BOOST =
             registerSoundEvents("depower_boost");
+    public static final RegistryObject<SoundEvent> HOMING_ATTACK =
+            registerSoundEvents("homing_attack");
+    public static final RegistryObject<SoundEvent> SPINDASH_CHARGE =
+            registerSoundEvents("spindash_charge");
+    public static final RegistryObject<SoundEvent> SPINDASH_RELEASE =
+            registerSoundEvents("spindash_release");
 
     private static RegistryObject<SoundEvent> registerSoundEvents(String soundName){
         return SOUND_EVENTS.register(soundName,

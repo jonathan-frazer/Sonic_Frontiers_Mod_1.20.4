@@ -26,6 +26,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.Ste
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.*;
 import net.sonicrushxii.beyondthehorizon.network.sync.*;
+import net.sonicrushxii.beyondthehorizon.timehandler.TimeProjSync;
 
 public class PacketHandler {
     private static final int PROTOCOL_VERSION = 1;
@@ -45,6 +46,7 @@ public class PacketHandler {
             INSTANCE.messageBuilder(PlayerPlaySoundPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(PlayerPlaySoundPacketS2C::encode).decoder(PlayerPlaySoundPacketS2C::new).consumerMainThread(PlayerPlaySoundPacketS2C::handle).add();
             INSTANCE.messageBuilder(PlayerStopSoundPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(PlayerStopSoundPacketS2C::encode).decoder(PlayerStopSoundPacketS2C::new).consumerMainThread(PlayerStopSoundPacketS2C::handle).add();
             INSTANCE.messageBuilder(VirtualSlotSyncS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(VirtualSlotSyncS2C::encode).decoder(VirtualSlotSyncS2C::new).consumerMainThread(VirtualSlotSyncS2C::handle).add();
+            INSTANCE.messageBuilder(TimeProjSync.class, NetworkDirection.PLAY_TO_CLIENT).encoder(TimeProjSync::encode).decoder(TimeProjSync::new).consumerMainThread(TimeProjSync::handle).add();
         }
 
         //Base form
