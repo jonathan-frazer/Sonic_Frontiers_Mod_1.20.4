@@ -37,33 +37,6 @@ public class RevertFromSpindash {
             baseformProperties.ballFormState = (byte)0;
             baseformProperties.selectiveInvul = false;
 
-            //Return to normal
-            {
-                //Feet
-                ItemStack armorItem = (baseformProperties.lightSpeedState == (byte) 2) ? new ItemStack(ModItems.BASEFORM_LIGHTSPEED_BOOTS.get()) : new ItemStack(ModItems.BASEFORM_BOOTS.get());
-                armorItem.setTag(BaseformHandler.baseformArmorNBTTag);
-                player.setItemSlot(EquipmentSlot.FEET, armorItem);
-
-                //Legs
-                armorItem = (baseformProperties.lightSpeedState == (byte) 2) ? new ItemStack(ModItems.BASEFORM_LIGHTSPEED_LEGGINGS.get()) : new ItemStack(ModItems.BASEFORM_LEGGINGS.get());
-                armorItem.setTag(BaseformHandler.baseformArmorNBTTag);
-                player.setItemSlot(EquipmentSlot.LEGS, armorItem);
-
-                //Chest
-                armorItem = (baseformProperties.lightSpeedState == (byte) 2) ? new ItemStack(ModItems.BASEFORM_LIGHTSPEED_CHESTPLATE.get()) : new ItemStack(ModItems.BASEFORM_CHESTPLATE.get());
-                armorItem.setTag(BaseformHandler.baseformArmorNBTTag);
-                player.setItemSlot(EquipmentSlot.CHEST, armorItem);
-
-                //Head
-                EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
-                if (baseformProperties.lightSpeedState == (byte) 2)
-                    player.setItemSlot(EquipmentSlot.HEAD, BaseformHandler.baseformLSSonicHead);
-                else if (baseformProperties.powerBoost)
-                    player.setItemSlot(EquipmentSlot.HEAD, BaseformHandler.baseformPBSonicHead);
-                else
-                    player.setItemSlot(EquipmentSlot.HEAD, BaseformHandler.baseformSonicHead);
-            }
-
             //Normal Speed
             //Launch
             if (player.getAttribute(Attributes.MOVEMENT_SPEED).getModifier(new UUID(0x1234767890AB9DEFL, 0xFEBCBA09F7654C21L)) != null)
@@ -71,9 +44,6 @@ public class RevertFromSpindash {
 
             if(baseformProperties.boostLvl == 0 && !player.isSprinting())
                 player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(0.0);
-
-            //Set Invisibility
-            player.setInvisible(false);
 
             //PlaySound
 

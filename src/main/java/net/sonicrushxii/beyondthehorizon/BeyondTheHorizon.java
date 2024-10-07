@@ -60,6 +60,8 @@ public class BeyondTheHorizon
         MinecraftForge.EVENT_BUS.register(new AttackHandler());
         MinecraftForge.EVENT_BUS.register(new EquipmentChangeHandler());
 
+
+
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 
@@ -109,7 +111,6 @@ public class BeyondTheHorizon
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
-
         }
 
         @SubscribeEvent

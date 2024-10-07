@@ -38,16 +38,6 @@ public class ChargeSpindash {
                             baseformProperties.spinDashChargeTime = 0;
                             baseformProperties.selectiveInvul = true;
 
-                            //Remove all Armor
-                            EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
-                            player.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
-                            player.setItemSlot(EquipmentSlot.CHEST, ItemStack.EMPTY);
-                            player.setItemSlot(EquipmentSlot.LEGS, ItemStack.EMPTY);
-                            player.setItemSlot(EquipmentSlot.FEET, ItemStack.EMPTY);
-
-                            //Set Invisibility
-                            player.setInvisible(true);
-
                             //Set Data -> Charging
                             baseformProperties.ballFormState = (byte)1;
 
