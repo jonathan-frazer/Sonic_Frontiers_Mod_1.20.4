@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
@@ -25,6 +26,7 @@ import net.sonicrushxii.beyondthehorizon.event_handler.*;
 import net.sonicrushxii.beyondthehorizon.modded.ModCreativeModeTabs;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
+import net.sonicrushxii.beyondthehorizon.models.Spindash;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import net.sonicrushxii.beyondthehorizon.timehandler.TimeHandler;
@@ -129,6 +131,12 @@ public class BeyondTheHorizon
             event.register(KeyBindings.INSTANCE.useAbility5);
             event.register(KeyBindings.INSTANCE.useAbility6);
             event.register(KeyBindings.INSTANCE.useSingleAbility);
+        }
+
+        @SubscribeEvent
+        public static void registerModelLayer(EntityRenderersEvent.RegisterLayerDefinitions event)
+        {
+            event.registerLayerDefinition(Spindash.LAYER_LOCATION,Spindash::createBodyLayer);
         }
     }
 }
