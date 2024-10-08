@@ -6,6 +6,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
@@ -35,7 +36,7 @@ public class PlayerTickHandler {
         if (!player.isAlive())
             return;
 
-        CompoundTag playerNBT = player.serializeNBT();
+       CompoundTag playerNBT = player.serializeNBT();
         switch(ClientFormData.getPlayerForm())
         {
             case BASEFORM -> BaseformHandler.performBaseformClientTick(player,playerNBT);

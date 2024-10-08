@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.models.ModelRenderer;
 import net.sonicrushxii.beyondthehorizon.models.Spindash;
 
 @Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID)
@@ -37,17 +38,17 @@ public class RenderHandler {
 
                 //PoseStack
                 PoseStack poseStack = event.getPoseStack();
-                MultiBufferSource buffer = event.getMultiBufferSource();
 
                 if(baseformProperties.ballFormState >= 1 || baseformProperties.homingAttackAirTime > 1)
                 {
                     poseStack.pushPose();
                     // Translate to the entity's position
-                    poseStack.translate(0.0D, 0.0D, 0.0D);
+                    poseStack.translate(0.0D, -0.5D, 0.0D);
                     //Control Orientation
-                    controlOrientation(poseStack, entity);
+                    float entityYaw = (entity.getYRot() > 180.0)?entity.getYRot()-180.0f:entity.getYRot()+180.0f;
+                    poseStack.mulPose(Axis.YP.rotationDegrees(-entityYaw));
                     //Render The Custom Model
-                    renderCustomModel(poseStack, buffer, entity, event.getPartialTick(), event.getPackedLight());
+                    ModelRenderer.renderModel(Spindash.class,event,poseStack);
                     poseStack.popPose();
 
                     event.setCanceled(true);
@@ -64,15 +65,16 @@ public class RenderHandler {
                 if(player != null && entity.is(player))
                 {
                     PoseStack poseStack = event.getPoseStack();
-                    MultiBufferSource buffer = event.getMultiBufferSource();
 
                     poseStack.pushPose();
-                    // Translate to the entity's position
-                    poseStack.translate(0.0D, 0.0D, 0.0D);
-                    //Control Orientation
-                    controlOrientation(poseStack, entity);
+                    poseStack.translate(0.0D, -0.5D, 0.0D);
+
+                    //Apply Rotation
+                    float entityYaw = (entity.getYRot() > 180.0)?entity.getYRot()-180.0f:entity.getYRot()+180.0f;
+                    poseStack.mulPose(Axis.YP.rotationDegrees(-entityYaw));
+
                     //Render The Custom Model
-                    renderCustomModel(poseStack, buffer, entity, event.getPartialTick(), event.getPackedLight());
+                    ModelRenderer.renderModel(Spindash.class,event,poseStack);
                     poseStack.popPose();
 
                     event.setCanceled(true);
@@ -94,42 +96,24 @@ public class RenderHandler {
         Vec3 entityPos = entity.getPosition(0);
         Vec3 playerPos = player.getPosition(0);
 
-        double dist1 = playerPos.distanceTo(entityPos);
+        double dist1 = playerPos.distanceToSqr(entityPos);
 
         playerPos = playerPos.add(player.getLookAngle());
 
-        double dist2 = playerPos.distanceTo(entityPos);
+        double dist2 = playerPos.distanceToSqr(entityPos);
 
-        if(dist1 - dist2 < 0.5 || player.onGround())
+        if(dist1 - dist2 < 0.89 || player.onGround())
             return;
 
         PoseStack poseStack = event.getPoseStack();
-        MultiBufferSource buffer = event.getMultiBufferSource();
 
         // Push the current matrix stack
         poseStack.pushPose();
         poseStack.translate(0.0D, entity.getBbHeight() - 0.5D, 0.0D);
 
-        controlOrientation(poseStack, entity);
         // Render the custom model
-        renderCustomModel(poseStack, buffer, entity, event.getPartialTick(), event.getPackedLight());
+        ModelRenderer.renderModel(Spindash.class,event,poseStack);
 
         poseStack.popPose();
-    }
-
-    private static void renderCustomModel(PoseStack poseStack, MultiBufferSource buffer, LivingEntity entity, float partialTick, int packedLight) {
-        Spindash<LivingEntity> model = new Spindash<>(Minecraft.getInstance().getEntityModels().bakeLayer(Spindash.LAYER_LOCATION));
-
-        // Render the custom model
-        VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/entity/spindash.png")));
-        model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
-    }
-
-    private static void controlOrientation(PoseStack poseStack, LivingEntity entity) {
-        // Example: Rotate the model based on the entity's yaw and pitch
-        float entityYaw = (entity.getYRot() > 180.0)?entity.getYRot()-180.0f:entity.getYRot()+180.0f;
-
-        // Apply rotation to the model
-        poseStack.mulPose(Axis.YP.rotationDegrees(-entityYaw));
     }
 }
