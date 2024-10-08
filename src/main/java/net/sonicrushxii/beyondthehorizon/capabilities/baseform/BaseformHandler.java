@@ -637,12 +637,12 @@ public class BaseformHandler
                                     0.001, 0.00f, 0.00f, 0.00f, 1,
                                     true));
 
-                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                            /*PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1.5f),
                                     player.getX(), player.getY()+0.55, player.getZ(),
-                                    1.0, 0.65f, 0.65f, 0.65f, 75,
+                                    1.0, 0.65f, 0.65f, 0.65f, 10,
                                     true)
-                            );
+                            );*/
                         }
                         if (baseformProperties.ballFormState == (byte) 2) {
 
@@ -653,12 +653,12 @@ public class BaseformHandler
                                 nearbyEntity.hurt(player.damageSources().playerAttack(player),
                                         Math.min(22.0f,baseformProperties.spinDashChargeTime/4.0f));
 
-                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                            /*PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1.5f),
                                     player.getX(), player.getY()+0.55, player.getZ(),
-                                    1.0, 0.65f, 0.65f, 0.65f, 75,
+                                    1.0, 0.65f, 0.65f, 0.65f, 10,
                                     true)
-                            );
+                            );*/
                         }
                     }
 

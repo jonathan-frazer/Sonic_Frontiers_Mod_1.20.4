@@ -39,7 +39,9 @@ public class ModelRenderer {
             ModelPart modelPart = entityModelSet.bakeLayer(layerLocation);
 
             VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(new ResourceLocation(BeyondTheHorizon.MOD_ID, textureLocation)));
-            modelClass.getConstructor(ModelPart.class).newInstance(modelPart).renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
+            EntityModel model = modelClass.getConstructor(ModelPart.class).newInstance(modelPart);
+            model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
+
         }
 
         catch (NullPointerException | ClassCastException | NoSuchMethodError | NoSuchFieldException |
