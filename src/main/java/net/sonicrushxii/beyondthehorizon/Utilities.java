@@ -218,6 +218,29 @@ public class Utilities {
         return new Vec3((f3 * f4), (-f5), (f2 * f4));
     }
 
+    public static float getYawFromVec(Vec3 vec) {
+        double x = vec.x();
+        double z = vec.z();
+
+        return (float) (Math.atan2(z, x) * (180 / Math.PI));
+    }
+
+    public static float[] getYawPitchFromVec(Vec3 vec) {
+        double x = vec.x();
+        double y = vec.normalize().y();
+        double z = vec.z();
+
+        // Calculate yaw
+        float yaw = (float) (Math.atan2(z, x) * (180 / Math.PI));
+
+        // Calculate pitch
+        float pitch = (float) (Math.asin(y) * (180 / Math.PI));
+
+        System.out.println(y+":"+Math.asin(y));
+
+        return new float[]{yaw, pitch};
+    }
+
     public static void displayParticle(Player player , ParticleOptions particleType,
                                        double absX, double absY, double absZ,
                                        float radiusX, float radiusY, float radiusZ,

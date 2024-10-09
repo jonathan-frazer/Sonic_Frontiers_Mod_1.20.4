@@ -4,12 +4,12 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
+import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.models.ModelRenderer;
@@ -34,8 +34,10 @@ public class RenderHandler {
 
                     if (baseformProperties.ballFormState >= 1 || baseformProperties.homingAttackAirTime > 1) {
                         poseStack.pushPose();
+
                         // Translate to the entity's position
                         poseStack.translate(0.0D, -0.5D, 0.0D);
+
                         //Control Orientation
                         float entityYaw = (entity.getYRot() > 180.0) ? entity.getYRot() - 180.0f : entity.getYRot() + 180.0f;
                         poseStack.mulPose(Axis.YP.rotationDegrees(-entityYaw));
@@ -79,37 +81,36 @@ public class RenderHandler {
     @SubscribeEvent
     public static void onPostRenderLiving(RenderLivingEvent.Post<?, ?> event)
     {
+        LivingEntity entity = event.getEntity();
+        LocalPlayer player = Minecraft.getInstance().player;
+
+        assert player != null;
+        Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+        Vec3 playerLookAngle = player.getLookAngle();
+        Vec3 entityPos = new Vec3(entity.getX(),entity.getY(),entity.getZ());
+
         //Homing Attack
         {
-            LivingEntity entity = event.getEntity();
-            Player player = Minecraft.getInstance().player;
+            if (VirtualSlotHandler.getCurrAbility() == 1 && entity.getUUID().equals(ClientFormData.hasHomingReticle()))
+            {
+                PoseStack poseStack = event.getPoseStack();
 
-            if (VirtualSlotHandler.getCurrAbility() != 1)
-                return;
+                // Push the current matrix stack
+                poseStack.pushPose();
 
-            assert player != null;
-            Vec3 entityPos = entity.getPosition(0);
-            Vec3 playerPos = player.getPosition(0);
+                Vec3 dir = playerPos.subtract(entityPos).normalize();
+                poseStack.translate(dir.x, dir.y + entity.getEyeHeight()-1D, dir.z);
 
-            double dist1 = playerPos.distanceToSqr(entityPos);
+                //Apply Rotation
+                float[] yawPitch = Utilities.getYawPitchFromVec(dir);
+                poseStack.mulPose(Axis.YP.rotationDegrees(-yawPitch[0]));
+                poseStack.mulPose(Axis.ZP.rotationDegrees(yawPitch[1]));
 
-            playerPos = playerPos.add(player.getLookAngle());
+                // Render the custom model
+                ModelRenderer.renderModel(HomingAttack.class, event, poseStack);
 
-            double dist2 = playerPos.distanceToSqr(entityPos);
-
-            if (dist1 - dist2 < 0.89 || player.onGround())
-                return;
-
-            PoseStack poseStack = event.getPoseStack();
-
-            // Push the current matrix stack
-            poseStack.pushPose();
-            poseStack.translate(0.0D, entity.getBbHeight() - 0.5D, 0.0D);
-
-            // Render the custom model
-            ModelRenderer.renderModel(HomingAttack.class, event, poseStack);
-
-            poseStack.popPose();
+                poseStack.popPose();
+            }
         }
     }
 }

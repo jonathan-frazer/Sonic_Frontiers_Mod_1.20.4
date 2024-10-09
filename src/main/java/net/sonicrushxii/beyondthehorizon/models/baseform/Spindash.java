@@ -2,11 +2,6 @@ package net.sonicrushxii.beyondthehorizon.models.baseform;// Made with Blockbenc
 // Exported for Minecraft version 1.17 or later with Mojang mappings
 // Paste this class into your mod and generate all required imports
 
-import net.minecraft.client.animation.AnimationChannel;
-import net.minecraft.client.animation.AnimationDefinition;
-import net.minecraft.client.animation.Keyframe;
-import net.minecraft.client.animation.KeyframeAnimations;
-import net.minecraft.client.model.HierarchicalModel;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -18,11 +13,17 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.sonicrushxii.beyondthehorizon.models.ModelRenderer;
 
-public class Spindash<T extends Entity> extends HierarchicalModel<T> {
+public class Spindash<T extends Entity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "spindash"), "main");
-	public static final String TEXTURE_LOCATION = "textures/custom_model/spindash_0.png";
+	public static final ModelRenderer.Texture[] TEXTURE_LOCATIONS = {
+			new ModelRenderer.Texture("textures/custom_model/spindash_0.png",(byte)0),
+			new ModelRenderer.Texture("",(byte)5),
+	};
+	public static final byte ANIMATION_LENGTH = 10;
+
 	private final ModelPart Ballform;
 	private final ModelPart hexadecagon1;
 	private final ModelPart hexadecagon2;
@@ -100,54 +101,10 @@ public class Spindash<T extends Entity> extends HierarchicalModel<T> {
 
 	@Override
 	public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.root().getAllParts().forEach(ModelPart::resetPose);
-		this.applyStatic(SPIN);
 	}
 
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
 		Ballform.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
 	}
-
-	@Override
-	public ModelPart root() {
-		return Ballform;
-	}
-
-	public static final AnimationDefinition SPIN = AnimationDefinition.Builder.withLength(0.3333F).looping()
-			.addAnimation("Ballform", new AnimationChannel(AnimationChannel.Targets.ROTATION,
-					new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 45.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.0407F, KeyframeAnimations.degreeVec(0.0F, 45.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.0417F, KeyframeAnimations.degreeVec(0.0F, 90.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.0823F, KeyframeAnimations.degreeVec(0.0F, 90.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.0833F, KeyframeAnimations.degreeVec(0.0F, 125.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.124F, KeyframeAnimations.degreeVec(0.0F, 125.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.125F, KeyframeAnimations.degreeVec(0.0F, 180.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.1657F, KeyframeAnimations.degreeVec(0.0F, 180.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.1667F, KeyframeAnimations.degreeVec(0.0F, 225.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.2073F, KeyframeAnimations.degreeVec(0.0F, 225.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.2083F, KeyframeAnimations.degreeVec(0.0F, 270.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.249F, KeyframeAnimations.degreeVec(0.0F, 270.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.25F, KeyframeAnimations.degreeVec(0.0F, 315.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.2907F, KeyframeAnimations.degreeVec(0.0F, 315.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.2917F, KeyframeAnimations.degreeVec(0.0F, 360.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
-			))
-			.addAnimation("Ballform", new AnimationChannel(AnimationChannel.Targets.POSITION,
-					new Keyframe(0.0F, KeyframeAnimations.posVec(0.0F, 4.0F, -9.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.0407F, KeyframeAnimations.posVec(0.0F, 4.0F, -9.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.0417F, KeyframeAnimations.posVec(0.0F, 13.15F, -13.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.0823F, KeyframeAnimations.posVec(0.0F, 13.15F, -13.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.0833F, KeyframeAnimations.posVec(0.0F, 20.7F, -11.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.124F, KeyframeAnimations.posVec(0.0F, 20.7F, -11.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.125F, KeyframeAnimations.posVec(0.0F, 26.1F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.1657F, KeyframeAnimations.posVec(0.0F, 26.1F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.1667F, KeyframeAnimations.posVec(0.0F, 22.25F, 9.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.2073F, KeyframeAnimations.posVec(0.0F, 22.25F, 9.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.2083F, KeyframeAnimations.posVec(0.0F, 13.1F, 13.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.249F, KeyframeAnimations.posVec(0.0F, 13.1F, 13.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.25F, KeyframeAnimations.posVec(0.0F, 4.0F, 9.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.2907F, KeyframeAnimations.posVec(0.0F, 4.0F, 9.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(0.2917F, KeyframeAnimations.posVec(0.0F, 0.1F, 0.0F), AnimationChannel.Interpolations.LINEAR)
-			))
-			.build();
 }

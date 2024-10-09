@@ -23,7 +23,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
@@ -71,10 +70,7 @@ import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class BaseformHandler
 {
@@ -240,6 +236,7 @@ public class BaseformHandler
         Minecraft minecraft = Minecraft.getInstance();
         Level level = player.level();
 
+        Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
 
         Vec3 playerDirCentre = Utilities.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
         BlockPos centrePos = player.blockPosition().offset(
@@ -461,11 +458,20 @@ public class BaseformHandler
 
             //Homing Attack
             {
+                //Reset Reticle
+                ClientFormData.setHomingReticle(null);
+
+                //Spawn Reticle
+                if(!player.onGround())
+                    HomingAttack.scanFoward(player);
+
+                //Perform homing attack
                 if (VirtualSlotHandler.getCurrAbility() == 1 && (player.getXRot() <= 80.0 || !player.isShiftKeyDown()) &&
                         KeyBindings.INSTANCE.useAbility1.consumeClick() && baseformProperties.ballFormState != (byte)1 && baseformProperties.homingAttackAirTime == 0)
                 {
-                    System.out.println("Send Homing attack Packet");
-                    PacketHandler.sendToServer(new HomingAttack());
+                    //Perform an Obligatory Scan Foward again
+                    HomingAttack.scanFoward(player);
+                    PacketHandler.sendToServer(new HomingAttack(ClientFormData.hasHomingReticle()));
                 }
             }
         }
@@ -664,6 +670,7 @@ public class BaseformHandler
 
                     //Homing Attack
                     {
+                        //Perform homing attack
                         if(baseformProperties.homingAttackAirTime > 0)
                         {
                             try {
