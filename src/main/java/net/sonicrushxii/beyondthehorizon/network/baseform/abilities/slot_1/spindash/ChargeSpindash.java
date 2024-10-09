@@ -11,7 +11,9 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
@@ -43,6 +45,7 @@ public class ChargeSpindash {
 
                             //Lock Player in Position
                             player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.0);
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.80);
 
                             //PlaySound
                             Level world = player.level();

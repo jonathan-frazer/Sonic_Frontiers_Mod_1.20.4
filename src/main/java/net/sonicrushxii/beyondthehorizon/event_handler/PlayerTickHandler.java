@@ -18,7 +18,6 @@ public class PlayerTickHandler {
     public static int clientTickCounter = 0;
     private static final int TICKS_PER_SECOND = 20;
 
-
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent.Pre event) {
         if (event.player == null) return;

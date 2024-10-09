@@ -85,9 +85,9 @@ public class RenderHandler {
         LocalPlayer player = Minecraft.getInstance().player;
 
         assert player != null;
-        Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+        Vec3 playerPos = new Vec3(player.getX(),player.getY()+entity.getEyeHeight(),player.getZ());
         Vec3 playerLookAngle = player.getLookAngle();
-        Vec3 entityPos = new Vec3(entity.getX(),entity.getY(),entity.getZ());
+        Vec3 entityPos = new Vec3(entity.getX(),entity.getY()+entity.getEyeHeight(),entity.getZ());
 
         //Homing Attack
         {
@@ -98,8 +98,8 @@ public class RenderHandler {
                 // Push the current matrix stack
                 poseStack.pushPose();
 
-                Vec3 dir = playerPos.subtract(entityPos).normalize();
-                poseStack.translate(dir.x, dir.y + entity.getEyeHeight()-1D, dir.z);
+                Vec3 dir = playerPos.subtract(entityPos).normalize().scale(1.5);
+                poseStack.translate(dir.x, dir.y, dir.z);
 
                 //Apply Rotation
                 float[] yawPitch = Utilities.getYawPitchFromVec(dir);

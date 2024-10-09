@@ -236,8 +236,6 @@ public class Utilities {
         // Calculate pitch
         float pitch = (float) (Math.asin(y) * (180 / Math.PI));
 
-        System.out.println(y+":"+Math.asin(y));
-
         return new float[]{yaw, pitch};
     }
 

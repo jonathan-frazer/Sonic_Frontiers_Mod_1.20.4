@@ -25,7 +25,9 @@ public class ModelRenderer {
     //Used for Animations
     private static String getTextureLocation(Texture[] textures, byte animationLength)
     {
-        assert animationLength <= 20;
+        if(animationLength > 20 || 20%animationLength != 0)
+            throw new RuntimeException("Incorrect Animation Length, Must be a divisor of 20");
+
         if(animationLength == 0 || textures.length == 1)
             return textures[0].textureLocation;
 

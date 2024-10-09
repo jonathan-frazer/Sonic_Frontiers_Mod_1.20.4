@@ -424,12 +424,14 @@ public class BaseformHandler
                         KeyBindings.INSTANCE.useAbility1.isDown()) {
                     //Set Camera
                     player.setXRot(0.0f);
+                    ClientFormData.storeCamPos((ClientFormData.getStoredCamPos()==null)?minecraft.options.getCameraType():ClientFormData.getStoredCamPos());
                     minecraft.options.setCameraType(CameraType.THIRD_PERSON_BACK);
 
                     //Let go of Z
                     minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), KeyBindings.INSTANCE.useAbility1.getKey().getValue(), 0, GLFW.GLFW_RELEASE, 0);
 
                     //Send Packet
+                    baseformProperties.ballFormState = 1;
                     PacketHandler.sendToServer(new ChargeSpindash());
                 }
 
@@ -446,10 +448,12 @@ public class BaseformHandler
                         if(!InputConstants.isKeyDown(mc.getWindow().getWindow(),InputConstants.KEY_R))
                             mc.keyboardHandler.keyPress(mc.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_RELEASE, 0);
                         mc.options.sensitivity().set(currentSens);
+                        mc.options.setCameraType(ClientFormData.useStoredCamPos());
                         PacketHandler.sendToServer(new RevertFromSpindash());
 
                     },Math.min(baseformProperties.spinDashChargeTime/2, 100));
                 }
+
                 //Keep going forward
                 if(baseformProperties.ballFormState == (byte)2) {
                     minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_PRESS, 0);
@@ -643,12 +647,12 @@ public class BaseformHandler
                                     0.001, 0.00f, 0.00f, 0.00f, 1,
                                     true));
 
-                            /*PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                    new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1.5f),
-                                    player.getX(), player.getY()+0.55, player.getZ(),
+                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1f),
+                                    player.getX(), player.getY()+0.45, player.getZ(),
                                     1.0, 0.65f, 0.65f, 0.65f, 10,
                                     true)
-                            );*/
+                            );
                         }
                         if (baseformProperties.ballFormState == (byte) 2) {
 
@@ -659,12 +663,12 @@ public class BaseformHandler
                                 nearbyEntity.hurt(player.damageSources().playerAttack(player),
                                         Math.min(22.0f,baseformProperties.spinDashChargeTime/4.0f));
 
-                            /*PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                    new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1.5f),
-                                    player.getX(), player.getY()+0.55, player.getZ(),
+                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1f),
+                                    player.getX(), player.getY()+0.45, player.getZ(),
                                     1.0, 0.65f, 0.65f, 0.65f, 10,
                                     true)
-                            );*/
+                            );
                         }
                     }
 

@@ -44,6 +44,7 @@ public class LaunchSpindash {
                                                 "Spindash_Speed", Math.min(baseformProperties.spinDashChargeTime/100.0,1.0), AttributeModifier.Operation.ADDITION));
                             player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
                             player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(1.5);
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
 
                             //PlaySound
                             Level world = player.level();
