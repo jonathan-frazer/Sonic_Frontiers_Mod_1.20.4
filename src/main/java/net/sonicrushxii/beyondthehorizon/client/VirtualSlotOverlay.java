@@ -155,7 +155,6 @@ public class VirtualSlotOverlay {
                 slotName = "Combo";
                 iconTextures = (Arrays.asList(
                         new Ability(HOMING_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_ATTACK.ordinal()]),
-                        new Ability(DODGE_SLOT,null,cooldownArray[BaseformActiveAbility.DODGE.ordinal()]),
                         new Ability(MELEE_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.MELEE_ATTACK.ordinal()]),
                         new Ability(SPEED_BLITZ_SLOT,null,cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()]),
                         new Ability(SMASH_HIT_SLOT,null,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()]))
