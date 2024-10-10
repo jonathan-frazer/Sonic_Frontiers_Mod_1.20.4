@@ -26,7 +26,7 @@ import net.sonicrushxii.beyondthehorizon.network.sync.VirtualSlotSyncS2C;
 
 import java.util.Iterator;
 
-public class BaseformTransform {
+public class BaseformTransformer {
 
     public static void performActivation(ServerPlayer player)
     {

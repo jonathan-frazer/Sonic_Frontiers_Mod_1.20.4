@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 * */
 public class DoubleTapHandler
 {
+    public static boolean doubleTapLock = false;
     private static final ScheduledExecutorService leftExecutor = Executors.newScheduledThreadPool(1);
     private static ScheduledFuture<?> leftFuture=null;
     private static final ScheduledExecutorService rightExecutor = Executors.newScheduledThreadPool(1);

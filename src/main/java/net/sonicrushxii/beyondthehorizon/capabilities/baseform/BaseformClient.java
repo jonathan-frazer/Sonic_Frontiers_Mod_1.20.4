@@ -15,7 +15,6 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActi
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 import net.sonicrushxii.beyondthehorizon.client.DoubleTapDirection;
-import net.sonicrushxii.beyondthehorizon.client.DoubleTapHandler;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.*;
@@ -25,6 +24,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
@@ -63,37 +63,6 @@ public class BaseformClient {
                 || InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_LSHIFT));
 
         BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
-
-        //Double Tap Handler
-        {
-            if (InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_A) &&
-                    !DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft)
-                DoubleTapHandler.pressedLeft = true;
-            if (!InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_A) &&
-                    DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft) {
-                DoubleTapHandler.releasedLeft = true;
-                DoubleTapHandler.scheduleResetLeftPress();
-            }
-            if (InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_A) &&
-                    DoubleTapHandler.pressedLeft && DoubleTapHandler.releasedLeft) {
-                performDoublePress(player,baseformProperties,DoubleTapDirection.LEFT_PRESS);
-                DoubleTapHandler.markDoubleLeftPress();
-            }
-
-            if (InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_D) &&
-                    !DoubleTapHandler.pressedRight && !DoubleTapHandler.releasedRight)
-                DoubleTapHandler.pressedRight = true;
-            if (!InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_D) &&
-                    DoubleTapHandler.pressedRight && !DoubleTapHandler.releasedRight) {
-                DoubleTapHandler.releasedRight = true;
-                DoubleTapHandler.scheduleResetRightPress();
-            }
-            if (InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_D) &&
-                    DoubleTapHandler.pressedRight && DoubleTapHandler.releasedRight) {
-                performDoublePress(player,baseformProperties,DoubleTapDirection.RIGHT_PRESS);
-                DoubleTapHandler.markDoubleRightPress();
-            }
-        }
 
         //Passive Abilities
         {
@@ -262,7 +231,7 @@ public class BaseformClient {
                         mc.options.sensitivity().set(currentSens);
                         PacketHandler.sendToServer(new RevertFromSpindash());
 
-                    },Math.min(baseformProperties.spinDashChargeTime/2, 100));
+                    },Math.min(baseformProperties.spinDashChargeTime/3, 60));
                 }
 
                 //Keep going forward
@@ -305,8 +274,8 @@ public class BaseformClient {
         if(player.isSprinting() && VirtualSlotHandler.getCurrAbility() == 0 && baseformProperties.boostLvl > 0)
         {
             switch(doubleTapDirection) {
-                case LEFT_PRESS: PacketHandler.sendToServer(new SidestepLeft());
-                case RIGHT_PRESS: PacketHandler.sendToServer(new SidestepRight());
+                case RIGHT_PRESS: PacketHandler.sendToServer(new Sidestep(true)); break;
+                case LEFT_PRESS: PacketHandler.sendToServer(new Sidestep(false)); break;
             }
         }
 
@@ -314,8 +283,8 @@ public class BaseformClient {
         if(VirtualSlotHandler.getCurrAbility() == 1)
         {
             switch(doubleTapDirection){
-                case LEFT_PRESS: PacketHandler.sendToServer(new SidestepLeft());
-                case RIGHT_PRESS: PacketHandler.sendToServer(new SidestepRight());
+                case RIGHT_PRESS: PacketHandler.sendToServer(new Dodge(true)); break;
+                case LEFT_PRESS: PacketHandler.sendToServer(new Dodge(false)); break;
             }
         }
     }

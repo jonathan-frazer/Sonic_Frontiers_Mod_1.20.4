@@ -1,5 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -8,10 +10,14 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.hyperform.HyperformHandler;
 import net.sonicrushxii.beyondthehorizon.capabilities.starfall.StarfallFormHandler;
 import net.sonicrushxii.beyondthehorizon.capabilities.superform.SuperformHandler;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
+import net.sonicrushxii.beyondthehorizon.client.DoubleTapDirection;
+import net.sonicrushxii.beyondthehorizon.client.DoubleTapHandler;
+import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 
 
 public class PlayerTickHandler {
@@ -31,7 +37,7 @@ public class PlayerTickHandler {
         if (!player.isAlive())
             return;
 
-       CompoundTag playerNBT = player.serializeNBT();
+        CompoundTag playerNBT = player.serializeNBT();
         switch(ClientFormData.getPlayerForm())
         {
             case BASEFORM -> BaseformClient.performClientTick(player,playerNBT);
@@ -43,6 +49,76 @@ public class PlayerTickHandler {
         //Play Second
         if(clientTickCounter == 0)
             localPlayerSecond(player,playerNBT);
+
+        //Double Tap Handler
+        Minecraft mc = Minecraft.getInstance();
+        {
+            if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_A) &&
+                    !DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft)
+                DoubleTapHandler.pressedLeft = true;
+            if (!InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_A) &&
+                    DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft) {
+                DoubleTapHandler.releasedLeft = true;
+                DoubleTapHandler.scheduleResetLeftPress();
+            }
+            if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_A) &&
+                    DoubleTapHandler.pressedLeft && DoubleTapHandler.releasedLeft) {
+                //Handle some internal stuff
+                DoubleTapHandler.markDoubleLeftPress();
+
+                //Perform the Function
+                if(DoubleTapHandler.doubleTapLock == false){
+                    switch(ClientFormData.getPlayerForm())
+                    {
+                        case BASEFORM -> BaseformClient.performDoublePress(player,(BaseformProperties) ClientFormData.getPlayerFormDetails(), DoubleTapDirection.LEFT_PRESS);
+                        /*
+                        case SUPERFORM
+                        case STARFALLFORM
+                        case HYPERFORM
+                         */
+                    }
+                }
+
+                //Prevent it from being pressed for a lil bit
+                DoubleTapHandler.doubleTapLock = true;
+                Scheduler.scheduleTask(()->{
+                    DoubleTapHandler.doubleTapLock = false;
+                },20);
+            }
+
+            if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_D) &&
+                    !DoubleTapHandler.pressedRight && !DoubleTapHandler.releasedRight)
+                DoubleTapHandler.pressedRight = true;
+            if (!InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_D) &&
+                    DoubleTapHandler.pressedRight && !DoubleTapHandler.releasedRight) {
+                DoubleTapHandler.releasedRight = true;
+                DoubleTapHandler.scheduleResetRightPress();
+            }
+            if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_D) &&
+                    DoubleTapHandler.pressedRight && DoubleTapHandler.releasedRight) {
+                //Handle some internal stuff
+                DoubleTapHandler.markDoubleRightPress();
+
+                //Perform the Function
+                if(DoubleTapHandler.doubleTapLock == false) {
+                    switch(ClientFormData.getPlayerForm())
+                    {
+                        case BASEFORM -> BaseformClient.performDoublePress(player,(BaseformProperties) ClientFormData.getPlayerFormDetails(), DoubleTapDirection.RIGHT_PRESS);
+                        /*
+                        case SUPERFORM
+                        case STARFALLFORM
+                        case HYPERFORM
+                         */
+                    }
+                }
+
+                //Prevent it from being pressed for a lil bit
+                DoubleTapHandler.doubleTapLock = true;
+                Scheduler.scheduleTask(()->{
+                    DoubleTapHandler.doubleTapLock = false;
+                },20);
+            }
+        }
     }
 
     private void localPlayerSecond(LocalPlayer player, CompoundTag playerNBT)

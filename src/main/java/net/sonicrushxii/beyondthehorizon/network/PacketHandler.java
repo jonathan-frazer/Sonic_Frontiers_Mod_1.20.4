@@ -15,6 +15,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
@@ -78,8 +79,7 @@ public class PacketHandler {
                 //Boost
                 INSTANCE.messageBuilder(Boost.class, NetworkDirection.PLAY_TO_SERVER).encoder(Boost::encode).decoder(Boost::new).consumerMainThread(Boost::handle).add();
                 //Quick Step
-                INSTANCE.messageBuilder(SidestepLeft.class, NetworkDirection.PLAY_TO_SERVER).encoder(SidestepLeft::encode).decoder(SidestepLeft::new).consumerMainThread(SidestepLeft::handle).add();
-                INSTANCE.messageBuilder(SidestepRight.class, NetworkDirection.PLAY_TO_SERVER).encoder(SidestepRight::encode).decoder(SidestepRight::new).consumerMainThread(SidestepRight::handle).add();
+                INSTANCE.messageBuilder(Sidestep.class, NetworkDirection.PLAY_TO_SERVER).encoder(Sidestep::encode).decoder(Sidestep::new).consumerMainThread(Sidestep::handle).add();
 
                 //Light Speed Attack
                 INSTANCE.messageBuilder(LightspeedCharge.class, NetworkDirection.PLAY_TO_SERVER).encoder(LightspeedCharge::encode).decoder(LightspeedCharge::new).consumerMainThread(LightspeedCharge::handle).add();
@@ -99,6 +99,8 @@ public class PacketHandler {
                 INSTANCE.messageBuilder(RevertFromSpindash.class, NetworkDirection.PLAY_TO_SERVER).encoder(RevertFromSpindash::encode).decoder(RevertFromSpindash::new).consumerMainThread(RevertFromSpindash::handle).add();
 
                 INSTANCE.messageBuilder(HomingAttack.class, NetworkDirection.PLAY_TO_SERVER).encoder(HomingAttack::encode).decoder(HomingAttack::new).consumerMainThread(HomingAttack::handle).add();
+
+                INSTANCE.messageBuilder(Dodge.class,NetworkDirection.PLAY_TO_SERVER).encoder(Dodge::encode).decoder(Dodge::new).consumerMainThread(Dodge::handle).add();
             }
         }
 

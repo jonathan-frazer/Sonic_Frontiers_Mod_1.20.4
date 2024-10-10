@@ -6,19 +6,32 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 
-import java.util.function.Supplier;
+public class Sidestep {
 
-public class SidestepRight {
+    private final boolean steppingRight;
 
-    public SidestepRight() {    }
+    public Sidestep(boolean steppingRight) {
+        this.steppingRight = steppingRight;
+    }
 
-    public SidestepRight(FriendlyByteBuf buffer){    }
+    public Sidestep(FriendlyByteBuf buffer){
+        this.steppingRight = buffer.readBoolean();
+    }
 
-    public void encode(FriendlyByteBuf buffer){    }
+    public void encode(FriendlyByteBuf buffer){
+        buffer.writeBoolean(this.steppingRight);
+    }
 
     public static void performRightSideStep(ServerPlayer player){
         player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
         Vec3 directionVector = player.getLookAngle().cross(new Vec3(0,1,0));
+        player.addDeltaMovement(directionVector.scale(3.0));
+        player.connection.send(new ClientboundSetEntityMotionPacket(player));
+    }
+
+    public static void performLeftSideStep(ServerPlayer player){
+        player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
+        Vec3 directionVector = player.getLookAngle().cross(new Vec3(0,-1,0));
         player.addDeltaMovement(directionVector.scale(3.0));
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }
@@ -28,7 +41,8 @@ public class SidestepRight {
                 ()->{
                     ServerPlayer player = ctx.getSender();
                     if(player != null){
-                        performRightSideStep(player);
+                        if(steppingRight) performRightSideStep(player);
+                        else performLeftSideStep(player);
                     }
                 });
         ctx.setPacketHandled(true);

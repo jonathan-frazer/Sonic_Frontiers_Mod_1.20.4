@@ -9,7 +9,7 @@ import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformTransform;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformTransformer;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
@@ -47,17 +47,17 @@ public class EquipmentChangeHandler {
                     if (playerSonicForm.getCurrentForm() == SonicForm.PLAYER &&
                             headItem.getItem() == Items.PLAYER_HEAD &&
                             headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) {
-                        BaseformTransform.performActivation(player);
+                        BaseformTransformer.performActivation(player);
                     }
                 }catch(NullPointerException ignored){}
 
                 try {
                     if (playerSonicForm.getCurrentForm() == SonicForm.BASEFORM &&
                             (headItem.getTag().getByte("BeyondTheHorizon") != (byte) 2)) {
-                        BaseformTransform.performActivation(player);
+                        BaseformTransformer.performActivation(player);
                     }
                 }catch(NullPointerException ignored){
-                    BaseformTransform.performDeactivation(player);
+                    BaseformTransformer.performDeactivation(player);
                 }
 
                 PacketHandler.sendToPlayer(player,
