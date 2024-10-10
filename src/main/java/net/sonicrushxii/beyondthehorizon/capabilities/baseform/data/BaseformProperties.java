@@ -131,6 +131,7 @@ public class BaseformProperties extends FormProperties {
     public short spinDashChargeTime;
     public UUID homingTarget;
     public short homingAttackAirTime;
+    public boolean dodgeInvul;
 
     public BaseformProperties()
     {
@@ -155,6 +156,7 @@ public class BaseformProperties extends FormProperties {
         spinDashChargeTime = 0;
         homingTarget = new UUID(0L,0L);
         homingAttackAirTime = 0;
+        dodgeInvul = false;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -181,6 +183,7 @@ public class BaseformProperties extends FormProperties {
         spinDashChargeTime = nbt.getShort("Spindash");
         homingTarget = nbt.getUUID("HomingTarget");
         homingAttackAirTime = nbt.getShort("HomingTime");
+        dodgeInvul = nbt.getBoolean("isDodging");
     }
 
     @Override
@@ -210,6 +213,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putShort("Spindash", spinDashChargeTime);
         nbt.putUUID("HomingTarget",homingTarget);
         nbt.putShort("HomingTime",homingAttackAirTime);
+        nbt.putBoolean("isDodging",dodgeInvul);
 
         return nbt;
     }

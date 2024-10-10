@@ -282,6 +282,19 @@ public class BaseformServer {
                             }
                         }
                     }
+
+                    //Dodge
+                    {
+                        if (baseformProperties.dodgeInvul)
+                        {
+                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    ParticleTypes.SWEEP_ATTACK,
+                                    player.getX(), player.getY()+1, player.getZ(),
+                                    0.0, 0.3f, 0.85f, 0.3f, 3,
+                                    true)
+                            );
+                        }
+                    }
                 }
             }
 

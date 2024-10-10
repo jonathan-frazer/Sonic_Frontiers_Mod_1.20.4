@@ -18,6 +18,9 @@ public class AttackHandler {
                 //Makes you only invulnerable to Direct mob attacks when using this ability. Like weakness but better
                 if (baseformProperties.selectiveInvul && !(event.getSource().getEntity() instanceof Player) && !event.getSource().isIndirect())
                     event.setCanceled(true);
+
+                if (baseformProperties.dodgeInvul)
+                    event.setCanceled(true);
             });
         }catch(NullPointerException | ClassCastException ignored) {}
     }

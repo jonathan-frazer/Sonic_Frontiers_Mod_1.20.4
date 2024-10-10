@@ -89,8 +89,8 @@ public class BaseformTransformer {
         if(!player.isAlive() && !world.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY))
         {
             for (ItemEntity itemEntity : world.getEntitiesOfClass(ItemEntity.class,
-                    new AABB(player.getX() + 2, player.getX() + 2, player.getX() + 2,
-                            player.getX() - 2, player.getX() - 2, player.getX() - 2),
+                    new AABB(player.getX() + 2, player.getY() + 2, player.getZ() + 2,
+                            player.getX() - 2, player.getY() - 2, player.getZ() - 2),
                     (itemEntity) -> {
                         try {
                             byte bthTagVal = itemEntity.getItem().getTag().getByte("BeyondTheHorizon");
@@ -169,8 +169,7 @@ public class BaseformTransformer {
 
             //Slot 2
             {
-                //SpinDash
-                player.setInvisible(false);
+
             }
 
         }

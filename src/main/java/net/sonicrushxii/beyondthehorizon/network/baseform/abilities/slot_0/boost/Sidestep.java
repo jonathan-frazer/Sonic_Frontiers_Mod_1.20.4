@@ -22,27 +22,20 @@ public class Sidestep {
         buffer.writeBoolean(this.steppingRight);
     }
 
-    public static void performRightSideStep(ServerPlayer player){
+    public static void performSideStep(ServerPlayer player, boolean steppingRight){
         player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
-        Vec3 directionVector = player.getLookAngle().cross(new Vec3(0,1,0));
+        Vec3 directionVector = player.getLookAngle().cross(new Vec3(0,(steppingRight)?1:-1,0));
         player.addDeltaMovement(directionVector.scale(3.0));
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }
 
-    public static void performLeftSideStep(ServerPlayer player){
-        player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
-        Vec3 directionVector = player.getLookAngle().cross(new Vec3(0,-1,0));
-        player.addDeltaMovement(directionVector.scale(3.0));
-        player.connection.send(new ClientboundSetEntityMotionPacket(player));
-    }
 
     public void handle(CustomPayloadEvent.Context ctx){
         ctx.enqueueWork(
                 ()->{
                     ServerPlayer player = ctx.getSender();
                     if(player != null){
-                        if(steppingRight) performRightSideStep(player);
-                        else performLeftSideStep(player);
+                        performSideStep(player,steppingRight);
                     }
                 });
         ctx.setPacketHandled(true);

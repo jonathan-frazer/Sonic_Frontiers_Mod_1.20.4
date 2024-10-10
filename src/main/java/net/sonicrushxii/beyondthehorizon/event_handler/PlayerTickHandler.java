@@ -53,6 +53,8 @@ public class PlayerTickHandler {
         //Double Tap Handler
         Minecraft mc = Minecraft.getInstance();
         {
+            final int DOUBLE_TAP_COOLDOWN = 15;//In Ticks
+
             if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_A) &&
                     !DoubleTapHandler.pressedLeft && !DoubleTapHandler.releasedLeft)
                 DoubleTapHandler.pressedLeft = true;
@@ -77,13 +79,13 @@ public class PlayerTickHandler {
                         case HYPERFORM
                          */
                     }
-                }
 
-                //Prevent it from being pressed for a lil bit
-                DoubleTapHandler.doubleTapLock = true;
-                Scheduler.scheduleTask(()->{
-                    DoubleTapHandler.doubleTapLock = false;
-                },20);
+                    //Prevent it from being pressed for a lil bit
+                    DoubleTapHandler.doubleTapLock = true;
+                    Scheduler.scheduleTask(()->{
+                        DoubleTapHandler.doubleTapLock = false;
+                    },DOUBLE_TAP_COOLDOWN);
+                }
             }
 
             if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_D) &&
@@ -110,13 +112,12 @@ public class PlayerTickHandler {
                         case HYPERFORM
                          */
                     }
+                    //Prevent it from being pressed for a lil bit
+                    DoubleTapHandler.doubleTapLock = true;
+                    Scheduler.scheduleTask(()->{
+                        DoubleTapHandler.doubleTapLock = false;
+                    },DOUBLE_TAP_COOLDOWN);
                 }
-
-                //Prevent it from being pressed for a lil bit
-                DoubleTapHandler.doubleTapLock = true;
-                Scheduler.scheduleTask(()->{
-                    DoubleTapHandler.doubleTapLock = false;
-                },20);
             }
         }
     }

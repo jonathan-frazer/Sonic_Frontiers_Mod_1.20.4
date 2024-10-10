@@ -226,10 +226,11 @@ public class BaseformClient {
                     Scheduler.scheduleTask(()->
                     {
                         Minecraft mc = Minecraft.getInstance();
-                        if(!InputConstants.isKeyDown(mc.getWindow().getWindow(),InputConstants.KEY_R))
+                        if(!player.isSprinting())
                             mc.keyboardHandler.keyPress(mc.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_RELEASE, 0);
                         mc.options.sensitivity().set(currentSens);
                         PacketHandler.sendToServer(new RevertFromSpindash());
+                        baseformProperties.ballFormState = 0;
 
                     },Math.min(baseformProperties.spinDashChargeTime/3, 60));
                 }
