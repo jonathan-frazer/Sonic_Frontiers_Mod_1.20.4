@@ -6,7 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.hyperform.HyperformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.starfall.StarfallFormProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.superform.SuperformProperties;

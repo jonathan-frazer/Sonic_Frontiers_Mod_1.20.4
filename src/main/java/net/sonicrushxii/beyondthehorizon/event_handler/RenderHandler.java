@@ -1,22 +1,25 @@
-package net.sonicrushxii.beyondthehorizon.client;
+package net.sonicrushxii.beyondthehorizon.event_handler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
-import net.sonicrushxii.beyondthehorizon.models.ModelRenderer;
-import net.sonicrushxii.beyondthehorizon.models.baseform.HomingAttack;
-import net.sonicrushxii.beyondthehorizon.models.baseform.Spindash;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
+import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
+import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.Spindash;
 
-@Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID)
+@Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
 public class RenderHandler {
     @SubscribeEvent
     public static void onPreRenderLiving(RenderLivingEvent.Pre<?, ?> event) {
@@ -36,14 +39,17 @@ public class RenderHandler {
                         poseStack.pushPose();
 
                         // Translate to the entity's position
-                        poseStack.translate(0.0D, -0.5D, 0.0D);
+                        poseStack.translate(0.0D, -0.65D, 0.0D);
+
+                        // Scale
+                        poseStack.scale(1.15f, 1.15f, 1.15f);
 
                         //Control Orientation
                         float entityYaw = (entity.getYRot() > 180.0) ? entity.getYRot() - 180.0f : entity.getYRot() + 180.0f;
                         poseStack.mulPose(Axis.YP.rotationDegrees(-entityYaw));
 
                         //Render The Custom Model
-                        ModelRenderer.renderModel(Spindash.class, event, poseStack);
+                        ModModelRenderer.renderModel(Spindash.class, event, poseStack);
                         poseStack.popPose();
 
                         event.setCanceled(true);
@@ -61,14 +67,20 @@ public class RenderHandler {
                         PoseStack poseStack = event.getPoseStack();
 
                         poseStack.pushPose();
-                        poseStack.translate(0.0D, -0.5D, 0.0D);
+
+                        //Translate
+                        poseStack.translate(0.0D, -0.65D, 0.0D);
+
+                        // Scale
+                        poseStack.scale(1.15f, 1.15f, 1.15f);
+
 
                         //Apply Rotation
                         float entityYaw = (entity.getYRot() > 180.0) ? entity.getYRot() - 180.0f : entity.getYRot() + 180.0f;
                         poseStack.mulPose(Axis.YP.rotationDegrees(-entityYaw));
 
                         //Render The Custom Model
-                        ModelRenderer.renderModel(Spindash.class, event, poseStack);
+                        ModModelRenderer.renderModel(Spindash.class, event, poseStack);
                         poseStack.popPose();
 
                         event.setCanceled(true);
@@ -86,7 +98,6 @@ public class RenderHandler {
 
         assert player != null;
         Vec3 playerPos = new Vec3(player.getX(),player.getY()+entity.getEyeHeight(),player.getZ());
-        Vec3 playerLookAngle = player.getLookAngle();
         Vec3 entityPos = new Vec3(entity.getX(),entity.getY()+entity.getEyeHeight(),entity.getZ());
 
         //Homing Attack
@@ -107,7 +118,7 @@ public class RenderHandler {
                 poseStack.mulPose(Axis.ZP.rotationDegrees(yawPitch[1]));
 
                 // Render the custom model
-                ModelRenderer.renderModel(HomingAttack.class, event, poseStack);
+                ModModelRenderer.renderModel(HomingAttack.class, event, poseStack);
 
                 poseStack.popPose();
             }

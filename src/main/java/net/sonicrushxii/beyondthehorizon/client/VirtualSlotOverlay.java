@@ -11,8 +11,8 @@ import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformActiveAbility;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 
 import java.util.Arrays;
 import java.util.List;

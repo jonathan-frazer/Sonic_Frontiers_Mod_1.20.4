@@ -9,9 +9,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformActiveAbility;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
@@ -48,7 +47,7 @@ public class LightspeedDecay {
                 try {
                     if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
                         ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_BOOTS.get());
-                        itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
+                        itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
                         player.setItemSlot(EquipmentSlot.FEET, itemToPlace);
                     }
                 }
@@ -57,7 +56,7 @@ public class LightspeedDecay {
                 try {
                     if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
                         ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_LEGGINGS.get());
-                        itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
+                        itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
                         player.setItemSlot(EquipmentSlot.LEGS, itemToPlace);
                     }
                 }
@@ -66,7 +65,7 @@ public class LightspeedDecay {
                 try {
                     if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
                         ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_CHESTPLATE.get());
-                        itemToPlace.setTag(BaseformHandler.baseformArmorNBTTag);
+                        itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
                         player.setItemSlot(EquipmentSlot.CHEST, itemToPlace);
                     }
                 }
@@ -77,8 +76,8 @@ public class LightspeedDecay {
                     {
                         EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(), true);
 
-                        if(baseformProperties.powerBoost) player.setItemSlot(EquipmentSlot.HEAD, BaseformHandler.baseformPBSonicHead);
-                        else                              player.setItemSlot(EquipmentSlot.HEAD, BaseformHandler.baseformSonicHead);
+                        if(baseformProperties.powerBoost) player.setItemSlot(EquipmentSlot.HEAD, BaseformProperties.baseformPBSonicHead);
+                        else                              player.setItemSlot(EquipmentSlot.HEAD, BaseformProperties.baseformSonicHead);
                     }
                 }
                 catch(NullPointerException ignored){}

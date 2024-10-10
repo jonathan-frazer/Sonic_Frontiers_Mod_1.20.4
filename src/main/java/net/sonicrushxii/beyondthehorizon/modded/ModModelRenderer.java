@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.models;
+package net.sonicrushxii.beyondthehorizon.modded;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -19,17 +19,17 @@ import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
-public class ModelRenderer {
+public class ModModelRenderer {
     public record Texture(String textureLocation, byte frameNo) {}
 
     //Used for Animations
     private static String getTextureLocation(Texture[] textures, byte animationLength)
     {
-        if(animationLength > 20 || 20%animationLength != 0)
-            throw new RuntimeException("Incorrect Animation Length, Must be a divisor of 20");
-
         if(animationLength == 0 || textures.length == 1)
             return textures[0].textureLocation;
+
+        if(animationLength > 20 || 20%animationLength != 0)
+            throw new RuntimeException("Incorrect Animation Length, Must be a divisor of 20");
 
         byte frame = (byte)(PlayerTickHandler.clientTickCounter%animationLength);
         while(true)

@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.models.baseform;// Made with Blockbench 4.11.1
+package net.sonicrushxii.beyondthehorizon.capabilities.baseform.models;// Made with Blockbench 4.11.1
 // Exported for Minecraft version 1.17 or later with Mojang mappings
 // Paste this class into your mod and generate all required imports
 
@@ -13,16 +13,16 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.sonicrushxii.beyondthehorizon.models.ModelRenderer;
+import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
 
 public class Spindash<T extends Entity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "spindash"), "main");
-	public static final ModelRenderer.Texture[] TEXTURE_LOCATIONS = {
-			new ModelRenderer.Texture("textures/custom_model/spindash/0.png",(byte)0),
-			new ModelRenderer.Texture("textures/custom_model/spindash/1.png",(byte)1),
-			new ModelRenderer.Texture("textures/custom_model/spindash/2.png",(byte)2),
-			new ModelRenderer.Texture("textures/custom_model/spindash/3.png",(byte)3)
+	public static final ModModelRenderer.Texture[] TEXTURE_LOCATIONS = {
+			new ModModelRenderer.Texture("textures/custom_model/spindash/0.png",(byte)0),
+			new ModModelRenderer.Texture("textures/custom_model/spindash/1.png",(byte)1),
+			new ModModelRenderer.Texture("textures/custom_model/spindash/2.png",(byte)2),
+			new ModModelRenderer.Texture("textures/custom_model/spindash/3.png",(byte)3)
 	};
 	public static final byte ANIMATION_LENGTH = 4;
 

@@ -2,12 +2,10 @@ package net.sonicrushxii.beyondthehorizon.capabilities;
 
 import net.minecraft.nbt.CompoundTag;
 import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.hyperform.HyperformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.starfall.StarfallFormProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.superform.SuperformProperties;
-
-import java.util.Objects;
 
 public class PlayerSonicForm {
     private SonicForm currentForm;
@@ -64,21 +62,21 @@ public class PlayerSonicForm {
         if(currentForm != SonicForm.SUPERFORM)
             return;
         currentForm = SonicForm.PLAYER;
-        formProperties = new FormProperties();;
+        formProperties = new FormProperties();
     }
 
     public void deactivateStarfallForm(){
         if(currentForm != SonicForm.STARFALLFORM)
             return;
         currentForm = SonicForm.PLAYER;
-        formProperties = new FormProperties();;
+        formProperties = new FormProperties();
     }
 
     public void deactivateHyperForm(){
         if(currentForm != SonicForm.HYPERFORM)
             return;
         currentForm = SonicForm.PLAYER;
-        formProperties = new FormProperties();;
+        formProperties = new FormProperties();
     }
 
     public void copyFrom(PlayerSonicForm source){

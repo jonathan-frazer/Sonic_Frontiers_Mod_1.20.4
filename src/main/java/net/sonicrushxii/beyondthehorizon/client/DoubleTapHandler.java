@@ -21,13 +21,11 @@ import java.util.concurrent.TimeUnit;
                 DoubleTapHandler.markDoubleRightPress();
             }
 * */
-
-
 public class DoubleTapHandler
 {
-    private static ScheduledExecutorService leftExecutor = Executors.newScheduledThreadPool(1);
+    private static final ScheduledExecutorService leftExecutor = Executors.newScheduledThreadPool(1);
     private static ScheduledFuture<?> leftFuture=null;
-    private static ScheduledExecutorService rightExecutor = Executors.newScheduledThreadPool(1);
+    private static final ScheduledExecutorService rightExecutor = Executors.newScheduledThreadPool(1);
     private static ScheduledFuture<?> rightFuture=null;
 
     public static void scheduleResetLeftPress(){

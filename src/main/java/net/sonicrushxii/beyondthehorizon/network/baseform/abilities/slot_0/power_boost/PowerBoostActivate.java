@@ -11,8 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
@@ -46,7 +45,7 @@ public class PowerBoostActivate {
                 try{
                     if(armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 2){
                         EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
-                        player.setItemSlot(EquipmentSlot.HEAD, BaseformHandler.baseformPBSonicHead);
+                        player.setItemSlot(EquipmentSlot.HEAD, BaseformProperties.baseformPBSonicHead);
                     }
                 }
                 catch(NullPointerException ignored){}

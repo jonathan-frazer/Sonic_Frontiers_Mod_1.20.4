@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
+package net.sonicrushxii.beyondthehorizon.capabilities.baseform.data;
 
 //If Adding abilities, add it to here, as well as adding it to the VirtualSlotOverlay
 public enum BaseformActiveAbility {

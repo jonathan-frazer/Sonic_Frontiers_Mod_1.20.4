@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 
 import java.lang.reflect.Field;
 
@@ -59,7 +59,7 @@ public class ServerTickHandler
                                 itemEntity.remove(Entity.RemovalReason.KILLED);
 
                             if(itemInfo.getItem() == Items.PLAYER_HEAD && itemInfo.getTag().getByte("BeyondTheHorizon") == (byte)2)
-                                itemEntity.setItem(BaseformHandler.baseformSonicHead);
+                                itemEntity.setItem(BaseformProperties.baseformSonicHead);
 
                         }catch(NullPointerException ignored) {
                             continue;
@@ -109,7 +109,7 @@ public class ServerTickHandler
                                             //Spawn Head
                                             {
                                                 //Instead of Killing it, Transform the Beacon into the sonic head
-                                                itemEntity.setItem(BaseformHandler.baseformSonicHead);
+                                                itemEntity.setItem(BaseformProperties.baseformSonicHead);
                                                 itemEntity.setDeltaMovement(0,0.1,0);
                                             }
                                             //Spawn Fireworks
