@@ -41,6 +41,9 @@ public class LoginHandler {
                     player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                 }
 
+                //Reset Combo Meter
+                baseformProperties.hitCount = 0;
+
                 PacketHandler.sendToPlayer(player,
                         new SyncPlayerFormS2C(
                                 playerSonicForm.getCurrentForm(),

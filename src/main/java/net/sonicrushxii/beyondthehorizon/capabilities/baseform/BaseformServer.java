@@ -51,8 +51,6 @@ public class BaseformServer {
             //Get Data From the Player
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-
-
             //Passive Abilities
             {
                 //Double Jump

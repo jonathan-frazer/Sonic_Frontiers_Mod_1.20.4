@@ -25,12 +25,13 @@ public enum ModDamageTypes
 
     private final ResourceKey<DamageType> dmgSrc;
 
-    ModDamageTypes(String name)
+    ModDamageTypes(String jsonFilename)
     {
-        dmgSrc = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(BeyondTheHorizon.MOD_ID, name));
+        dmgSrc = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(BeyondTheHorizon.MOD_ID, jsonFilename));
     }
 
-    public ResourceKey<DamageType> get(){
+    public ResourceKey<DamageType> get()
+    {
         return dmgSrc;
     }
 }
