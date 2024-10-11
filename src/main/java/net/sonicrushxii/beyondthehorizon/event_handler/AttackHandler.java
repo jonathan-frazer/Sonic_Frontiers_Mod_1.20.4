@@ -9,6 +9,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformHandler;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 import java.util.Objects;
 
@@ -27,6 +29,13 @@ public class AttackHandler {
                     case STARFALLFORM ->
                     case HYPERFORM ->*/
                 }
+
+                //Sync Player Properties
+                PacketHandler.sendToPlayer(player,
+                        new SyncPlayerFormS2C(
+                                playerSonicForm.getCurrentForm(),
+                                playerSonicForm.getFormProperties()
+                        ));
             });
         }
 
@@ -42,6 +51,13 @@ public class AttackHandler {
                         case STARFALLFORM ->
                         case HYPERFORM ->*/
                     }
+
+                    //Sync Player Properties
+                    PacketHandler.sendToPlayer(player,
+                            new SyncPlayerFormS2C(
+                                    playerSonicForm.getCurrentForm(),
+                                    playerSonicForm.getFormProperties()
+                            ));
                 });
             }
         }catch(NullPointerException ignored){}

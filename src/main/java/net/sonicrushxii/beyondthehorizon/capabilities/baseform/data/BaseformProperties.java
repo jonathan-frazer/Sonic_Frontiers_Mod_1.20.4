@@ -118,6 +118,7 @@ public class BaseformProperties extends FormProperties {
     public boolean dangerSenseActive;
     public boolean dangerSensePlaying;
     public boolean selectiveInvul;
+    public byte hitCount;
 
     //Slot 1
     public byte airBoosts;
@@ -137,6 +138,7 @@ public class BaseformProperties extends FormProperties {
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
         selectiveInvul = false;
+        hitCount = 0;
 
         //Passives
         hasDoubleJump = true;
@@ -161,9 +163,10 @@ public class BaseformProperties extends FormProperties {
 
     public BaseformProperties(CompoundTag nbt)
     {
-        //Cooldowns
+        //Common
         abilityCooldowns = nbt.getByteArray("AbilityCooldowns");
         selectiveInvul = nbt.getBoolean("sonicInvul");
+        hitCount = nbt.getByte("hitsPerformed");
 
         //Passives
         hasDoubleJump = nbt.getBoolean("hasDoubleJump");
@@ -191,9 +194,10 @@ public class BaseformProperties extends FormProperties {
     {
         CompoundTag nbt = new CompoundTag();
 
-        //Cooldowns
+        //Common
         nbt.putByteArray("AbilityCooldowns",abilityCooldowns);
         nbt.putBoolean("sonicInvul",selectiveInvul);
+        nbt.putByte("hitsPerformed",hitCount);
 
         //Passives
         nbt.putBoolean("hasDoubleJump",hasDoubleJump);
