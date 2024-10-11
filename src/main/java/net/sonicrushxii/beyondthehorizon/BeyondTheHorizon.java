@@ -59,8 +59,6 @@ public class BeyondTheHorizon
         MinecraftForge.EVENT_BUS.register(new AttackHandler());
         MinecraftForge.EVENT_BUS.register(new EquipmentChangeHandler());
 
-
-
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 

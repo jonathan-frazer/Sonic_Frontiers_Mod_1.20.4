@@ -19,10 +19,10 @@ public class Spindash<T extends Entity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "spindash"), "main");
 	public static final ModModelRenderer.Texture[] TEXTURE_LOCATIONS = {
-			new ModModelRenderer.Texture("textures/custom_model/spindash/0.png",(byte)0),
-			new ModModelRenderer.Texture("textures/custom_model/spindash/1.png",(byte)1),
-			new ModModelRenderer.Texture("textures/custom_model/spindash/2.png",(byte)2),
-			new ModModelRenderer.Texture("textures/custom_model/spindash/3.png",(byte)3)
+			new ModModelRenderer.Texture("textures/custom_model/baseform/spindash/0.png",(byte)0),
+			new ModModelRenderer.Texture("textures/custom_model/baseform/spindash/1.png",(byte)1),
+			new ModModelRenderer.Texture("textures/custom_model/baseform/spindash/2.png",(byte)2),
+			new ModModelRenderer.Texture("textures/custom_model/baseform/spindash/3.png",(byte)3)
 	};
 	public static final byte ANIMATION_LENGTH = 4;
 

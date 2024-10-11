@@ -126,43 +126,11 @@ public class RenderHandler {
         {
             switch(ClientFormData.getPlayerForm())
             {
-                case BASEFORM -> BaseformRenderer.onRenderToSelfPost(event, event.getEntity(), (BaseformProperties) ClientFormData.getPlayerFormDetails());
-                /*
-                case SUPERFORM
-                case STARFALLFORM
-                case HYPERFORM
-                 */
-            }
-        }
-
-        LivingEntity entity = event.getEntity();
-        LocalPlayer player = Minecraft.getInstance().player;
-
-        assert player != null;
-        Vec3 playerPos = new Vec3(player.getX(),player.getY()+entity.getEyeHeight(),player.getZ());
-        Vec3 entityPos = new Vec3(entity.getX(),entity.getY()+entity.getEyeHeight(),entity.getZ());
-
-        //Homing Attack
-        {
-            if (VirtualSlotHandler.getCurrAbility() == 1 && entity.getUUID().equals(ClientFormData.hasHomingReticle()))
-            {
-                PoseStack poseStack = event.getPoseStack();
-
-                // Push the current matrix stack
-                poseStack.pushPose();
-
-                Vec3 dir = playerPos.subtract(entityPos).normalize().scale(1.5);
-                poseStack.translate(dir.x, dir.y, dir.z);
-
-                //Apply Rotation
-                float[] yawPitch = Utilities.getYawPitchFromVec(dir);
-                poseStack.mulPose(Axis.YP.rotationDegrees(-yawPitch[0]));
-                poseStack.mulPose(Axis.ZP.rotationDegrees(yawPitch[1]));
-
-                // Render the custom model
-                ModModelRenderer.renderModel(HomingAttack.class, event, poseStack);
-
-                poseStack.popPose();
+                case BASEFORM: BaseformRenderer.onRenderToSelfPost(event, event.getEntity(), (BaseformProperties) ClientFormData.getPlayerFormDetails());
+                case SUPERFORM:
+                case STARFALLFORM:
+                case HYPERFORM:
+                case PLAYER:
             }
         }
     }

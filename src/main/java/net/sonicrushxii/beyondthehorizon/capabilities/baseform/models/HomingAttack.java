@@ -18,7 +18,7 @@ public class HomingAttack<T extends Entity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "homingattack"), "main");
 	public static final ModModelRenderer.Texture[] TEXTURE_LOCATIONS = {
-					new ModModelRenderer.Texture("textures/custom_model/homingattack.png",(byte)0)
+					new ModModelRenderer.Texture("textures/custom_model/baseform/homingattack.png",(byte)0)
 			};
 	public static final byte ANIMATION_LENGTH = 1;
 

@@ -8,7 +8,6 @@ import java.util.UUID;
 public class ClientFormData {
     private static SonicForm playerForm = SonicForm.PLAYER;
     private static FormProperties formData = new FormProperties();
-    private static UUID homingAttackReticle = null;
 
     public static void setPlayerForm(SonicForm playerForm, FormProperties formData){
         ClientFormData.playerForm = playerForm;
@@ -22,8 +21,4 @@ public class ClientFormData {
     public static FormProperties getPlayerFormDetails(){
         return formData;
     }
-
-    public static void setHomingReticle(UUID enemyUUID) {homingAttackReticle = enemyUUID;}
-    public static UUID hasHomingReticle() {return homingAttackReticle;}
-
 }

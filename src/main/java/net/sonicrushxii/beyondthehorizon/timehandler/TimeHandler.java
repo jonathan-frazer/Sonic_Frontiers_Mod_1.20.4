@@ -61,8 +61,6 @@ public class TimeHandler {
                                                 player.getX()-32,player.getY()-32,player.getZ()-32),
                                         (projectile)->!slowedProjectiles.contains(projectile.getUUID())))
                                 {
-                                    System.out.println("Slowed Projectile");
-
                                     //Remove Gravity, Lower Speed
                                     projectile.setNoGravity(true);
                                     projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.25));

@@ -42,9 +42,11 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class BaseformClient {
     private static ScheduledTask lightSpeedCanceller = null;
+    public static UUID homingAttackReticle = null;
 
     public static void performClientTick(LocalPlayer player, CompoundTag playerNBT) {
         Minecraft minecraft = Minecraft.getInstance();
@@ -220,18 +222,21 @@ public class BaseformClient {
                 if (!player.isShiftKeyDown() && baseformProperties.ballFormState == (byte)1)
                 {
                     //Force W Presses and lower Mouse Sens
-                    double currentSens = minecraft.options.sensitivity().get();
-                    minecraft.options.sensitivity().set(currentSens/4.5f);
+                    minecraft.options.sensitivity().set(minecraft.options.sensitivity().get()/4.5f);
                     PacketHandler.sendToServer(new LaunchSpindash());
                     Scheduler.scheduleTask(()->
                     {
                         Minecraft mc = Minecraft.getInstance();
+
+                        //Release W
                         if(!player.isSprinting())
                             mc.keyboardHandler.keyPress(mc.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_RELEASE, 0);
-                        mc.options.sensitivity().set(currentSens);
+
+                        //Return Mouse Sensitivity
+                        mc.options.sensitivity().set(minecraft.options.sensitivity().get()*4.5f);
+
                         PacketHandler.sendToServer(new RevertFromSpindash());
                         baseformProperties.ballFormState = 0;
-
                     },Math.min(baseformProperties.spinDashChargeTime/3, 60));
                 }
 
@@ -244,7 +249,7 @@ public class BaseformClient {
             //Homing Attack
             {
                 //Reset Reticle
-                ClientFormData.setHomingReticle(null);
+                homingAttackReticle = null;
 
                 //Spawn Reticle
                 if(!player.onGround())
@@ -256,7 +261,7 @@ public class BaseformClient {
                 {
                     //Perform an Obligatory Scan Foward again
                     HomingAttack.scanFoward(player);
-                    PacketHandler.sendToServer(new HomingAttack(ClientFormData.hasHomingReticle()));
+                    PacketHandler.sendToServer(new HomingAttack(homingAttackReticle));
                 }
             }
 

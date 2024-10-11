@@ -30,9 +30,11 @@ import org.joml.Vector3f;
 import java.util.UUID;
 
 public class BaseformServer {
+    private static final float HOMING_ATTACK_DAMAGE = 8.0f;
+
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
-        Minecraft minecraft = Minecraft.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         Level level = player.level();
         ServerLevel serverLevel = player.serverLevel();
 
@@ -53,7 +55,6 @@ public class BaseformServer {
                 //Auto Step
                 //Danger Sense
                 //Hunger
-
             }
 
             //Active Abilities
@@ -256,7 +257,7 @@ public class BaseformServer {
                                         player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                                         //Damage Enemy
-                                        enemy.hurt(player.damageSources().playerAttack(player), 4.0f);
+                                        enemy.hurt(player.damageSources().playerAttack(player), HOMING_ATTACK_DAMAGE);
                                     }
 
                                 }
@@ -288,13 +289,14 @@ public class BaseformServer {
                         if (baseformProperties.dodgeInvul)
                         {
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                    ParticleTypes.SWEEP_ATTACK,
+                                    ParticleTypes.CRIT,
                                     player.getX(), player.getY()+1, player.getZ(),
                                     0.0, 0.3f, 0.85f, 0.3f, 3,
                                     true)
                             );
                         }
                     }
+
                 }
             }
 

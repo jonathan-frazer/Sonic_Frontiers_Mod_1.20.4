@@ -2,6 +2,7 @@ package net.sonicrushxii.beyondthehorizon.event_handler;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
@@ -28,9 +29,23 @@ public class LoginHandler {
             if(playerSonicForm.getCurrentForm() == SonicForm.BASEFORM)
             {
                 BaseformTransformer.performActivation(player);
+                BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                if(((BaseformProperties)playerSonicForm.getFormProperties()).ballFormState != 0)
+                //Revert Spindash
+                if(baseformProperties.ballFormState != 0)
                     RevertFromSpindash.performRevertSpindash(player);
+
+                //Revert Dodge
+                if(baseformProperties.dodgeInvul) {
+                    baseformProperties.dodgeInvul = false;
+                    player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                }
+
+                PacketHandler.sendToPlayer(player,
+                        new SyncPlayerFormS2C(
+                                playerSonicForm.getCurrentForm(),
+                                baseformProperties
+                        ));
             }
 
             PacketHandler.sendToPlayer(player, new SyncPlayerFormS2C(
