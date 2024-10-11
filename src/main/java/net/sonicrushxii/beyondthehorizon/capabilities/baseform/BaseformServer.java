@@ -21,6 +21,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.event_handler.DamageHandler;
+import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
@@ -207,8 +209,8 @@ public class BaseformServer {
                                     new AABB(player.getX()+1.5,player.getY()+1.5,player.getZ()+1.5,
                                             player.getX()-1.5,player.getY()-1.5,player.getZ()-1.5),
                                     (nearbyEntity)->!nearbyEntity.is(player)))
-                                nearbyEntity.hurt(player.damageSources().playerAttack(player),
-                                        Math.min(100.0f,baseformProperties.spinDashChargeTime));
+                                nearbyEntity.hurt(DamageHandler.getCustomDamageSrc(ModDamageTypes.SONIC_BALL.get(),player,player),
+                                        Math.min(40.0f,baseformProperties.spinDashChargeTime/2f));
 
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1f),
@@ -260,7 +262,8 @@ public class BaseformServer {
                                         player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                                         //Damage Enemy
-                                        enemy.hurt(player.damageSources().playerAttack(player), HOMING_ATTACK_DAMAGE);
+                                        enemy.hurt(DamageHandler.getCustomDamageSrc(ModDamageTypes.SONIC_BALL.get(),player,player),
+                                                HOMING_ATTACK_DAMAGE);
                                     }
 
                                 }

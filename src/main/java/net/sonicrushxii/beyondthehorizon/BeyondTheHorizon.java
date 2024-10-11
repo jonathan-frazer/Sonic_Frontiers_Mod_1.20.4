@@ -56,7 +56,7 @@ public class BeyondTheHorizon
         MinecraftForge.EVENT_BUS.register(new PlayerTickHandler());
         MinecraftForge.EVENT_BUS.register(new Scheduler());
         MinecraftForge.EVENT_BUS.register(new TimeHandler());
-        MinecraftForge.EVENT_BUS.register(new AttackHandler());
+        MinecraftForge.EVENT_BUS.register(new DamageHandler());
         MinecraftForge.EVENT_BUS.register(new EquipmentChangeHandler());
 
         // Register the item to a creative tab

@@ -226,14 +226,12 @@ public class BaseformClient {
                     PacketHandler.sendToServer(new LaunchSpindash());
                     Scheduler.scheduleTask(()->
                     {
-                        Minecraft mc = Minecraft.getInstance();
-
                         //Release W
                         if(!player.isSprinting())
-                            mc.keyboardHandler.keyPress(mc.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_RELEASE, 0);
+                            minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_RELEASE, 0);
 
                         //Return Mouse Sensitivity
-                        mc.options.sensitivity().set(minecraft.options.sensitivity().get()*4.5f);
+                        minecraft.options.sensitivity().set(minecraft.options.sensitivity().get()*4.5f);
 
                         PacketHandler.sendToServer(new RevertFromSpindash());
                         baseformProperties.ballFormState = 0;
