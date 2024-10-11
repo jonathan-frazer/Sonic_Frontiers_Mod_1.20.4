@@ -14,7 +14,7 @@ public class BaseformHandler {
             ServerPlayer receiver = (ServerPlayer) event.getEntity();
             Entity damageGiver = event.getSource().getEntity();
 
-            System.out.println(damageGiver.getName().getString()+", Damaged: "+((receiver==null)?"Nothing":receiver.getName().getString()));
+            System.out.println((damageGiver==null)?"Nothing":damageGiver.getName().getString()+", Damaged: "+receiver.getName().getString());
 
             // Makes you only invulnerable to Direct mob attacks when using this ability. Like weakness but better
             if (baseformProperties.selectiveInvul && !(damageGiver instanceof Player) && !event.getSource().isIndirect())
@@ -32,7 +32,7 @@ public class BaseformHandler {
             ServerPlayer damageGiver = (ServerPlayer) event.getSource().getEntity();
             Entity receiver = event.getEntity();
 
-            System.out.println(damageGiver.getName().getString()+", Damaged: "+((receiver==null)?"Nothing":receiver.getName().getString()));
+            System.out.println(damageGiver.getName().getString()+", Damaged: "+receiver.getName().getString());
 
         }catch(NullPointerException ignored){}
     }
