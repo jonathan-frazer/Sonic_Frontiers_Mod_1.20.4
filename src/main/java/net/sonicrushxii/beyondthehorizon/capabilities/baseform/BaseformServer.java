@@ -247,7 +247,6 @@ public class BaseformServer {
                                     if (distanceFromEnemy > 16.0) {
                                         //Homing Attack Data
                                         baseformProperties.homingAttackAirTime = 44;
-                                        baseformProperties.selectiveInvul = false;
                                     }
 
                                     //Succeed
@@ -275,7 +274,6 @@ public class BaseformServer {
                                     if (baseformProperties.homingAttackAirTime == 55) {
                                         baseformProperties.homingAttackAirTime = 0;
                                         baseformProperties.homingTarget = new UUID(0L, 0L);
-                                        baseformProperties.selectiveInvul = false;
                                     }
                                 }
                             } catch (NullPointerException e)
@@ -283,7 +281,6 @@ public class BaseformServer {
                                 player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                                 baseformProperties.homingAttackAirTime = 0;
                                 baseformProperties.homingTarget = new UUID(0L, 0L);
-                                baseformProperties.selectiveInvul = false;
                             }
                         }
                     }
@@ -299,6 +296,31 @@ public class BaseformServer {
                                     true)
                             );
                         }
+                    }
+                    //Melee Swipes
+                    {
+                        //Start
+                        if(baseformProperties.meleeSwipeTime == 1)
+                        {
+
+                        }
+                        //Duration
+                        if(baseformProperties.meleeSwipeTime > 0)
+                        {
+                            baseformProperties.meleeSwipeTime += 1;
+                        }
+                        //Ability End
+                        if(baseformProperties.meleeSwipeTime == 10)
+                        {
+                            //Reset Gravity
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                        }
+                        //Cooldown End
+                        if (baseformProperties.meleeSwipeTime > 20)
+                        {
+                            baseformProperties.meleeSwipeTime = 0;
+                        }
+
                     }
 
                 }

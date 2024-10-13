@@ -117,7 +117,6 @@ public class BaseformProperties extends FormProperties {
     public boolean sprintFlag;
     public boolean dangerSenseActive;
     public boolean dangerSensePlaying;
-    public boolean selectiveInvul;
     public byte hitCount;
 
     //Slot 1
@@ -131,13 +130,13 @@ public class BaseformProperties extends FormProperties {
     public byte ballFormState;
     public short spinDashChargeTime;
     public UUID homingTarget;
-    public short homingAttackAirTime;
+    public byte homingAttackAirTime;
     public boolean dodgeInvul;
+    public byte meleeSwipeTime;
 
     public BaseformProperties()
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
-        selectiveInvul = false;
         hitCount = 0;
 
         //Passives
@@ -159,13 +158,13 @@ public class BaseformProperties extends FormProperties {
         homingTarget = new UUID(0L,0L);
         homingAttackAirTime = 0;
         dodgeInvul = false;
+        meleeSwipeTime = 0;
     }
 
     public BaseformProperties(CompoundTag nbt)
     {
         //Common
         abilityCooldowns = nbt.getByteArray("AbilityCooldowns");
-        selectiveInvul = nbt.getBoolean("sonicInvul");
         hitCount = nbt.getByte("hitsPerformed");
 
         //Passives
@@ -185,8 +184,9 @@ public class BaseformProperties extends FormProperties {
         ballFormState = nbt.getByte("InBallForm");
         spinDashChargeTime = nbt.getShort("Spindash");
         homingTarget = nbt.getUUID("HomingTarget");
-        homingAttackAirTime = nbt.getShort("HomingTime");
+        homingAttackAirTime = nbt.getByte("HomingTime");
         dodgeInvul = nbt.getBoolean("isDodging");
+        meleeSwipeTime = nbt.getByte("meleeSwiping");
     }
 
     @Override
@@ -196,7 +196,6 @@ public class BaseformProperties extends FormProperties {
 
         //Common
         nbt.putByteArray("AbilityCooldowns",abilityCooldowns);
-        nbt.putBoolean("sonicInvul",selectiveInvul);
         nbt.putByte("hitsPerformed",hitCount);
 
         //Passives
@@ -216,8 +215,9 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("InBallForm",ballFormState);
         nbt.putShort("Spindash", spinDashChargeTime);
         nbt.putUUID("HomingTarget",homingTarget);
-        nbt.putShort("HomingTime",homingAttackAirTime);
+        nbt.putByte("HomingTime",homingAttackAirTime);
         nbt.putBoolean("isDodging",dodgeInvul);
+        nbt.putByte("meleeSwiping",meleeSwipeTime);
 
         return nbt;
     }
@@ -226,4 +226,25 @@ public class BaseformProperties extends FormProperties {
     public byte[] getAllCooldowns() {return abilityCooldowns;}
     public byte getCooldown(BaseformActiveAbility ability){return abilityCooldowns[ability.ordinal()];}
     public void setCooldown(BaseformActiveAbility ability, byte seconds){abilityCooldowns[ability.ordinal()] = seconds;}
+
+    //Decides when to apply Selective Invulnerability
+    public boolean selectiveInvul()
+    {
+        boolean ballForm = ballFormState > 0;
+        boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
+        boolean melee = hitCount > 2;
+        boolean meleeSwipe = meleeSwipeTime > 0;
+
+        return ballForm || homingAttack || melee || meleeSwipe;
+    }
+
+    //Checks if Player is in the middle of another attack
+    public boolean isAttacking()
+    {
+        boolean ballform = ballFormState == 1;
+        boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
+        boolean meleeSwipes = (meleeSwipeTime > 0 && meleeSwipeTime <= 10);
+
+        return homingAttack || meleeSwipes || ballform;
+    }
 }

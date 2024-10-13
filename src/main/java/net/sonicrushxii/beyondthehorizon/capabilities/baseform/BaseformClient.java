@@ -26,6 +26,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.melee.MeleeSwipes;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.RevertFromSpindash;
@@ -82,7 +83,8 @@ public class BaseformClient {
                 if (KeyBindings.INSTANCE.doubleJump.consumeClick()
                         && !player.onGround() && !player.isSpectator()
                         && baseformProperties.hasDoubleJump
-                        && playerNBT.getCompound("abilities").getByte("flying") == 0) {
+                        && playerNBT.getCompound("abilities").getByte("flying") == 0
+                        && !baseformProperties.isAttacking()) {
                     PacketHandler.sendToServer(new DoubleJump());
                 }
 
@@ -92,7 +94,7 @@ public class BaseformClient {
             }
             //Auto Step
             {
-                if (player.isSprinting()) {
+                if (player.isSprinting() && !baseformProperties.isAttacking()) {
                     List<String> blocksinFront = new ArrayList<>();
                     blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -3, 0)).getBlock()) + "");
                     blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -2, 0)).getBlock()) + "");
@@ -144,7 +146,7 @@ public class BaseformClient {
             //Boost
             {
                 //Air Boosts
-                if (baseformProperties.airBoosts < 3 && player.onGround()) {
+                if (baseformProperties.airBoosts < 3 && player.onGround() && !baseformProperties.isAttacking()) {
                     PacketHandler.sendToServer(new ResetAirBoost());
                 }
 
@@ -154,7 +156,7 @@ public class BaseformClient {
                     if (player.onGround())
                         PacketHandler.sendToServer(new Boost());
                         //Air Boost
-                    else
+                    else if(!baseformProperties.isAttacking())
                         PacketHandler.sendToServer(new AirBoost());
                 }
 
@@ -189,7 +191,7 @@ public class BaseformClient {
             //Power Boost
             {
                 //Activate if Player Presses Z
-                if(VirtualSlotHandler.getCurrAbility() == 0 && baseformProperties.getCooldown(BaseformActiveAbility.HOMING_ATTACK) == 0 &&
+                if(VirtualSlotHandler.getCurrAbility() == 0 && !baseformProperties.isAttacking() &&
                         baseformProperties.getCooldown(BaseformActiveAbility.POWER_BOOST) == (byte) 0 &&
                         KeyBindings.INSTANCE.useAbility3.consumeClick())
                 {
@@ -206,7 +208,7 @@ public class BaseformClient {
                 //Charge Spindash
                 if (VirtualSlotHandler.getCurrAbility() == 1 && player.isShiftKeyDown() &&
                         player.getXRot() > 80.0 && baseformProperties.ballFormState == (byte) 0 &&
-                        KeyBindings.INSTANCE.useAbility1.isDown()) {
+                        KeyBindings.INSTANCE.useAbility1.isDown() && !baseformProperties.isAttacking()) {
                     //Set Camera
                     player.setXRot(0.0f);
 
@@ -235,7 +237,7 @@ public class BaseformClient {
 
                         PacketHandler.sendToServer(new RevertFromSpindash());
                         baseformProperties.ballFormState = 0;
-                    },Math.min(baseformProperties.spinDashChargeTime/3, 60));
+                    },Math.min(baseformProperties.spinDashChargeTime/2, 60));
                 }
 
                 //Keep going forward
@@ -254,8 +256,8 @@ public class BaseformClient {
                     HomingAttack.scanFoward(player);
 
                 //Perform homing attack
-                if (VirtualSlotHandler.getCurrAbility() == 1 && (player.getXRot() <= 80.0 || !player.isShiftKeyDown()) &&
-                        KeyBindings.INSTANCE.useAbility1.consumeClick() && baseformProperties.ballFormState != (byte)1 && baseformProperties.homingAttackAirTime == 0)
+                if (VirtualSlotHandler.getCurrAbility() == 1 && !baseformProperties.isAttacking() && (player.getXRot() <= 80.0 || !player.isShiftKeyDown())
+                         && baseformProperties.homingAttackAirTime == 0 && KeyBindings.INSTANCE.useAbility1.consumeClick())
                 {
                     //Perform an Obligatory Scan Foward again
                     HomingAttack.scanFoward(player);
@@ -263,6 +265,14 @@ public class BaseformClient {
                 }
             }
 
+            //Melee Swipes
+            {
+                if (VirtualSlotHandler.getCurrAbility() == 1 && !baseformProperties.isAttacking() &&
+                baseformProperties.getCooldown(BaseformActiveAbility.MELEE_ATTACK) == (byte)0 && KeyBindings.INSTANCE.useAbility2.consumeClick())
+                {
+                    PacketHandler.sendToServer(new MeleeSwipes());
+                }
+            }
 
         }
     }
@@ -274,6 +284,9 @@ public class BaseformClient {
 
     public static void performDoublePress(LocalPlayer player, BaseformProperties baseformProperties, DoubleTapDirection doubleTapDirection)
     {
+        if(baseformProperties.isAttacking())
+            return;
+
         //Quickstep
         if(player.isSprinting() && VirtualSlotHandler.getCurrAbility() == 0 && baseformProperties.boostLvl > 0)
         {

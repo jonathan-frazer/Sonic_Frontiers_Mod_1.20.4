@@ -33,7 +33,7 @@ public class BaseformHandler {
             // Makes you only invulnerable to Direct mob attacks when using this ability. Like weakness but better
             if (baseformProperties.dodgeInvul)
                 event.setCanceled(true);
-            if (baseformProperties.selectiveInvul && !(damageGiver instanceof Player) && !event.getSource().isIndirect())
+            if (baseformProperties.selectiveInvul() && !(damageGiver instanceof Player) && !event.getSource().isIndirect())
                 event.setCanceled(true);
 
         }catch(NullPointerException ignored){}
@@ -46,69 +46,72 @@ public class BaseformHandler {
             Entity receiver = event.getEntity();
 
             //Melee Attack
-            if(event.getSource().is(DamageTypes.PLAYER_ATTACK))
             {
-                //Perform Knockup/Knockdown
-                assert damageGiver != null;
+                final int COMBO_TIME = 40;
 
-                if(!damageGiver.onGround())
-                {
-                    Vec3 currentPlayerMovement = damageGiver.getDeltaMovement();
-                    damageGiver.setDeltaMovement(currentPlayerMovement.x(),0.0,currentPlayerMovement.z());
-                    damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageGiver));
-                    if(receiver instanceof LivingEntity damageTaker){
-                        damageTaker.setDeltaMovement(Vec3.ZERO);
-                        damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
-                    }
-                }
+                if (event.getSource().is(DamageTypes.PLAYER_ATTACK)) {
+                    //Perform Knockup/Knockdown
+                    assert damageGiver != null;
 
-                if(baseformProperties.hitCount == 3) {
-                    Level world = damageGiver.level();
-                    world.playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), SoundEvents.SPLASH_POTION_BREAK, SoundSource.MASTER, 1.0f, 1.0f);
-                }
-                if(baseformProperties.hitCount == 4)
-                {
-                    if(damageGiver.isShiftKeyDown())
-                    {
-                        damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 120, 10, false, false));
-                        if(receiver instanceof LivingEntity damageTaker){
-                            damageTaker.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 120, 10, false, false));
-                            damageTaker.addDeltaMovement(new Vec3(0.0,0.85,0.0));
+                    if (!damageGiver.onGround()) {
+                        Vec3 currentPlayerMovement = damageGiver.getDeltaMovement();
+                        damageGiver.setDeltaMovement(currentPlayerMovement.x(), 0.0, currentPlayerMovement.z());
+                        damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageGiver));
+                        if (receiver instanceof LivingEntity damageTaker) {
+                            damageTaker.setDeltaMovement(Vec3.ZERO);
+                            damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
                         }
                     }
-                    else if(!damageGiver.onGround())
-                    {
-                        damageGiver.removeEffect(MobEffects.SLOW_FALLING);
-                        if(receiver instanceof LivingEntity damageTaker){
-                            damageTaker.removeEffect(MobEffects.SLOW_FALLING);
-                            damageTaker.addDeltaMovement(new Vec3(0.0,-0.85,0.0));
-                        }
+
+                    if (baseformProperties.hitCount == 3) {
+                        Level world = damageGiver.level();
+                        world.playSound(null, damageGiver.getX(), damageGiver.getY(), damageGiver.getZ(), SoundEvents.SPLASH_POTION_BREAK, SoundSource.MASTER, 1.0f, 1.0f);
                     }
-                }
-
-                //Increase Count
-                baseformProperties.hitCount = (byte) ((baseformProperties.hitCount + 1) % 5);
-
-                //Cancel the Current Combo schedule
-                ScheduledTask currentSchedule = hitSchedule.get(damageGiver.getUUID());
-                if (currentSchedule != null && !currentSchedule.isCancelled()) currentSchedule.cancel();
-
-                //Add another Schedule to reset counter After 2 seconds
-                hitSchedule.put(damageGiver.getUUID(), Scheduler.scheduleTask(() -> {
-                            baseformProperties.hitCount = 0;
+                    if (baseformProperties.hitCount == 4) {
+                        if (damageGiver.isShiftKeyDown()) {
+                            damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 10, false, false));
+                            if (receiver instanceof LivingEntity damageTaker) {
+                                damageTaker.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 10, false, false));
+                                damageTaker.moveTo(damageTaker.getX(), damageTaker.getY() + 5.0, damageTaker.getZ());
+                            }
+                        } else if (!damageGiver.onGround()) {
                             damageGiver.removeEffect(MobEffects.SLOW_FALLING);
-                            System.out.println("Reset Combo");
-                        }, 40)
-                );
-            }
-            else if(DamageHandler.isDamageSourceModded(event.getSource())){
-                //Cancel Combo, if you do any other modded Attack
-                ScheduledTask currentSchedule = hitSchedule.get(damageGiver.getUUID());
-                if (currentSchedule != null && !currentSchedule.isCancelled()) {
-                    currentSchedule.cancel();
-                    damageGiver.removeEffect(MobEffects.SLOW_FALLING);
-                    baseformProperties.hitCount = 0;
-                    System.out.println("Interrupt Combo");
+                            if (receiver instanceof LivingEntity damageTaker) {
+                                damageTaker.removeEffect(MobEffects.SLOW_FALLING);
+                                damageTaker.addDeltaMovement(new Vec3(0.0, -0.85, 0.0));
+                                damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
+                            }
+                        } else {
+                            if (receiver instanceof LivingEntity damageTaker) {
+                                damageTaker.addDeltaMovement(damageGiver.getLookAngle());
+
+                            }
+                        }
+                    }
+
+                    //Increase Count
+                    baseformProperties.hitCount = (byte) ((baseformProperties.hitCount + 1) % 5);
+
+                    //Cancel the Current Combo schedule
+                    ScheduledTask currentSchedule = hitSchedule.get(damageGiver.getUUID());
+                    if (currentSchedule != null && !currentSchedule.isCancelled()) currentSchedule.cancel();
+
+                    //Add another Schedule to reset counter After 2 seconds
+                    hitSchedule.put(damageGiver.getUUID(), Scheduler.scheduleTask(() -> {
+                                baseformProperties.hitCount = 0;
+                                damageGiver.removeEffect(MobEffects.SLOW_FALLING);
+                                System.out.println("Reset Combo");
+                            }, COMBO_TIME)
+                    );
+                } else if (DamageHandler.isDamageSourceModded(event.getSource())) {
+                    //Cancel Combo, if you do any other modded Attack
+                    ScheduledTask currentSchedule = hitSchedule.get(damageGiver.getUUID());
+                    if (currentSchedule != null && !currentSchedule.isCancelled()) {
+                        currentSchedule.cancel();
+                        damageGiver.removeEffect(MobEffects.SLOW_FALLING);
+                        baseformProperties.hitCount = 0;
+                        System.out.println("Interrupt Combo");
+                    }
                 }
             }
 

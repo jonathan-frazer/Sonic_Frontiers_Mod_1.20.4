@@ -64,7 +64,7 @@ public class PlayerTickHandler {
                 DoubleTapHandler.scheduleResetLeftPress();
             }
             if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_A) &&
-                    DoubleTapHandler.pressedLeft && DoubleTapHandler.releasedLeft) {
+                    DoubleTapHandler.pressedLeft && DoubleTapHandler.releasedLeft && !mc.isPaused() && mc.screen == null) {
                 //Handle some internal stuff
                 DoubleTapHandler.markDoubleLeftPress();
 
@@ -97,7 +97,7 @@ public class PlayerTickHandler {
                 DoubleTapHandler.scheduleResetRightPress();
             }
             if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_D) &&
-                    DoubleTapHandler.pressedRight && DoubleTapHandler.releasedRight) {
+                    DoubleTapHandler.pressedRight && DoubleTapHandler.releasedRight && !mc.isPaused() && mc.screen == null) {
                 //Handle some internal stuff
                 DoubleTapHandler.markDoubleRightPress();
 

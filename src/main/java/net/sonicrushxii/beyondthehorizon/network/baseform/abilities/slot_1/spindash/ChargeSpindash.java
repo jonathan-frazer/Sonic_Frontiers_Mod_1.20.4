@@ -30,7 +30,6 @@ public class ChargeSpindash {
 
                             //Initialize Counter
                             baseformProperties.spinDashChargeTime = 0;
-                            baseformProperties.selectiveInvul = true;
 
                             //Set Data -> Charging
                             baseformProperties.ballFormState = (byte)1;

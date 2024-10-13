@@ -88,7 +88,6 @@ public class HomingAttack
                             {
                                 //Homing Attack Data
                                 baseformProperties.homingAttackAirTime = 1;
-                                baseformProperties.selectiveInvul = true;
                                 baseformProperties.homingTarget = enemyID;
 
                                 //Remove Gravity
