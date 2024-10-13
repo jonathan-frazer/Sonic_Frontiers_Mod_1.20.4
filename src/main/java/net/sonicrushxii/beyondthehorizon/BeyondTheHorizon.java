@@ -22,6 +22,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
 import net.sonicrushxii.beyondthehorizon.event_handler.*;
 import net.sonicrushxii.beyondthehorizon.modded.ModCreativeModeTabs;
+import net.sonicrushxii.beyondthehorizon.potion_effects.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;
@@ -66,6 +67,7 @@ public class BeyondTheHorizon
         ModCreativeModeTabs.register(modEventBus);
         ModItems.register(modEventBus);
         ModSounds.register(modEventBus);
+        ModEffects.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);

@@ -30,6 +30,8 @@
   "item.beyondthehorizon.sonic_hyperform_armor_leggings": "Sonic Leggings(Hyper)",
   "item.beyondthehorizon.sonic_hyperform_armor_boots": "Sonic Shoes(Hyper)",
 
+  "effects.beyondthehorizon.combo_effect" : "Sonic Combo",
+
   "key.categories.beyondthehorizon": "Sonic Frontiers",
   "key.beyondthehorizon.DoubleJump": "Double Jump(Should be same as Jump)",
   "key.beyondthehorizon.SideStepLeft": "Strafe Left",
