@@ -18,6 +18,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.melee.MeleeSwipes;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SmashHit;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.RevertFromSpindash;
@@ -44,6 +46,7 @@ public class PacketHandler {
         {
             INSTANCE.messageBuilder(SyncPlayerFormS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(SyncPlayerFormS2C::encode).decoder(SyncPlayerFormS2C::new).consumerMainThread(SyncPlayerFormS2C::handle).add();
             INSTANCE.messageBuilder(ParticleAuraPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(ParticleAuraPacketS2C::encode).decoder(ParticleAuraPacketS2C::new).consumerMainThread(ParticleAuraPacketS2C::handle).add();
+            INSTANCE.messageBuilder(ParticleDirPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(ParticleDirPacketS2C::encode).decoder(ParticleDirPacketS2C::new).consumerMainThread(ParticleDirPacketS2C::handle).add();
             INSTANCE.messageBuilder(ParticleRaycastPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(ParticleRaycastPacketS2C::encode).decoder(ParticleRaycastPacketS2C::new).consumerMainThread(ParticleRaycastPacketS2C::handle).add();
             INSTANCE.messageBuilder(PlayerPlaySoundPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(PlayerPlaySoundPacketS2C::encode).decoder(PlayerPlaySoundPacketS2C::new).consumerMainThread(PlayerPlaySoundPacketS2C::handle).add();
             INSTANCE.messageBuilder(PlayerStopSoundPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(PlayerStopSoundPacketS2C::encode).decoder(PlayerStopSoundPacketS2C::new).consumerMainThread(PlayerStopSoundPacketS2C::handle).add();
@@ -104,6 +107,10 @@ public class PacketHandler {
                 INSTANCE.messageBuilder(Dodge.class,NetworkDirection.PLAY_TO_SERVER).encoder(Dodge::encode).decoder(Dodge::new).consumerMainThread(Dodge::handle).add();
 
                 INSTANCE.messageBuilder(MeleeSwipes.class,NetworkDirection.PLAY_TO_SERVER).encoder(MeleeSwipes::encode).decoder(MeleeSwipes::new).consumerMainThread(MeleeSwipes::handle).add();
+
+                INSTANCE.messageBuilder(SpeedBlitz.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpeedBlitz::encode).decoder(SpeedBlitz::new).consumerMainThread(SpeedBlitz::handle).add();
+
+                INSTANCE.messageBuilder(SmashHit.class,NetworkDirection.PLAY_TO_SERVER).encoder(SmashHit::encode).decoder(SmashHit::new).consumerMainThread(SmashHit::handle).add();
             }
         }
 

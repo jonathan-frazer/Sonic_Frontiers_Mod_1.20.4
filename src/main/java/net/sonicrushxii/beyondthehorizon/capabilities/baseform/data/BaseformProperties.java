@@ -133,6 +133,8 @@ public class BaseformProperties extends FormProperties {
     public byte homingAttackAirTime;
     public boolean dodgeInvul;
     public byte meleeSwipeTime;
+    public boolean speedBlitz;
+    public boolean smashHit;
 
     public BaseformProperties()
     {
@@ -159,6 +161,12 @@ public class BaseformProperties extends FormProperties {
         homingAttackAirTime = 0;
         dodgeInvul = false;
         meleeSwipeTime = 0;
+        speedBlitz = false;
+        smashHit = false;
+
+
+        //Slot 3
+
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -187,6 +195,8 @@ public class BaseformProperties extends FormProperties {
         homingAttackAirTime = nbt.getByte("HomingTime");
         dodgeInvul = nbt.getBoolean("isDodging");
         meleeSwipeTime = nbt.getByte("meleeSwiping");
+        speedBlitz = nbt.getBoolean("speedBliztOn");
+        smashHit = nbt.getBoolean("smashHitOn");
     }
 
     @Override
@@ -218,6 +228,8 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("HomingTime",homingAttackAirTime);
         nbt.putBoolean("isDodging",dodgeInvul);
         nbt.putByte("meleeSwiping",meleeSwipeTime);
+        nbt.putBoolean("speedBliztOn",speedBlitz);
+        nbt.putBoolean("smashHitOn",smashHit);
 
         return nbt;
     }
@@ -231,8 +243,8 @@ public class BaseformProperties extends FormProperties {
     public boolean selectiveInvul()
     {
         boolean ballForm = ballFormState > 0;
-        boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
-        boolean melee = hitCount > 2;
+        boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 50);
+        boolean melee = hitCount > 3;
         boolean meleeSwipe = meleeSwipeTime > 0;
 
         return ballForm || homingAttack || melee || meleeSwipe;

@@ -27,6 +27,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.melee.MeleeSwipes;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SmashHit;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.RevertFromSpindash;
@@ -229,8 +231,7 @@ public class BaseformClient {
                     Scheduler.scheduleTask(()->
                     {
                         //Release W
-                        if(!player.isSprinting())
-                            minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_RELEASE, 0);
+                        minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_RELEASE, 0);
 
                         //Return Mouse Sensitivity
                         minecraft.options.sensitivity().set(minecraft.options.sensitivity().get()*4.5f);
@@ -274,6 +275,29 @@ public class BaseformClient {
                 }
             }
 
+            //Speed Blitz
+            {
+                if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility3.consumeClick())
+                {
+                    PacketHandler.sendToServer(new SpeedBlitz());
+                }
+            }
+
+            //Smash Hit
+            {
+                if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility4.consumeClick())
+                {
+                    PacketHandler.sendToServer(new SmashHit());
+                }
+            }
+
+            //Stomp
+            {
+                if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility5.consumeClick())
+                {
+
+                }
+            }
         }
     }
 
@@ -295,10 +319,8 @@ public class BaseformClient {
                 case LEFT_PRESS: PacketHandler.sendToServer(new Sidestep(false)); break;
             }
         }
-
         //Dodge
-        if(VirtualSlotHandler.getCurrAbility() == 1)
-        {
+        else{
             switch(doubleTapDirection){
                 case RIGHT_PRESS: PacketHandler.sendToServer(new Dodge(true)); break;
                 case LEFT_PRESS: PacketHandler.sendToServer(new Dodge(false)); break;

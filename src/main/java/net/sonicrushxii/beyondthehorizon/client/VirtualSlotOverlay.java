@@ -32,14 +32,14 @@ public class VirtualSlotOverlay {
             "textures/custom_gui/baseform/cyclone_kick_slot.png");
     private static final ResourceLocation CYLOOP_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/cyloop_slot.png");
-    private static final ResourceLocation DODGE_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
-            "textures/custom_gui/baseform/dodge_slot.png");
     private static final ResourceLocation HOMING_SHOT_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/homing_shot_slot.png");
     private static final ResourceLocation HOMING_ATTACK_SLOT = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/homing_slot.png");
     private static final ResourceLocation LIGHT_SPEED_ATTACK_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/light_speed_attack_slot.png");
+    private static final ResourceLocation LIGHT_SPEED_ATTACK_ACTIVE  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/custom_gui/baseform/light_speed_attack_active.png");
     private static final ResourceLocation LOOPKICK_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/loopkick_slot.png");
     private static final ResourceLocation MELEE_ATTACK_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
@@ -52,14 +52,20 @@ public class VirtualSlotOverlay {
             "textures/custom_gui/baseform/phantom_rush_slot.png");
     private static final ResourceLocation POWER_BOOST_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/power_boost_slot.png");
+    private static final ResourceLocation POWER_BOOST_ACTIVE  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/custom_gui/baseform/power_boost_active.png");
     private static final ResourceLocation SMASH_HIT_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/smash_hit_slot.png");
+    private static final ResourceLocation SMASH_HIT_ACTIVE  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/custom_gui/baseform/smash_hit_active.png");
     private static final ResourceLocation SONIC_BOOM_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/sonic_boom_slot.png");
     private static final ResourceLocation SONIC_WIND_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/sonic_wind_slot.png");
     private static final ResourceLocation SPEED_BLITZ_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/speed_blitz_slot.png");
+    private static final ResourceLocation SPEED_BLITZ_ACTIVE  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/custom_gui/baseform/speed_blitz_active.png");
     private static final ResourceLocation SPINSLASH_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/spinslash_slot.png");
     private static final ResourceLocation STOMP_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
@@ -146,8 +152,8 @@ public class VirtualSlotOverlay {
                 slotName = "Boost";
                 iconTextures = (Arrays.asList(
                         new Ability(BOOST_SLOT,"Lv. "+baseformProperties.boostLvl,cooldownArray[BaseformActiveAbility.BOOST.ordinal()]),
-                        new Ability(LIGHT_SPEED_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.LIGHT_SPEED_ATTACK.ordinal()]),
-                        new Ability(POWER_BOOST_SLOT,null,cooldownArray[BaseformActiveAbility.POWER_BOOST.ordinal()]))
+                        new Ability((baseformProperties.lightSpeedState==2)?LIGHT_SPEED_ATTACK_ACTIVE:LIGHT_SPEED_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.LIGHT_SPEED_ATTACK.ordinal()]),
+                        new Ability((baseformProperties.powerBoost)?POWER_BOOST_ACTIVE:POWER_BOOST_SLOT,null,cooldownArray[BaseformActiveAbility.POWER_BOOST.ordinal()]))
                 );
                 break;
 
@@ -156,9 +162,10 @@ public class VirtualSlotOverlay {
                 iconTextures = (Arrays.asList(
                         new Ability(HOMING_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_ATTACK.ordinal()]),
                         new Ability(MELEE_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.MELEE_ATTACK.ordinal()]),
-                        new Ability(SPEED_BLITZ_SLOT,null,cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()]),
-                        new Ability(SMASH_HIT_SLOT,null,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()]))
-                );
+                        new Ability((baseformProperties.speedBlitz)?SPEED_BLITZ_ACTIVE:SPEED_BLITZ_SLOT,null,cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()]),
+                        new Ability((baseformProperties.smashHit)?SMASH_HIT_ACTIVE:SMASH_HIT_SLOT,null,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()]),
+                        new Ability(STOMP_SLOT,null,cooldownArray[BaseformActiveAbility.STOMP.ordinal()])
+                ));
                 break;
 
             case 2 :
@@ -167,8 +174,7 @@ public class VirtualSlotOverlay {
                         new Ability(TORNADO_JUMP_SLOT,null,cooldownArray[BaseformActiveAbility.TORNADO_JUMP.ordinal()]),
                         new Ability(SPINSLASH_SLOT,null,cooldownArray[BaseformActiveAbility.SPINSLASH.ordinal()]),
                         new Ability(WILDRUSH_SLOT,null,cooldownArray[BaseformActiveAbility.WILDRUSH.ordinal()]),
-                        new Ability(LOOPKICK_SLOT,null,cooldownArray[BaseformActiveAbility.LOOPKICK.ordinal()]),
-                        new Ability(STOMP_SLOT,null,cooldownArray[BaseformActiveAbility.STOMP.ordinal()])
+                        new Ability(LOOPKICK_SLOT,null,cooldownArray[BaseformActiveAbility.LOOPKICK.ordinal()])
                 ));
                 if(player.isShiftKeyDown()){
                     iconTextures.set(0,new Ability(MIRAGE_SLOT,null,cooldownArray[BaseformActiveAbility.MIRAGE.ordinal()]));

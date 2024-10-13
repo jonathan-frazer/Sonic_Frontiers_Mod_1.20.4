@@ -32,7 +32,7 @@ import org.joml.Vector3f;
 import java.util.UUID;
 
 public class BaseformServer {
-    private static final float HOMING_ATTACK_DAMAGE = 8.0f;
+    private static final float HOMING_ATTACK_DAMAGE = 12.0f;
 
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
@@ -56,8 +56,9 @@ public class BaseformServer {
                 //Double Jump
                 //Auto Step
                 //Danger Sense
-                //Hunger
-
+                //Subdue Hunger
+                if (player.getFoodData().getFoodLevel() <= 7)
+                    player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
             }
 
             //Active Abilities
@@ -122,7 +123,7 @@ public class BaseformServer {
                                     break;
                                 case 2:
                                     PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                            new DustParticleOptions(new Vector3f(1.000f, 0.000f, 0.000f), 2f),
+                                            new DustParticleOptions((baseformProperties.ballFormState==0)?(new Vector3f(1.000f, 0.000f, 0.000f)):(new Vector3f(0.000f, 0.000f, 0.800f)), 2f),
                                             player.getX()+0.00, player.getY()+0.35, player.getZ()+0.00,
                                             0.001, 0.25f, 0.25f, 0.25f, 4,
                                             true)
@@ -357,9 +358,7 @@ public class BaseformServer {
                 if (baseformProperties.dangerSenseActive)
                     DangerSenseEmit.performDangerSenseEmit(player);
 
-                //Subdue Hunger
-                if (player.getFoodData().getFoodLevel() <= 8)
-                    player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
+
             }
 
             //Slot 1
