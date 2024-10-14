@@ -14,10 +14,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.DamageHandler;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleDirPacketS2C;
+import net.sonicrushxii.beyondthehorizon.potion_effects.ModEffects;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
@@ -45,7 +47,7 @@ public class BaseformHandler {
 
     public static void dealDamage(LivingAttackEvent event, BaseformProperties baseformProperties)
     {
-        //Living Entity Damage
+        //Living Entity, Rapid Damage (Hurt Time 0 only)
         try {
             ServerPlayer damageGiver = (ServerPlayer) event.getSource().getEntity();
             LivingEntity damageTaker = event.getEntity();
@@ -125,6 +127,27 @@ public class BaseformHandler {
                         System.out.println("Interrupt Combo");
                     }
                 }
+            }
+        }catch(NullPointerException|ClassCastException ignored){}
+
+        //Living Entity, Instantaneous Damage(HurtTime any)
+        try {
+            ServerPlayer damageGiver = (ServerPlayer) event.getSource().getEntity();
+            LivingEntity damageTaker = event.getEntity();
+
+            //Deal Damage
+            if(baseformProperties.speedBlitz && event.getSource().is(DamageTypes.PLAYER_ATTACK))
+            {
+                System.out.println("Speed Blitz Punch");
+                //Current Combo Duration
+                MobEffectInstance currComboEffect = damageTaker.getEffect(ModEffects.COMBO.get());
+                if(currComboEffect == null)
+                    damageTaker.addEffect(new MobEffectInstance(ModEffects.COMBO.get(), 20, 0, false, false));
+                else
+                    currComboEffect.update(new MobEffectInstance(ModEffects.COMBO.get(), 20, 0, false, false));
+
+                damageTaker.setDeltaMovement(Utilities.calculateViewVector(damageGiver.onGround()?Math.max(-90.0f,damageGiver.getXRot()-20):damageGiver.getXRot(),damageGiver.getYRot()).scale(0.85));
+                damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
             }
 
         }catch(NullPointerException|ClassCastException ignored){}

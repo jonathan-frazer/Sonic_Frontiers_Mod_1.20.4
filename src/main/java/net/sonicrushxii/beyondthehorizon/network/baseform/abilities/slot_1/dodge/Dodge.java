@@ -10,7 +10,6 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
-import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
@@ -51,9 +50,8 @@ public class Dodge {
             },5);
 
             //Delta Movement
-            player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
             Vec3 directionVector = player.getLookAngle().cross(new Vec3(0, (dodgingRight)?1:-1, 0));
-            player.addDeltaMovement(directionVector.scale(2.0));
+            player.setDeltaMovement(directionVector.scale(2.0));
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
             //Playsound

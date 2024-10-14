@@ -15,7 +15,6 @@ import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.Spindash;
-import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
 
@@ -87,7 +86,7 @@ public class BaseformRenderer
                 //Apply Rotation
                 float[] yawPitch = Utilities.getYawPitchFromVec(dir);
                 poseStack.mulPose(Axis.YP.rotationDegrees(-yawPitch[0]));
-                poseStack.mulPose(Axis.ZP.rotationDegrees(yawPitch[1]));
+                poseStack.mulPose(Axis.XP.rotationDegrees(yawPitch[1]));
 
                 // Render the custom model
                 ModModelRenderer.renderModel(HomingAttack.class, event, poseStack);

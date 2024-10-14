@@ -279,7 +279,11 @@ public class BaseformClient {
             {
                 if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility3.consumeClick())
                 {
-                    PacketHandler.sendToServer(new SpeedBlitz());
+                    //Scan foward for any enemies
+                    Vec3 enemyPos = SpeedBlitz.scanFoward(player);
+
+                    if(enemyPos == null)
+                        PacketHandler.sendToServer(new SpeedBlitz());
                 }
             }
 

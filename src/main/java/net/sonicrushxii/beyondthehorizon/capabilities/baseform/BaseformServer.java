@@ -21,7 +21,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
-import net.sonicrushxii.beyondthehorizon.event_handler.DamageHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
@@ -208,7 +207,7 @@ public class BaseformServer {
                                     new AABB(player.getX()+1.5,player.getY()+1.5,player.getZ()+1.5,
                                             player.getX()-1.5,player.getY()-1.5,player.getZ()-1.5),
                                     (nearbyEntity)->!nearbyEntity.is(player)))
-                                nearbyEntity.hurt(DamageHandler.getCustomDamageSrc(ModDamageTypes.SONIC_BALL.get(),player,player),
+                                nearbyEntity.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
                                         Math.min(40.0f,baseformProperties.spinDashChargeTime/2f));
 
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
@@ -260,7 +259,7 @@ public class BaseformServer {
                                         player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                                         //Damage Enemy
-                                        enemy.hurt(DamageHandler.getCustomDamageSrc(ModDamageTypes.SONIC_BALL.get(),player,player),
+                                        enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
                                                 HOMING_ATTACK_DAMAGE);
                                     }
 
@@ -321,6 +320,11 @@ public class BaseformServer {
                         {
                             baseformProperties.meleeSwipeTime = 0;
                         }
+
+                    }
+
+                    //Speed Blitz
+                    {
 
                     }
 
