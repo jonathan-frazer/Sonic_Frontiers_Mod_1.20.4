@@ -2,6 +2,7 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spee
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -16,7 +17,6 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProp
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
-import net.sonicrushxii.beyondthehorizon.network.sync.TpSyncPacketS2C;
 import net.sonicrushxii.beyondthehorizon.potion_effects.ModEffects;
 import org.joml.Vector3f;
 
@@ -46,7 +46,7 @@ public class SpeedBlitz {
 
             List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
                     LivingEntity.class, boundingBox,
-                    (enemy) -> !enemy.is(player) && enemy.isAlive() && enemy.hasEffect(ModEffects.COMBO.get()));
+                    (enemy) -> !enemy.is(player) && enemy.isAlive() && enemy.hasEffect(ModEffects.SPEED_BLITZED.get()));
 
             //If enemy is found then Target it
             if (!nearbyEntities.isEmpty()) {
@@ -98,23 +98,20 @@ public class SpeedBlitz {
         ));
 
         //Current Combo Duration
-        MobEffectInstance currComboEffect = player.getEffect(ModEffects.COMBO.get());
+        MobEffectInstance currComboEffect = player.getEffect(ModEffects.SPEED_BLITZING.get());
         if(currComboEffect == null)
-            player.addEffect(new MobEffectInstance(ModEffects.COMBO.get(), 20, 0, false, false));
+            player.addEffect(new MobEffectInstance(ModEffects.SPEED_BLITZING.get(), 20, 0, false, false));
         else
-            currComboEffect.update(new MobEffectInstance(ModEffects.COMBO.get(), 20, 0, false, false));
-
+            currComboEffect.update(new MobEffectInstance(ModEffects.SPEED_BLITZING.get(), 20, 0, false, false));
 
         //Set New Position
-        player.setPos(newPlayerPos);
-        player.setYRot(yawPitch[0]);
-        player.setXRot(yawPitch[1]);
+        player.teleportTo(player.serverLevel(),newPlayerPos.x,newPlayerPos.y,newPlayerPos.z,
+                Collections.emptySet(),yawPitch[0],yawPitch[1]);
+        player.connection.send(new ClientboundPlayerPositionPacket(newPlayerPos.x,newPlayerPos.y,newPlayerPos.z,
+                yawPitch[0],yawPitch[1],Collections.emptySet(),0));
 
         //Set Speed to Zero
         player.setDeltaMovement(new Vec3(0.0,0.0,0.0));
-
-        //Update Motion and Position On Client Side
-        PacketHandler.sendToPlayer(player,new TpSyncPacketS2C(newPlayerPos,yawPitch[0],yawPitch[1]));
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }
 

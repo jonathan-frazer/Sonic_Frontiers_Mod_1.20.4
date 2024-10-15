@@ -157,13 +157,12 @@ public class BaseformHandler {
             }//Speed Blitz
             else if(baseformProperties.speedBlitz && event.getSource().is(DamageTypes.PLAYER_ATTACK))
             {
-                System.out.println("Speed Blitz Punch");
                 //Current Combo Duration
-                MobEffectInstance currComboEffect = damageTaker.getEffect(ModEffects.COMBO.get());
+                MobEffectInstance currComboEffect = damageTaker.getEffect(ModEffects.SPEED_BLITZED.get());
                 if(currComboEffect == null)
-                    damageTaker.addEffect(new MobEffectInstance(ModEffects.COMBO.get(), 20, 0, false, false));
+                    damageTaker.addEffect(new MobEffectInstance(ModEffects.SPEED_BLITZED.get(), 20, 0, false, false));
                 else
-                    currComboEffect.update(new MobEffectInstance(ModEffects.COMBO.get(), 20, 0, false, false));
+                    currComboEffect.update(new MobEffectInstance(ModEffects.SPEED_BLITZED.get(), 20, 0, false, false));
 
                 Scheduler.scheduleTask(()->{
                     damageTaker.setDeltaMovement(Utilities.calculateViewVector(damageGiver.getXRot(),damageGiver.getYRot()).scale(0.85));

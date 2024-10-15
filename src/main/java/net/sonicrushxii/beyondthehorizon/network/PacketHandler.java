@@ -53,7 +53,6 @@ public class PacketHandler {
             INSTANCE.messageBuilder(PlayerStopSoundPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(PlayerStopSoundPacketS2C::encode).decoder(PlayerStopSoundPacketS2C::new).consumerMainThread(PlayerStopSoundPacketS2C::handle).add();
             INSTANCE.messageBuilder(VirtualSlotSyncS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(VirtualSlotSyncS2C::encode).decoder(VirtualSlotSyncS2C::new).consumerMainThread(VirtualSlotSyncS2C::handle).add();
             INSTANCE.messageBuilder(TimeProjSync.class, NetworkDirection.PLAY_TO_CLIENT).encoder(TimeProjSync::encode).decoder(TimeProjSync::new).consumerMainThread(TimeProjSync::handle).add();
-            INSTANCE.messageBuilder(TpSyncPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(TpSyncPacketS2C::encode).decoder(TpSyncPacketS2C::new).consumerMainThread(TpSyncPacketS2C::handle).add();
         }
 
         //Base form

@@ -3,7 +3,6 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.mele
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
-import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -27,9 +26,6 @@ public class MeleeSwipes {
 
             //Add Data
             baseformProperties.meleeSwipeTime = 1;
-
-            //Remove Gravity
-            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(

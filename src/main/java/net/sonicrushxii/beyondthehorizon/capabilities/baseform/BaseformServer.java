@@ -32,6 +32,7 @@ import java.util.UUID;
 
 public class BaseformServer {
     private static final float HOMING_ATTACK_DAMAGE = 12.0f;
+    private static final float MELEE_SWIPE_DAMAGE = 6.0f;
 
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
@@ -297,7 +298,9 @@ public class BaseformServer {
                             );
                         }
                     }
+
                     //Melee Swipes
+                    Vec3 playerInFrontOf = player.position().add(player.getLookAngle().scale(0.65));
                     {
                         //Start
                         if(baseformProperties.meleeSwipeTime == 1)
@@ -307,13 +310,34 @@ public class BaseformServer {
                         //Duration
                         if(baseformProperties.meleeSwipeTime > 0)
                         {
+                            //Add Time
                             baseformProperties.meleeSwipeTime += 1;
+
+                            //Attack
+                            for(LivingEntity enemy : serverLevel.getEntitiesOfClass(LivingEntity.class,
+                                    new AABB(playerInFrontOf.x()+0.8,playerInFrontOf.y()+player.getEyeHeight()/2+0.8, playerInFrontOf.z()+0.8,
+                                            playerInFrontOf.x()-0.8,playerInFrontOf.y()+player.getEyeHeight()/2-0.8, playerInFrontOf.z()-0.8),
+                                    (target)->!target.is(player)))
+                            {
+                                //Damage Enemy
+                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),player),
+                                        MELEE_SWIPE_DAMAGE);
+                            }
+
+                            //Play Sweep Particle
+                            if(baseformProperties.meleeSwipeTime%4 == 0)
+                                PacketHandler.sendToPlayer(player, new ParticleAuraPacketS2C(
+                                        ParticleTypes.SWEEP_ATTACK,
+                                        playerInFrontOf.x(), playerInFrontOf.y()+player.getEyeHeight()/2, playerInFrontOf.z(),
+                                        0.0, 0.2f, 0.2f, 0.2f, 4, true)
+                                );
+
                         }
                         //Ability End
                         if(baseformProperties.meleeSwipeTime == 10)
                         {
                             //Reset Gravity
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            //player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                         }
                         //Cooldown End
                         if (baseformProperties.meleeSwipeTime > 20)
@@ -324,7 +348,35 @@ public class BaseformServer {
                     }
 
                     //Speed Blitz
-                    
+
+                    //Smash Hit
+                    {
+                        switch(baseformProperties.smashHit)
+                        {
+                            case 20:
+                            case 31:
+                            case 42:
+                            case 53:PacketHandler.sendToPlayer(player, new ParticleAuraPacketS2C(
+                                    ParticleTypes.FLASH,
+                                            playerInFrontOf.x(), playerInFrontOf.y()+player.getEyeHeight()/2, playerInFrontOf.z(),
+                                    0.0, 0.2f, 0.2f, 0.2f, 1, true)
+                                    );
+                                    baseformProperties.smashHit += 1;
+                                    break;
+                            case 64:PacketHandler.sendToPlayer(player, new ParticleAuraPacketS2C(
+                                    ParticleTypes.FLASH,
+                                            playerInFrontOf.x(), playerInFrontOf.y()+player.getEyeHeight()/2, playerInFrontOf.z(),
+                                    0.0, 0.2f, 0.2f, 0.2f, 3, true)
+                                    );
+                                    baseformProperties.smashHit += 1;
+                                    break;
+                        }
+                    }
+
+                    //Stomp
+                    {
+
+                    }
 
                 }
             }

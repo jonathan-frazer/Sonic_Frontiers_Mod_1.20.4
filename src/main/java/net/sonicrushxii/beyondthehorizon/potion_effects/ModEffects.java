@@ -14,9 +14,13 @@ public class ModEffects {
     public static final DeferredRegister<MobEffect> MOB_EFFECTS
             = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, BeyondTheHorizon.MOD_ID);
 
-    public static final RegistryObject<MobEffect> COMBO = MOB_EFFECTS.register(
-            "combo_effect",()->((new ComboEffect(MobEffectCategory.HARMFUL,3215315)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020331", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
+    public static final RegistryObject<MobEffect> SPEED_BLITZED = MOB_EFFECTS.register(
+            "speed_blitzed",()->((new ComboEffect(MobEffectCategory.HARMFUL,3215315)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020331", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
     );
+    public static final RegistryObject<MobEffect> SPEED_BLITZING = MOB_EFFECTS.register(
+            "speed_blitzing",()->((new ComboEffect(MobEffectCategory.BENEFICIAL,2215315)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020332", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
+    );
+
 
     public static void register(IEventBus eventBus)
     {

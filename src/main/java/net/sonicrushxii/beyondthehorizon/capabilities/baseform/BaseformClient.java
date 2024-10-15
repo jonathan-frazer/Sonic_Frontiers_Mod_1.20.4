@@ -6,6 +6,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -33,6 +34,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.RevertFromSpindash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
@@ -293,11 +295,11 @@ public class BaseformClient {
                 if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility4.isDown())
                 {
                     //Slow down Player
-                    if(baseformProperties.smashHit == 0)
+                    if(!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT))
                         PacketHandler.sendToServer(new SmashHitToggle(true));
 
                     //Remove Effects
-                    baseformProperties.smashHit = (byte) Math.min(baseformProperties.smashHit+1,61);
+                    baseformProperties.smashHit = (byte) Math.min(baseformProperties.smashHit+1,65);
                     PacketHandler.sendToServer(new SetSmashHitChargeC2S(baseformProperties.smashHit));
                 }
 
