@@ -15,10 +15,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.DamageHandler;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleDirPacketS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.potion_effects.ModEffects;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
@@ -59,7 +61,7 @@ public class BaseformHandler {
             {
                 final int COMBO_TIME = 40;
 
-                if (event.getSource().is(DamageTypes.PLAYER_ATTACK)) {
+                if (event.getSource().is(DamageTypes.PLAYER_ATTACK) && !baseformProperties.speedBlitz) {
 
                     //Perform Knockup/Knockdown
                     assert damageGiver != null;
@@ -135,8 +137,25 @@ public class BaseformHandler {
             ServerPlayer damageGiver = (ServerPlayer) event.getSource().getEntity();
             LivingEntity damageTaker = event.getEntity();
 
-            //Deal Damage
-            if(baseformProperties.speedBlitz && event.getSource().is(DamageTypes.PLAYER_ATTACK))
+            //Smash Hit
+            if(baseformProperties.smashHit > 0 && event.getSource().is(DamageTypes.PLAYER_ATTACK))
+            {
+                damageTaker.setDeltaMovement(damageGiver.getLookAngle().scale(baseformProperties.smashHit/20.0f));
+
+                damageGiver.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                    //Get Data From the Player
+                    BaseformProperties updatedBaseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                    updatedBaseformProperties.smashHit = 0;
+
+                    //Sync Data
+                    PacketHandler.sendToPlayer(damageGiver,
+                            new SyncPlayerFormS2C(
+                                    playerSonicForm.getCurrentForm(),
+                                    baseformProperties
+                            ));
+                });
+            }//Speed Blitz
+            else if(baseformProperties.speedBlitz && event.getSource().is(DamageTypes.PLAYER_ATTACK))
             {
                 System.out.println("Speed Blitz Punch");
                 //Current Combo Duration
@@ -146,9 +165,12 @@ public class BaseformHandler {
                 else
                     currComboEffect.update(new MobEffectInstance(ModEffects.COMBO.get(), 20, 0, false, false));
 
-                damageTaker.setDeltaMovement(Utilities.calculateViewVector(damageGiver.onGround()?Math.max(-90.0f,damageGiver.getXRot()-20):damageGiver.getXRot(),damageGiver.getYRot()).scale(0.85));
-                damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
+                Scheduler.scheduleTask(()->{
+                    damageTaker.setDeltaMovement(Utilities.calculateViewVector(damageGiver.getXRot(),damageGiver.getYRot()).scale(0.85));
+                    damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
+                },2);
             }
+
 
         }catch(NullPointerException|ClassCastException ignored){}
     }

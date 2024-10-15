@@ -13,7 +13,6 @@ import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
-import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -63,7 +62,7 @@ public class HomingAttack
             //If enemy is found then Target it
             if (!nearbyEntities.isEmpty()) {
                 //Select Closest target
-                BaseformClient.homingAttackReticle = Collections.min(nearbyEntities, (e1, e2) -> {
+                BaseformClient.ClientOnlyData.homingAttackReticle = Collections.min(nearbyEntities, (e1, e2) -> {
                     Vec3 e1Pos = new Vec3(e1.getX(), e1.getY(), e1.getZ());
                     Vec3 e2Pos = new Vec3(e2.getX(), e2.getY(), e2.getZ());
 

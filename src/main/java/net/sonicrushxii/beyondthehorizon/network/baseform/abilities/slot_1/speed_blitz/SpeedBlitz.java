@@ -1,6 +1,8 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz;
 
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,9 +14,11 @@ import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.TpSyncPacketS2C;
 import net.sonicrushxii.beyondthehorizon.potion_effects.ModEffects;
+import org.joml.Vector3f;
 
 import java.util.Collections;
 import java.util.List;
@@ -86,6 +90,12 @@ public class SpeedBlitz {
         Vec3 newPlayerPos = enemyPos.add(tpDirection.scale(3));
         float[] yawPitch = Utilities.calculateFacing(newPlayerPos,enemyPos);
 
+        //Display Raycast Particle
+        PacketHandler.sendToPlayer(player, new ParticleRaycastPacketS2C(
+                new DustParticleOptions(new Vector3f(0.000f,0.969f,1.000f), 1.5f),
+                playerPos.add(0,0.75,0),
+                newPlayerPos.add(0,0.75,0)
+        ));
 
         //Current Combo Duration
         MobEffectInstance currComboEffect = player.getEffect(ModEffects.COMBO.get());
@@ -100,8 +110,12 @@ public class SpeedBlitz {
         player.setYRot(yawPitch[0]);
         player.setXRot(yawPitch[1]);
 
-        //Update Position On Client Side
+        //Set Speed to Zero
+        player.setDeltaMovement(new Vec3(0.0,0.0,0.0));
+
+        //Update Motion and Position On Client Side
         PacketHandler.sendToPlayer(player,new TpSyncPacketS2C(newPlayerPos,yawPitch[0],yawPitch[1]));
+        player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }
 
     public void handle(CustomPayloadEvent.Context ctx){

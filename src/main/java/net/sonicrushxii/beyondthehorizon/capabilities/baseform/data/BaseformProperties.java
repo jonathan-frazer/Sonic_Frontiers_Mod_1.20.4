@@ -134,7 +134,7 @@ public class BaseformProperties extends FormProperties {
     public boolean dodgeInvul;
     public byte meleeSwipeTime;
     public boolean speedBlitz;
-    public boolean smashHit;
+    public byte smashHit;
 
     public BaseformProperties()
     {
@@ -162,7 +162,7 @@ public class BaseformProperties extends FormProperties {
         dodgeInvul = false;
         meleeSwipeTime = 0;
         speedBlitz = false;
-        smashHit = false;
+        smashHit = (byte)0;
 
 
         //Slot 3
@@ -196,7 +196,7 @@ public class BaseformProperties extends FormProperties {
         dodgeInvul = nbt.getBoolean("isDodging");
         meleeSwipeTime = nbt.getByte("meleeSwiping");
         speedBlitz = nbt.getBoolean("speedBliztOn");
-        smashHit = nbt.getBoolean("smashHitOn");
+        smashHit = nbt.getByte("smashHitTime");
     }
 
     @Override
@@ -229,7 +229,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putBoolean("isDodging",dodgeInvul);
         nbt.putByte("meleeSwiping",meleeSwipeTime);
         nbt.putBoolean("speedBliztOn",speedBlitz);
-        nbt.putBoolean("smashHitOn",smashHit);
+        nbt.putByte("smashHitTime",smashHit);
 
         return nbt;
     }

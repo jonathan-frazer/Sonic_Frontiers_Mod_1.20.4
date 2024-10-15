@@ -71,7 +71,7 @@ public class BaseformRenderer
 
         //Homing Attack
         {
-            if (VirtualSlotHandler.getCurrAbility() == 1 && target.getUUID().equals(BaseformClient.homingAttackReticle))
+            if (VirtualSlotHandler.getCurrAbility() == 1 && target.getUUID().equals(BaseformClient.ClientOnlyData.homingAttackReticle))
             {
                 Vec3 playerPos = new Vec3(player.getX(),player.getY()+target.getEyeHeight(),player.getZ());
                 Vec3 targetPos = new Vec3(target.getX(),target.getY()+target.getEyeHeight(),target.getZ());

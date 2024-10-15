@@ -324,9 +324,7 @@ public class BaseformServer {
                     }
 
                     //Speed Blitz
-                    {
-
-                    }
+                    
 
                 }
             }

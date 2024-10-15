@@ -163,7 +163,7 @@ public class VirtualSlotOverlay {
                         new Ability(HOMING_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_ATTACK.ordinal()]),
                         new Ability(MELEE_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.MELEE_ATTACK.ordinal()]),
                         new Ability((baseformProperties.speedBlitz)?SPEED_BLITZ_ACTIVE:SPEED_BLITZ_SLOT,null,cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()]),
-                        new Ability((baseformProperties.smashHit)?SMASH_HIT_ACTIVE:SMASH_HIT_SLOT,null,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()]),
+                        new Ability((baseformProperties.smashHit == 0)?SMASH_HIT_SLOT:SMASH_HIT_ACTIVE,null,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()]),
                         new Ability(STOMP_SLOT,null,cooldownArray[BaseformActiveAbility.STOMP.ordinal()])
                 ));
                 break;

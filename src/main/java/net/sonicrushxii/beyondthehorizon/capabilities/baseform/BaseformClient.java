@@ -27,7 +27,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.melee.MeleeSwipes;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SmashHit;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SetSmashHitChargeC2S;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SmashHitToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
@@ -48,8 +49,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class BaseformClient {
-    private static ScheduledTask lightSpeedCanceller = null;
-    public static UUID homingAttackReticle = null;
+    public class ClientOnlyData
+    {
+        private static ScheduledTask lightSpeedCanceller = null;
+        public static UUID homingAttackReticle = null;
+    }
 
     public static void performClientTick(LocalPlayer player, CompoundTag playerNBT) {
         Minecraft minecraft = Minecraft.getInstance();
@@ -176,7 +180,7 @@ public class BaseformClient {
                         KeyBindings.INSTANCE.useAbility2.isDown()) {
                     PacketHandler.sendToServer(new LightspeedCharge());
 
-                    lightSpeedCanceller = Scheduler.scheduleTask(() -> {
+                    ClientOnlyData.lightSpeedCanceller = Scheduler.scheduleTask(() -> {
                         PacketHandler.sendToServer(new LightspeedEffect());
                         Scheduler.scheduleTask(() -> PacketHandler.sendToServer(new LightspeedDecay()), 300);
                     }, 66);
@@ -184,9 +188,9 @@ public class BaseformClient {
 
                 //Cancel Light Speed Attack
                 if (baseformProperties.lightSpeedState == (byte) 1 &&
-                        lightSpeedCanceller != null &&
+                        ClientOnlyData.lightSpeedCanceller != null &&
                         !player.isShiftKeyDown()) {
-                    lightSpeedCanceller.cancel();
+                    ClientOnlyData.lightSpeedCanceller.cancel();
                     PacketHandler.sendToServer(new LightspeedCancel());
                 }
             }
@@ -250,7 +254,7 @@ public class BaseformClient {
             //Homing Attack
             {
                 //Reset Reticle
-                homingAttackReticle = null;
+                ClientOnlyData.homingAttackReticle = null;
 
                 //Spawn Reticle
                 if(!player.onGround())
@@ -262,7 +266,7 @@ public class BaseformClient {
                 {
                     //Perform an Obligatory Scan Foward again
                     HomingAttack.scanFoward(player);
-                    PacketHandler.sendToServer(new HomingAttack(homingAttackReticle));
+                    PacketHandler.sendToServer(new HomingAttack(ClientOnlyData.homingAttackReticle));
                 }
             }
 
@@ -279,20 +283,40 @@ public class BaseformClient {
             {
                 if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility3.consumeClick())
                 {
-                    //Scan foward for any enemies
-                    Vec3 enemyPos = SpeedBlitz.scanFoward(player);
-
-                    if(enemyPos == null)
-                        PacketHandler.sendToServer(new SpeedBlitz());
+                    PacketHandler.sendToServer(new SpeedBlitz());
                 }
             }
 
             //Smash Hit
             {
-                if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility4.consumeClick())
+                //Increase Smash hit
+                if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility4.isDown())
                 {
-                    PacketHandler.sendToServer(new SmashHit());
+                    //Slow down Player
+                    if(baseformProperties.smashHit == 0)
+                        PacketHandler.sendToServer(new SmashHitToggle(true));
+
+                    //Remove Effects
+                    baseformProperties.smashHit = (byte) Math.min(baseformProperties.smashHit+1,61);
+                    PacketHandler.sendToServer(new SetSmashHitChargeC2S(baseformProperties.smashHit));
                 }
+
+                //If Smash hit is Enabled
+                if(baseformProperties.smashHit > 0)
+                {
+                    //When the key is released give speed back
+                    if(!KeyBindings.INSTANCE.useAbility4.isDown())
+                        PacketHandler.sendToServer(new SmashHitToggle(false));
+
+                    //Turn off automatically if you switch to another slot or start another attack
+                    if(VirtualSlotHandler.getCurrAbility() != 1 || baseformProperties.isAttacking()) {
+                        baseformProperties.smashHit = 0;
+                        PacketHandler.sendToServer(new SetSmashHitChargeC2S((byte) 0));
+                        PacketHandler.sendToServer(new SmashHitToggle(false)); //Get Speed back
+                    }
+                }
+
+
             }
 
             //Stomp
