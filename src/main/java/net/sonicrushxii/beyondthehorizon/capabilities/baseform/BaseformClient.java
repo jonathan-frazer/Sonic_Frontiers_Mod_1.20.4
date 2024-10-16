@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
@@ -18,7 +17,9 @@ import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 import net.sonicrushxii.beyondthehorizon.client.DoubleTapDirection;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.*;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Boost;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Sidestep;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCancel;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCharge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
@@ -36,19 +37,12 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spind
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.RevertFromSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDownDouble;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJumpEnd;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class BaseformClient {
@@ -79,14 +73,7 @@ public class BaseformClient {
         //Passive Abilities
         {
             //General Sprinting
-            {
-                //It handles Auto Step,
-                if (player.isSprinting() && baseformProperties.sprintFlag == false)
-                    PacketHandler.sendToServer(new StartSprint());
-                if (!player.isSprinting() && baseformProperties.sprintFlag == true)
-                    PacketHandler.sendToServer(new StopSprint());
 
-            }
             //Double Jump
             {
                 if (KeyBindings.INSTANCE.doubleJump.consumeClick()
@@ -96,34 +83,8 @@ public class BaseformClient {
                         && !baseformProperties.isAttacking()) {
                     PacketHandler.sendToServer(new DoubleJump());
                 }
-
-                if (!baseformProperties.hasDoubleJump && player.onGround()) {
-                    PacketHandler.sendToServer(new DoubleJumpEnd());
-                }
             }
             //Auto Step
-            {
-                if (player.isSprinting() && !baseformProperties.isAttacking()) {
-                    List<String> blocksinFront = new ArrayList<>();
-                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -3, 0)).getBlock()) + "");
-                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -2, 0)).getBlock()) + "");
-                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -1, 0)).getBlock()) + "");
-                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos).getBlock()) + "");
-
-                    if (Utilities.passableBlocks.contains(blocksinFront.get(3))
-                            && Utilities.passableBlocks.contains(blocksinFront.get(2))
-                            && !Utilities.passableBlocks.contains(blocksinFront.get(1))
-                            && player.onGround())
-                        PacketHandler.sendToServer(new StepDown());
-
-                    if (Utilities.passableBlocks.contains(blocksinFront.get(3))
-                            && Utilities.passableBlocks.contains(blocksinFront.get(2))
-                            && Utilities.passableBlocks.contains(blocksinFront.get(1))
-                            && !Utilities.passableBlocks.contains(blocksinFront.get(0))
-                            && player.onGround())
-                        PacketHandler.sendToServer(new StepDownDouble());
-                }
-            }
 
             //Danger Sense
             {
@@ -154,11 +115,6 @@ public class BaseformClient {
         {
             //Boost
             {
-                //Air Boosts
-                if (baseformProperties.airBoosts < 3 && player.onGround() && !baseformProperties.isAttacking()) {
-                    PacketHandler.sendToServer(new ResetAirBoost());
-                }
-
                 if ( VirtualSlotHandler.getCurrAbility() == 0 &&
                         KeyBindings.INSTANCE.useAbility1.consumeClick()) {
                     //Boost

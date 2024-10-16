@@ -3,6 +3,8 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stom
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -17,11 +19,8 @@ import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import org.joml.Vector3f;
 
-import java.util.Collections;
-import java.util.List;
-
 public class Stomp {
-    private static final float STOMP_DAMAGE=10.0f;
+    private static final float STOMP_DAMAGE=30.0f;
 
     public Stomp() {}
 
@@ -29,7 +28,7 @@ public class Stomp {
 
     public void encode(FriendlyByteBuf buffer) {}
 
-    public static void performDeactivateStomp(ServerPlayer player)
+    public static void performEndStomp(ServerPlayer player)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
@@ -57,6 +56,9 @@ public class Stomp {
                     player.getX(),player.getY()+0.2,player.getZ(),
                     0.0 ,3.0f,0.10f, 3.0f,100,true)
             );
+
+            //Sound
+            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.MASTER, 0.95f, 0.5f);
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(

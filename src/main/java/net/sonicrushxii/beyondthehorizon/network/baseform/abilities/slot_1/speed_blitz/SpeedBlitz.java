@@ -1,16 +1,21 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -38,7 +43,8 @@ public class SpeedBlitz {
         Vec3 lookAngle = player.getLookAngle();
 
         //Scan Forward for enemies
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 10; ++i)
+        {
             //Increment Current Position Forward
             currentPos = currentPos.add(lookAngle);
             AABB boundingBox = new AABB(currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3,
@@ -49,7 +55,8 @@ public class SpeedBlitz {
                     (enemy) -> !enemy.is(player) && enemy.isAlive() && enemy.hasEffect(ModEffects.SPEED_BLITZED.get()));
 
             //If enemy is found then Target it
-            if (!nearbyEntities.isEmpty()) {
+            if (!nearbyEntities.isEmpty())
+            {
                 //Select Closest target
                 LivingEntity target = Collections.min(nearbyEntities, (e1, e2) -> {
                     Vec3 e1Pos = new Vec3(e1.getX(), e1.getY(), e1.getZ());
@@ -96,6 +103,8 @@ public class SpeedBlitz {
                 playerPos.add(0,0.75,0),
                 newPlayerPos.add(0,0.75,0)
         ));
+        //Sound
+        player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.TRIDENT_HIT, SoundSource.MASTER, 0.65f, 1.6f);
 
         //Current Combo Duration
         MobEffectInstance currComboEffect = player.getEffect(ModEffects.SPEED_BLITZING.get());
@@ -104,11 +113,24 @@ public class SpeedBlitz {
         else
             currComboEffect.update(new MobEffectInstance(ModEffects.SPEED_BLITZING.get(), 20, 0, false, false));
 
+        //Check if position is Safe
+        Level world = player.level();
+        String destinationBlockName = ForgeRegistries.BLOCKS.getKey(
+                world.getBlockState(
+                        new BlockPos(
+                                (int)Math.round(newPlayerPos.x),
+                                (int)Math.round(newPlayerPos.y+1),
+                                (int)Math.round(newPlayerPos.z)
+                        )
+                ).getBlock())+"";
         //Set New Position
-        player.teleportTo(player.serverLevel(),newPlayerPos.x,newPlayerPos.y,newPlayerPos.z,
-                Collections.emptySet(),yawPitch[0],yawPitch[1]);
-        player.connection.send(new ClientboundPlayerPositionPacket(newPlayerPos.x,newPlayerPos.y,newPlayerPos.z,
-                yawPitch[0],yawPitch[1],Collections.emptySet(),0));
+        if(Utilities.passableBlocks.contains(destinationBlockName))
+        {
+            player.teleportTo(player.serverLevel(), newPlayerPos.x, newPlayerPos.y, newPlayerPos.z,
+                    Collections.emptySet(), yawPitch[0], yawPitch[1]);
+            player.connection.send(new ClientboundPlayerPositionPacket(newPlayerPos.x, newPlayerPos.y, newPlayerPos.z,
+                    yawPitch[0], yawPitch[1], Collections.emptySet(), 0));
+        }
 
         //Set Speed to Zero
         player.setDeltaMovement(new Vec3(0.0,0.0,0.0));

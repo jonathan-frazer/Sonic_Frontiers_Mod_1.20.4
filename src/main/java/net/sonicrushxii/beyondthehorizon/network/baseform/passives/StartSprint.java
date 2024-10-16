@@ -11,7 +11,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepUp;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
@@ -37,43 +37,43 @@ public class StartSprint {
                 0.001, 0.0f, 1, true));
     }
 
+    public static void performStartSprint(ServerPlayer player)
+    {
+        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
+            BaseformProperties baseformProperties =  (BaseformProperties) playerSonicForm.getFormProperties();
+            baseformProperties.sprintFlag = true;
+
+            PacketHandler.sendToPlayer(player,
+                    new SyncPlayerFormS2C(
+                            playerSonicForm.getCurrentForm(),
+                            baseformProperties
+                    ));
+
+            //Activate Auto Step
+            AutoStep.performStepUpActivate(player);
+
+            //Apply Boost Levels
+            switch(baseformProperties.boostLvl)
+            {
+                case 0: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
+                    break;
+                case 1: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.75);
+                    break;
+                case 2: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.00);
+                    break;
+                case 3: sonicBoomEffect(player);
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
+                    break;
+            }
+        });
+    }
+
     public void handle(CustomPayloadEvent.Context ctx) {
         ctx.enqueueWork(
                 ()->{
                     ServerPlayer player = ctx.getSender();
                     if(player != null)
-                    {
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
-                            BaseformProperties baseformProperties =  (BaseformProperties) playerSonicForm.getFormProperties();
-                            baseformProperties.sprintFlag = true;
-
-                            PacketHandler.sendToPlayer(player,
-                                    new SyncPlayerFormS2C(
-                                            playerSonicForm.getCurrentForm(),
-                                            baseformProperties
-                                    ));
-
-                            //Activate Auto Step
-                            StepUp.performStepUpActivate(player);
-
-                            //Apply Boost Levels
-                            switch(baseformProperties.boostLvl)
-                            {
-                                case 0: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
-                                    break;
-                                case 1: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.75);
-                                    break;
-                                case 2: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.00);
-                                    break;
-                                case 3: sonicBoomEffect(player);
-                                    player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
-                                    break;
-                            }
-                        });
-
-
-
-                    }
+                        StartSprint.performStartSprint(player);
                 });
         ctx.setPacketHandled(true);
     }

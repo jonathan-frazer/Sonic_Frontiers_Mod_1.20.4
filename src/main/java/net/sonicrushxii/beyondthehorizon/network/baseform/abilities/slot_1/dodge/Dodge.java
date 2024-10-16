@@ -55,7 +55,7 @@ public class Dodge {
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
             //Playsound
-            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.MASTER, 0.5f, 0.5f);
+            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.MASTER, 0.5f, 1f);
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(

@@ -42,7 +42,7 @@ public class BaseformHandler {
             // Makes you only invulnerable to Direct mob attacks when using this ability. Like weakness but better
             if (baseformProperties.dodgeInvul)
                 event.setCanceled(true);
-            if (baseformProperties.selectiveInvul() && !(damageGiver instanceof Player) && !event.getSource().isIndirect())
+            if (baseformProperties.selectiveInvul() && receiver.hasEffect(ModEffects.SPEED_BLITZING.get()) && !(damageGiver instanceof Player) && !event.getSource().isIndirect())
                 event.setCanceled(true);
 
         }catch(NullPointerException ignored){}

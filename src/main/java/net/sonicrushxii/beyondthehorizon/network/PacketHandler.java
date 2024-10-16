@@ -8,7 +8,9 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.*;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Boost;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Sidestep;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCancel;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCharge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
@@ -27,10 +29,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spind
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDownDouble;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.*;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.network.sync.*;
 import net.sonicrushxii.beyondthehorizon.timehandler.TimeProjSync;
 
@@ -65,11 +65,8 @@ public class PacketHandler {
 
                 //Double Jump
                 INSTANCE.messageBuilder(DoubleJump.class, NetworkDirection.PLAY_TO_SERVER).encoder(DoubleJump::encode).decoder(DoubleJump::new).consumerMainThread(DoubleJump::handle).add();
-                INSTANCE.messageBuilder(DoubleJumpEnd.class, NetworkDirection.PLAY_TO_SERVER).encoder(DoubleJumpEnd::encode).decoder(DoubleJumpEnd::new).consumerMainThread(DoubleJumpEnd::handle).add();
 
                 //Auto Step
-                INSTANCE.messageBuilder(StepDown.class, NetworkDirection.PLAY_TO_SERVER).encoder(StepDown::encode).decoder(StepDown::new).consumerMainThread(StepDown::handle).add();
-                INSTANCE.messageBuilder(StepDownDouble.class, NetworkDirection.PLAY_TO_SERVER).encoder(StepDownDouble::encode).decoder(StepDownDouble::new).consumerMainThread(StepDownDouble::handle).add();
 
                 //Danger Sense
                 INSTANCE.messageBuilder(DangerSenseToggle.class, NetworkDirection.PLAY_TO_SERVER).encoder(DangerSenseToggle::encode).decoder(DangerSenseToggle::new).consumerMainThread(DangerSenseToggle::handle).add();
@@ -81,7 +78,6 @@ public class PacketHandler {
             {
                 //Air Boost
                 INSTANCE.messageBuilder(AirBoost.class, NetworkDirection.PLAY_TO_SERVER).encoder(AirBoost::encode).decoder(AirBoost::new).consumerMainThread(AirBoost::handle).add();
-                INSTANCE.messageBuilder(ResetAirBoost.class, NetworkDirection.PLAY_TO_SERVER).encoder(ResetAirBoost::encode).decoder(ResetAirBoost::new).consumerMainThread(ResetAirBoost::handle).add();
                 //Boost
                 INSTANCE.messageBuilder(Boost.class, NetworkDirection.PLAY_TO_SERVER).encoder(Boost::encode).decoder(Boost::new).consumerMainThread(Boost::handle).add();
                 //Quick Step

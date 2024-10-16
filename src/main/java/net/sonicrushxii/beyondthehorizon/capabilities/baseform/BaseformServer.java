@@ -8,6 +8,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,11 +26,16 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProp
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class BaseformServer {
@@ -54,9 +61,41 @@ public class BaseformServer {
 
             //Passive Abilities
             {
+                //General Sprinting, it also handles autostep
+                if (player.isSprinting() && baseformProperties.sprintFlag == false)
+                    StartSprint.performStartSprint(player);
+                if (!player.isSprinting() && baseformProperties.sprintFlag == true)
+                    StopSprint.performStopSprint(player);
+
                 //Double Jump
+                if (!baseformProperties.hasDoubleJump && player.onGround()) {
+                    baseformProperties.hasDoubleJump = true;
+                }
+
                 //Auto Step
+                if (player.isSprinting() && !baseformProperties.isAttacking())
+                {
+                    List<String> blocksinFront = new ArrayList<>();
+                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -3, 0)).getBlock()) + "");
+                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -2, 0)).getBlock()) + "");
+                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -1, 0)).getBlock()) + "");
+                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos).getBlock()) + "");
+
+                    if (Utilities.passableBlocks.contains(blocksinFront.get(3))
+                            && Utilities.passableBlocks.contains(blocksinFront.get(2))
+                            && !Utilities.passableBlocks.contains(blocksinFront.get(1))
+                            && player.onGround())
+                        AutoStep.performStepDown(player,0.95);
+
+                    if (Utilities.passableBlocks.contains(blocksinFront.get(3))
+                            && Utilities.passableBlocks.contains(blocksinFront.get(2))
+                            && Utilities.passableBlocks.contains(blocksinFront.get(1))
+                            && !Utilities.passableBlocks.contains(blocksinFront.get(0))
+                            && player.onGround())
+                        AutoStep.performStepDown(player,1.95);
+                }
                 //Danger Sense
+
                 //Subdue Hunger
                 if (player.getFoodData().getFoodLevel() <= 7)
                     player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
@@ -66,6 +105,10 @@ public class BaseformServer {
             {
                 //Slot 1
                 {
+                    //Air Boosts
+                    if (baseformProperties.airBoosts < 3 && player.onGround())
+                        baseformProperties.airBoosts = 3;
+
                     //Boost
                     {
                         //Water Boost
@@ -297,11 +340,12 @@ public class BaseformServer {
                                     0.0, 0.3f, 0.85f, 0.3f, 3,
                                     true)
                             );
+                            level.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_WEAK, SoundSource.MASTER, 1.0f, 1.0f);
                         }
                     }
 
                     //Melee Swipes
-                    Vec3 playerInFrontOf = player.position().add(player.getLookAngle().scale(0.65));
+                    Vec3 playerInFrontOf = player.position().add(player.getLookAngle().scale(0.90));
                     {
                         //Start
                         if(baseformProperties.meleeSwipeTime == 1)
@@ -326,26 +370,39 @@ public class BaseformServer {
                             }
 
                             //Play Sweep Particle
-                            if(baseformProperties.meleeSwipeTime%4 == 0)
+                            if(baseformProperties.meleeSwipeTime%2 == 0 && baseformProperties.meleeSwipeTime <= 10)
+                            {
+                                //Play Sweep Particle
                                 PacketHandler.sendToPlayer(player, new ParticleAuraPacketS2C(
                                         ParticleTypes.SWEEP_ATTACK,
-                                        playerInFrontOf.x(), playerInFrontOf.y()+player.getEyeHeight()/2, playerInFrontOf.z(),
+                                        playerInFrontOf.x(), playerInFrontOf.y() + player.getEyeHeight() / 2, playerInFrontOf.z(),
                                         0.0, 0.2f, 0.2f, 0.2f, 4, true)
                                 );
+
+                                //Playsound
+                                level.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.MASTER, 0.55f, 1.0f);
+                            }
 
                         }
                         //Ability End
                         if(baseformProperties.meleeSwipeTime == 10)
                         {
-                            //Reset Gravity
-                            //player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            //Attack
+                            for(LivingEntity enemy : serverLevel.getEntitiesOfClass(LivingEntity.class,
+                                    new AABB(playerInFrontOf.x()+0.8,playerInFrontOf.y()+player.getEyeHeight()/2+0.8, playerInFrontOf.z()+0.8,
+                                            playerInFrontOf.x()-0.8,playerInFrontOf.y()+player.getEyeHeight()/2-0.8, playerInFrontOf.z()-0.8),
+                                    (target)->!target.is(player)))
+                            {
+                                //Damage Enemy
+                                enemy.setDeltaMovement(player.getLookAngle().scale(0.75));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                            }
                         }
                         //Cooldown End
                         if (baseformProperties.meleeSwipeTime > 20)
                         {
                             baseformProperties.meleeSwipeTime = 0;
                         }
-
                     }
 
                     //Speed Blitz
@@ -357,11 +414,14 @@ public class BaseformServer {
                             case 20:
                             case 31:
                             case 42:
-                            case 53:PacketHandler.sendToPlayer(player, new ParticleAuraPacketS2C(
-                                    ParticleTypes.FLASH,
-                                            playerInFrontOf.x(), playerInFrontOf.y()+player.getEyeHeight()/2, playerInFrontOf.z(),
-                                    0.0, 0.2f, 0.2f, 0.2f, 1, true)
-                                    );
+                            case 53://Particle
+                                    PacketHandler.sendToPlayer(player, new ParticleAuraPacketS2C(
+                                        ParticleTypes.FLASH,
+                                                playerInFrontOf.x(), playerInFrontOf.y()+player.getEyeHeight()/2, playerInFrontOf.z(),
+                                        0.0, 0.2f, 0.2f, 0.2f, 1, true)
+                                        );
+                                    //Sound
+                                    level.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.MASTER, 0.65f, 1.2f);
                                     baseformProperties.smashHit += 1;
                                     break;
                             case 64:PacketHandler.sendToPlayer(player, new ParticleAuraPacketS2C(
@@ -369,6 +429,8 @@ public class BaseformServer {
                                             playerInFrontOf.x(), playerInFrontOf.y()+player.getEyeHeight()/2, playerInFrontOf.z(),
                                     0.0, 0.2f, 0.2f, 0.2f, 3, true)
                                     );
+                                    //Sound
+                                    level.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.MASTER, 1.0f, 2.0f);
                                     baseformProperties.smashHit += 1;
                                     break;
                         }
@@ -383,7 +445,7 @@ public class BaseformServer {
 
                             //Deactivate Stomp
                             if(baseformProperties.stomp == Byte.MAX_VALUE || player.onGround() || player.isInWater())
-                                Stomp.performDeactivateStomp(player);
+                                Stomp.performEndStomp(player);
                         }
                     }
 
