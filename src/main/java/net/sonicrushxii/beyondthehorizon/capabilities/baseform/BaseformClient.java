@@ -30,7 +30,6 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.melee.MeleeSwipes;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SetSmashHitChargeC2S;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SmashHitToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
@@ -119,7 +118,7 @@ public class BaseformClient {
                         KeyBindings.INSTANCE.useAbility1.consumeClick()) {
                     //Boost
                     if (player.onGround())
-                        PacketHandler.sendToServer(new Boost());
+                        PacketHandler.sendToServer(new Boost(player.isShiftKeyDown()));
                         //Air Boost
                     else if(!baseformProperties.isAttacking())
                         PacketHandler.sendToServer(new AirBoost());
@@ -251,11 +250,7 @@ public class BaseformClient {
                 //Increase Smash hit
                 if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility4.isDown())
                 {
-                    //Slow down Player
-                    if(!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT))
-                        PacketHandler.sendToServer(new SmashHitToggle(true));
-
-                    //Remove Effects
+                    //Add Number
                     baseformProperties.smashHit = (byte) Math.min(baseformProperties.smashHit+1,65);
                     PacketHandler.sendToServer(new SetSmashHitChargeC2S(baseformProperties.smashHit));
                 }
@@ -263,19 +258,12 @@ public class BaseformClient {
                 //If Smash hit is Enabled
                 if(baseformProperties.smashHit > 0)
                 {
-                    //When the key is released give speed back
-                    if(!KeyBindings.INSTANCE.useAbility4.isDown())
-                        PacketHandler.sendToServer(new SmashHitToggle(false));
-
                     //Turn off automatically if you switch to another slot or start another attack
-                    if(VirtualSlotHandler.getCurrAbility() != 1 || baseformProperties.isAttacking()) {
+                    if(VirtualSlotHandler.getCurrAbility() != 1 || baseformProperties.isAttacking() || !KeyBindings.INSTANCE.useAbility4.isDown()) {
                         baseformProperties.smashHit = 0;
                         PacketHandler.sendToServer(new SetSmashHitChargeC2S((byte) 0));
-                        PacketHandler.sendToServer(new SmashHitToggle(false)); //Get Speed back
                     }
                 }
-
-
             }
 
             //Stomp
@@ -307,7 +295,7 @@ public class BaseformClient {
             }
         }
         //Dodge
-        else{
+        else if(player.isShiftKeyDown()){
             switch(doubleTapDirection){
                 case RIGHT_PRESS: PacketHandler.sendToServer(new Dodge(true)); break;
                 case LEFT_PRESS: PacketHandler.sendToServer(new Dodge(false)); break;

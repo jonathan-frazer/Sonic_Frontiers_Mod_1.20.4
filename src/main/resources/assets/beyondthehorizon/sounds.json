@@ -58,5 +58,29 @@
     "sounds": [
       "beyondthehorizon:baseform/spindash_release_sfx"
     ]
+  },
+  "blitz": {
+    "subtitles": "sounds.sonic.baseform.blitz",
+    "sounds": [
+      "beyondthehorizon:baseform/blitz_sfx"
+    ]
+  },
+  "smash_charge": {
+    "subtitles": "sounds.sonic.baseform.smash_charge",
+    "sounds": [
+      "beyondthehorizon:baseform/smash_charge_sfx"
+    ]
+  },
+  "smash_hit": {
+    "subtitles": "sounds.sonic.baseform.smash_hit",
+    "sounds": [
+      "beyondthehorizon:baseform/smash_hit_sfx"
+    ]
+  },
+  "stomp": {
+    "subtitles": "sounds.sonic.baseform.stomp",
+    "sounds": [
+      "beyondthehorizon:baseform/stomp_sfx"
+    ]
   }
 }

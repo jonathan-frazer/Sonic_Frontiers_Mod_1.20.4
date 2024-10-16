@@ -23,7 +23,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMult
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.VirtualSlotSyncS2C;
-import net.sonicrushxii.beyondthehorizon.potion_effects.ModEffects;
+import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 
 import java.util.Iterator;
 
@@ -182,10 +182,6 @@ public class BaseformTransformer {
                 //Smash HIt
                 if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT))
                     player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.SMASH_HIT.getId());
-
-                //Reset Stomp Gravity
-                if (player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).hasModifier(AttributeMultipliers.STOMP_GRAVITY))
-                    player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).removeModifier(AttributeMultipliers.STOMP_GRAVITY.getId());
             }
 
         }

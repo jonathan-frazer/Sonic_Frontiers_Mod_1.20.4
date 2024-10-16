@@ -24,6 +24,7 @@ import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
@@ -421,7 +422,7 @@ public class BaseformServer {
                                         0.0, 0.2f, 0.2f, 0.2f, 1, true)
                                         );
                                     //Sound
-                                    level.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.MASTER, 0.65f, 1.2f);
+                                    level.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SMASH_CHARGE.get(), SoundSource.MASTER, 1.0f, 1.0f);
                                     baseformProperties.smashHit += 1;
                                     break;
                             case 64:PacketHandler.sendToPlayer(player, new ParticleAuraPacketS2C(
@@ -430,7 +431,7 @@ public class BaseformServer {
                                     0.0, 0.2f, 0.2f, 0.2f, 3, true)
                                     );
                                     //Sound
-                                    level.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.MASTER, 1.0f, 2.0f);
+                                    level.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SMASH_CHARGE.get(), SoundSource.MASTER, 1.0f, 1.0f);
                                     baseformProperties.smashHit += 1;
                                     break;
                         }
@@ -442,6 +443,17 @@ public class BaseformServer {
                         {
                             //Increase Stomp time
                             baseformProperties.stomp += 1;
+
+                            //Bring Enemies Down with you
+                            for(LivingEntity enemy: player.level().getEntitiesOfClass(LivingEntity.class,
+                                    new AABB(player.getX()+2.5,player.getY()+1.0,player.getZ()+2.5,
+                                            player.getX()-2.5,player.getY()-4.0,player.getZ()-2.5),
+                                    (target)->!target.is(player)))
+                            {
+                                //Damage Enemy
+                                enemy.setDeltaMovement(0,-5.0,0);
+                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                            }
 
                             //Deactivate Stomp
                             if(baseformProperties.stomp == Byte.MAX_VALUE || player.onGround() || player.isInWater())

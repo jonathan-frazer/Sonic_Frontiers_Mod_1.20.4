@@ -22,7 +22,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
 import net.sonicrushxii.beyondthehorizon.event_handler.*;
 import net.sonicrushxii.beyondthehorizon.modded.ModCreativeModeTabs;
-import net.sonicrushxii.beyondthehorizon.potion_effects.ModEffects;
+import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;

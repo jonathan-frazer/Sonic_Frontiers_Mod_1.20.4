@@ -33,6 +33,14 @@ public class ModSounds {
             registerSoundEvents("spindash_charge");
     public static final RegistryObject<SoundEvent> SPINDASH_RELEASE =
             registerSoundEvents("spindash_release");
+    public static final RegistryObject<SoundEvent> BLITZ =
+            registerSoundEvents("blitz");
+    public static final RegistryObject<SoundEvent> SMASH_HIT =
+            registerSoundEvents("smash_hit");
+    public static final RegistryObject<SoundEvent> SMASH_CHARGE =
+            registerSoundEvents("smash_charge");
+    public static final RegistryObject<SoundEvent> STOMP =
+            registerSoundEvents("stomp");
 
     private static RegistryObject<SoundEvent> registerSoundEvents(String soundName){
         return SOUND_EVENTS.register(soundName,

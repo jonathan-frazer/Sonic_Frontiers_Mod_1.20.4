@@ -12,22 +12,27 @@ import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 
 public class Boost {
+    private final boolean wasShiftDown;
 
-    public Boost() {}
+    public Boost(boolean wasShiftDown) {
+        this.wasShiftDown = wasShiftDown;
+    }
 
     public Boost(FriendlyByteBuf buffer) {
-
+        this.wasShiftDown = buffer.readBoolean();
     }
 
     public void encode(FriendlyByteBuf buffer){
-
+        buffer.writeBoolean(this.wasShiftDown);
     }
 
-    public static void performBoost(ServerPlayer player)
+    public static void performBoost(ServerPlayer player, boolean wasShiftDown)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
-            baseformProperties.boostLvl = (byte)((baseformProperties.boostLvl+1)%4);
+            if(!wasShiftDown) baseformProperties.boostLvl = (byte)((baseformProperties.boostLvl+1)%4);
+            else             baseformProperties.boostLvl = (byte)((baseformProperties.boostLvl==0)?3: baseformProperties.boostLvl-1);
+
 
             if(player.isSprinting())
                 switch(baseformProperties.boostLvl)
@@ -56,7 +61,7 @@ public class Boost {
                 ()->{
                     ServerPlayer player = ctx.getSender();
                     if(player != null)
-                        performBoost(player);
+                        performBoost(player,this.wasShiftDown);
                 });
         ctx.setPacketHandled(true);
     }

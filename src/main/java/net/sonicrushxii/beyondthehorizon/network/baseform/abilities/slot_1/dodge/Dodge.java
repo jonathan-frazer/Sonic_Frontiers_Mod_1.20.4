@@ -49,13 +49,13 @@ public class Dodge {
                         ));
             },5);
 
+            //Playsound
+            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.MASTER, 0.5f, 1f);
+
             //Delta Movement
             Vec3 directionVector = player.getLookAngle().cross(new Vec3(0, (dodgingRight)?1:-1, 0));
             player.setDeltaMovement(directionVector.scale(2.0));
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
-
-            //Playsound
-            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.MASTER, 0.5f, 1f);
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(

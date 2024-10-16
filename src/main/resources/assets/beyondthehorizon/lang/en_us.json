@@ -17,6 +17,10 @@
   "sounds.sonic.baseform.spindash_charge": "Spindash Charge(Sonic Frontiers)",
   "sounds.sonic.baseform.spindash_release": "Spindash Release(Sonic Frontiers)",
   "sounds.sonic.baseform.homing_attack": "Homing Attack(Sonic Frontiers)",
+  "sounds.sonic.baseform.blitz" : "Speed Blitz(Sonic Frontiers)",
+  "sounds.sonic.baseform.smash_charge" : "Smash Charge(Sonic Frontiers)",
+  "sounds.sonic.baseform.smash_hit" : "Smash Hit(Sonic Frontiers)",
+  "sounds.sonic.baseform.stomp" : "Stomp(Sonic Frontiers)",
 
   "item.beyondthehorizon.sonic_superform_armor_chestplate": "Sonic Chestplate(Super)",
   "item.beyondthehorizon.sonic_superform_armor_leggings": "Sonic Leggings(Super)",
@@ -30,7 +34,9 @@
   "item.beyondthehorizon.sonic_hyperform_armor_leggings": "Sonic Leggings(Hyper)",
   "item.beyondthehorizon.sonic_hyperform_armor_boots": "Sonic Shoes(Hyper)",
 
-  "effects.beyondthehorizon.speed_blitzing" : "Sonic Combo",
+  "effects.beyondthehorizon.combo_effect" : "Sonic Combo",
+  "effects.beyondthehorizon.speed_blitzing" : "Speed Blitzing",
+  "effects.beyondthehorizon.speed_blitzed" : "Speed Blitzed",
 
   "key.categories.beyondthehorizon": "Sonic Frontiers",
   "key.beyondthehorizon.DoubleJump": "Double Jump(Should be same as Jump)",

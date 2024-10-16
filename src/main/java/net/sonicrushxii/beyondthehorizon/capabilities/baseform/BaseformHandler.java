@@ -1,6 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -19,10 +20,11 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.DamageHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleDirPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
-import net.sonicrushxii.beyondthehorizon.potion_effects.ModEffects;
+import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
@@ -42,7 +44,8 @@ public class BaseformHandler {
             // Makes you only invulnerable to Direct mob attacks when using this ability. Like weakness but better
             if (baseformProperties.dodgeInvul)
                 event.setCanceled(true);
-            if (baseformProperties.selectiveInvul() && receiver.hasEffect(ModEffects.SPEED_BLITZING.get()) && !(damageGiver instanceof Player) && !event.getSource().isIndirect())
+            if ((baseformProperties.selectiveInvul() || receiver.hasEffect(ModEffects.SPEED_BLITZING.get())) &&
+                    !(damageGiver instanceof Player) && !event.getSource().isIndirect())
                 event.setCanceled(true);
 
         }catch(NullPointerException ignored){}
@@ -69,9 +72,6 @@ public class BaseformHandler {
 
                     if (!damageGiver.onGround())
                     {
-                        Vec3 currentPlayerMovement = damageGiver.getDeltaMovement();
-                        damageGiver.setDeltaMovement(currentPlayerMovement.x(), 0.0, currentPlayerMovement.z());
-                        damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageGiver));
 
                         damageTaker.setDeltaMovement(Vec3.ZERO);
                         damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
@@ -93,11 +93,22 @@ public class BaseformHandler {
                     {
                         if (damageGiver.isShiftKeyDown()) {
                             damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 10, false, false));
-                            damageTaker.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 10, false, false));
+                            damageTaker.addEffect(new MobEffectInstance(ModEffects.COMBO_EFFECT.get(), 40, 0, false, false));
                             damageTaker.moveTo(damageTaker.getX(), damageTaker.getY() + 5.0, damageTaker.getZ());
                         } else if (!damageGiver.onGround()) {
+                            //Sonic Eagle
+                            PacketHandler.sendToALLPlayers(new ParticleDirPacketS2C(
+                                    ParticleTypes.FLAME,
+                                    damageTaker.getX(), damageTaker.getY()+damageTaker.getEyeHeight(), damageTaker.getZ(),
+                                    0.0,-0.1,0.0 ,0.65f, 0.65f, 0.65f, 30,
+                                    true)
+                            );
+                            //Sound Effect
+                            damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.MASTER, 1.0f, 1.0f);
+
                             damageGiver.removeEffect(MobEffects.SLOW_FALLING);
-                            damageTaker.removeEffect(MobEffects.SLOW_FALLING);
+                            damageTaker.removeEffect(ModEffects.COMBO_EFFECT.get());
+                            damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),damageGiver), 6.0f);
                             damageTaker.addDeltaMovement(new Vec3(0.0, -0.85, 0.0));
                             damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
                         } else {
@@ -138,6 +149,14 @@ public class BaseformHandler {
             ServerPlayer damageGiver = (ServerPlayer) event.getSource().getEntity();
             LivingEntity damageTaker = event.getEntity();
 
+            //Reduce Vertical Movement to 0 if In Player attack
+            if(event.getSource().is(DamageTypes.PLAYER_ATTACK))
+            {
+                Vec3 currentPlayerMovement = damageGiver.getDeltaMovement();
+                damageGiver.setDeltaMovement(currentPlayerMovement.x(), 0.0, currentPlayerMovement.z());
+                damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageGiver));
+            }
+
             //Smash Hit
             if(baseformProperties.smashHit > 0 && event.getSource().is(DamageTypes.PLAYER_ATTACK))
             {
@@ -145,7 +164,10 @@ public class BaseformHandler {
                 damageTaker.setDeltaMovement(damageGiver.getLookAngle().scale(baseformProperties.smashHit/20.0f));
                 //Damage Enemy
                 damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),damageGiver),
-                        baseformProperties.smashHit/1.2f);
+                        baseformProperties.smashHit*0.5f);
+
+                //Sound
+                damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), ModSounds.SMASH_HIT.get(), SoundSource.MASTER, 1.0f, 1.0f);;
 
                 damageGiver.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
                     //Get Data From the Player
@@ -162,6 +184,10 @@ public class BaseformHandler {
             }//Speed Blitz
             else if(baseformProperties.speedBlitz && event.getSource().is(DamageTypes.PLAYER_ATTACK))
             {
+                //Recover Speed Blitz Dashes
+                if(!damageGiver.hasEffect(ModEffects.SPEED_BLITZING.get()) && damageGiver.onGround())
+                    baseformProperties.speedBlitzDashes = 4;
+
                 //Current Combo Duration
                 MobEffectInstance currComboEffect = damageTaker.getEffect(ModEffects.SPEED_BLITZED.get());
                 if(currComboEffect == null)
@@ -172,7 +198,7 @@ public class BaseformHandler {
                 Scheduler.scheduleTask(()->{
                     damageTaker.setDeltaMovement(Utilities.calculateViewVector(damageGiver.getXRot(),damageGiver.getYRot()).scale(0.85));
                     damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
-                },2);
+                },3);
             }
 
 

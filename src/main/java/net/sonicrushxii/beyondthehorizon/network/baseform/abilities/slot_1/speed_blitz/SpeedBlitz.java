@@ -6,7 +6,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,10 +18,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
-import net.sonicrushxii.beyondthehorizon.potion_effects.ModEffects;
+import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import org.joml.Vector3f;
 
 import java.util.Collections;
@@ -104,7 +104,7 @@ public class SpeedBlitz {
                 newPlayerPos.add(0,0.75,0)
         ));
         //Sound
-        player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.TRIDENT_HIT, SoundSource.MASTER, 0.65f, 1.6f);
+        player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.BLITZ.get(), SoundSource.MASTER, 0.5f, 1.0f);
 
         //Current Combo Duration
         MobEffectInstance currComboEffect = player.getEffect(ModEffects.SPEED_BLITZING.get());
@@ -112,6 +112,17 @@ public class SpeedBlitz {
             player.addEffect(new MobEffectInstance(ModEffects.SPEED_BLITZING.get(), 20, 0, false, false));
         else
             currComboEffect.update(new MobEffectInstance(ModEffects.SPEED_BLITZING.get(), 20, 0, false, false));
+
+        //Consume Speed Blitz Dash
+        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+            baseformProperties.speedBlitzDashes -= 1;
+            PacketHandler.sendToPlayer(player,
+                    new SyncPlayerFormS2C(
+                            playerSonicForm.getCurrentForm(),
+                            baseformProperties
+                    ));
+        });
 
         //Check if position is Safe
         Level world = player.level();
@@ -143,11 +154,21 @@ public class SpeedBlitz {
                     ServerPlayer player = ctx.getSender();
                     if(player != null)
                     {
-                        Vec3 enemyPos = scanFoward(player);
-                        if(enemyPos == null)
-                            performToggleSpeedBlitz(player);
-                        else
-                            performSpeedDash(player,enemyPos);
+                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+                            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+
+                            Vec3 enemyPos = scanFoward(player);
+                            if(enemyPos == null)
+                                performToggleSpeedBlitz(player);
+                            else if(baseformProperties.speedBlitzDashes > 0)
+                                performSpeedDash(player,enemyPos);
+
+                            PacketHandler.sendToPlayer(player,
+                                    new SyncPlayerFormS2C(
+                                            playerSonicForm.getCurrentForm(),
+                                            baseformProperties
+                                    ));
+                        });
                     }
                 });
         ctx.setPacketHandled(true);
