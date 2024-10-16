@@ -19,7 +19,7 @@ import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import org.joml.Vector3f;
 
 public class Stomp {
-    private static final float STOMP_DAMAGE=30.0f;
+    private static final float STOMP_DAMAGE=12.0f;
 
     public Stomp() {}
 
