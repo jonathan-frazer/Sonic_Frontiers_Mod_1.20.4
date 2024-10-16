@@ -23,6 +23,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMult
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.VirtualSlotSyncS2C;
+import net.sonicrushxii.beyondthehorizon.potion_effects.ModEffects;
 
 import java.util.Iterator;
 
@@ -169,7 +170,22 @@ public class BaseformTransformer {
 
             //Slot 2
             {
+                //Homing Attack
+                //Gravity Removal
 
+                //Melee Swipes
+                //Gravity Removal
+
+                //Speed Blitz
+                player.removeEffect(ModEffects.SPEED_BLITZING.get());
+
+                //Smash HIt
+                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT))
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.SMASH_HIT.getId());
+
+                //Reset Stomp Gravity
+                if (player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).hasModifier(AttributeMultipliers.STOMP_GRAVITY))
+                    player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).removeModifier(AttributeMultipliers.STOMP_GRAVITY.getId());
             }
 
         }

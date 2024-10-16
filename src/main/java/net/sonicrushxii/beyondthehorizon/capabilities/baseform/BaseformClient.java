@@ -34,6 +34,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.RevertFromSpindash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
@@ -51,7 +52,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class BaseformClient {
-    public class ClientOnlyData
+    public static class ClientOnlyData
     {
         private static ScheduledTask lightSpeedCanceller = null;
         public static UUID homingAttackReticle = null;
@@ -323,9 +324,9 @@ public class BaseformClient {
 
             //Stomp
             {
-                if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility5.consumeClick())
+                if(VirtualSlotHandler.getCurrAbility() == 1 && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.consumeClick())
                 {
-
+                    PacketHandler.sendToServer(new Stomp());
                 }
             }
         }

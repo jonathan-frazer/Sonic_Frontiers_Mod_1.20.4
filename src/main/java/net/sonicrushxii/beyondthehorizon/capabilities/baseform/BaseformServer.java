@@ -23,6 +23,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -375,7 +376,15 @@ public class BaseformServer {
 
                     //Stomp
                     {
+                        if(baseformProperties.stomp > 0)
+                        {
+                            //Increase Stomp time
+                            baseformProperties.stomp += 1;
 
+                            //Deactivate Stomp
+                            if(baseformProperties.stomp == Byte.MAX_VALUE || player.onGround() || player.isInWater())
+                                Stomp.performDeactivateStomp(player);
+                        }
                     }
 
                 }

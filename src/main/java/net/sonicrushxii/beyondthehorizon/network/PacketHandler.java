@@ -24,6 +24,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.RevertFromSpindash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.StepDown;
@@ -113,6 +114,8 @@ public class PacketHandler {
 
                 INSTANCE.messageBuilder(SmashHitToggle.class,NetworkDirection.PLAY_TO_SERVER).encoder(SmashHitToggle::encode).decoder(SmashHitToggle::new).consumerMainThread(SmashHitToggle::handle).add();
                 INSTANCE.messageBuilder(SetSmashHitChargeC2S.class,NetworkDirection.PLAY_TO_SERVER).encoder(SetSmashHitChargeC2S::encode).decoder(SetSmashHitChargeC2S::new).consumerMainThread(SetSmashHitChargeC2S::handle).add();
+
+                INSTANCE.messageBuilder(Stomp.class,NetworkDirection.PLAY_TO_SERVER).encoder(Stomp::encode).decoder(Stomp::new).consumerMainThread(Stomp::handle).add();
             }
         }
 

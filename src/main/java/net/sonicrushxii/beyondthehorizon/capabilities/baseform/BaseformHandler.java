@@ -18,6 +18,7 @@ import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.DamageHandler;
+import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleDirPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -140,7 +141,11 @@ public class BaseformHandler {
             //Smash Hit
             if(baseformProperties.smashHit > 0 && event.getSource().is(DamageTypes.PLAYER_ATTACK))
             {
+                //Knockback
                 damageTaker.setDeltaMovement(damageGiver.getLookAngle().scale(baseformProperties.smashHit/20.0f));
+                //Damage Enemy
+                damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),damageGiver),
+                        baseformProperties.smashHit/1.2f);
 
                 damageGiver.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
                     //Get Data From the Player

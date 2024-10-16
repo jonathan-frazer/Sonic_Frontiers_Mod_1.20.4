@@ -15,4 +15,6 @@ public class AttributeMultipliers {
             "Spindash_Speed", 0.60F, AttributeModifier.Operation.MULTIPLY_TOTAL);
     public static final AttributeModifier SMASH_HIT = new AttributeModifier(new UUID(0x1234767890AC1DEFL, 0xFEBCBA09F7654C21L),
             "Smash_Hit", -1.0F, AttributeModifier.Operation.ADDITION);
+    public static final AttributeModifier STOMP_GRAVITY = new AttributeModifier(new UUID(0x1234767890AC2DEFL, 0xFEBCBA09F7654C21L),
+            "Stomp_Gravity", 4.0F, AttributeModifier.Operation.ADDITION);
 }

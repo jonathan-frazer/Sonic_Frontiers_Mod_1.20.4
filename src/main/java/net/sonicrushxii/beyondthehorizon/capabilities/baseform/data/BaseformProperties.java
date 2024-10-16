@@ -135,6 +135,7 @@ public class BaseformProperties extends FormProperties {
     public byte meleeSwipeTime;
     public boolean speedBlitz;
     public byte smashHit;
+    public byte stomp;
 
     public BaseformProperties()
     {
@@ -163,7 +164,7 @@ public class BaseformProperties extends FormProperties {
         meleeSwipeTime = 0;
         speedBlitz = false;
         smashHit = (byte)0;
-
+        stomp = (byte)0;
 
         //Slot 3
 
@@ -195,8 +196,9 @@ public class BaseformProperties extends FormProperties {
         homingAttackAirTime = nbt.getByte("HomingTime");
         dodgeInvul = nbt.getBoolean("isDodging");
         meleeSwipeTime = nbt.getByte("meleeSwiping");
-        speedBlitz = nbt.getBoolean("speedBliztOn");
+        speedBlitz = nbt.getBoolean("speedBlitzOn");
         smashHit = nbt.getByte("smashHitTime");
+        stomp = nbt.getByte("stompTime");
     }
 
     @Override
@@ -228,8 +230,9 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("HomingTime",homingAttackAirTime);
         nbt.putBoolean("isDodging",dodgeInvul);
         nbt.putByte("meleeSwiping",meleeSwipeTime);
-        nbt.putBoolean("speedBliztOn",speedBlitz);
+        nbt.putBoolean("speedBlitzOn",speedBlitz);
         nbt.putByte("smashHitTime",smashHit);
+        nbt.putByte("stompTime",stomp);
 
         return nbt;
     }
@@ -246,8 +249,9 @@ public class BaseformProperties extends FormProperties {
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 50);
         boolean melee = hitCount > 3;
         boolean meleeSwipe = meleeSwipeTime > 0;
+        boolean stomping = (stomp > 0);
 
-        return ballForm || homingAttack || melee || meleeSwipe;
+        return ballForm || homingAttack || melee || meleeSwipe || stomping;
     }
 
     //Checks if Player is in the middle of another attack
@@ -256,7 +260,8 @@ public class BaseformProperties extends FormProperties {
         boolean ballform = ballFormState == 1;
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
         boolean meleeSwipes = (meleeSwipeTime > 0 && meleeSwipeTime <= 10);
+        boolean stomping = (stomp > 0);
 
-        return homingAttack || meleeSwipes || ballform;
+        return homingAttack || meleeSwipes || ballform || stomping;
     }
 }
