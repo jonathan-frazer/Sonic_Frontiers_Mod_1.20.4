@@ -6,7 +6,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
@@ -33,9 +32,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.RevertFromSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -49,6 +46,7 @@ public class BaseformClient {
     {
         private static ScheduledTask lightSpeedCanceller = null;
         public static UUID homingAttackReticle = null;
+        private static boolean airBoostLock = false;
     }
 
     public static void performClientTick(LocalPlayer player, CompoundTag playerNBT) {
@@ -117,11 +115,7 @@ public class BaseformClient {
                 if ( VirtualSlotHandler.getCurrAbility() == 0 &&
                         KeyBindings.INSTANCE.useAbility1.consumeClick()) {
                     //Boost
-                    if (player.onGround())
-                        PacketHandler.sendToServer(new Boost(player.isShiftKeyDown()));
-                        //Air Boost
-                    else if(!baseformProperties.isAttacking())
-                        PacketHandler.sendToServer(new AirBoost());
+                    PacketHandler.sendToServer(new Boost(player.isShiftKeyDown()));
                 }
 
                 //Quickstep
@@ -187,26 +181,10 @@ public class BaseformClient {
                 //Launch Spindash
                 if (!player.isShiftKeyDown() && baseformProperties.ballFormState == (byte)1)
                 {
-                    //Force W Presses and lower Mouse Sens
-                    minecraft.options.sensitivity().set(minecraft.options.sensitivity().get()/4.5f);
                     PacketHandler.sendToServer(new LaunchSpindash());
-                    Scheduler.scheduleTask(()->
-                    {
-                        //Release W
-                        minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_RELEASE, 0);
 
-                        //Return Mouse Sensitivity
-                        minecraft.options.sensitivity().set(minecraft.options.sensitivity().get()*4.5f);
-
-                        PacketHandler.sendToServer(new RevertFromSpindash());
-                        baseformProperties.ballFormState = 0;
-                    },Math.min(baseformProperties.spinDashChargeTime/2, 60));
                 }
 
-                //Keep going forward
-                if(baseformProperties.ballFormState == (byte)2) {
-                    minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), InputConstants.KEY_W, 0, GLFW.GLFW_PRESS, 0);
-                }
             }
 
             //Homing Attack
@@ -220,11 +198,18 @@ public class BaseformClient {
 
                 //Perform homing attack
                 if (VirtualSlotHandler.getCurrAbility() == 1 && !baseformProperties.isAttacking() && (player.getXRot() <= 80.0 || !player.isShiftKeyDown())
-                         && baseformProperties.homingAttackAirTime == 0 && KeyBindings.INSTANCE.useAbility1.consumeClick())
+                         && baseformProperties.homingAttackAirTime == 0 && KeyBindings.INSTANCE.useAbility1.isDown())
                 {
                     //Perform an Obligatory Scan Foward again
                     HomingAttack.scanFoward(player);
-                    PacketHandler.sendToServer(new HomingAttack(ClientOnlyData.homingAttackReticle));
+                    //If scan fails do air boost
+                    if(ClientOnlyData.homingAttackReticle == null && !ClientOnlyData.airBoostLock) {
+                        PacketHandler.sendToServer(new AirBoost());
+                        ClientOnlyData.airBoostLock = true;
+                        Scheduler.scheduleTask(()->{ClientOnlyData.airBoostLock = false;},5);
+                    }
+                    else
+                        PacketHandler.sendToServer(new HomingAttack(ClientOnlyData.homingAttackReticle));
                 }
             }
 
@@ -268,7 +253,7 @@ public class BaseformClient {
 
             //Stomp
             {
-                if(VirtualSlotHandler.getCurrAbility() == 1 && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.consumeClick())
+                if(VirtualSlotHandler.getCurrAbility() == 1 && !player.onGround() && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.consumeClick())
                 {
                     PacketHandler.sendToServer(new Stomp());
                 }

@@ -38,10 +38,10 @@ public class AirBoost {
             if(baseformProperties.airBoosts > 0)
             {
                 baseformProperties.airBoosts -= 1;
+
                 //PlaySound
                 Level world = player.level();
                 world.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.AIR_BOOST.get(), SoundSource.MASTER, 1.0f, 1.0f);
-
 
                 //Particle
                 Vec3 playerPosition = player.getPosition(0).add(new Vec3(0,0.75,0));

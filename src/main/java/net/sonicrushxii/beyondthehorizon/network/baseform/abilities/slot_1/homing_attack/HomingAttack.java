@@ -86,6 +86,7 @@ public class HomingAttack
                             if(enemyID != null)
                             {
                                 //Homing Attack Data
+                                baseformProperties.airBoosts = 3;
                                 baseformProperties.homingAttackAirTime = 1;
                                 baseformProperties.homingTarget = enemyID;
 

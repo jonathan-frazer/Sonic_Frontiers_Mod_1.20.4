@@ -91,11 +91,11 @@ public class BaseformHandler {
                     }
                     if (baseformProperties.hitCount == 4)
                     {
-                        if (damageGiver.isShiftKeyDown()) {
+                        if (damageGiver.isShiftKeyDown()||damageGiver.getY()+damageGiver.getEyeHeight() < damageTaker.getY()+damageTaker.getEyeHeight()) {
                             damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 10, false, false));
                             damageTaker.addEffect(new MobEffectInstance(ModEffects.COMBO_EFFECT.get(), 40, 0, false, false));
                             damageTaker.moveTo(damageTaker.getX(), damageTaker.getY() + 5.0, damageTaker.getZ());
-                        } else if (!damageGiver.onGround()) {
+                        } else {
                             //Sonic Eagle
                             PacketHandler.sendToALLPlayers(new ParticleDirPacketS2C(
                                     ParticleTypes.FLAME,
@@ -110,9 +110,6 @@ public class BaseformHandler {
                             damageTaker.removeEffect(ModEffects.COMBO_EFFECT.get());
                             damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),damageGiver), 6.0f);
                             damageTaker.addDeltaMovement(new Vec3(0.0, -0.85, 0.0));
-                            damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
-                        } else {
-                            damageTaker.addDeltaMovement(damageGiver.getLookAngle());
                             damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
                         }
                     }

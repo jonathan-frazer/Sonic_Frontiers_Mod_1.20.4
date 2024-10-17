@@ -24,7 +24,6 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.RevertFromSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
@@ -97,7 +96,6 @@ public class PacketHandler {
             {
                 INSTANCE.messageBuilder(ChargeSpindash.class, NetworkDirection.PLAY_TO_SERVER).encoder(ChargeSpindash::encode).decoder(ChargeSpindash::new).consumerMainThread(ChargeSpindash::handle).add();
                 INSTANCE.messageBuilder(LaunchSpindash.class, NetworkDirection.PLAY_TO_SERVER).encoder(LaunchSpindash::encode).decoder(LaunchSpindash::new).consumerMainThread(LaunchSpindash::handle).add();
-                INSTANCE.messageBuilder(RevertFromSpindash.class, NetworkDirection.PLAY_TO_SERVER).encoder(RevertFromSpindash::encode).decoder(RevertFromSpindash::new).consumerMainThread(RevertFromSpindash::handle).add();
 
                 INSTANCE.messageBuilder(HomingAttack.class, NetworkDirection.PLAY_TO_SERVER).encoder(HomingAttack::encode).decoder(HomingAttack::new).consumerMainThread(HomingAttack::handle).add();
 

@@ -10,7 +10,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformTransformer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.RevertFromSpindash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 public class LoginHandler {
@@ -33,7 +33,7 @@ public class LoginHandler {
 
                 //Revert Spindash
                 if(baseformProperties.ballFormState != 0)
-                    RevertFromSpindash.performRevertSpindash(player);
+                    LaunchSpindash.performRevertSpindash(player,baseformProperties);
 
                 //Revert Dodge
                 if(baseformProperties.dodgeInvul) {

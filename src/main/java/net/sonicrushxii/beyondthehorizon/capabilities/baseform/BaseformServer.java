@@ -248,6 +248,8 @@ public class BaseformServer {
                             );
                         }
                         if (baseformProperties.ballFormState == (byte) 2) {
+                            player.setDeltaMovement((Utilities.calculateViewVector(0,player.getYRot())).scale(baseformProperties.spinDashChargeTime/10f));
+                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                             for(LivingEntity nearbyEntity : level.getEntitiesOfClass(LivingEntity.class,
                                     new AABB(player.getX()+1.5,player.getY()+1.5,player.getZ()+1.5,
