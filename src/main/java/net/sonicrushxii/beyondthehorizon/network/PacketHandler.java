@@ -19,7 +19,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.melee.MeleeSwipes;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SetSmashHitChargeC2S;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
@@ -101,7 +101,7 @@ public class PacketHandler {
 
                 INSTANCE.messageBuilder(Dodge.class,NetworkDirection.PLAY_TO_SERVER).encoder(Dodge::encode).decoder(Dodge::new).consumerMainThread(Dodge::handle).add();
 
-                INSTANCE.messageBuilder(MeleeSwipes.class,NetworkDirection.PLAY_TO_SERVER).encoder(MeleeSwipes::encode).decoder(MeleeSwipes::new).consumerMainThread(MeleeSwipes::handle).add();
+                INSTANCE.messageBuilder(HummingTop.class,NetworkDirection.PLAY_TO_SERVER).encoder(HummingTop::encode).decoder(HummingTop::new).consumerMainThread(HummingTop::handle).add();
 
                 INSTANCE.messageBuilder(SpeedBlitz.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpeedBlitz::encode).decoder(SpeedBlitz::new).consumerMainThread(SpeedBlitz::handle).add();
 

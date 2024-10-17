@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.melee;
+package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,21 +11,21 @@ import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 
-public class MeleeSwipes {
+public class HummingTop {
 
-    public MeleeSwipes() {}
+    public HummingTop() {}
 
-    public MeleeSwipes(FriendlyByteBuf buffer) {}
+    public HummingTop(FriendlyByteBuf buffer) {}
 
     public void encode(FriendlyByteBuf buffer) {}
 
-    public static void performDodge(ServerPlayer player)
+    public static void performHummingTop(ServerPlayer player)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
             //Add Data
-            baseformProperties.meleeSwipeTime = 1;
+            baseformProperties.hummingTop = 1;
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(
@@ -41,7 +41,7 @@ public class MeleeSwipes {
                     ServerPlayer player = ctx.getSender();
                     if(player != null)
                     {
-                        performDodge(player);
+                        performHummingTop(player);
                     }
                 });
         ctx.setPacketHandled(true);

@@ -351,15 +351,15 @@ public class BaseformServer {
                     Vec3 playerInFrontOf = player.position().add(player.getLookAngle().scale(0.90));
                     {
                         //Start
-                        if(baseformProperties.meleeSwipeTime == 1)
+                        if(baseformProperties.hummingTop == 1)
                         {
 
                         }
                         //Duration
-                        if(baseformProperties.meleeSwipeTime > 0)
+                        if(baseformProperties.hummingTop > 0)
                         {
                             //Add Time
-                            baseformProperties.meleeSwipeTime += 1;
+                            baseformProperties.hummingTop += 1;
 
                             //Attack
                             for(LivingEntity enemy : serverLevel.getEntitiesOfClass(LivingEntity.class,
@@ -373,7 +373,7 @@ public class BaseformServer {
                             }
 
                             //Play Sweep Particle
-                            if(baseformProperties.meleeSwipeTime%2 == 0 && baseformProperties.meleeSwipeTime <= 10)
+                            if(baseformProperties.hummingTop %2 == 0 && baseformProperties.hummingTop <= 10)
                             {
                                 //Play Sweep Particle
                                 PacketHandler.sendToPlayer(player, new ParticleAuraPacketS2C(
@@ -388,7 +388,7 @@ public class BaseformServer {
 
                         }
                         //Ability End
-                        if(baseformProperties.meleeSwipeTime == 10)
+                        if(baseformProperties.hummingTop == 10)
                         {
                             //Attack
                             for(LivingEntity enemy : serverLevel.getEntitiesOfClass(LivingEntity.class,
@@ -402,9 +402,9 @@ public class BaseformServer {
                             }
                         }
                         //Cooldown End
-                        if (baseformProperties.meleeSwipeTime > 20)
+                        if (baseformProperties.hummingTop > 20)
                         {
-                            baseformProperties.meleeSwipeTime = 0;
+                            baseformProperties.hummingTop = 0;
                         }
                     }
 

@@ -42,8 +42,8 @@ public class VirtualSlotOverlay {
             "textures/custom_gui/baseform/light_speed_attack_active.png");
     private static final ResourceLocation LOOPKICK_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/loopkick_slot.png");
-    private static final ResourceLocation MELEE_ATTACK_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
-            "textures/custom_gui/baseform/melee_attack_slot.png");
+    private static final ResourceLocation HUMMING_TOP_SLOT = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/custom_gui/baseform/humming_top_slot.png");
     private static final ResourceLocation GRAND_SLAM_SLOT = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/grand_slam_slot.png");
     private static final ResourceLocation PARRY_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
@@ -161,7 +161,7 @@ public class VirtualSlotOverlay {
                 slotName = "Combo";
                 iconTextures = (Arrays.asList(
                         new Ability(HOMING_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_ATTACK.ordinal()]),
-                        new Ability(MELEE_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.MELEE_ATTACK.ordinal()]),
+                        new Ability(HUMMING_TOP_SLOT,null,cooldownArray[BaseformActiveAbility.HUMMING_TOP.ordinal()]),
                         new Ability((baseformProperties.speedBlitz)?SPEED_BLITZ_ACTIVE:SPEED_BLITZ_SLOT,null,cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()]),
                         new Ability((baseformProperties.smashHit == 0)?SMASH_HIT_SLOT:SMASH_HIT_ACTIVE,null,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()]),
                         new Ability(STOMP_SLOT,null,cooldownArray[BaseformActiveAbility.STOMP.ordinal()])

@@ -132,7 +132,7 @@ public class BaseformProperties extends FormProperties {
     public UUID homingTarget;
     public byte homingAttackAirTime;
     public boolean dodgeInvul;
-    public byte meleeSwipeTime;
+    public byte hummingTop;
     public boolean speedBlitz;
     public byte speedBlitzDashes;
     public byte smashHit;
@@ -162,7 +162,7 @@ public class BaseformProperties extends FormProperties {
         homingTarget = new UUID(0L,0L);
         homingAttackAirTime = 0;
         dodgeInvul = false;
-        meleeSwipeTime = 0;
+        hummingTop = 0;
         speedBlitz = false;
         speedBlitzDashes = 4;
         smashHit = (byte)0;
@@ -197,7 +197,7 @@ public class BaseformProperties extends FormProperties {
         homingTarget = nbt.getUUID("HomingTarget");
         homingAttackAirTime = nbt.getByte("HomingTime");
         dodgeInvul = nbt.getBoolean("isDodging");
-        meleeSwipeTime = nbt.getByte("meleeSwiping");
+        hummingTop = nbt.getByte("meleeSwiping");
         speedBlitz = nbt.getBoolean("speedBlitzOn");
         speedBlitzDashes = nbt.getByte("speedBlitzes");
         smashHit = nbt.getByte("smashHitTime");
@@ -232,7 +232,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putUUID("HomingTarget",homingTarget);
         nbt.putByte("HomingTime",homingAttackAirTime);
         nbt.putBoolean("isDodging",dodgeInvul);
-        nbt.putByte("meleeSwiping",meleeSwipeTime);
+        nbt.putByte("meleeSwiping", hummingTop);
         nbt.putBoolean("speedBlitzOn",speedBlitz);
         nbt.putByte("speedBlitzes",speedBlitzDashes);
         nbt.putByte("smashHitTime",smashHit);
@@ -252,7 +252,7 @@ public class BaseformProperties extends FormProperties {
         boolean ballForm = ballFormState > 0;
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 50);
         boolean melee = hitCount > 3;
-        boolean meleeSwipe = meleeSwipeTime > 0;
+        boolean meleeSwipe = hummingTop > 0;
         boolean stomping = (stomp > 0);
 
         return ballForm || homingAttack || melee || meleeSwipe || stomping;
@@ -263,7 +263,7 @@ public class BaseformProperties extends FormProperties {
     {
         boolean ballform = ballFormState == 1;
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
-        boolean meleeSwipes = (meleeSwipeTime > 0 && meleeSwipeTime <= 10);
+        boolean meleeSwipes = (hummingTop > 0 && hummingTop <= 10);
         boolean stomping = (stomp > 0);
 
         return homingAttack || meleeSwipes || ballform || stomping;

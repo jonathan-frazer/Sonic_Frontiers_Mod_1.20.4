@@ -27,7 +27,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.melee.MeleeSwipes;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SetSmashHitChargeC2S;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
@@ -216,15 +216,16 @@ public class BaseformClient {
             //Melee Swipes
             {
                 if (VirtualSlotHandler.getCurrAbility() == 1 && !baseformProperties.isAttacking() &&
-                baseformProperties.getCooldown(BaseformActiveAbility.MELEE_ATTACK) == (byte)0 && KeyBindings.INSTANCE.useAbility2.consumeClick())
+                baseformProperties.getCooldown(BaseformActiveAbility.HUMMING_TOP) == (byte)0 && KeyBindings.INSTANCE.useAbility2.consumeClick())
                 {
-                    PacketHandler.sendToServer(new MeleeSwipes());
+                    PacketHandler.sendToServer(new HummingTop());
                 }
             }
 
             //Speed Blitz
             {
-                if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility3.consumeClick())
+                if(VirtualSlotHandler.getCurrAbility() == 1 && baseformProperties.getCooldown(BaseformActiveAbility.SPEED_BLITZ) == (byte)0
+                && KeyBindings.INSTANCE.useAbility3.consumeClick())
                 {
                     PacketHandler.sendToServer(new SpeedBlitz());
                 }
@@ -233,7 +234,8 @@ public class BaseformClient {
             //Smash Hit
             {
                 //Increase Smash hit
-                if(VirtualSlotHandler.getCurrAbility() == 1 && KeyBindings.INSTANCE.useAbility4.isDown())
+                if(VirtualSlotHandler.getCurrAbility() == 1 && baseformProperties.getCooldown(BaseformActiveAbility.SMASH_HIT) == (byte)0
+                        && KeyBindings.INSTANCE.useAbility4.isDown())
                 {
                     //Add Number
                     baseformProperties.smashHit = (byte) Math.min(baseformProperties.smashHit+1,65);
@@ -253,7 +255,8 @@ public class BaseformClient {
 
             //Stomp
             {
-                if(VirtualSlotHandler.getCurrAbility() == 1 && !player.onGround() && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.consumeClick())
+                if(VirtualSlotHandler.getCurrAbility() == 1 && baseformProperties.getCooldown(BaseformActiveAbility.STOMP) == (byte)0
+                    &&  !player.onGround() && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.consumeClick())
                 {
                     PacketHandler.sendToServer(new Stomp());
                 }
