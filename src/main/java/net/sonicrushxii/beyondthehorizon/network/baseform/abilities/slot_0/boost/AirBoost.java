@@ -56,6 +56,9 @@ public class AirBoost {
                         0.0 ,0.0f,0.0f, 0.2f,1,true)
                 );
 
+                //Ballform
+                baseformProperties.ballFormState = (byte)3;
+
                 //Add Trajectory
                 player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
                 player.addDeltaMovement(player.getLookAngle().scale(2*player.getAttribute(Attributes.MOVEMENT_SPEED).getValue()));

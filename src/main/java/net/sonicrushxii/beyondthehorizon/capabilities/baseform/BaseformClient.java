@@ -1,6 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -33,6 +34,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.CyloopTrigger;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -213,12 +215,13 @@ public class BaseformClient {
                 }
             }
 
-            //Melee Swipes
+            //Humming Top
             {
                 if (VirtualSlotHandler.getCurrAbility() == 1 && !baseformProperties.isAttacking() &&
-                baseformProperties.getCooldown(BaseformActiveAbility.HUMMING_TOP) == (byte)0 && KeyBindings.INSTANCE.useAbility2.consumeClick())
+                baseformProperties.getCooldown(BaseformActiveAbility.HUMMING_TOP) == (byte)0 && KeyBindings.INSTANCE.useAbility2.isDown())
                 {
                     PacketHandler.sendToServer(new HummingTop());
+                    baseformProperties.hummingTop = 1;
                 }
             }
 
@@ -261,6 +264,23 @@ public class BaseformClient {
                     PacketHandler.sendToServer(new Stomp());
                 }
             }
+        }
+
+        //Slot 6
+        {
+            //Cyloop
+            KeyMapping rightClick = Minecraft.getInstance().options.keyUse;
+            if(VirtualSlotHandler.getCurrAbility() == 5 && rightClick.isDown() && !baseformProperties.isAttacking()) {
+                if(!baseformProperties.cylooping){
+                    PacketHandler.sendToServer(new CyloopTrigger(true));
+                    baseformProperties.cylooping = true;
+                }
+            }
+            else if(baseformProperties.cylooping) {
+                PacketHandler.sendToServer(new CyloopTrigger(false));
+                baseformProperties.cylooping = false;
+            }
+
         }
     }
 

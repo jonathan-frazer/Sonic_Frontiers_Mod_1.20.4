@@ -14,6 +14,7 @@ import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HummingTop;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.Spindash;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
@@ -50,10 +51,41 @@ public class BaseformRenderer
 
             event.setCanceled(true);
         }
+        //Humming Top
+        else if(baseformProperties.hummingTop > 1)
+        {
+            //Rotate Player
+            poseStack.pushPose();
+            poseStack.mulPose(Axis.XP.rotationDegrees(-2F));
+            poseStack.mulPose(Axis.YP.rotationDegrees((baseformProperties.hummingTop%7)*51.42F));
+        }
     }
 
     public static void onRenderPlayerModelPost(RenderLivingEvent.Post<?,?> event, Player player, BaseformProperties baseformProperties)
     {
+        PoseStack poseStack = event.getPoseStack();
+        if(baseformProperties.hummingTop > 1)
+        {
+            poseStack.popPose();
+
+            // Push the current matrix stack
+            poseStack.pushPose();
+
+            // Translate
+            poseStack.translate(0.0D, -1.65D, 0.0D);
+
+            // Scale
+            poseStack.scale(2.5f, 2.5f, 2.5f);
+
+            //Apply Rotation
+            poseStack.mulPose(Axis.XP.rotationDegrees(-2F));
+            poseStack.mulPose(Axis.YP.rotationDegrees((float)-(player.getY()-(baseformProperties.hummingTop%7)*51.42F)));
+
+            // Render the custom model
+            ModModelRenderer.renderModel(HummingTop.class, event, poseStack);
+
+            poseStack.popPose();
+        }
 
     }
 
@@ -96,13 +128,15 @@ public class BaseformRenderer
         }
     }
 
+    public static void onRenderToEveryonePre(RenderLivingEvent.Pre<?,?> event, LivingEntity target)
+    {
+
+    }
+
     public static void onRenderToEveryonePost(RenderLivingEvent.Post<?,?> event, LivingEntity target)
     {
 
     }
 
-    public static void onRenderToEveryonePre(RenderLivingEvent.Pre<?,?> event, LivingEntity target)
-    {
 
-    }
 }

@@ -122,6 +122,7 @@ public class BaseformProperties extends FormProperties {
     //Slot 1
     public byte airBoosts;
     public byte boostLvl;
+    public boolean wallBoosting;
     public boolean isWaterBoosting;
     public byte lightSpeedState;
     public boolean powerBoost;
@@ -138,6 +139,9 @@ public class BaseformProperties extends FormProperties {
     public byte smashHit;
     public byte stomp;
 
+    //Slot 6
+    public boolean cylooping;
+
     public BaseformProperties()
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
@@ -152,6 +156,7 @@ public class BaseformProperties extends FormProperties {
         //Slot 1
         airBoosts = 3;
         boostLvl = 0;
+        wallBoosting = false;
         isWaterBoosting = false;
         lightSpeedState = 0;
         powerBoost = false;
@@ -168,7 +173,8 @@ public class BaseformProperties extends FormProperties {
         smashHit = (byte)0;
         stomp = (byte)0;
 
-        //Slot 3
+        //Slot 6
+        cylooping = true;
 
     }
 
@@ -187,6 +193,7 @@ public class BaseformProperties extends FormProperties {
         //Slot 1
         airBoosts = nbt.getByte("AirBoosts");
         boostLvl = nbt.getByte("BoostLvl");
+        wallBoosting = nbt.getBoolean("IsWallBoosting");
         isWaterBoosting = nbt.getBoolean("IsWaterBoosting");
         lightSpeedState = nbt.getByte("LightSpeedState");
         powerBoost = nbt.getBoolean("PowerBoost");
@@ -197,11 +204,14 @@ public class BaseformProperties extends FormProperties {
         homingTarget = nbt.getUUID("HomingTarget");
         homingAttackAirTime = nbt.getByte("HomingTime");
         dodgeInvul = nbt.getBoolean("isDodging");
-        hummingTop = nbt.getByte("meleeSwiping");
+        hummingTop = nbt.getByte("hummingTop");
         speedBlitz = nbt.getBoolean("speedBlitzOn");
         speedBlitzDashes = nbt.getByte("speedBlitzes");
         smashHit = nbt.getByte("smashHitTime");
         stomp = nbt.getByte("stompTime");
+
+        //Slot 6
+        cylooping = nbt.getBoolean("isCylooping");
     }
 
     @Override
@@ -222,6 +232,7 @@ public class BaseformProperties extends FormProperties {
         //Slot 1
         nbt.putByte("AirBoosts",airBoosts);
         nbt.putByte("BoostLvl",boostLvl);
+        nbt.putBoolean("IsWallBoosting",wallBoosting);
         nbt.putBoolean("IsWaterBoosting",isWaterBoosting);
         nbt.putByte("LightSpeedState",lightSpeedState);
         nbt.putBoolean("PowerBoost",powerBoost);
@@ -232,11 +243,14 @@ public class BaseformProperties extends FormProperties {
         nbt.putUUID("HomingTarget",homingTarget);
         nbt.putByte("HomingTime",homingAttackAirTime);
         nbt.putBoolean("isDodging",dodgeInvul);
-        nbt.putByte("meleeSwiping", hummingTop);
+        nbt.putByte("hummingTop", hummingTop);
         nbt.putBoolean("speedBlitzOn",speedBlitz);
         nbt.putByte("speedBlitzes",speedBlitzDashes);
         nbt.putByte("smashHitTime",smashHit);
         nbt.putByte("stompTime",stomp);
+
+        //Slot 6
+        nbt.putBoolean("isCylooping",cylooping);
 
         return nbt;
     }
@@ -252,10 +266,10 @@ public class BaseformProperties extends FormProperties {
         boolean ballForm = ballFormState > 0;
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 50);
         boolean melee = hitCount > 3;
-        boolean meleeSwipe = hummingTop > 0;
+        boolean hummingTop = this.hummingTop > 0;
         boolean stomping = (stomp > 0);
 
-        return ballForm || homingAttack || melee || meleeSwipe || stomping;
+        return ballForm || homingAttack || melee || hummingTop || stomping;
     }
 
     //Checks if Player is in the middle of another attack
@@ -263,9 +277,9 @@ public class BaseformProperties extends FormProperties {
     {
         boolean ballform = ballFormState == 1;
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
-        boolean meleeSwipes = (hummingTop > 0 && hummingTop <= 10);
+        boolean hummingTop = (this.hummingTop > 0 && this.hummingTop <= 10);
         boolean stomping = (stomp > 0);
 
-        return homingAttack || meleeSwipes || ballform || stomping;
+        return homingAttack || hummingTop || ballform || stomping;
     }
 }

@@ -2,6 +2,7 @@ package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -35,13 +36,14 @@ import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class BaseformServer {
     private static final float HOMING_ATTACK_DAMAGE = 12.0f;
-    private static final float MELEE_SWIPE_DAMAGE = 6.0f;
+    private static final float BALLFORM_DAMAGE = 6.0f;
+    private static final float HUMMING_TOP_DAMAGE = 3.0f;
+
+    public static final Map<UUID,List<Vec3i>> cyloopCoords = new HashMap<>();
 
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
@@ -198,8 +200,52 @@ public class BaseformServer {
                                     && baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3) {
                                 //Move Upward
                                 player.setSprinting(false);
-                                player.addDeltaMovement(new Vec3(0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 1.5, 0));
+                                baseformProperties.wallBoosting = true;
+                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                                player.setDeltaMovement(new Vec3(0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 2.5, 0));
                                 player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                            }
+                        }
+                        //Wall Boost
+                        if(baseformProperties.wallBoosting)
+                        {
+                            if (!Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + ""))
+                            {
+                                //Particle
+                                switch (baseformProperties.boostLvl) {
+                                    case 1:
+                                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                                ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                                                player.getX()+0.00, player.getY()+0.05, player.getZ()+0.00,
+                                                0.001, 0.00f, 0.00f, 0.00f, 1,
+                                                true));
+                                        break;
+                                    case 2:
+                                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                                new DustParticleOptions((baseformProperties.ballFormState==0)?(new Vector3f(1.000f, 0.000f, 0.000f)):(new Vector3f(0.000f, 0.000f, 0.800f)), 2f),
+                                                player.getX()+0.00, player.getY()+0.35, player.getZ()+0.00,
+                                                0.001, 0.25f, 0.25f, 0.25f, 4,
+                                                true)
+                                        );
+                                        break;
+                                    case 3:
+                                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                                new DustParticleOptions(new Vector3f(0.0f, 0.89f, 1.00f), 1),
+                                                player.getX()+0.00, player.getY()+1.0, player.getZ()+0.00,
+                                                0.001, 0.35f, 1f, 0.35f, 12,
+                                                true)
+                                        );
+                                        break;
+                                    default:
+                                }
+
+                                //Motion
+                                player.setDeltaMovement(new Vec3(0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 2.5, 0));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                            }
+                            else {
+                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                baseformProperties.wallBoosting = false;
                             }
                         }
                     }
@@ -248,7 +294,7 @@ public class BaseformServer {
                             );
                         }
                         if (baseformProperties.ballFormState == (byte) 2) {
-                            player.setDeltaMovement((Utilities.calculateViewVector(0,player.getYRot())).scale(baseformProperties.spinDashChargeTime/10f));
+                            player.setDeltaMovement((Utilities.calculateViewVector(0,player.getYRot())).scale(Math.min(10.0,baseformProperties.spinDashChargeTime/10f)));
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                             for(LivingEntity nearbyEntity : level.getEntitiesOfClass(LivingEntity.class,
@@ -256,7 +302,7 @@ public class BaseformServer {
                                             player.getX()-1.5,player.getY()-1.5,player.getZ()-1.5),
                                     (nearbyEntity)->!nearbyEntity.is(player)))
                                 nearbyEntity.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
-                                        Math.min(40.0f,baseformProperties.spinDashChargeTime/2f));
+                                        Math.min(50.0f,baseformProperties.spinDashChargeTime/2f));
 
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1f),
@@ -333,6 +379,25 @@ public class BaseformServer {
                         }
                     }
 
+                    //Air Boost
+                    if(baseformProperties.ballFormState == 3) {
+
+                        //Damage Enemy
+                        for(LivingEntity enemy: level.getEntitiesOfClass(LivingEntity.class,
+                                new AABB(player.getX()+0.5,player.getY()+1.0,player.getZ()+0.5,
+                                        player.getX()-0.5,player.getY(),player.getZ()-0.5),(enemy)->!enemy.is(player)))
+                        {
+                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player),
+                                    BALLFORM_DAMAGE);
+                            player.addDeltaMovement(new Vec3(0.0,0.3,0.0));
+                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                        }
+
+                        //Go back to normal
+                        if(player.onGround())
+                            baseformProperties.ballFormState = 0;
+                    }
+
                     //Dodge
                     {
                         if (baseformProperties.dodgeInvul)
@@ -347,63 +412,39 @@ public class BaseformServer {
                         }
                     }
 
-                    //Melee Swipes
+                    //Humming Top
                     Vec3 playerInFrontOf = player.position().add(player.getLookAngle().scale(0.90));
                     {
-                        //Start
-                        if(baseformProperties.hummingTop == 1)
-                        {
-
-                        }
                         //Duration
                         if(baseformProperties.hummingTop > 0)
                         {
                             //Add Time
                             baseformProperties.hummingTop += 1;
 
-                            //Attack
-                            for(LivingEntity enemy : serverLevel.getEntitiesOfClass(LivingEntity.class,
-                                    new AABB(playerInFrontOf.x()+0.8,playerInFrontOf.y()+player.getEyeHeight()/2+0.8, playerInFrontOf.z()+0.8,
-                                            playerInFrontOf.x()-0.8,playerInFrontOf.y()+player.getEyeHeight()/2-0.8, playerInFrontOf.z()-0.8),
-                                    (target)->!target.is(player)))
-                            {
-                                //Damage Enemy
-                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),player),
-                                        MELEE_SWIPE_DAMAGE);
-                            }
+                            //Go Forward
+                            Vec3 lookAngle = player.getLookAngle();
+                            player.setDeltaMovement(new Vec3(lookAngle.x,-0.1,lookAngle.z).scale(1.0));
+                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
-                            //Play Sweep Particle
-                            if(baseformProperties.hummingTop %2 == 0 && baseformProperties.hummingTop <= 10)
+                            //Damage and Move Entities
+                            for(LivingEntity enemy: level.getEntitiesOfClass(LivingEntity.class,
+                                    new AABB(player.getX()+1.0,player.getY()+0.75,player.getZ()+1.0,
+                                            player.getX()-1.0,player.getY()-0.25,player.getZ()-1.0),(enemy)->!enemy.is(player)))
                             {
-                                //Play Sweep Particle
-                                PacketHandler.sendToPlayer(player, new ParticleAuraPacketS2C(
-                                        ParticleTypes.SWEEP_ATTACK,
-                                        playerInFrontOf.x(), playerInFrontOf.y() + player.getEyeHeight() / 2, playerInFrontOf.z(),
-                                        0.0, 0.2f, 0.2f, 0.2f, 4, true)
-                                );
-
-                                //Playsound
-                                level.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.MASTER, 0.55f, 1.0f);
-                            }
-
-                        }
-                        //Ability End
-                        if(baseformProperties.hummingTop == 10)
-                        {
-                            //Attack
-                            for(LivingEntity enemy : serverLevel.getEntitiesOfClass(LivingEntity.class,
-                                    new AABB(playerInFrontOf.x()+0.8,playerInFrontOf.y()+player.getEyeHeight()/2+0.8, playerInFrontOf.z()+0.8,
-                                            playerInFrontOf.x()-0.8,playerInFrontOf.y()+player.getEyeHeight()/2-0.8, playerInFrontOf.z()-0.8),
-                                    (target)->!target.is(player)))
-                            {
-                                //Damage Enemy
-                                enemy.setDeltaMovement(player.getLookAngle().scale(0.75));
+                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player),
+                                        HUMMING_TOP_DAMAGE);
+                                enemy.setDeltaMovement(new Vec3(lookAngle.x,-0.1,lookAngle.z).scale(1.4));
                                 player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
                             }
+
                         }
-                        //Cooldown End
-                        if (baseformProperties.hummingTop > 20)
+                        if(baseformProperties.hummingTop == 40) {
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                        }
+                        //Ability End
+                        if(baseformProperties.hummingTop >= 50 || (baseformProperties.hummingTop > 0 && player.onGround()))
                         {
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             baseformProperties.hummingTop = 0;
                         }
                     }
@@ -463,6 +504,18 @@ public class BaseformServer {
                         }
                     }
 
+                }
+
+                //Slot 6
+                {
+                    if(baseformProperties.cylooping)
+                    {
+                        List<Vec3i> currCoords = cyloopCoords.get(player.getUUID());
+                        assert currCoords != null;
+                        Vec3i currPoint = new Vec3i((int)player.getX(),(int)player.getY(),(int)player.getZ());
+                        System.out.println(currPoint);
+                        currCoords.add(currPoint);
+                    }
                 }
             }
 

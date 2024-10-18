@@ -19,14 +19,15 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HummingTop;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.Spindash;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
 import net.sonicrushxii.beyondthehorizon.event_handler.*;
 import net.sonicrushxii.beyondthehorizon.modded.ModCreativeModeTabs;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.Spindash;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import net.sonicrushxii.beyondthehorizon.timehandler.TimeHandler;
@@ -138,6 +139,7 @@ public class BeyondTheHorizon
         {
             event.registerLayerDefinition(Spindash.LAYER_LOCATION,Spindash::createBodyLayer);
             event.registerLayerDefinition(HomingAttack.LAYER_LOCATION,HomingAttack::createBodyLayer);
+            event.registerLayerDefinition(HummingTop.LAYER_LOCATION,HummingTop::createBodyLayer);
         }
     }
 }

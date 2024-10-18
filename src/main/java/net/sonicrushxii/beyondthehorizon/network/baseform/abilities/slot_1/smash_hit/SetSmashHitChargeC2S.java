@@ -36,7 +36,7 @@ public class SetSmashHitChargeC2S {
                         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
                             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                            if (this.newChargeAmt == 0 && player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT))
+                            if(this.newChargeAmt == 0 && player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT))
                                 player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.SMASH_HIT.getId());
                             if(this.newChargeAmt > 0 && !player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT))
                                 player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.SMASH_HIT);

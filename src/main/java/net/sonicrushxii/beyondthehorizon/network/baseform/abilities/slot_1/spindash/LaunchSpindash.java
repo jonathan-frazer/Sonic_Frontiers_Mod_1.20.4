@@ -54,7 +54,7 @@ public class LaunchSpindash {
                             world.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SPINDASH_RELEASE.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
                             //Schedule Reversion from Spindash
-                            Scheduler.scheduleTask(()-> performRevertSpindash(player,baseformProperties),Math.min(baseformProperties.spinDashChargeTime/2, 60));
+                            Scheduler.scheduleTask(()-> performRevertSpindash(player,baseformProperties),Math.max(50,Math.min(baseformProperties.spinDashChargeTime, 100)));
 
                             PacketHandler.sendToPlayer(player,
                                     new SyncPlayerFormS2C(

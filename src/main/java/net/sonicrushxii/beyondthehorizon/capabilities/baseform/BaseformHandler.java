@@ -91,11 +91,13 @@ public class BaseformHandler {
                     }
                     if (baseformProperties.hitCount == 4)
                     {
-                        if (damageGiver.isShiftKeyDown()||damageGiver.getY()+damageGiver.getEyeHeight() < damageTaker.getY()+damageTaker.getEyeHeight()) {
+                        if (damageGiver.isShiftKeyDown()||damageGiver.getXRot() < 0) {
                             damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 10, false, false));
                             damageTaker.addEffect(new MobEffectInstance(ModEffects.COMBO_EFFECT.get(), 40, 0, false, false));
                             damageTaker.moveTo(damageTaker.getX(), damageTaker.getY() + 5.0, damageTaker.getZ());
-                        } else {
+                        }
+                        else if(damageGiver.getXRot() > 0)
+                        {
                             //Sonic Eagle
                             PacketHandler.sendToALLPlayers(new ParticleDirPacketS2C(
                                     ParticleTypes.FLAME,
