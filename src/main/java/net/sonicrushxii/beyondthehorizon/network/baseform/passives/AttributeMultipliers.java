@@ -11,8 +11,6 @@ public class AttributeMultipliers {
             "Power_boost_Speed", 0.60F, AttributeModifier.Operation.MULTIPLY_TOTAL);
     public static final AttributeModifier POWERBOOST_ARMOR = new AttributeModifier(new UUID(0x1234767890AB8DEFL, 0xFEBCBA09F7654C21L),
             "Power_boost_Armor", 3.67F, AttributeModifier.Operation.MULTIPLY_TOTAL);
-    public static final AttributeModifier SPINDASH_SPEED = new AttributeModifier(new UUID(0x1234767890AB9DEFL, 0xFEBCBA09F7654C21L),
-            "Spindash_Speed", 0.60F, AttributeModifier.Operation.MULTIPLY_TOTAL);
     public static final AttributeModifier SMASH_HIT = new AttributeModifier(new UUID(0x1234767890AC1DEFL, 0xFEBCBA09F7654C21L),
             "Smash_Hit", -1.0F, AttributeModifier.Operation.ADDITION);
 }
