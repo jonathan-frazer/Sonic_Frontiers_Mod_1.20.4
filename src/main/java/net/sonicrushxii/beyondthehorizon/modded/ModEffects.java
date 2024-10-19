@@ -10,6 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.potion_effects.ComboEffect;
+import net.sonicrushxii.beyondthehorizon.potion_effects.CyloopEffect;
 import net.sonicrushxii.beyondthehorizon.potion_effects.SpeedBlitzed;
 import net.sonicrushxii.beyondthehorizon.potion_effects.SpeedBlitzing;
 
@@ -18,13 +19,16 @@ public class ModEffects {
             = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, BeyondTheHorizon.MOD_ID);
 
     public static final RegistryObject<MobEffect> COMBO_EFFECT = MOB_EFFECTS.register(
-            "combo_effect",()->((new ComboEffect(MobEffectCategory.HARMFUL,3215315)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020331", -0.9, AttributeModifier.Operation.MULTIPLY_TOTAL))
+            "combo_effect",()->((new ComboEffect(MobEffectCategory.HARMFUL,0x0011FF)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020331", -0.9, AttributeModifier.Operation.MULTIPLY_TOTAL))
     );
     public static final RegistryObject<MobEffect> SPEED_BLITZED = MOB_EFFECTS.register(
-            "speed_blitzed",()->((new SpeedBlitzed(MobEffectCategory.HARMFUL,3215315)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020332", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
+            "speed_blitzed",()->((new SpeedBlitzed(MobEffectCategory.HARMFUL,0x0011FF)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020332", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
     );
     public static final RegistryObject<MobEffect> SPEED_BLITZING = MOB_EFFECTS.register(
-            "speed_blitzing",()->((new SpeedBlitzing(MobEffectCategory.BENEFICIAL,3215315)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020333", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
+            "speed_blitzing",()->((new SpeedBlitzing(MobEffectCategory.BENEFICIAL,0x0011FF)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020333", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
+    );
+    public static final RegistryObject<MobEffect> CYLOOPED = MOB_EFFECTS.register(
+            "cyloop_effect",()->((new CyloopEffect(MobEffectCategory.HARMFUL,0x00FFFF)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020334", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
     );
 
 

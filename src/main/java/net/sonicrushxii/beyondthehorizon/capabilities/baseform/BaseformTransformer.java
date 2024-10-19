@@ -184,6 +184,11 @@ public class BaseformTransformer {
                     player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.SMASH_HIT.getId());
             }
 
+            //Slot 6
+            {
+
+            }
+
         }
         //Remove Data
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{

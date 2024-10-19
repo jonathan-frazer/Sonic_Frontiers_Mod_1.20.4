@@ -6,6 +6,7 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -28,6 +29,7 @@ import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.Cyloop;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -433,8 +435,8 @@ public class BaseformServer {
                             {
                                 enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player),
                                         HUMMING_TOP_DAMAGE);
-                                enemy.setDeltaMovement(new Vec3(lookAngle.x,-0.1,lookAngle.z).scale(1.4));
-                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                                enemy.teleportTo(player.getX()+lookAngle.x*2.0,player.getY()+lookAngle.y*2.0,player.getZ()+lookAngle.z*2.0);
+                                player.connection.send(new ClientboundTeleportEntityPacket(enemy));
                             }
 
                         }
@@ -518,34 +520,9 @@ public class BaseformServer {
                         Vec3 currPoint = new Vec3(player.getX(),player.getY(),player.getZ());
                         Cyloop.addToList(currCoords,currPoint);
 
-
                         //Display all points in the list
-                        for(Vec3 coord: currCoords)
-                        {
-                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                    new DustParticleOptions(new Vector3f(0.0f, 1.00f, 1.00f), 2f),
-                                    coord.x, coord.y+0.5, coord.z,
-                                    0.001, 0.55f, 0.55f, 0.55f, 3,
-                                    true)
-                            );
-                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                    new DustParticleOptions(new Vector3f(0.00f, 0.11f, 1.00f), 1.5f),
-                                    coord.x, coord.y+0.5, coord.z,
-                                    0.001, 0.65f, 0.65f, 0.65f, 2,
-                                    true)
-                            );
-                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                    new DustParticleOptions(new Vector3f(1.00f, 0.00f, 0.89f), 1.5f),
-                                    coord.x, coord.y+0.5, coord.z,
-                                    0.001, 0.55f, 0.55f, 0.55f, 2,
-                                    true)
-                            );
-                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                    ParticleTypes.FIREWORK,
-                                    coord.x, coord.y, coord.z,
-                                    0.001, 0.55f, 0.55f, 0.55f, 1,
-                                    true)
-                            );
+                        for(Vec3 coord: currCoords) {
+                            PacketHandler.sendToALLPlayers(new CyloopParticleS2C(coord));
                         }
                     }
                 }

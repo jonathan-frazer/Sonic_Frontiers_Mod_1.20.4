@@ -1,6 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5;
 
-import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
@@ -9,13 +9,15 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
+import org.joml.Vector3f;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 
 public class Cyloop {
+    public static final int MAX_CYLOOP_SIZE = 75;
 
     private final boolean activate;
 
@@ -31,32 +33,34 @@ public class Cyloop {
         buffer.writeBoolean(this.activate);
     }
 
-    public static void isLoop(ArrayList<Vec3i> cyloopPath)
+    private static void deleteFromLast(Deque<Vec3> currCoords)
     {
-
+        Vec3 deathPoint = currCoords.removeLast();
+        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                new DustParticleOptions(new Vector3f(1.0f,0.0f,0.0f),10f),
+                deathPoint.x(), deathPoint.y()+0.5, deathPoint.z(),
+                0.0, 1f, 1f, 1f, 5, true)
+        );
     }
 
     public static void addToList(Deque<Vec3> currCoords, Vec3 newPoint)
     {
-        final int CYLOOP_DECAY_TIME = 30;
-
-        while(currCoords.size() >= 49)
-            currCoords.removeFirst();
 
         if(currCoords.isEmpty())
         {
             //Add a New Point
-            currCoords.addLast(newPoint);
+            currCoords.addFirst(newPoint);
         }
         else
         {
             //Get the current Last Point
-            final Vec3 lastPt = currCoords.getLast();
+            final Vec3 lastPt = currCoords.getFirst();
             //If the Distance between them is small, just add
             if(lastPt.distanceToSqr(newPoint) < 2.0)
             {
                 //Add a New Point
-                currCoords.addLast(newPoint);
+                if(currCoords.size() == MAX_CYLOOP_SIZE) deleteFromLast(currCoords);
+                currCoords.addFirst(newPoint);
             }
             //If the Distance between them is too Far, Interpolate
             else
@@ -70,9 +74,12 @@ public class Cyloop {
                 Vec3 interpolatedPoint = lastPt.add(dirVec);
                 while(noOfSegments-- > 0)
                 {
-                    interpolatedPoint = interpolatedPoint.add(dirVec);
                     //Add
-                    currCoords.addLast(interpolatedPoint);
+                    if(currCoords.size() == MAX_CYLOOP_SIZE) deleteFromLast(currCoords);
+                    currCoords.addFirst(interpolatedPoint);
+
+                    //Move to next Point
+                    interpolatedPoint = interpolatedPoint.add(dirVec);
                 }
             }
         }
@@ -91,13 +98,16 @@ public class Cyloop {
             {
                 BaseformServer.cyloopCoords.put(
                         player.getUUID(),
-                        new ArrayDeque<>(50)
+                        new ArrayDeque<Vec3>(50)
                 );
             }
 
             //If Deactivating, print List of Traversal. Discard the old list
-            /*if(!activate)
-            {}*/
+            if(!activate)
+            {
+                CyloopMath.cyloopEffect(player,
+                        BaseformServer.cyloopCoords.get(player.getUUID()).toArray());
+            }
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(

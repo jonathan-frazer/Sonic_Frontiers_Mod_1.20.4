@@ -26,6 +26,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spind
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.Cyloop;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
@@ -114,6 +115,7 @@ public class PacketHandler {
             //Slot 6
             {
                 INSTANCE.messageBuilder(Cyloop.class,NetworkDirection.PLAY_TO_SERVER).encoder(Cyloop::encode).decoder(Cyloop::new).consumerMainThread(Cyloop::handle).add();
+                INSTANCE.messageBuilder(CyloopParticleS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(CyloopParticleS2C::encode).decoder(CyloopParticleS2C::new).consumerMainThread(CyloopParticleS2C::handle).add();
             }
         }
 
