@@ -28,6 +28,7 @@ import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.Cyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -43,7 +44,7 @@ public class BaseformServer {
     private static final float BALLFORM_DAMAGE = 6.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
 
-    public static final Map<UUID,List<Vec3i>> cyloopCoords = new HashMap<>();
+    public static final Map<UUID,Deque<Vec3i>> cyloopCoords = new HashMap<>();
 
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
@@ -510,11 +511,43 @@ public class BaseformServer {
                 {
                     if(baseformProperties.cylooping)
                     {
-                        List<Vec3i> currCoords = cyloopCoords.get(player.getUUID());
+                        //Get a Deque of current Coordinates
+                        Deque<Vec3i> currCoords = cyloopCoords.get(player.getUUID());
                         assert currCoords != null;
+
+                        //Add points to list
                         Vec3i currPoint = new Vec3i((int)player.getX(),(int)player.getY(),(int)player.getZ());
-                        System.out.println(currPoint);
-                        currCoords.add(currPoint);
+                        Cyloop.addToList(currCoords,currPoint);
+
+
+                        //Display all points in the list
+                        for(Vec3i coord: currCoords)
+                        {
+                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    new DustParticleOptions(new Vector3f(0.0f, 1.00f, 1.00f), 2f),
+                                    coord.getX()+0.00, coord.getY()+0.5, coord.getZ()+0.00,
+                                    0.001, 0.55f, 0.55f, 0.55f, 3,
+                                    true)
+                            );
+                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    new DustParticleOptions(new Vector3f(0.00f, 0.11f, 1.00f), 1.5f),
+                                    coord.getX()+0.00, coord.getY()+0.5, coord.getZ()+0.00,
+                                    0.001, 0.65f, 0.65f, 0.65f, 2,
+                                    true)
+                            );
+                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    new DustParticleOptions(new Vector3f(1.00f, 0.00f, 0.89f), 1.5f),
+                                    coord.getX()+0.00, coord.getY()+0.5, coord.getZ()+0.00,
+                                    0.001, 0.55f, 0.55f, 0.55f, 2,
+                                    true)
+                            );
+                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    ParticleTypes.FIREWORK,
+                                    coord.getX()+0.00, coord.getY()+0.5, coord.getZ()+0.00,
+                                    0.001, 0.55f, 0.55f, 0.55f, 1,
+                                    true)
+                            );
+                        }
                     }
                 }
             }

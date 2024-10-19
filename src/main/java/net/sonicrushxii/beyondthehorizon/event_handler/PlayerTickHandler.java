@@ -50,6 +50,7 @@ public class PlayerTickHandler {
         if(clientTickCounter == 0)
             localPlayerSecond(player,playerNBT);
 
+
         //Double Tap Handler
         Minecraft mc = Minecraft.getInstance();
         {

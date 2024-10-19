@@ -3,7 +3,9 @@ package net.sonicrushxii.beyondthehorizon.network.sync;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -42,7 +44,7 @@ public class SyncPlayerFormS2C {
     public void handle(CustomPayloadEvent.Context ctx){
         ctx.enqueueWork(()->{
             //On Client Side
-            ClientFormData.setPlayerForm(this.playerForm,this.formData);
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientFormData.setPlayerForm(this.playerForm,this.formData));
         });
         ctx.setPacketHandled(true);
     }

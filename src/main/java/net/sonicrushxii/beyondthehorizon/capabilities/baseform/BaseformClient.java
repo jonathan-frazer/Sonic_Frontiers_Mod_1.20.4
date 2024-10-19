@@ -34,7 +34,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.CyloopTrigger;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.Cyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -66,6 +66,9 @@ public class BaseformClient {
                 || InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_LCONTROL));
         final boolean isShiftDown = (InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_RSHIFT)
                 || InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_LSHIFT));
+
+        final boolean isMoving = player.getDeltaMovement().lengthSqr() > 0.01;
+
 
         BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
 
@@ -269,18 +272,17 @@ public class BaseformClient {
         //Slot 6
         {
             //Cyloop
-            KeyMapping rightClick = Minecraft.getInstance().options.keyUse;
-            if(VirtualSlotHandler.getCurrAbility() == 5 && rightClick.isDown() && !baseformProperties.isAttacking()) {
+            KeyMapping rightClick = minecraft.options.keyUse;
+            if(VirtualSlotHandler.getCurrAbility() == 5 && isMoving && !baseformProperties.isAttacking() && rightClick.isDown()) {
                 if(!baseformProperties.cylooping){
-                    PacketHandler.sendToServer(new CyloopTrigger(true));
+                    PacketHandler.sendToServer(new Cyloop(true));
                     baseformProperties.cylooping = true;
                 }
             }
             else if(baseformProperties.cylooping) {
-                PacketHandler.sendToServer(new CyloopTrigger(false));
+                PacketHandler.sendToServer(new Cyloop(false));
                 baseformProperties.cylooping = false;
             }
-
         }
     }
 
