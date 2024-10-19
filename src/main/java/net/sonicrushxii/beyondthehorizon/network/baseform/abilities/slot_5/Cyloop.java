@@ -10,7 +10,6 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
-import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -37,63 +36,43 @@ public class Cyloop {
 
     }
 
-    public static void addToList(Deque<Vec3i> currCoords, Vec3i newPoint)
+    public static void addToList(Deque<Vec3> currCoords, Vec3 newPoint)
     {
         final int CYLOOP_DECAY_TIME = 30;
+
+        while(currCoords.size() >= 49)
+            currCoords.removeFirst();
 
         if(currCoords.isEmpty())
         {
             //Add a New Point
             currCoords.addLast(newPoint);
-
-            //Schedule it's deletion
-            Scheduler.scheduleTask(() -> {
-                if (!currCoords.isEmpty()) currCoords.removeFirst();
-            }, CYLOOP_DECAY_TIME);
         }
         else
         {
             //Get the current Last Point
-            final Vec3i lastPt = currCoords.getLast();
-            System.out.println(lastPt.distSqr(newPoint));
+            final Vec3 lastPt = currCoords.getLast();
             //If the Distance between them is small, just add
-            if(lastPt.distSqr(newPoint) < 2.0)
+            if(lastPt.distanceToSqr(newPoint) < 2.0)
             {
                 //Add a New Point
                 currCoords.addLast(newPoint);
-
-                //Schedule it's deletion
-                Scheduler.scheduleTask(() -> {
-                    if (!currCoords.isEmpty()) currCoords.removeFirst();
-                }, CYLOOP_DECAY_TIME);
             }
             //If the Distance between them is too Far, Interpolate
             else
             {
-                //Get the two Points as Vec3's
-                final Vec3 lastPoint = new Vec3(lastPt.getX(), lastPt.getY(), lastPt.getZ());
-                final Vec3 endPoint = new Vec3(newPoint.getX(), newPoint.getY(), newPoint.getZ());
-
                 //Find Direction between them
-                final Vec3 dirVec = endPoint.subtract(lastPoint).normalize();
+                final Vec3 dirVec = newPoint.subtract(lastPt).normalize();
 
                 //Loop for No. of Segments
-                int noOfSegments = (int)Math.floor(lastPoint.distanceTo(endPoint));
+                int noOfSegments = (int)Math.floor(lastPt.distanceTo(newPoint));
 
-                Vec3 interpolatedPoint = lastPoint.add(dirVec);
+                Vec3 interpolatedPoint = lastPt.add(dirVec);
                 while(noOfSegments-- > 0)
                 {
                     interpolatedPoint = interpolatedPoint.add(dirVec);
                     //Add
-                    currCoords.addLast(new Vec3i(
-                            (int) Math.round(interpolatedPoint.x()),
-                            (int) Math.round(interpolatedPoint.y()),
-                            (int) Math.round(interpolatedPoint.z()))
-                    );
-                    //Schedule it's deletion
-                    Scheduler.scheduleTask(() -> {
-                        if (!currCoords.isEmpty()) currCoords.removeFirst();
-                    }, CYLOOP_DECAY_TIME);
+                    currCoords.addLast(interpolatedPoint);
                 }
             }
         }
@@ -112,7 +91,7 @@ public class Cyloop {
             {
                 BaseformServer.cyloopCoords.put(
                         player.getUUID(),
-                        new ArrayDeque<Vec3i>(100)
+                        new ArrayDeque<>(50)
                 );
             }
 

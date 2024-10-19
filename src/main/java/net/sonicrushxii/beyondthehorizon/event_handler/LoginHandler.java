@@ -44,6 +44,9 @@ public class LoginHandler {
                 //Reset Combo Meter
                 baseformProperties.hitCount = 0;
 
+                //Revert Cyloop
+                baseformProperties.cylooping = false;
+
                 PacketHandler.sendToPlayer(player,
                         new SyncPlayerFormS2C(
                                 playerSonicForm.getCurrentForm(),

@@ -2,7 +2,6 @@ package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -44,7 +43,7 @@ public class BaseformServer {
     private static final float BALLFORM_DAMAGE = 6.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
 
-    public static final Map<UUID,Deque<Vec3i>> cyloopCoords = new HashMap<>();
+    public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
 
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
@@ -512,38 +511,38 @@ public class BaseformServer {
                     if(baseformProperties.cylooping)
                     {
                         //Get a Deque of current Coordinates
-                        Deque<Vec3i> currCoords = cyloopCoords.get(player.getUUID());
+                        Deque<Vec3> currCoords = cyloopCoords.get(player.getUUID());
                         assert currCoords != null;
 
                         //Add points to list
-                        Vec3i currPoint = new Vec3i((int)player.getX(),(int)player.getY(),(int)player.getZ());
+                        Vec3 currPoint = new Vec3(player.getX(),player.getY(),player.getZ());
                         Cyloop.addToList(currCoords,currPoint);
 
 
                         //Display all points in the list
-                        for(Vec3i coord: currCoords)
+                        for(Vec3 coord: currCoords)
                         {
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(0.0f, 1.00f, 1.00f), 2f),
-                                    coord.getX()+0.00, coord.getY()+0.5, coord.getZ()+0.00,
+                                    coord.x, coord.y+0.5, coord.z,
                                     0.001, 0.55f, 0.55f, 0.55f, 3,
                                     true)
                             );
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(0.00f, 0.11f, 1.00f), 1.5f),
-                                    coord.getX()+0.00, coord.getY()+0.5, coord.getZ()+0.00,
+                                    coord.x, coord.y+0.5, coord.z,
                                     0.001, 0.65f, 0.65f, 0.65f, 2,
                                     true)
                             );
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(1.00f, 0.00f, 0.89f), 1.5f),
-                                    coord.getX()+0.00, coord.getY()+0.5, coord.getZ()+0.00,
+                                    coord.x, coord.y+0.5, coord.z,
                                     0.001, 0.55f, 0.55f, 0.55f, 2,
                                     true)
                             );
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     ParticleTypes.FIREWORK,
-                                    coord.getX()+0.00, coord.getY()+0.5, coord.getZ()+0.00,
+                                    coord.x, coord.y, coord.z,
                                     0.001, 0.55f, 0.55f, 0.55f, 1,
                                     true)
                             );
