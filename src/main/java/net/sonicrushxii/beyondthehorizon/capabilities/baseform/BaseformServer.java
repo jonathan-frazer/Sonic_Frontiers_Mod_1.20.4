@@ -440,11 +440,8 @@ public class BaseformServer {
                             }
 
                         }
-                        if(baseformProperties.hummingTop == 40) {
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
-                        }
                         //Ability End
-                        if(baseformProperties.hummingTop >= 50 || (baseformProperties.hummingTop > 0 && player.onGround()))
+                        if(baseformProperties.hummingTop > 0 && player.onGround())
                         {
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             baseformProperties.hummingTop = 0;

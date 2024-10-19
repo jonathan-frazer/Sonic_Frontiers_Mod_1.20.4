@@ -220,11 +220,17 @@ public class BaseformClient {
 
             //Humming Top
             {
-                if (VirtualSlotHandler.getCurrAbility() == 1 && !baseformProperties.isAttacking() &&
+                if (VirtualSlotHandler.getCurrAbility() == 1 && !baseformProperties.isAttacking() && !player.onGround() &&
                 baseformProperties.getCooldown(BaseformActiveAbility.HUMMING_TOP) == (byte)0 && KeyBindings.INSTANCE.useAbility2.isDown())
                 {
-                    PacketHandler.sendToServer(new HummingTop());
+                    PacketHandler.sendToServer(new HummingTop(true));
                     baseformProperties.hummingTop = 1;
+                }
+
+                if (VirtualSlotHandler.getCurrAbility() == 1 && baseformProperties.hummingTop > 1 && !KeyBindings.INSTANCE.useAbility2.isDown())
+                {
+                    PacketHandler.sendToServer(new HummingTop(false));
+                    baseformProperties.hummingTop = 0;
                 }
             }
 
@@ -262,7 +268,7 @@ public class BaseformClient {
             //Stomp
             {
                 if(VirtualSlotHandler.getCurrAbility() == 1 && baseformProperties.getCooldown(BaseformActiveAbility.STOMP) == (byte)0
-                    &&  !player.onGround() && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.consumeClick())
+                    &&  !player.onGround() && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.isDown())
                 {
                     PacketHandler.sendToServer(new Stomp());
                 }

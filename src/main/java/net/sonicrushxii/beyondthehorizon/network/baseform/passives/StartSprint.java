@@ -61,7 +61,7 @@ public class StartSprint {
                     break;
                 case 2: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.00);
                     break;
-                case 3: sonicBoomEffect(player);
+                case 3:
                     player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
                     break;
             }

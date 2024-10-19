@@ -37,15 +37,15 @@ public class CyloopParticleS2C {
                             Utilities.displayParticle(player, (new DustParticleOptions(new Vector3f(0.000f, 0.11f, 1.000f), 2f)),
                                     this.position.x, this.position.y + 0.5, this.position.z,
                                     0.65f, 0.65f, 0.65f,
-                                    0.01, 2, true);
+                                    0.01, 2, false);
                             Utilities.displayParticle(player, (new DustParticleOptions(new Vector3f(1.000f, 0.0f, 0.890f), 2f)),
                                     this.position.x, this.position.y + 0.5, this.position.z,
                                     0.55f, 0.55f, 0.55f,
-                                    0.01, 2, true);
+                                    0.01, 2, false);
                             Utilities.displayParticle(player, (ParticleTypes.FIREWORK),
                                     this.position.x, this.position.y + 0.5, this.position.z,
                                     0.55f, 0.55f, 0.55f,
-                                    0.01, 1, true);
+                                    0.01, 1, false);
                 }));
         ctx.setPacketHandled(true);
     }

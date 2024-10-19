@@ -12,22 +12,41 @@ import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 public class HummingTop {
 
-    public HummingTop() {}
+    private final boolean activate;
 
-    public HummingTop(FriendlyByteBuf buffer) {}
+    public HummingTop(boolean activate) {
+        this.activate = activate;
+    }
 
-    public void encode(FriendlyByteBuf buffer) {}
+    public HummingTop(FriendlyByteBuf buffer) {
+        this.activate = buffer.readBoolean();
+    }
 
-    public static void performHummingTop(ServerPlayer player)
+    public void encode(FriendlyByteBuf buffer) {
+        buffer.writeBoolean(this.activate);
+    }
+
+    public static void performHummingTop(ServerPlayer player, boolean activate)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            //Gravity
-            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+            if(activate)
+            {
+                //Gravity
+                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                //Modify Data
+                baseformProperties.hummingTop = 1;
 
-            //Add Data
-            baseformProperties.hummingTop = 1;
+            }
+            else
+            {
+                //Gravity
+                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                //Modify Data
+                baseformProperties.hummingTop = 0;
+            }
+
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(
@@ -43,7 +62,7 @@ public class HummingTop {
                     ServerPlayer player = ctx.getSender();
                     if(player != null)
                     {
-                        performHummingTop(player);
+                        performHummingTop(player,this.activate);
                     }
                 });
         ctx.setPacketHandled(true);

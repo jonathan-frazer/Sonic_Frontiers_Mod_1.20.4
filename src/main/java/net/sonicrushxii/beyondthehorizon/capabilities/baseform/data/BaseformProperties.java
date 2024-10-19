@@ -277,7 +277,7 @@ public class BaseformProperties extends FormProperties {
     {
         boolean ballform = ballFormState == 1;
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
-        boolean hummingTop = (this.hummingTop > 0 && this.hummingTop <= 10);
+        boolean hummingTop = (this.hummingTop > 0);
         boolean stomping = (stomp > 0);
 
         return homingAttack || hummingTop || ballform || stomping;
