@@ -241,6 +241,22 @@ public class Utilities {
         return new float[]{yaw, pitch};
     }
 
+    public static float[] getYawPitchFromVecinRadian(Vec3 vec) {
+        vec = vec.normalize();
+        double x = vec.x();
+        double y = vec.y();
+        double z = vec.z();
+
+        // Calculate yaw
+        float yaw = (float) (Math.acos(z));
+        yaw = (x>0.0)?-yaw:yaw;
+
+        // Calculate pitch
+        float pitch = (float) (-Math.asin(y));
+
+        return new float[]{yaw, pitch};
+    }
+
     public static float[] calculateFacing(Vec3 playerPos, Vec3 targetPos) {
         return getYawPitchFromVec(targetPos.subtract(playerPos));
     }

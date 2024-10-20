@@ -141,6 +141,9 @@ public class BaseformProperties extends FormProperties {
 
     //Slot 6
     public boolean cylooping;
+    public byte quickCyloop;
+    public UUID qkCyloopTarget;
+    public float qkCyloopPhase;
 
     public BaseformProperties()
     {
@@ -174,8 +177,10 @@ public class BaseformProperties extends FormProperties {
         stomp = (byte)0;
 
         //Slot 6
-        cylooping = true;
-
+        cylooping = false;
+        quickCyloop = 0;
+        qkCyloopTarget = new UUID(0L,0L);
+        qkCyloopPhase = 0.0f;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -212,6 +217,9 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 6
         cylooping = nbt.getBoolean("isCylooping");
+        quickCyloop = nbt.getByte("quickCyloop");
+        qkCyloopTarget = nbt.getUUID("QkCyloopTarget");
+        qkCyloopPhase = nbt.getFloat("QkCyloopPhase");
     }
 
     @Override
@@ -251,6 +259,9 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 6
         nbt.putBoolean("isCylooping",cylooping);
+        nbt.putByte("QuickCyloop",quickCyloop);
+        nbt.putUUID("QkCyloopTarget",qkCyloopTarget);
+        nbt.putFloat("QkCyloppPhase",qkCyloopPhase);
 
         return nbt;
     }
@@ -268,8 +279,9 @@ public class BaseformProperties extends FormProperties {
         boolean melee = hitCount > 3;
         boolean hummingTop = this.hummingTop > 0;
         boolean stomping = (stomp > 0);
+        boolean quickCyloop = (this.quickCyloop > 0);
 
-        return ballForm || homingAttack || melee || hummingTop || stomping;
+        return ballForm || homingAttack || melee || hummingTop || stomping || quickCyloop;
     }
 
     //Checks if Player is in the middle of another attack
@@ -279,7 +291,8 @@ public class BaseformProperties extends FormProperties {
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
         boolean hummingTop = (this.hummingTop > 0);
         boolean stomping = (stomp > 0);
+        boolean quickCyloop = (this.quickCyloop > 0);
 
-        return homingAttack || hummingTop || ballform || stomping;
+        return homingAttack || hummingTop || ballform || stomping || quickCyloop;
     }
 }

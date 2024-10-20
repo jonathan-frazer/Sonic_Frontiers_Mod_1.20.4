@@ -34,7 +34,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.Cyloop;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop.Cyloop;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.quick_cyloop.QuickCyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -269,17 +270,15 @@ public class BaseformClient {
             {
                 if(VirtualSlotHandler.getCurrAbility() == 1 && baseformProperties.getCooldown(BaseformActiveAbility.STOMP) == (byte)0
                     &&  !player.onGround() && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.isDown())
-                {
                     PacketHandler.sendToServer(new Stomp());
-                }
             }
         }
 
         //Slot 6
         {
-            //Cyloop
+            //Base Cyloop
             KeyMapping rightClick = minecraft.options.keyUse;
-            if(VirtualSlotHandler.getCurrAbility() == 5 && isMoving && !baseformProperties.isAttacking() && rightClick.isDown()) {
+            if(VirtualSlotHandler.getCurrAbility() == 5 && isMoving && !baseformProperties.isAttacking() && rightClick.isDown() && !player.isShiftKeyDown()) {
                 if(!baseformProperties.cylooping){
                     PacketHandler.sendToServer(new Cyloop(true));
                     baseformProperties.cylooping = true;
@@ -288,6 +287,13 @@ public class BaseformClient {
             else if(baseformProperties.cylooping) {
                 PacketHandler.sendToServer(new Cyloop(false));
                 baseformProperties.cylooping = false;
+            }
+
+            //Quick Cyloop
+            if(VirtualSlotHandler.getCurrAbility() == 5 && !baseformProperties.isAttacking() && rightClick.isDown() && player.isShiftKeyDown())
+            {
+                PacketHandler.sendToServer(new QuickCyloop());
+                baseformProperties.quickCyloop = 1;
             }
         }
     }

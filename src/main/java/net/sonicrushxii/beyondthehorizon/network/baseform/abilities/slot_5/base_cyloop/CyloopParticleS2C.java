@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5;
+package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;

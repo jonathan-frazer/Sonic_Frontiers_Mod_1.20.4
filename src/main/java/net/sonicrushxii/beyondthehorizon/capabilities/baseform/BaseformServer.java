@@ -28,8 +28,8 @@ import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.Cyloop;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.CyloopParticleS2C;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop.Cyloop;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -328,7 +328,11 @@ public class BaseformServer {
                                 assert baseformProperties.homingTarget != null;
                                 LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.homingTarget);
 
-                                assert enemy != null;
+                                if(enemy == null)
+                                {
+                                    baseformProperties.homingAttackAirTime = 0;
+                                    throw new NullPointerException("Enemy died/doesn't exist anymore");
+                                }
                                 Vec3 playerPos = player.getPosition(0);
                                 Vec3 enemyPos = enemy.getPosition(0);
                                 double distanceFromEnemy = playerPos.distanceTo(enemyPos);
@@ -507,6 +511,7 @@ public class BaseformServer {
 
                 //Slot 6
                 {
+                    //Base Cyloop
                     if(baseformProperties.cylooping)
                     {
                         //Get a Deque of current Coordinates
@@ -521,6 +526,45 @@ public class BaseformServer {
                         for(Vec3 coord: currCoords) {
                             PacketHandler.sendToALLPlayers(new CyloopParticleS2C(coord));
                         }
+                    }
+
+                    //Quick Cyloop
+                    //Duration
+                    try {
+                        if (baseformProperties.quickCyloop > 0) {
+                            //Increment Counter
+                            baseformProperties.quickCyloop += 1;
+
+                            //Particle
+                            PacketHandler.sendToALLPlayers(new CyloopParticleS2C(new Vec3(player.getX(),player.getY(),player.getZ())));
+
+                            //Circular Motion
+                            //Get Target
+                            assert baseformProperties.qkCyloopTarget != null;
+                            LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.qkCyloopTarget);
+
+                            //Perform technique
+                            assert enemy != null;
+
+                            //Motion
+                            Vec3 motionDirection = new Vec3(
+                                        // sin(wt + T)
+                                        Math.sin((Math.PI/4)*baseformProperties.quickCyloop/2 + baseformProperties.qkCyloopPhase*(Math.PI/180)),
+                                        0,
+                                        // cos(wt + T)
+                                        Math.cos((Math.PI/4)*baseformProperties.quickCyloop/2 + baseformProperties.qkCyloopPhase*(Math.PI/180))
+                            );
+                            player.setDeltaMovement(motionDirection);
+                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                        }
+                    }catch(NullPointerException ignored) {}
+
+                    //Ending
+                    if(baseformProperties.quickCyloop > 16)
+                    {
+                        baseformProperties.quickCyloop = 0;
+                        baseformProperties.qkCyloopTarget = new UUID(0L,0L);
+                        System.out.println("End Qk Cyloop");
                     }
                 }
             }

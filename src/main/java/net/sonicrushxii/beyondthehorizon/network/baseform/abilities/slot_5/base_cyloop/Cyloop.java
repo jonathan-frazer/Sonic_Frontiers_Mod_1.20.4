@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5;
+package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop;
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
