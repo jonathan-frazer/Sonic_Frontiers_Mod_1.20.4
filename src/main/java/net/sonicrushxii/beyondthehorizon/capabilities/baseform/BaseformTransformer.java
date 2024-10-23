@@ -62,7 +62,7 @@ public class BaseformTransformer {
         });
 
         //Initialize Virtual Slot Handler
-        PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)7));
+        PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)6));
 
         //Effects
         {

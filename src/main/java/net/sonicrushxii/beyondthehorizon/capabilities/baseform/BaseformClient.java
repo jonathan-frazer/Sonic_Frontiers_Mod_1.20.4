@@ -163,6 +163,26 @@ public class BaseformClient {
                     else                                PacketHandler.sendToServer(new PowerBoostActivate());
                 }
             }
+
+            //Base Cyloop
+            KeyMapping rightClick = minecraft.options.keyUse;
+            if(VirtualSlotHandler.getCurrAbility() == 0 && isMoving && !baseformProperties.isAttacking() && rightClick.isDown() && !player.isShiftKeyDown()) {
+                if(!baseformProperties.cylooping){
+                    PacketHandler.sendToServer(new Cyloop(true));
+                    baseformProperties.cylooping = true;
+                }
+            }
+            else if(baseformProperties.cylooping) {
+                PacketHandler.sendToServer(new Cyloop(false));
+                baseformProperties.cylooping = false;
+            }
+
+            //Quick Cyloop
+            if(VirtualSlotHandler.getCurrAbility() == 0 && !baseformProperties.isAttacking() && rightClick.isDown() && player.isShiftKeyDown())
+            {
+                PacketHandler.sendToServer(new QuickCyloop());
+                baseformProperties.quickCyloop = 1;
+            }
         }
 
         //Slot 2
@@ -271,29 +291,6 @@ public class BaseformClient {
                 if(VirtualSlotHandler.getCurrAbility() == 1 && baseformProperties.getCooldown(BaseformActiveAbility.STOMP) == (byte)0
                     &&  !player.onGround() && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.isDown())
                     PacketHandler.sendToServer(new Stomp());
-            }
-        }
-
-        //Slot 6
-        {
-            //Base Cyloop
-            KeyMapping rightClick = minecraft.options.keyUse;
-            if(VirtualSlotHandler.getCurrAbility() == 5 && isMoving && !baseformProperties.isAttacking() && rightClick.isDown() && !player.isShiftKeyDown()) {
-                if(!baseformProperties.cylooping){
-                    PacketHandler.sendToServer(new Cyloop(true));
-                    baseformProperties.cylooping = true;
-                }
-            }
-            else if(baseformProperties.cylooping) {
-                PacketHandler.sendToServer(new Cyloop(false));
-                baseformProperties.cylooping = false;
-            }
-
-            //Quick Cyloop
-            if(VirtualSlotHandler.getCurrAbility() == 5 && !baseformProperties.isAttacking() && rightClick.isDown() && player.isShiftKeyDown())
-            {
-                PacketHandler.sendToServer(new QuickCyloop());
-                baseformProperties.quickCyloop = 1;
             }
         }
     }

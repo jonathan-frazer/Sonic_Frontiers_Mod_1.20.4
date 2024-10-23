@@ -71,11 +71,9 @@ public class QuickCyloop {
             if(enemy == null)
                 return;
 
-            System.out.println(enemy.getStringUUID());
-
             //Activate Cyloop
             baseformProperties.quickCyloop = 1;
-            baseformProperties.qkCyloopPhase = player.getYRot()+180f;
+            baseformProperties.qkCyloopPhase = -player.getYRot()-135f;
             System.out.println(baseformProperties.qkCyloopPhase);
 
             //Target Enemy
@@ -85,9 +83,9 @@ public class QuickCyloop {
             Vec3 lookAngle = Utilities.calculateViewVector(0f, player.getYRot());
 
             double destX, destY, destZ;
-            destX = enemy.getX() - lookAngle.x * 2;
+            destX = enemy.getX() - lookAngle.x * 1.1;
             destY = enemy.getY();
-            destZ = enemy.getZ() - lookAngle.z * 2;
+            destZ = enemy.getZ() - lookAngle.z * 1.1;
 
             player.teleportTo(destX, destY, destZ);
             PacketHandler.sendToALLPlayers(new CyloopParticleS2C(new Vec3(destX, destY, destZ)));

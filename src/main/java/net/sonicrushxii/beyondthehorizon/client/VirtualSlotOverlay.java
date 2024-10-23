@@ -153,8 +153,10 @@ public class VirtualSlotOverlay {
                 iconTextures = (Arrays.asList(
                         new Ability(BOOST_SLOT,"Lv. "+baseformProperties.boostLvl,cooldownArray[BaseformActiveAbility.BOOST.ordinal()]),
                         new Ability((baseformProperties.lightSpeedState==2)?LIGHT_SPEED_ATTACK_ACTIVE:LIGHT_SPEED_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.LIGHT_SPEED_ATTACK.ordinal()]),
-                        new Ability((baseformProperties.powerBoost)?POWER_BOOST_ACTIVE:POWER_BOOST_SLOT,null,cooldownArray[BaseformActiveAbility.POWER_BOOST.ordinal()]))
+                        new Ability((baseformProperties.powerBoost)?POWER_BOOST_ACTIVE:POWER_BOOST_SLOT,null,cooldownArray[BaseformActiveAbility.POWER_BOOST.ordinal()]),
+                        new Ability(CYLOOP_SLOT,null,cooldownArray[BaseformActiveAbility.CYLOOP.ordinal()]))
                 );
+                keyBindings.set(3,KeyBindings.INSTANCE.useSingleAbility.getKey());
                 break;
 
             case 1 :
@@ -201,15 +203,6 @@ public class VirtualSlotOverlay {
                 break;
 
             case 5 :
-                slotName = "Cyloop";
-                iconTextures = (Arrays.asList(
-                        new Ability(CYLOOP_SLOT,null,cooldownArray[BaseformActiveAbility.CYLOOP.ordinal()])
-                )
-                );
-                keyBindings.set(0,KeyBindings.INSTANCE.useSingleAbility.getKey());
-                break;
-
-            case 6 :
                 slotName = "Ultimate";
                 iconTextures = (Arrays.asList(
                         new Ability(PHANTOM_RUSH_SLOT,null,cooldownArray[BaseformActiveAbility.PHANTOM_RUSH.ordinal()])
