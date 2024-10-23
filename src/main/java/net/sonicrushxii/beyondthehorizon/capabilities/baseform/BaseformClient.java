@@ -22,7 +22,6 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Sidestep;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCancel;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCharge;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
@@ -140,7 +139,6 @@ public class BaseformClient {
 
                     ClientOnlyData.lightSpeedCanceller = Scheduler.scheduleTask(() -> {
                         PacketHandler.sendToServer(new LightspeedEffect());
-                        Scheduler.scheduleTask(() -> PacketHandler.sendToServer(new LightspeedDecay()), 300);
                     }, 66);
                 }
 
@@ -178,10 +176,12 @@ public class BaseformClient {
             }
 
             //Quick Cyloop
-            if(VirtualSlotHandler.getCurrAbility() == 0 && !baseformProperties.isAttacking() && rightClick.isDown() && player.isShiftKeyDown())
+            if(VirtualSlotHandler.getCurrAbility() == 0 && !baseformProperties.isAttacking() &&
+                    rightClick.isDown() && player.isShiftKeyDown() && baseformProperties.qkCyloopMeter > 50.0)
             {
                 PacketHandler.sendToServer(new QuickCyloop());
                 baseformProperties.quickCyloop = 1;
+                baseformProperties.qkCyloopMeter -= 50.0;
             }
         }
 

@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.quick_cyloop;
 
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,7 +13,9 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop.CyloopParticleS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
+import org.joml.Vector3f;
 
 import java.util.Collections;
 import java.util.List;
@@ -71,6 +74,9 @@ public class QuickCyloop {
             if(enemy == null)
                 return;
 
+            //Consume Meter
+            baseformProperties.qkCyloopMeter -= 50.0;
+
             //Activate Cyloop
             baseformProperties.quickCyloop = 1;
             baseformProperties.qkCyloopPhase = -player.getYRot()-135f;
@@ -87,6 +93,12 @@ public class QuickCyloop {
             destY = enemy.getY();
             destZ = enemy.getZ() - lookAngle.z * 1.1;
 
+            //Dash to Enemy
+            PacketHandler.sendToALLPlayers(new ParticleRaycastPacketS2C(
+                    new DustParticleOptions(new Vector3f(0.000f,1.000f,1.000f), 2.0f),
+                    new Vec3(player.getX(),player.getY(),player.getZ()),
+                    new Vec3(destX,destY,destZ)
+            ));
             player.teleportTo(destX, destY, destZ);
             PacketHandler.sendToALLPlayers(new CyloopParticleS2C(new Vec3(destX, destY, destZ)));
             player.connection.send(new ClientboundTeleportEntityPacket(player));

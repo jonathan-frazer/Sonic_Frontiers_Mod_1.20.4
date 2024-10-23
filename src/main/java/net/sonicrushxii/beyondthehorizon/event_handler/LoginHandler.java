@@ -10,6 +10,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformTransformer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
@@ -30,6 +31,10 @@ public class LoginHandler {
             {
                 BaseformTransformer.performActivation(player);
                 BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+
+                //Revert Light Speed
+                if(baseformProperties.lightSpeedState == 2)
+                    LightspeedDecay.performLightspeedDecay(player);
 
                 //Revert Spindash
                 if(baseformProperties.ballFormState != 0)

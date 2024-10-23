@@ -126,6 +126,11 @@ public class BaseformProperties extends FormProperties {
     public boolean isWaterBoosting;
     public byte lightSpeedState;
     public boolean powerBoost;
+    public boolean cylooping;
+    public byte quickCyloop;
+    public UUID qkCyloopTarget;
+    public float qkCyloopPhase;
+    public double qkCyloopMeter;
 
     //Slot 2
     public byte ballFormState;
@@ -138,12 +143,6 @@ public class BaseformProperties extends FormProperties {
     public byte speedBlitzDashes;
     public byte smashHit;
     public byte stomp;
-
-    //Slot 6
-    public boolean cylooping;
-    public byte quickCyloop;
-    public UUID qkCyloopTarget;
-    public float qkCyloopPhase;
 
     public BaseformProperties()
     {
@@ -163,6 +162,11 @@ public class BaseformProperties extends FormProperties {
         isWaterBoosting = false;
         lightSpeedState = 0;
         powerBoost = false;
+        cylooping = false;
+        quickCyloop = 0;
+        qkCyloopTarget = new UUID(0L,0L);
+        qkCyloopPhase = 0.0f;
+        qkCyloopMeter = 0.0;
 
         //Slot 2
         ballFormState = (byte)0;
@@ -175,12 +179,6 @@ public class BaseformProperties extends FormProperties {
         speedBlitzDashes = 4;
         smashHit = (byte)0;
         stomp = (byte)0;
-
-        //Slot 6
-        cylooping = false;
-        quickCyloop = 0;
-        qkCyloopTarget = new UUID(0L,0L);
-        qkCyloopPhase = 0.0f;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -202,6 +200,11 @@ public class BaseformProperties extends FormProperties {
         isWaterBoosting = nbt.getBoolean("IsWaterBoosting");
         lightSpeedState = nbt.getByte("LightSpeedState");
         powerBoost = nbt.getBoolean("PowerBoost");
+        cylooping = nbt.getBoolean("isCylooping");
+        quickCyloop = nbt.getByte("quickCyloop");
+        qkCyloopTarget = nbt.getUUID("QkCyloopTarget");
+        qkCyloopPhase = nbt.getFloat("QkCyloopPhase");
+        qkCyloopMeter = nbt.getDouble("QkCyloopMeter");
 
         //Slot 2
         ballFormState = nbt.getByte("InBallForm");
@@ -215,11 +218,6 @@ public class BaseformProperties extends FormProperties {
         smashHit = nbt.getByte("smashHitTime");
         stomp = nbt.getByte("stompTime");
 
-        //Slot 6
-        cylooping = nbt.getBoolean("isCylooping");
-        quickCyloop = nbt.getByte("quickCyloop");
-        qkCyloopTarget = nbt.getUUID("QkCyloopTarget");
-        qkCyloopPhase = nbt.getFloat("QkCyloopPhase");
     }
 
     @Override
@@ -244,6 +242,11 @@ public class BaseformProperties extends FormProperties {
         nbt.putBoolean("IsWaterBoosting",isWaterBoosting);
         nbt.putByte("LightSpeedState",lightSpeedState);
         nbt.putBoolean("PowerBoost",powerBoost);
+        nbt.putBoolean("isCylooping",cylooping);
+        nbt.putByte("QuickCyloop",quickCyloop);
+        nbt.putUUID("QkCyloopTarget",qkCyloopTarget);
+        nbt.putFloat("QkCyloopPhase",qkCyloopPhase);
+        nbt.putDouble("QkCyloopMeter",qkCyloopMeter);
 
         //Slot 2
         nbt.putByte("InBallForm",ballFormState);
@@ -256,12 +259,6 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("speedBlitzes",speedBlitzDashes);
         nbt.putByte("smashHitTime",smashHit);
         nbt.putByte("stompTime",stomp);
-
-        //Slot 6
-        nbt.putBoolean("isCylooping",cylooping);
-        nbt.putByte("QuickCyloop",quickCyloop);
-        nbt.putUUID("QkCyloopTarget",qkCyloopTarget);
-        nbt.putFloat("QkCyloppPhase",qkCyloopPhase);
 
         return nbt;
     }

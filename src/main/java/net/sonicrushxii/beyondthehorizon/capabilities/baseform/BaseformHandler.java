@@ -200,6 +200,8 @@ public class BaseformHandler {
                 },3);
             }
 
+            //Cyloop meter increase
+            baseformProperties.qkCyloopMeter = Math.min(100.0,baseformProperties.qkCyloopMeter+event.getAmount()/5.0);
 
         }catch(NullPointerException|ClassCastException ignored){}
     }
