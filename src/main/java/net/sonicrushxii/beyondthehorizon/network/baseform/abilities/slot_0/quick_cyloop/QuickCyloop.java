@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.quick_cyloop;
+package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.quick_cyloop;
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
@@ -12,7 +12,7 @@ import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop.CyloopParticleS2C;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import org.joml.Vector3f;
@@ -79,8 +79,8 @@ public class QuickCyloop {
 
             //Activate Cyloop
             baseformProperties.quickCyloop = 1;
-            baseformProperties.qkCyloopPhase = -player.getYRot()-135f;
-            System.out.println(baseformProperties.qkCyloopPhase);
+            baseformProperties.atkRotPhase = -player.getYRot()-135f;
+            System.out.println(baseformProperties.atkRotPhase);
 
             //Target Enemy
             baseformProperties.qkCyloopTarget = enemy.getUUID();

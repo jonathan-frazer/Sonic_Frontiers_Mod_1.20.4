@@ -45,7 +45,6 @@ public class ServerTickHandler
 
     public void onServerSecond(MinecraftServer server)
     {
-
         {
             for (ServerLevel world : server.getAllLevels()) {
                 for (Entity entity : world.getEntities().getAll()) {

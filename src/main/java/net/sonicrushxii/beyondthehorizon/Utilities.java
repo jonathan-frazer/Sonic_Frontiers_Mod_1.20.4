@@ -4,16 +4,21 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.function.Consumer;
 
 public class Utilities {
 
@@ -205,6 +210,31 @@ public class Utilities {
                     "minecraft:tall_grass",
                     "minecraft:large_fern")
             );
+
+    /** Method to summon an entity in a given world at specified coordinates
+     * Mob specifies the mob to be summon, Eg: EntityType.ZOMBIE
+     * ServerLevel determines the world in which the entity is summoned
+     * Vec3 tells us where to spawn the entity
+     * entityConsumer allows the user to perform some actions on the entity
+     * **/
+
+    public static <T extends Entity> void summonEntity(EntityType<T> entityType, ServerLevel world, Vec3 pos, @Nullable Consumer<T> entityConsumer)
+    {
+        // Create an instance of the entity
+        T entity = entityType.create(world);
+
+        if (entity != null) {
+            // Set the entity's position
+            entity.setPos(pos.x(), pos.y(), pos.z());
+
+            //Perform the given operations on the Entity
+            if(entityConsumer!=null) entityConsumer.accept(entity);
+
+            // Add the entity to the world
+            world.addFreshEntity(entity);
+        }
+    }
+
 
     //User Defined Functions for things that should be available
     public static Vec3 calculateViewVector(float pXRot, float pYRot)

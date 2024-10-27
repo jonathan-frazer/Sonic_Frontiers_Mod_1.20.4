@@ -8,6 +8,8 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Boost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Sidestep;
@@ -17,6 +19,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.quick_cyloop.QuickCyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
@@ -25,9 +28,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop.Cyloop;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop.CyloopParticleS2C;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.quick_cyloop.QuickCyloop;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
@@ -93,6 +94,13 @@ public class PacketHandler {
                 //Power Boost
                 INSTANCE.messageBuilder(PowerBoostActivate.class, NetworkDirection.PLAY_TO_SERVER).encoder(PowerBoostActivate::encode).decoder(PowerBoostActivate::new).consumerMainThread(PowerBoostActivate::handle).add();
                 INSTANCE.messageBuilder(PowerBoostDeactivate.class, NetworkDirection.PLAY_TO_SERVER).encoder(PowerBoostDeactivate::encode).decoder(PowerBoostDeactivate::new).consumerMainThread(PowerBoostDeactivate::handle).add();
+
+                //Cyloop
+                INSTANCE.messageBuilder(Cyloop.class,NetworkDirection.PLAY_TO_SERVER).encoder(Cyloop::encode).decoder(Cyloop::new).consumerMainThread(Cyloop::handle).add();
+                INSTANCE.messageBuilder(CyloopParticleS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(CyloopParticleS2C::encode).decoder(CyloopParticleS2C::new).consumerMainThread(CyloopParticleS2C::handle).add();
+
+                //Quick Cyloop
+                INSTANCE.messageBuilder(QuickCyloop.class,NetworkDirection.PLAY_TO_SERVER).encoder(QuickCyloop::encode).decoder(QuickCyloop::new).consumerMainThread(QuickCyloop::handle).add();
             }
 
             //Slot 2
@@ -113,12 +121,9 @@ public class PacketHandler {
                 INSTANCE.messageBuilder(Stomp.class,NetworkDirection.PLAY_TO_SERVER).encoder(Stomp::encode).decoder(Stomp::new).consumerMainThread(Stomp::handle).add();
             }
 
-            //Slot 6
+            //Slot 3
             {
-                INSTANCE.messageBuilder(Cyloop.class,NetworkDirection.PLAY_TO_SERVER).encoder(Cyloop::encode).decoder(Cyloop::new).consumerMainThread(Cyloop::handle).add();
-                INSTANCE.messageBuilder(CyloopParticleS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(CyloopParticleS2C::encode).decoder(CyloopParticleS2C::new).consumerMainThread(CyloopParticleS2C::handle).add();
-
-                INSTANCE.messageBuilder(QuickCyloop.class,NetworkDirection.PLAY_TO_SERVER).encoder(QuickCyloop::encode).decoder(QuickCyloop::new).consumerMainThread(QuickCyloop::handle).add();
+                INSTANCE.messageBuilder(TornadoJump.class,NetworkDirection.PLAY_TO_SERVER).encoder(TornadoJump::encode).decoder(TornadoJump::new).consumerMainThread(TornadoJump::handle).add();
             }
         }
 

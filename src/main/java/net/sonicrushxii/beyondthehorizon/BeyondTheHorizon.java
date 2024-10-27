@@ -2,6 +2,7 @@ package net.sonicrushxii.beyondthehorizon;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
@@ -23,11 +24,9 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAtta
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HummingTop;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.Spindash;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
+import net.sonicrushxii.beyondthehorizon.entities.CustomPointRenderer;
 import net.sonicrushxii.beyondthehorizon.event_handler.*;
-import net.sonicrushxii.beyondthehorizon.modded.ModCreativeModeTabs;
-import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
-import net.sonicrushxii.beyondthehorizon.modded.ModItems;
-import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
+import net.sonicrushxii.beyondthehorizon.modded.*;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import net.sonicrushxii.beyondthehorizon.timehandler.TimeHandler;
@@ -69,6 +68,7 @@ public class BeyondTheHorizon
         ModItems.register(modEventBus);
         ModSounds.register(modEventBus);
         ModEffects.register(modEventBus);
+        ModEntityTypes.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -111,6 +111,8 @@ public class BeyondTheHorizon
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+
+            EntityRenderers.register(ModEntityTypes.TORNADO_JUMP_CLOUD.get(), CustomPointRenderer::new);
         }
 
         @SubscribeEvent

@@ -111,6 +111,7 @@ public class BaseformProperties extends FormProperties {
     }
 
     private final byte[] abilityCooldowns;
+    public float atkRotPhase;
 
     //Passives
     public boolean hasDoubleJump;
@@ -129,7 +130,6 @@ public class BaseformProperties extends FormProperties {
     public boolean cylooping;
     public byte quickCyloop;
     public UUID qkCyloopTarget;
-    public float qkCyloopPhase;
     public double qkCyloopMeter;
 
     //Slot 2
@@ -144,10 +144,15 @@ public class BaseformProperties extends FormProperties {
     public byte smashHit;
     public byte stomp;
 
+    //Slot 3
+    public byte tornadoJump;
+    public float tornadoJumpPhase;
+
     public BaseformProperties()
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
         hitCount = 0;
+        atkRotPhase = 0.0f;
 
         //Passives
         hasDoubleJump = true;
@@ -165,7 +170,6 @@ public class BaseformProperties extends FormProperties {
         cylooping = false;
         quickCyloop = 0;
         qkCyloopTarget = new UUID(0L,0L);
-        qkCyloopPhase = 0.0f;
         qkCyloopMeter = 0.0;
 
         //Slot 2
@@ -179,6 +183,10 @@ public class BaseformProperties extends FormProperties {
         speedBlitzDashes = 4;
         smashHit = (byte)0;
         stomp = (byte)0;
+
+        //Slot 3
+        tornadoJump = (byte)0;
+        tornadoJumpPhase = 0f;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -186,6 +194,7 @@ public class BaseformProperties extends FormProperties {
         //Common
         abilityCooldowns = nbt.getByteArray("AbilityCooldowns");
         hitCount = nbt.getByte("hitsPerformed");
+        atkRotPhase = nbt.getFloat("atkRotPhase");
 
         //Passives
         hasDoubleJump = nbt.getBoolean("hasDoubleJump");
@@ -203,7 +212,6 @@ public class BaseformProperties extends FormProperties {
         cylooping = nbt.getBoolean("isCylooping");
         quickCyloop = nbt.getByte("quickCyloop");
         qkCyloopTarget = nbt.getUUID("QkCyloopTarget");
-        qkCyloopPhase = nbt.getFloat("QkCyloopPhase");
         qkCyloopMeter = nbt.getDouble("QkCyloopMeter");
 
         //Slot 2
@@ -218,6 +226,9 @@ public class BaseformProperties extends FormProperties {
         smashHit = nbt.getByte("smashHitTime");
         stomp = nbt.getByte("stompTime");
 
+        //Slot 3
+        tornadoJump = nbt.getByte("tornadoJump");
+
     }
 
     @Override
@@ -228,6 +239,7 @@ public class BaseformProperties extends FormProperties {
         //Common
         nbt.putByteArray("AbilityCooldowns",abilityCooldowns);
         nbt.putByte("hitsPerformed",hitCount);
+        nbt.putFloat("atkRotPhase", atkRotPhase);
 
         //Passives
         nbt.putBoolean("hasDoubleJump",hasDoubleJump);
@@ -245,7 +257,6 @@ public class BaseformProperties extends FormProperties {
         nbt.putBoolean("isCylooping",cylooping);
         nbt.putByte("QuickCyloop",quickCyloop);
         nbt.putUUID("QkCyloopTarget",qkCyloopTarget);
-        nbt.putFloat("QkCyloopPhase",qkCyloopPhase);
         nbt.putDouble("QkCyloopMeter",qkCyloopMeter);
 
         //Slot 2
@@ -260,6 +271,9 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("smashHitTime",smashHit);
         nbt.putByte("stompTime",stomp);
 
+        //Slot 3
+        nbt.putByte("tornadoJump",tornadoJump);
+
         return nbt;
     }
 
@@ -271,25 +285,34 @@ public class BaseformProperties extends FormProperties {
     //Decides when to apply Selective Invulnerability
     public boolean selectiveInvul()
     {
+        boolean quickCyloop = (this.quickCyloop > 0);
         boolean ballForm = ballFormState > 0;
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 50);
         boolean melee = hitCount > 3;
         boolean hummingTop = this.hummingTop > 0;
-        boolean stomping = (stomp > 0);
-        boolean quickCyloop = (this.quickCyloop > 0);
+        boolean stomping = (this.stomp > 0);
 
-        return ballForm || homingAttack || melee || hummingTop || stomping || quickCyloop;
+        boolean tornadoJump = (this.tornadoJump != 0);
+
+        return quickCyloop ||
+                ballForm || homingAttack || melee || hummingTop || stomping ||
+                tornadoJump;
     }
 
     //Checks if Player is in the middle of another attack
     public boolean isAttacking()
     {
+        boolean quickCyloop = (this.quickCyloop > 0);
+
         boolean ballform = ballFormState == 1;
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
         boolean hummingTop = (this.hummingTop > 0);
-        boolean stomping = (stomp > 0);
-        boolean quickCyloop = (this.quickCyloop > 0);
+        boolean stomping = (this.stomp > 0);
 
-        return homingAttack || hummingTop || ballform || stomping || quickCyloop;
+        boolean tornadoJump = (this.tornadoJump != 0);
+
+        return quickCyloop ||
+                homingAttack || hummingTop || ballform || stomping ||
+                tornadoJump;
     }
 }

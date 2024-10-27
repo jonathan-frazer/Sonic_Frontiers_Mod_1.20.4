@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop;
+package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -38,7 +38,7 @@ public class CyloopMath
 
     }
 
-    private static double xzDistSqr(Vec3 p1, Vec3 p2)
+    public static double xzDistSqr(Vec3 p1, Vec3 p2)
     {
         return Math.pow(p1.x-p2.x,2)+Math.pow(p1.z-p2.z,2);
     }

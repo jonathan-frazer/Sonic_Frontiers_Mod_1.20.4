@@ -25,6 +25,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.quick_cyloop.QuickCyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
@@ -33,8 +35,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop.Cyloop;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.quick_cyloop.QuickCyloop;
+
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -292,6 +294,19 @@ public class BaseformClient {
                     &&  !player.onGround() && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.isDown())
                     PacketHandler.sendToServer(new Stomp());
             }
+        }
+
+        //Slot 3
+        {
+            if(VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
+                    KeyBindings.INSTANCE.useAbility1.isDown())
+            {
+                PacketHandler.sendToServer(new TornadoJump());
+                baseformProperties.tornadoJump = 1;
+            }
+
+            if(baseformProperties.tornadoJump == -1 && player.onGround())
+                baseformProperties.tornadoJump = 0;
         }
     }
 

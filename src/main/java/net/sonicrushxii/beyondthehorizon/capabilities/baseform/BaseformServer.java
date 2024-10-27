@@ -28,9 +28,9 @@ import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop.Cyloop;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -273,6 +273,124 @@ public class BaseformServer {
                                 true)
                         );
                     }
+
+                    //Base Cyloop
+                    if(baseformProperties.cylooping)
+                    {
+                        //Get a Deque of current Coordinates
+                        Deque<Vec3> currCoords = cyloopCoords.get(player.getUUID());
+                        assert currCoords != null;
+
+                        //Add points to list
+                        Vec3 currPoint = new Vec3(player.getX(),player.getY(),player.getZ());
+                        Cyloop.addToList(currCoords,currPoint);
+
+                        //Display all points in the list
+                        for(Vec3 coord: currCoords) {
+                            PacketHandler.sendToALLPlayers(new CyloopParticleS2C(coord));
+                        }
+                    }
+
+                    //Quick Cyloop
+                    {
+                        final float QK_CYLOOP_DAMAGE = 15.0f;
+
+                        //Duration
+                        try {
+                            if (baseformProperties.quickCyloop > 0) {
+                                //Increment Counter
+                                baseformProperties.quickCyloop += 1;
+
+                                //Particle
+                                PacketHandler.sendToALLPlayers(new CyloopParticleS2C(new Vec3(player.getX(), player.getY(), player.getZ())));
+
+                                //Circular Motion
+                                //Get Target
+                                assert baseformProperties.qkCyloopTarget != null;
+                                LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.qkCyloopTarget);
+
+                                //Perform technique
+                                if (enemy == null) {
+                                    baseformProperties.quickCyloop = 0;
+                                    throw new NullPointerException("Enemy died/doesn't exist anymore");
+                                }
+
+                                //Lock enemy in place
+                                enemy.setDeltaMovement(0.0,0.0,0.0);
+                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+
+                                //Motion
+                                Vec3 motionDirection = new Vec3(
+                                        // sin(wt + T)
+                                        Math.sin((Math.PI / 4) * baseformProperties.quickCyloop + baseformProperties.atkRotPhase * (Math.PI / 180)),
+                                        0,
+                                        // cos(wt + T)
+                                        Math.cos((Math.PI / 4) * baseformProperties.quickCyloop + baseformProperties.atkRotPhase * (Math.PI / 180))
+                                );
+                                player.setDeltaMovement(motionDirection.scale(1.1));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                            }
+                        } catch (NullPointerException ignored) {}
+
+                        //Ending
+                        try {
+                            if (baseformProperties.quickCyloop > 8) {
+                                baseformProperties.quickCyloop = 0;
+
+                                assert baseformProperties.qkCyloopTarget != null;
+                                LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.qkCyloopTarget);
+
+                                //Exit Move
+                                if (enemy == null)
+                                    throw new NullPointerException("Enemy died/doesn't exist anymore");
+
+
+                                baseformProperties.qkCyloopTarget = new UUID(0L, 0L);
+
+                                //Damage
+                                Vec3 enemyPos = new Vec3(enemy.getX(), enemy.getY(), enemy.getZ());
+
+                                //Play Particle
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        ParticleTypes.FLASH,
+                                        enemyPos.x(), enemyPos.y() + player.getEyeHeight() / 2, enemyPos.z(),
+                                        0.0, 0.2f, 0.2f, 0.2f, 1, true)
+                                );
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        ParticleTypes.EXPLOSION,
+                                        enemyPos.x(), enemyPos.y() + player.getEyeHeight() / 2, enemyPos.z(),
+                                        0.0, 0.2f, 0.2f, 0.2f, 1, true)
+                                );
+
+                                //Sound
+                                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.MASTER, 1.0f, 2.0f);
+
+                                //Damage
+                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_CYLOOP.getResourceKey(), player),
+                                        QK_CYLOOP_DAMAGE);
+
+                                //Launch up
+                                enemy.setDeltaMovement(0.0, 1.1, 0.0);
+                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+
+                                //Lock in MidAir for 2 sec
+                                Scheduler.scheduleTask(() -> {
+                                    //Set Movement to Zero
+                                    enemy.setDeltaMovement(0.0, 0.02, 0.0);
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+
+                                    //Give the Cylooped Effect
+                                    if (enemy.hasEffect(ModEffects.CYLOOPED.get()))
+                                        enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
+                                    else
+                                        enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
+
+                                }, 10);
+
+                                System.out.println("End Qk Cyloop");
+                            }
+                        }catch(NullPointerException ignored){}
+                    }
                 }
 
                 //Slot 2
@@ -511,125 +629,42 @@ public class BaseformServer {
 
                 }
 
-                //Slot 6
+                //Slot 3
                 {
-                    //Base Cyloop
-                    if(baseformProperties.cylooping)
-                    {
-                        //Get a Deque of current Coordinates
-                        Deque<Vec3> currCoords = cyloopCoords.get(player.getUUID());
-                        assert currCoords != null;
+                    //Tornado Jump
+                    if (baseformProperties.tornadoJump > 0) {
+                        //Increase Stomp time
+                        baseformProperties.tornadoJump += 1;
 
-                        //Add points to list
-                        Vec3 currPoint = new Vec3(player.getX(),player.getY(),player.getZ());
-                        Cyloop.addToList(currCoords,currPoint);
+                        //Particle
+                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                new DustParticleOptions(new Vector3f(0.0f,1.0f,1.0f),1.5f),
+                                player.getX(), player.getY()+1, player.getZ(),
+                                0.0, 0.55f, 0.55f, 0.55f, 10,
+                                true)
+                        );
 
-                        //Display all points in the list
-                        for(Vec3 coord: currCoords) {
-                            PacketHandler.sendToALLPlayers(new CyloopParticleS2C(coord));
-                        }
+                        //Motion
+                        Vec3 motionDirection = new Vec3(
+                                // sin(wt + T)
+                                Math.sin((Math.PI / 6)*baseformProperties.tornadoJump + baseformProperties.atkRotPhase*(Math.PI / 180)),
+                                0.10,
+                                // cos(wt + T)
+                                Math.cos((Math.PI / 6)*baseformProperties.tornadoJump + baseformProperties.atkRotPhase*(Math.PI / 180))
+                        );
+                        player.setDeltaMovement(motionDirection.scale(0.15 + 0.15*Math.min(6,baseformProperties.tornadoJump)));
+                        player.connection.send(new ClientboundSetEntityMotionPacket(player));
                     }
 
-                    //Quick Cyloop
-                    {
-                         final float QK_CYLOOP_DAMAGE = 15.0f;
-
-                        //Duration
-                        try {
-                            if (baseformProperties.quickCyloop > 0) {
-                                //Increment Counter
-                                baseformProperties.quickCyloop += 1;
-
-                                //Particle
-                                PacketHandler.sendToALLPlayers(new CyloopParticleS2C(new Vec3(player.getX(), player.getY(), player.getZ())));
-
-                                //Circular Motion
-                                //Get Target
-                                assert baseformProperties.qkCyloopTarget != null;
-                                LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.qkCyloopTarget);
-
-                                //Perform technique
-                                if (enemy == null) {
-                                    baseformProperties.quickCyloop = 0;
-                                    throw new NullPointerException("Enemy died/doesn't exist anymore");
-                                }
-
-                                //Lock enemy in place
-                                enemy.setDeltaMovement(0.0,0.0,0.0);
-                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
-
-                                //Motion
-                                Vec3 motionDirection = new Vec3(
-                                        // sin(wt + T)
-                                        Math.sin((Math.PI / 4) * baseformProperties.quickCyloop + baseformProperties.qkCyloopPhase * (Math.PI / 180)),
-                                        0,
-                                        // cos(wt + T)
-                                        Math.cos((Math.PI / 4) * baseformProperties.quickCyloop + baseformProperties.qkCyloopPhase * (Math.PI / 180))
-                                );
-                                player.setDeltaMovement(motionDirection.scale(1.1));
-                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
-                            }
-                        } catch (NullPointerException ignored) {}
-
-                        //Ending
-                        try {
-                            if (baseformProperties.quickCyloop > 8) {
-                                baseformProperties.quickCyloop = 0;
-
-                                assert baseformProperties.qkCyloopTarget != null;
-                                LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.qkCyloopTarget);
-
-                                //Exit Move
-                                if (enemy == null)
-                                    throw new NullPointerException("Enemy died/doesn't exist anymore");
-
-
-                                baseformProperties.qkCyloopTarget = new UUID(0L, 0L);
-
-                                //Damage
-                                Vec3 enemyPos = new Vec3(enemy.getX(), enemy.getY(), enemy.getZ());
-
-                                //Play Particle
-                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                        ParticleTypes.FLASH,
-                                        enemyPos.x(), enemyPos.y() + player.getEyeHeight() / 2, enemyPos.z(),
-                                        0.0, 0.2f, 0.2f, 0.2f, 1, true)
-                                );
-                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                        ParticleTypes.EXPLOSION,
-                                        enemyPos.x(), enemyPos.y() + player.getEyeHeight() / 2, enemyPos.z(),
-                                        0.0, 0.2f, 0.2f, 0.2f, 1, true)
-                                );
-
-                                //Sound
-                                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.MASTER, 1.0f, 2.0f);
-
-                                //Damage
-                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_CYLOOP.getResourceKey(), player),
-                                        QK_CYLOOP_DAMAGE);
-
-                                //Launch up
-                                enemy.setDeltaMovement(0.0, 1.1, 0.0);
-                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
-
-                                //Lock in MidAir for 2 sec
-                                Scheduler.scheduleTask(() -> {
-                                    //Set Movement to Zero
-                                    enemy.setDeltaMovement(0.0, 0.02, 0.0);
-                                    player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
-
-                                    //Give the Cylooped Effect
-                                    if (enemy.hasEffect(ModEffects.CYLOOPED.get()))
-                                        enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
-                                    else
-                                        enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
-
-                                }, 10);
-
-                                System.out.println("End Qk Cyloop");
-                            }
-                        }catch(NullPointerException ignored){}
+                    if (baseformProperties.tornadoJump > 30) {
+                        baseformProperties.tornadoJump = -1;
+                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                        player.setDeltaMovement(new Vec3(0.0,1.0,0.0));
+                        player.connection.send(new ClientboundSetEntityMotionPacket(player));
                     }
+
+                    if(baseformProperties.tornadoJump == -1 && player.onGround())
+                        baseformProperties.tornadoJump = 0;
                 }
             }
 
