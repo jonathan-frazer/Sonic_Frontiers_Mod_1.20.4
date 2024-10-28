@@ -45,7 +45,6 @@ public class TornadoJump {
                                 (Utilities.calculateViewVector(0,-baseformProperties.atkRotPhase+180).scale(1.4)),
                         (aoeCloud) -> {
                             aoeCloud.setDuration(40);
-                            aoeCloud.setRadius(0.0f);
                         });
             },5);
 

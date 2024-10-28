@@ -24,7 +24,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAtta
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HummingTop;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.Spindash;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
-import net.sonicrushxii.beyondthehorizon.entities.CustomPointRenderer;
+import net.sonicrushxii.beyondthehorizon.entities.all.PointRenderer;
 import net.sonicrushxii.beyondthehorizon.event_handler.*;
 import net.sonicrushxii.beyondthehorizon.modded.*;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
@@ -112,7 +112,7 @@ public class BeyondTheHorizon
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
 
-            EntityRenderers.register(ModEntityTypes.TORNADO_JUMP_CLOUD.get(), CustomPointRenderer::new);
+            EntityRenderers.register(ModEntityTypes.TORNADO_JUMP_CLOUD.get(), PointRenderer::new);
         }
 
         @SubscribeEvent

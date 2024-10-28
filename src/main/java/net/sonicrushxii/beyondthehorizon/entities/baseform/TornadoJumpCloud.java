@@ -1,7 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.entities.baseform;
 
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,11 +10,12 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopMath;
 import org.joml.Vector3f;
 
-public class TornadoJumpCloud extends AreaEffectCloud {
-    public TornadoJumpCloud(EntityType<? extends AreaEffectCloud> entityType, Level world) {
+public class TornadoJumpCloud extends PointEntity {
+    public TornadoJumpCloud(EntityType<? extends PointEntity> entityType, Level world) {
         super(entityType, world);
     }
 
@@ -29,7 +29,8 @@ public class TornadoJumpCloud extends AreaEffectCloud {
     }
 
     @Override
-    public void tick() {
+    public void tick()
+    {
         super.tick();
 
         Vec3 currentPos = new Vec3(this.getX(),this.getY(),this.getZ());
@@ -83,7 +84,7 @@ public class TornadoJumpCloud extends AreaEffectCloud {
 
             Vec3 motionDir = currentPos.subtract(enemyPos)
                             .normalize()
-                            .scale(Math.min(0.4,1/CyloopMath.xzDistSqr(currentPos,enemyPos)));
+                            .scale(Math.min(0.4,1.5/CyloopMath.xzDistSqr(currentPos,enemyPos)));
             enemy.setDeltaMovement(new Vec3(motionDir.x(),0,motionDir.z()));
         }
     }
