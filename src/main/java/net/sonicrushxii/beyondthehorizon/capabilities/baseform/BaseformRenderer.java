@@ -31,7 +31,8 @@ public class BaseformRenderer
         PoseStack poseStack = event.getPoseStack();
 
         //Ballform
-        if (baseformProperties.ballFormState >= 1 || baseformProperties.homingAttackAirTime > 1)
+        if (baseformProperties.ballFormState >= 1 || baseformProperties.homingAttackAirTime > 1 ||
+        baseformProperties.tornadoJump > 0)
         {
             poseStack.pushPose();
 

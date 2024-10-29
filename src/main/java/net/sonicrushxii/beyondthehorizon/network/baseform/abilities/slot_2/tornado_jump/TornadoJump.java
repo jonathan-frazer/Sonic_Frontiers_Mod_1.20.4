@@ -1,6 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
@@ -31,6 +32,10 @@ public class TornadoJump {
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+
+            //Set Motion
+            player.setDeltaMovement(new Vec3(0,0,0));
+            player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
             //Modify Data
             baseformProperties.tornadoJump = 1;

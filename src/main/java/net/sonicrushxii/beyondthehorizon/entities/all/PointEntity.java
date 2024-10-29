@@ -1,33 +1,36 @@
 package net.sonicrushxii.beyondthehorizon.entities.all;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.Level;
 
 public class PointEntity extends Entity {
-    protected int duration; // Time in ticks after which the entity disappears
-
+    public static final EntityDataAccessor<Integer> DURATION = SynchedEntityData.defineId(PointEntity.class, EntityDataSerializers.INT);
     public PointEntity(EntityType<? extends PointEntity> type, Level world) {
         super(type, world);
         this.noCulling = true; // Prevents entity from being rendered (invisible)
-        this.duration = 200; // Default duration (10 seconds at 20 ticks per second)
     }
 
     @Override
-    protected void defineSynchedData() {}
+    protected void defineSynchedData() {
+        this.entityData.define(DURATION, 200);
+    }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
         if (tag.contains("Duration")) {
-            this.duration = tag.getInt("Duration");
+            this.entityData.set(DURATION,tag.getInt("Duration"));
         }
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-        tag.putInt("Duration", this.duration);
+        tag.putInt("Duration", this.entityData.get(DURATION));
     }
 
     @Override
@@ -37,14 +40,15 @@ public class PointEntity extends Entity {
         this.move(MoverType.SELF, this.getDeltaMovement());
 
         // Custom tick logic - Here, it just counts down the duration and removes the entity
-        if (this.duration > 0) {
-            this.duration--;
-        } else {
+        if (this.entityData.get(DURATION) > 0) {
+            this.entityData.set(DURATION,this.entityData.get(DURATION)-1);
+        } else if(!this.level().isClientSide) {
             this.discard(); // Removes the entity from the world
         }
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
+    public void setDuration(int duration)
+    {
+        this.entityData.set(DURATION,duration);
     }
 }
