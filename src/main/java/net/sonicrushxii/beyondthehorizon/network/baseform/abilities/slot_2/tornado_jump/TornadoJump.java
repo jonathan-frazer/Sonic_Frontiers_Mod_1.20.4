@@ -49,7 +49,7 @@ public class TornadoJump {
                         playerPos.add
                                 (Utilities.calculateViewVector(0,-baseformProperties.atkRotPhase+180).scale(1.4)),
                         (aoeCloud) -> {
-                            aoeCloud.setDuration(40);
+                            aoeCloud.setDuration(100);
                         });
             },5);
 
