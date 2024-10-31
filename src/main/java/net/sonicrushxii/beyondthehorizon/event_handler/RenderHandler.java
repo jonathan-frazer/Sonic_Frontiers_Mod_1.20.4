@@ -1,29 +1,24 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
-import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformRenderer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
-import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
-import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;
 
 @Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
 public class RenderHandler {
     @SubscribeEvent
     public static void onPreRenderLiving(RenderLivingEvent.Pre<?, ?> event) {
+
         //Manage Player Models
         {
             try {

@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.entities.baseform;
+package net.sonicrushxii.beyondthehorizon.entities.baseform.mirage;
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.world.entity.EntityType;
@@ -14,8 +14,9 @@ import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopMath;
 import org.joml.Vector3f;
 
-public class TornadoJumpCloud extends PointEntity {
-    public TornadoJumpCloud(EntityType<? extends PointEntity> entityType, Level world) {
+public class MirageCloud extends PointEntity
+{
+    public MirageCloud(EntityType<? extends PointEntity> entityType, Level world) {
         super(entityType, world);
     }
 
@@ -50,38 +51,29 @@ public class TornadoJumpCloud extends PointEntity {
                         false,
                         particleX, particleY, particleZ,
                         0, 0, 0);
-
-                particleX = this.getX() - v0;
-                particleY = this.getY() - v1;
-                particleZ = this.getZ() - v2;
-
-                this.level().addParticle(new DustParticleOptions(colorSelect(t),2.0f),
-                        false,
-                        particleX, particleY, particleZ,
-                        0, 0, 0);
             }
         }
 
         for(LivingEntity enemy : this.level().getEntitiesOfClass(LivingEntity.class,
                 new AABB(this.getX()+10.0,this.getY()+10.0,this.getZ()+10.0,
                         this.getX()-10.0,this.getY()-10.0,this.getZ()-10.0),
-        (entity)->{
-            try {
-                Player playerEntity = (Player)entity;
-                ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
-                if (headItem.getItem() == Items.PLAYER_HEAD &&
-                        headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
-                    return false;
-            }
-            catch (NullPointerException|ClassCastException ignored){}
-            return true;
-        }))
+                (entity)->{
+                    try {
+                        Player playerEntity = (Player)entity;
+                        ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
+                        if (headItem.getItem() == Items.PLAYER_HEAD &&
+                                headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
+                            return false;
+                    }
+                    catch (NullPointerException|ClassCastException ignored){}
+                    return true;
+                }))
         {
             Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
 
             Vec3 motionDir = currentPos.subtract(enemyPos)
-                            .normalize()
-                            .scale(Math.min(0.8,5/CyloopMath.xzDistSqr(currentPos,enemyPos)));
+                    .normalize()
+                    .scale(Math.min(0.8,5/ CyloopMath.xzDistSqr(currentPos,enemyPos)));
 
             if(CyloopMath.xzDistSqr(currentPos,enemyPos) < 3.0) {
                 //Damage Enemy

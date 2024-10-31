@@ -22,9 +22,11 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HummingTop;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.MirageModel;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.Spindash;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointRenderer;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageRenderer;
 import net.sonicrushxii.beyondthehorizon.event_handler.*;
 import net.sonicrushxii.beyondthehorizon.modded.*;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
@@ -113,6 +115,7 @@ public class BeyondTheHorizon
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
 
             EntityRenderers.register(ModEntityTypes.TORNADO_JUMP_CLOUD.get(), PointRenderer::new);
+            EntityRenderers.register(ModEntityTypes.SONIC_BASEFORM_MIRAGE.get(), MirageRenderer::new);
         }
 
         @SubscribeEvent
@@ -142,6 +145,7 @@ public class BeyondTheHorizon
             event.registerLayerDefinition(Spindash.LAYER_LOCATION,Spindash::createBodyLayer);
             event.registerLayerDefinition(HomingAttack.LAYER_LOCATION,HomingAttack::createBodyLayer);
             event.registerLayerDefinition(HummingTop.LAYER_LOCATION,HummingTop::createBodyLayer);
+            event.registerLayerDefinition(MirageModel.LAYER_LOCATION, MirageModel::createBodyLayer);
         }
     }
 }
