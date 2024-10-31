@@ -60,6 +60,10 @@ public class BaseformRenderer
             poseStack.mulPose(Axis.XP.rotationDegrees(-2F));
             poseStack.mulPose(Axis.YP.rotationDegrees((baseformProperties.hummingTop%7)*51.42F));
         }
+        else if(baseformProperties.mirageTimer > 1)
+        {
+            event.setCanceled(true);
+        }
     }
 
     public static void onRenderPlayerModelPost(RenderLivingEvent.Post<?,?> event, Player player, BaseformProperties baseformProperties)

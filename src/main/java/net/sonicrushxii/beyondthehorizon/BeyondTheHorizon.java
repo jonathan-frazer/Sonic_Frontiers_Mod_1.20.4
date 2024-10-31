@@ -115,6 +115,7 @@ public class BeyondTheHorizon
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
 
             EntityRenderers.register(ModEntityTypes.TORNADO_JUMP_CLOUD.get(), PointRenderer::new);
+            EntityRenderers.register(ModEntityTypes.MIRAGE_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.SONIC_BASEFORM_MIRAGE.get(), MirageRenderer::new);
         }
 

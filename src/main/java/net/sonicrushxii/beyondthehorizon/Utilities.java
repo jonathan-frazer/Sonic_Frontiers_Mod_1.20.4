@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 public class Utilities {
 
-    static Random random = new Random();
+    public static Random random = new Random();
 
     static CompoundTag baseformArmorNBTTag; static {
         baseformArmorNBTTag = new CompoundTag();

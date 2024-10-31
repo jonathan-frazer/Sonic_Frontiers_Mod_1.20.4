@@ -146,7 +146,7 @@ public class BaseformProperties extends FormProperties {
 
     //Slot 3
     public byte tornadoJump;
-    public float tornadoJumpPhase;
+    public short mirageTimer;
 
     public BaseformProperties()
     {
@@ -186,7 +186,7 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 3
         tornadoJump = (byte)0;
-        tornadoJumpPhase = 0f;
+        mirageTimer = (short)0;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -228,7 +228,7 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 3
         tornadoJump = nbt.getByte("tornadoJump");
-
+        mirageTimer = nbt.getShort("MirageTimer");
     }
 
     @Override
@@ -273,6 +273,7 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 3
         nbt.putByte("tornadoJump",tornadoJump);
+        nbt.putShort("MirageTimer",mirageTimer);
 
         return nbt;
     }
@@ -293,10 +294,11 @@ public class BaseformProperties extends FormProperties {
         boolean stomping = (this.stomp > 0);
 
         boolean tornadoJump = (this.tornadoJump != 0);
+        boolean mirageTimer = (this.mirageTimer > 0);
 
         return quickCyloop ||
                 ballForm || homingAttack || melee || hummingTop || stomping ||
-                tornadoJump;
+                tornadoJump || mirageTimer;
     }
 
     //Checks if Player is in the middle of another attack

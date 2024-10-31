@@ -11,7 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopMath;
 import org.joml.Vector3f;
 
 public class MirageCloud extends PointEntity
@@ -37,26 +36,28 @@ public class MirageCloud extends PointEntity
         Vec3 currentPos = new Vec3(this.getX(),this.getY(),this.getZ());
 
         if(this.level().isClientSide) {
-            for (int t = 10; t < 90; ++t)
+            int color = 0;
+            for (double t = 0.0; t <= 12.0; t+=1.0/19)
             {
-                final double v0 = (t) * Math.cos(t/1.5) / 40;
-                final double v1 = (double)t/32;
-                final double v2 = (t) * Math.sin(t/1.5) / 40;
+                final double v0 = Math.sin((t%10)*Math.PI)*Math.cos(t/10*Math.PI)*4.5;
+                final double v1 = Math.sin(t/10*Math.PI)*3;
+                final double v2 = Math.cos((t%10)*Math.PI)*Math.cos(t/10*Math.PI)*4.5;
 
-                double particleY = this.getY() + v1;
                 double particleX = this.getX() + v0;
+                double particleY = this.getY() + v1;
                 double particleZ = this.getZ() + v2;
 
-                this.level().addParticle(new DustParticleOptions(colorSelect(t),2.0f),
+                this.level().addParticle(new DustParticleOptions(MirageCloud.colorSelect(color),2.0f),
                         false,
                         particleX, particleY, particleZ,
                         0, 0, 0);
+                color = (color+1)%3;
             }
         }
 
         for(LivingEntity enemy : this.level().getEntitiesOfClass(LivingEntity.class,
-                new AABB(this.getX()+10.0,this.getY()+10.0,this.getZ()+10.0,
-                        this.getX()-10.0,this.getY()-10.0,this.getZ()-10.0),
+                new AABB(this.getX()+7.0,this.getY()+7.0,this.getZ()+7.0,
+                        this.getX()-7.0,this.getY()-7.0,this.getZ()-7.0),
                 (entity)->{
                     try {
                         Player playerEntity = (Player)entity;
@@ -71,16 +72,14 @@ public class MirageCloud extends PointEntity
         {
             Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
 
+            if(currentPos.distanceToSqr(enemyPos) < 6.0)
+                return;
+
             Vec3 motionDir = currentPos.subtract(enemyPos)
                     .normalize()
-                    .scale(Math.min(0.8,5/ CyloopMath.xzDistSqr(currentPos,enemyPos)));
+                    .scale(Math.min(0.6, currentPos.distanceToSqr(enemyPos)));
 
-            if(CyloopMath.xzDistSqr(currentPos,enemyPos) < 3.0) {
-                //Damage Enemy
-                enemy.hurt(this.level().damageSources().generic(), 2.0f);
-            }
-
-            enemy.setDeltaMovement(new Vec3(motionDir.x(),0,motionDir.z()));
+            enemy.setDeltaMovement(motionDir);
         }
     }
 }

@@ -9,6 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.TornadoJumpCloud;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageEntity;
 
 @Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -19,6 +20,10 @@ public class ModEntityTypes {
             () -> EntityType.Builder.<TornadoJumpCloud>of(TornadoJumpCloud::new, MobCategory.MISC)
                     .sized(1F, 5F)  // Define the size of the entity
                     .build("tornado_jump_cloud"));
+    public static final RegistryObject<EntityType<MirageCloud>> MIRAGE_CLOUD = ENTITY_TYPES.register("mirage_cloud",
+            () -> EntityType.Builder.<MirageCloud>of(MirageCloud::new, MobCategory.MISC)
+                    .sized(5F, 5F)  // Define the size of the entity
+                    .build("mirage_cloud"));
     public static final RegistryObject<EntityType<MirageEntity>> SONIC_BASEFORM_MIRAGE = ENTITY_TYPES.register("baseform_mirage",
             () -> EntityType.Builder.<MirageEntity>of(MirageEntity::new, MobCategory.MISC)
                     .sized(1F, 2F)  // Define the size of the entity

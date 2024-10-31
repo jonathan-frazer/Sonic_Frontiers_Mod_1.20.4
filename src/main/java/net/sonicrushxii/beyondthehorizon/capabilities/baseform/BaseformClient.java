@@ -36,6 +36,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spind
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.Mirage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
@@ -298,15 +299,26 @@ public class BaseformClient {
 
         //Slot 3
         {
-            if(VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
-                    KeyBindings.INSTANCE.useAbility1.isDown())
+            //Tornado Jump
             {
-                PacketHandler.sendToServer(new TornadoJump());
-                baseformProperties.tornadoJump = 1;
+                if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking()
+                        && !player.isShiftKeyDown() && KeyBindings.INSTANCE.useAbility1.isDown()) {
+                    PacketHandler.sendToServer(new TornadoJump());
+                    baseformProperties.tornadoJump = 1;
+                }
+
+                if (baseformProperties.tornadoJump == -1 && player.onGround())
+                    baseformProperties.tornadoJump = 0;
             }
 
-            if(baseformProperties.tornadoJump == -1 && player.onGround())
-                baseformProperties.tornadoJump = 0;
+            //Mirage
+            {
+                if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking()
+                        && baseformProperties.mirageTimer <= 0 && player.isShiftKeyDown() && KeyBindings.INSTANCE.useAbility1.isDown()) {
+                    PacketHandler.sendToServer(new Mirage());
+                    baseformProperties.mirageTimer = 1;
+                }
+            }
         }
     }
 
