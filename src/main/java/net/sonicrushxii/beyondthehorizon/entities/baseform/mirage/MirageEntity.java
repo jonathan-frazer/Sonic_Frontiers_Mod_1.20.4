@@ -14,4 +14,5 @@ public class MirageEntity extends PointEntity {
     {
         super.tick();
     }
+    
 }

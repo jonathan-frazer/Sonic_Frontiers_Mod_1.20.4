@@ -43,12 +43,17 @@ public class PointEntity extends Entity {
         if (this.entityData.get(DURATION) > 0) {
             this.entityData.set(DURATION,this.entityData.get(DURATION)-1);
         } else if(!this.level().isClientSide) {
-            this.discard(); // Removes the entity from the world
+            this.kill(); // Removes the entity from the world
         }
     }
 
     public void setDuration(int duration)
     {
         this.entityData.set(DURATION,duration);
+    }
+
+    public int getDuration()
+    {
+        return this.entityData.get(DURATION);
     }
 }

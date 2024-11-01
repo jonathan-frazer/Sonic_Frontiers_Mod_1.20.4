@@ -2,19 +2,18 @@ package net.sonicrushxii.beyondthehorizon.entities.baseform.mirage;
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
+import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
 import org.joml.Vector3f;
 
 public class MirageCloud extends PointEntity
 {
+    private static final double RADIUS = 6.0;
+
     public MirageCloud(EntityType<? extends PointEntity> entityType, Level world) {
         super(entityType, world);
     }
@@ -32,54 +31,60 @@ public class MirageCloud extends PointEntity
     public void tick()
     {
         super.tick();
-
         Vec3 currentPos = new Vec3(this.getX(),this.getY(),this.getZ());
 
-        if(this.level().isClientSide) {
+        if(this.level().isClientSide)
+        {
             int color = 0;
-            for (double t = 0.0; t <= 12.0; t+=1.0/19)
+            Vec3[] positions = {new Vec3(-3,0,8),
+                                new Vec3(4,5,9),
+                                new Vec3(11,1,3),
+                                new Vec3(-7,5,4),
+                                new Vec3(7,7,9),
+                                new Vec3(-9,4,-3),
+                                new Vec3(-7,1,-3),
+                                new Vec3(-3,4,8),
+                                new Vec3(4,6,-5),
+                                new Vec3(5,1,-6)};
+
+            for(int i=0;i<positions.length;++i)
             {
-                final double v0 = Math.sin((t%10)*Math.PI)*Math.cos(t/10*Math.PI)*4.5;
-                final double v1 = Math.sin(t/10*Math.PI)*3;
-                final double v2 = Math.cos((t%10)*Math.PI)*Math.cos(t/10*Math.PI)*4.5;
-
-                double particleX = this.getX() + v0;
-                double particleY = this.getY() + v1;
-                double particleZ = this.getZ() + v2;
-
-                this.level().addParticle(new DustParticleOptions(MirageCloud.colorSelect(color),2.0f),
-                        false,
-                        particleX, particleY, particleZ,
-                        0, 0, 0);
-                color = (color+1)%3;
+                //Display to all other points
+                for(int j=0;j<positions.length;++j)
+                {
+                    if(i!=j) {
+                        //Display Particle
+                        Utilities.particleRaycast(this.level(),
+                                new DustParticleOptions(colorSelect(i),1.15f),
+                                currentPos.add(positions[i]),currentPos.add(positions[j]));
+                    }
+                }
             }
         }
-
-        for(LivingEntity enemy : this.level().getEntitiesOfClass(LivingEntity.class,
-                new AABB(this.getX()+7.0,this.getY()+7.0,this.getZ()+7.0,
-                        this.getX()-7.0,this.getY()-7.0,this.getZ()-7.0),
-                (entity)->{
-                    try {
-                        Player playerEntity = (Player)entity;
-                        ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
-                        if (headItem.getItem() == Items.PLAYER_HEAD &&
-                                headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
-                            return false;
-                    }
-                    catch (NullPointerException|ClassCastException ignored){}
-                    return true;
-                }))
+        else if(this.getDuration()%3 == 0)
         {
-            Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
+            //Set X,Y,Z Positions
+            double theta = Utilities.random.nextDouble(0,2*Math.PI);
+            double x = RADIUS*Math.sin(theta);
+            double y = theta/2.0;
+            double z = RADIUS*Math.cos(theta);
 
-            if(currentPos.distanceToSqr(enemyPos) < 6.0)
-                return;
-
-            Vec3 motionDir = currentPos.subtract(enemyPos)
-                    .normalize()
-                    .scale(Math.min(0.6, currentPos.distanceToSqr(enemyPos)));
-
-            enemy.setDeltaMovement(motionDir);
+            //Spawn AfterImages
+            MirageEntity sonicMirage = new MirageEntity(ModEntityTypes.SONIC_BASEFORM_MIRAGE.get(),this.level());
+            sonicMirage.setPos(this.getX()+x, this.getY()+y, this.getZ()+z);
+            sonicMirage.setDuration(10);
+            sonicMirage.setYRot(Utilities.getYawPitchFromVec( (new Vec3(x,y,z)).reverse() )[0]);
+            this.level().addFreshEntity(sonicMirage);
         }
+    }
+
+    @Override
+    public void kill() {
+        super.kill();
+        //Kill All the Mirages Around
+        for(MirageEntity sonicMirage : this.level().getEntitiesOfClass(MirageEntity.class, new AABB(
+                this.getX()+16,this.getY()+16,this.getZ()+16,
+                this.getX()-16,this.getY()-16,this.getZ()-16)))
+            sonicMirage.remove(RemovalReason.KILLED);
     }
 }

@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -25,12 +24,11 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
-import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageEntity;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
-import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
@@ -676,67 +674,55 @@ public class BaseformServer {
 
                     //Mirage
                     {
+                        //Increase Mirage Time
                         if (baseformProperties.mirageTimer > 0)
-                        {
-                            //Increase Tornado Jump time
                             baseformProperties.mirageTimer += 1;
 
-                            //Motion
-                            Vec3 motionDirection = new Vec3(
-                                    // sin(wt + T)
-                                    Math.sin((Math.PI / 9) * baseformProperties.mirageTimer + baseformProperties.atkRotPhase * (Math.PI / 180)),
-                                    0.00,
-                                    // cos(wt + T)
-                                    Math.cos((Math.PI / 9) * baseformProperties.mirageTimer + baseformProperties.atkRotPhase * (Math.PI / 180))
-                            );
-                            player.setDeltaMovement(motionDirection);
-                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                        //End Ability if no Cloud is detected
+                        if(baseformProperties.mirageTimer >= 8)
+                        {
+                            try {
+                                MirageCloud mirageCloud = level.getEntitiesOfClass(MirageCloud.class, new AABB(
+                                        player.getX() + 6, player.getY() + 6, player.getZ() + 6,
+                                        player.getX() - 6, player.getY() - 6, player.getZ() - 6)).get(0);
+                                if (mirageCloud == null) throw new NullPointerException("No Cloud");
+                                double newX = mirageCloud.getX()+Utilities.random.nextDouble(-5,5);
+                                double newY = mirageCloud.getY()+Utilities.random.nextDouble(0,1.5);
+                                double newZ = mirageCloud.getZ()+Utilities.random.nextDouble(-5,5);
 
-                            if(baseformProperties.mirageTimer % 15 == 0)
-                            {
-                                try {
-                                    MirageCloud mirageCloud = level.getEntitiesOfClass(MirageCloud.class, new AABB(
-                                            player.getX() + 16, player.getY() + 16, player.getZ() + 16,
-                                            player.getX() - 16, player.getY() - 16, player.getZ() - 16)).get(0);
-                                    if (mirageCloud == null) throw new NullPointerException("No Cloud");
+                                if(baseformProperties.mirageTimer == 9) {
+                                    Vec3 lookDir = (new Vec3(mirageCloud.getX(), mirageCloud.getY(), mirageCloud.getZ()))
+                                            .subtract(new Vec3(newX, newY, newZ));
+                                    float[] yawPitch = Utilities.getYawPitchFromVec(lookDir);
 
-                                    //Teleport
-                                    Vec3 dirVec = (new Vec3(mirageCloud.getX(), mirageCloud.getY(), mirageCloud.getZ())).subtract(new Vec3(player.getX(), player.getY(), player.getZ()));
-                                    float[] yawPitch = Utilities.getYawPitchFromVec(dirVec);
-                                    player.setYRot(yawPitch[0]); player.setXRot(yawPitch[1]);
-                                    player.connection.send(new ClientboundMoveEntityPacket.Rot(player.getId(),(byte)yawPitch[0],(byte)yawPitch[1],player.onGround()));
-
-                                    //Spawn Clones
-                                    Utilities.summonEntity(ModEntityTypes.SONIC_BASEFORM_MIRAGE.get(),
-                                            player.serverLevel(),
-                                            (new Vec3(player.getX(), player.getY() + Utilities.random.nextDouble(-0.25, 1.25), player.getZ())),
-                                            (sonicMirage) -> {
-                                                sonicMirage.setDuration(140);
-                                                sonicMirage.setYRot(Utilities.getYawPitchFromVec(dirVec)[0]);
-                                            });
-                                } catch (NullPointerException | IndexOutOfBoundsException e) {
-                                    baseformProperties.mirageTimer = 141;
+                                    player.teleportTo(player.serverLevel(), newX, newY, newZ,
+                                            Collections.emptySet(), yawPitch[0], yawPitch[1]);
+                                    player.connection.send(new ClientboundTeleportEntityPacket(player));
                                 }
+                            }catch (NullPointerException | IndexOutOfBoundsException e) {
+                                baseformProperties.mirageTimer = 141;
                             }
                         }
 
-                        if (baseformProperties.mirageTimer > 140 || baseformProperties.isAttacking()) {
+                        //End Mirage Ability
+                        if (baseformProperties.mirageTimer > 140 || (baseformProperties.mirageTimer > 1 && baseformProperties.isAttacking()))
+                        {
                             //Reset Timer
                             baseformProperties.mirageTimer = 0;
+
+                            //Remove Effect
+                            if(player.hasEffect(MobEffects.INVISIBILITY))
+                                player.removeEffect(MobEffects.INVISIBILITY);
+                            System.out.println("End Effect");
 
                             //Kill Any Mirage Cloud Around
                             for(MirageCloud mirageCloud : level.getEntitiesOfClass(MirageCloud.class, new AABB(
                                     player.getX()+16,player.getY()+16,player.getZ()+16,
                                     player.getX()-16,player.getY()-16,player.getZ()-16)))
-                                mirageCloud.remove(Entity.RemovalReason.DISCARDED);
+                                mirageCloud.remove(Entity.RemovalReason.KILLED);
 
-                            for(MirageEntity mirageEntity : level.getEntitiesOfClass(MirageEntity.class, new AABB(
-                                    player.getX()+16,player.getY()+16,player.getZ()+16,
-                                    player.getX()-16,player.getY()-16,player.getZ()-16)))
-                                mirageEntity.remove(Entity.RemovalReason.DISCARDED);
-
-                            //
-                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                            //Cooldown
+                            baseformProperties.setCooldown(BaseformActiveAbility.MIRAGE,(byte)45);
                         }
                     }
                 }

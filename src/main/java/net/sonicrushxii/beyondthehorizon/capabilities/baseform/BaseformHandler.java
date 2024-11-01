@@ -41,6 +41,18 @@ public class BaseformHandler {
             ServerPlayer receiver = (ServerPlayer) event.getEntity();
             Entity damageGiver = event.getSource().getEntity();
 
+            //End Mirage Timer if Damage is taken
+            receiver.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+                if (baseformProperties.mirageTimer > 1)
+                    baseformProperties.mirageTimer = 141;
+
+                PacketHandler.sendToPlayer(receiver,
+                        new SyncPlayerFormS2C(
+                                playerSonicForm.getCurrentForm(),
+                                baseformProperties
+                        ));
+            });
+
             // Makes you only invulnerable to Direct mob attacks when using this ability. Like weakness but better
             if (baseformProperties.dodgeInvul)
                 event.setCanceled(true);

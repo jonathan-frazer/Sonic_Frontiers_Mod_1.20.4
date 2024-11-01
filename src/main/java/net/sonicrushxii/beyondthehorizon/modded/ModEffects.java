@@ -3,6 +3,7 @@ package net.sonicrushxii.beyondthehorizon.modded;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -29,6 +30,9 @@ public class ModEffects {
     );
     public static final RegistryObject<MobEffect> CYLOOPED = MOB_EFFECTS.register(
             "cyloop_effect",()->((new CyloopEffect(MobEffectCategory.HARMFUL,0x00FFFF)).addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "12AEAA34-359B-1198-935C-2E7E61020334", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
+    );
+    public static final RegistryObject<MobEffect> MIRAGE_CONFUSE = MOB_EFFECTS.register(
+            "mirage_confusion",()->((new CyloopEffect(MobEffectCategory.HARMFUL,0x00FFFF)).addAttributeModifier(Attributes.FOLLOW_RANGE, "12AEAA34-359B-1198-935C-2E7E61020334", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
     );
 
 

@@ -314,7 +314,7 @@ public class BaseformClient {
             //Mirage
             {
                 if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking()
-                        && baseformProperties.mirageTimer <= 0 && player.isShiftKeyDown() && KeyBindings.INSTANCE.useAbility1.isDown()) {
+                        && baseformProperties.mirageTimer <= 0 && player.isShiftKeyDown() && player.onGround() && KeyBindings.INSTANCE.useAbility1.isDown()) {
                     PacketHandler.sendToServer(new Mirage());
                     baseformProperties.mirageTimer = 1;
                 }
