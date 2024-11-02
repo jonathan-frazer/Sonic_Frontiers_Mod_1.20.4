@@ -12,6 +12,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -52,6 +53,10 @@ public class BaseformHandler {
                                 baseformProperties
                         ));
             });
+
+            //Prevent Fireworks from damaging you when Turning into Power Boost
+            if(baseformProperties.powerBoost && !event.getSource().isIndirect() && event.getSource().getEntity() instanceof FireworkRocketEntity)
+                event.setCanceled(true);
 
             // Makes you only invulnerable to Direct mob attacks when using this ability. Like weakness but better
             if (baseformProperties.dodgeInvul)

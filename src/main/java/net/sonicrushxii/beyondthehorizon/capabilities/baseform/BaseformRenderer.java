@@ -32,7 +32,7 @@ public class BaseformRenderer
 
         //Ballform
         if (baseformProperties.ballFormState >= 1 || baseformProperties.homingAttackAirTime > 1 ||
-        baseformProperties.tornadoJump > 0)
+        baseformProperties.tornadoJump > 0 || baseformProperties.lightSpeedState == 1)
         {
             poseStack.pushPose();
 
@@ -69,6 +69,7 @@ public class BaseformRenderer
     public static void onRenderPlayerModelPost(RenderLivingEvent.Post<?,?> event, Player player, BaseformProperties baseformProperties)
     {
         PoseStack poseStack = event.getPoseStack();
+        // Humming Top
         if(baseformProperties.hummingTop > 1)
         {
             poseStack.popPose();
@@ -91,7 +92,6 @@ public class BaseformRenderer
 
             poseStack.popPose();
         }
-
     }
 
     public static void onRenderToSelfPre(RenderLivingEvent.Pre<?, ?> event, LivingEntity target, BaseformProperties baseformProperties)

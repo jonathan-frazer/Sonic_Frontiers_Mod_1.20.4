@@ -17,6 +17,7 @@ import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 import net.sonicrushxii.beyondthehorizon.client.DoubleTapDirection;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Boost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Sidestep;
@@ -25,7 +26,6 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.quick_cyloop.QuickCyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
@@ -35,7 +35,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
-
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.LightSpeedAssault;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.Mirage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
@@ -51,6 +51,7 @@ public class BaseformClient {
     {
         private static ScheduledTask lightSpeedCanceller = null;
         public static UUID homingAttackReticle = null;
+        public static UUID lightSpeedReticle = null;
         private static boolean airBoostLock = false;
     }
 
@@ -124,6 +125,7 @@ public class BaseformClient {
                         KeyBindings.INSTANCE.useAbility1.consumeClick()) {
                     //Boost
                     PacketHandler.sendToServer(new Boost(player.isShiftKeyDown()));
+                    while(KeyBindings.INSTANCE.useAbility1.consumeClick());
                 }
 
                 //Quickstep
@@ -142,6 +144,9 @@ public class BaseformClient {
 
                     ClientOnlyData.lightSpeedCanceller = Scheduler.scheduleTask(() -> {
                         PacketHandler.sendToServer(new LightspeedEffect());
+                        /*Scheduler.scheduleTask(()->{
+                            PacketHandler.sendToServer(new LightspeedDecay());
+                        },300);*/
                     }, 66);
                 }
 
@@ -313,10 +318,24 @@ public class BaseformClient {
 
             //Mirage
             {
-                if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking()
-                        && baseformProperties.mirageTimer <= 0 && player.isShiftKeyDown() && player.onGround() && KeyBindings.INSTANCE.useAbility1.isDown()) {
+                if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() && baseformProperties.lightSpeedState != 2
+                        && baseformProperties.mirageTimer <= 0 && player.isShiftKeyDown() && baseformProperties.getCooldown(BaseformActiveAbility.MIRAGE) == 0
+                        && player.onGround() && KeyBindings.INSTANCE.useAbility1.isDown()) {
                     PacketHandler.sendToServer(new Mirage());
                     baseformProperties.mirageTimer = 1;
+                }
+            }
+
+            //Light Speed Assault
+            {
+                if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() && baseformProperties.lightSpeedState == 2 &&
+                        player.isShiftKeyDown() && player.onGround() && baseformProperties.getCooldown(BaseformActiveAbility.MIRAGE) == 0 &&
+                        KeyBindings.INSTANCE.useAbility1.isDown()) {
+                    LightSpeedAssault.scanFoward(player);
+                    if(ClientOnlyData.lightSpeedReticle != null) {
+                        PacketHandler.sendToServer(new LightSpeedAssault(ClientOnlyData.lightSpeedReticle));
+                        baseformProperties.lightSpeedAssault = 1;
+                    }
                 }
             }
         }

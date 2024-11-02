@@ -38,7 +38,7 @@ public class LightspeedDecay {
             //Add Tag
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
             baseformProperties.lightSpeedState = (byte)0;
-            baseformProperties.setCooldown(BaseformActiveAbility.LIGHT_SPEED_ATTACK, (byte) 60);
+            baseformProperties.setCooldown(BaseformActiveAbility.LIGHT_SPEED_ATTACK, (byte) 1);
 
             //Requip Armor
             //SET ARMOR NBT DATA(COMMON)

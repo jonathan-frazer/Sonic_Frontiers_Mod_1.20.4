@@ -39,6 +39,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
@@ -263,7 +264,7 @@ public class BaseformServer {
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 new DustParticleOptions(new Vector3f(0.0f, 1.2f, 1.0f), 1),
                                 player.getX()+0.00, player.getY()+0.85, player.getZ()+0.00,
-                                1.0, 1.40f, 1.00f, 1.00f, 10,
+                                1.0, 1.00f, 1.00f, 1.00f, 10,
                                 true)
                         );
 
@@ -634,7 +635,7 @@ public class BaseformServer {
 
                 //Slot 3
                 {
-                    //Tornado Jump
+                    // Tornado Jump
                     {
                         if (baseformProperties.tornadoJump > 0) {
                             //Increase Stomp time
@@ -671,8 +672,7 @@ public class BaseformServer {
                             baseformProperties.tornadoJump = 0;
 
                     }
-
-                    //Mirage
+                    // Mirage
                     {
                         //Increase Mirage Time
                         if (baseformProperties.mirageTimer > 0)
@@ -725,6 +725,109 @@ public class BaseformServer {
                             baseformProperties.setCooldown(BaseformActiveAbility.MIRAGE,(byte)45);
                         }
                     }
+                    // Light Speed Assault
+                    {
+                        //Perform Light Speed Assault
+                        if(baseformProperties.lightSpeedAssault > 0)
+                        {
+                            try
+                            {
+                                //Increment Counter
+                                baseformProperties.lightSpeedAssault += 1;
+
+                                //Get Target
+                                assert baseformProperties.lightSpeedTarget != null;
+                                LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.lightSpeedTarget);
+
+                                if(enemy == null)  throw new NullPointerException("Enemy died/doesn't exist anymore");
+
+                                Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+                                Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
+                                double distanceFromEnemy = playerPos.distanceTo(enemyPos);
+
+                                //Light Speed Assault
+                                if (baseformProperties.lightSpeedAssault < 45)
+                                {
+                                    //Fail
+                                    if (distanceFromEnemy > 24.0) {
+                                        throw new NullPointerException("Too Far");
+                                    }
+                                    //Succeed
+                                    else if (baseformProperties.lightSpeedAssault % 3 == 0) {
+                                        //Damage Enemy
+                                        Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);;
+                                        float yawPitch[] = Utilities.getYawPitchFromVec(tpDir.reverse());
+
+                                        //Particle Raycast
+                                        PacketHandler.sendToALLPlayers(
+                                                new ParticleRaycastPacketS2C(
+                                                        new DustParticleOptions(new Vector3f(0f,0f,1f),1)
+                                                        ,playerPos.add(0,1.25,1),enemyPos.add(tpDir).add(0,1.25,0)
+                                                )
+                                        );
+                                        player.teleportTo(player.serverLevel(),
+                                                enemyPos.x() + tpDir.x(),
+                                                enemyPos.y() + tpDir.y(),
+                                                enemyPos.z() + tpDir.z(),
+                                                Collections.emptySet(),
+                                                yawPitch[0], yawPitch[1]);
+                                        player.connection.send(new ClientboundTeleportEntityPacket(player));
+                                        enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                                1.0f);
+                                        enemy.setDeltaMovement(player.getLookAngle().scale(1.0));
+                                        player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                                    }
+                                }
+                                else
+                                {
+                                    //Damage Enemy
+                                    Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);
+                                    float yawPitch[] = Utilities.getYawPitchFromVec(tpDir.reverse());
+
+                                    //Particle Raycast
+                                    PacketHandler.sendToALLPlayers(
+                                            new ParticleRaycastPacketS2C(
+                                                    new DustParticleOptions(new Vector3f(0f,0f,1f),1)
+                                                    ,playerPos.add(0,1.25,1),enemyPos.add(tpDir).add(0,1.25,0)
+                                            )
+                                    );
+
+                                    //Teleport
+                                    player.teleportTo(player.serverLevel(),
+                                            enemyPos.x() + tpDir.x(),
+                                            enemyPos.y() + tpDir.y(),
+                                            enemyPos.z() + tpDir.z(),
+                                            Collections.emptySet(),
+                                            yawPitch[0], yawPitch[1]);
+                                    player.connection.send(new ClientboundTeleportEntityPacket(player));
+
+                                    //Go Up
+                                    player.setDeltaMovement(0,0.5,0);
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                    //Hurt Enemy
+                                    enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                            20.0f);
+                                    enemy.setDeltaMovement(player.getLookAngle().scale(2.0));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+
+                                    throw new NullPointerException("Move Success");
+                                }
+                            }
+                            catch (NullPointerException e)
+                            {
+                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                baseformProperties.lightSpeedAssault = 0;
+                                baseformProperties.lightSpeedTarget = new UUID(0L, 0L);
+                            }
+                        }
+                    }
+
+                    //Loop Kick
+                    {
+
+                    }
+
                 }
             }
 

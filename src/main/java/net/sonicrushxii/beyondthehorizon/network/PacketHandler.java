@@ -28,6 +28,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.LightSpeedAssault;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.Mirage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
@@ -124,8 +125,10 @@ public class PacketHandler {
 
             //Slot 3
             {
+                // Tornado Jump
                 INSTANCE.messageBuilder(TornadoJump.class,NetworkDirection.PLAY_TO_SERVER).encoder(TornadoJump::encode).decoder(TornadoJump::new).consumerMainThread(TornadoJump::handle).add();
                 INSTANCE.messageBuilder(Mirage.class,NetworkDirection.PLAY_TO_SERVER).encoder(Mirage::encode).decoder(Mirage::new).consumerMainThread(Mirage::handle).add();
+                INSTANCE.messageBuilder(LightSpeedAssault.class,NetworkDirection.PLAY_TO_SERVER).encoder(LightSpeedAssault::encode).decoder(LightSpeedAssault::new).consumerMainThread(LightSpeedAssault::handle).add();
             }
         }
 

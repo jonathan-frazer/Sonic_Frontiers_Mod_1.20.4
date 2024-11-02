@@ -147,6 +147,8 @@ public class BaseformProperties extends FormProperties {
     //Slot 3
     public byte tornadoJump;
     public short mirageTimer;
+    public byte lightSpeedAssault;
+    public UUID lightSpeedTarget;
 
     public BaseformProperties()
     {
@@ -187,6 +189,8 @@ public class BaseformProperties extends FormProperties {
         //Slot 3
         tornadoJump = (byte)0;
         mirageTimer = (short)0;
+        lightSpeedAssault = (byte)0;
+        lightSpeedTarget = new UUID(0L,0L);
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -229,6 +233,8 @@ public class BaseformProperties extends FormProperties {
         //Slot 3
         tornadoJump = nbt.getByte("tornadoJump");
         mirageTimer = nbt.getShort("MirageTimer");
+        lightSpeedAssault = nbt.getByte("LSRush");
+        lightSpeedTarget = nbt.getUUID("LightSpeedTarget");
     }
 
     @Override
@@ -274,6 +280,8 @@ public class BaseformProperties extends FormProperties {
         //Slot 3
         nbt.putByte("tornadoJump",tornadoJump);
         nbt.putShort("MirageTimer",mirageTimer);
+        nbt.putByte("LSRush",lightSpeedAssault);
+        nbt.putUUID("LightSpeedTarget",lightSpeedTarget);
 
         return nbt;
     }
@@ -295,10 +303,11 @@ public class BaseformProperties extends FormProperties {
 
         boolean tornadoJump = (this.tornadoJump != 0);
         boolean mirageTimer = (this.mirageTimer > 0);
+        boolean lightSpeedRush = (this.lightSpeedAssault > 0);
 
         return quickCyloop ||
                 ballForm || homingAttack || melee || hummingTop || stomping ||
-                tornadoJump || mirageTimer;
+                tornadoJump || mirageTimer || lightSpeedRush;
     }
 
     //Checks if Player is in the middle of another attack
@@ -312,9 +321,10 @@ public class BaseformProperties extends FormProperties {
         boolean stomping = (this.stomp > 0);
 
         boolean tornadoJump = (this.tornadoJump != 0);
+        boolean lightSpeedRush = (this.lightSpeedAssault > 0);
 
         return quickCyloop ||
                 homingAttack || hummingTop || ballform || stomping ||
-                tornadoJump;
+                tornadoJump || lightSpeedRush;
     }
 }
