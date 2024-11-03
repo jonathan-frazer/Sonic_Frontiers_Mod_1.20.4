@@ -1,15 +1,13 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -17,8 +15,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
-
-import java.lang.reflect.Field;
 
 public class ServerTickHandler
 {
@@ -113,40 +109,12 @@ public class ServerTickHandler
                                             }
                                             //Spawn Fireworks
                                             {
-                                                // Create the ItemStack for the firework rocket
-                                                ItemStack fireworkStack = new ItemStack(Items.FIREWORK_ROCKET, 1);
-
-                                                // Create the NBT data for the firework rocket
-                                                CompoundTag fireworkTag = new CompoundTag();
-                                                ListTag explosions = new ListTag();
-
-                                                CompoundTag explosion = new CompoundTag();
-                                                explosion.putByte("Type", (byte) 4); // Star-shaped
-                                                explosion.put("Colors", new IntArrayTag(new int[]{65501, 16711918, 1966335}));
-                                                explosion.put("FadeColors", new IntArrayTag(new int[]{1966335, 65501}));
-                                                explosions.add(explosion);
-
-                                                CompoundTag fireworks = new CompoundTag();
-                                                fireworks.put("Explosions", explosions);
-                                                fireworkTag.put("Fireworks", fireworks);
-
-                                                // Add the NBT data to the ItemStack
-                                                fireworkStack.setTag(fireworkTag);
-
-                                                // Create an ItemEntity to represent the firework rocket in the world
-                                                FireworkRocketEntity fireworkEntity = new FireworkRocketEntity(world,
-                                                        itemEntity.getX(), itemEntity.getY()+0.1, itemEntity.getZ(), fireworkStack);
-
-                                                try {
-                                                    Field privateField = FireworkRocketEntity.class.getDeclaredField("lifetime");
-                                                    privateField.setAccessible(true);
-                                                    privateField.set(fireworkEntity,0);
-                                                    privateField.setAccessible(false);
-                                                } catch (NoSuchFieldException | IllegalAccessException e) {
-                                                    throw new RuntimeException(e);
-                                                }
-                                                // Add the ItemEntity to the world
-                                                world.addFreshEntity(fireworkEntity);
+                                                //Commands
+                                                String command = String.format("summon firework_rocket %.2f %.2f %.2f {Life:0,LifeTime:0,FireworksItem:{id:\"firework_rocket\",Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1b,Colors:[I;65501,16711918,1966335],FadeColors:[I;1966335,65501]}]}}}}",itemEntity.getX(),itemEntity.getY(),itemEntity.getZ());
+                                                CommandSourceStack commandSourceStack = server.createCommandSourceStack().withPermission(4).withSuppressedOutput();
+                                                server.
+                                                        getCommands().
+                                                        performPrefixedCommand(commandSourceStack,command);
                                             }
                                             //Playsound
                                             world.playSound(null,itemEntity.getX(),itemEntity.getY(),itemEntity.getZ(), SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.MASTER, 1.0f, 1.0f);
