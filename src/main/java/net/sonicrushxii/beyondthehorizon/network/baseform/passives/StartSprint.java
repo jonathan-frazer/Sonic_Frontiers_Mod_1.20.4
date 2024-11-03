@@ -50,17 +50,15 @@ public class StartSprint {
             switch(baseformProperties.boostLvl)
             {
                 case 0: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
-                    break;
+                        break;
                 case 1: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.75);
-                    break;
+                        break;
                 case 2: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.00);
-                    break;
-                case 3:
-                    if(!baseformProperties.boosted) sonicBoomEffect(player);
-                    System.out.println(baseformProperties.boosted);
-                    baseformProperties.boosted = true;
-                    player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
-                    break;
+                        break;
+                case 3: if(!baseformProperties.boosted) sonicBoomEffect(player);
+                        baseformProperties.boosted = true;
+                        player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
+                        break;
             }
 
             PacketHandler.sendToPlayer(player,
