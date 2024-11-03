@@ -36,6 +36,9 @@ public class InputSlotHandler {
 
             if(isScrollingUp)    VirtualSlotHandler.scrollUpByOne();
             else                 VirtualSlotHandler.scrollDownByOne();
+
+            if(VirtualSlotHandler.getCurrAbility() == 0)
+                while(KeyBindings.INSTANCE.useAbility1.consumeClick());
         }
     }
 
@@ -54,8 +57,9 @@ public class InputSlotHandler {
         {
             int key = event.getKey();
             if (key >= InputConstants.KEY_1 && key <= InputConstants.KEY_9) {
-                // Implement custom behavior here if desired
                 VirtualSlotHandler.setSlot((byte)(key-InputConstants.KEY_1));
+                if(VirtualSlotHandler.getCurrAbility() == 0)
+                    while(KeyBindings.INSTANCE.useAbility1.consumeClick());
             }
         }
     }

@@ -123,6 +123,7 @@ public class BaseformProperties extends FormProperties {
     //Slot 1
     public byte airBoosts;
     public byte boostLvl;
+    public boolean boosted;
     public boolean wallBoosting;
     public boolean isWaterBoosting;
     public byte lightSpeedState;
@@ -165,6 +166,7 @@ public class BaseformProperties extends FormProperties {
         //Slot 1
         airBoosts = 3;
         boostLvl = 0;
+        boosted = false;
         wallBoosting = false;
         isWaterBoosting = false;
         lightSpeedState = 0;
@@ -209,6 +211,7 @@ public class BaseformProperties extends FormProperties {
         //Slot 1
         airBoosts = nbt.getByte("AirBoosts");
         boostLvl = nbt.getByte("BoostLvl");
+        boosted = nbt.getBoolean("boosted");
         wallBoosting = nbt.getBoolean("IsWallBoosting");
         isWaterBoosting = nbt.getBoolean("IsWaterBoosting");
         lightSpeedState = nbt.getByte("LightSpeedState");
@@ -256,6 +259,7 @@ public class BaseformProperties extends FormProperties {
         //Slot 1
         nbt.putByte("AirBoosts",airBoosts);
         nbt.putByte("BoostLvl",boostLvl);
+        nbt.putBoolean("boosted",boosted);
         nbt.putBoolean("IsWallBoosting",wallBoosting);
         nbt.putBoolean("IsWaterBoosting",isWaterBoosting);
         nbt.putByte("LightSpeedState",lightSpeedState);

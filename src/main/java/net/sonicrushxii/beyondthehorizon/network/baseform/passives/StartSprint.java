@@ -43,12 +43,6 @@ public class StartSprint {
             BaseformProperties baseformProperties =  (BaseformProperties) playerSonicForm.getFormProperties();
             baseformProperties.sprintFlag = true;
 
-            PacketHandler.sendToPlayer(player,
-                    new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
-                    ));
-
             //Activate Auto Step
             AutoStep.performStepUpActivate(player);
 
@@ -62,9 +56,18 @@ public class StartSprint {
                 case 2: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.00);
                     break;
                 case 3:
+                    if(!baseformProperties.boosted) sonicBoomEffect(player);
+                    System.out.println(baseformProperties.boosted);
+                    baseformProperties.boosted = true;
                     player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
                     break;
             }
+
+            PacketHandler.sendToPlayer(player,
+                    new SyncPlayerFormS2C(
+                            playerSonicForm.getCurrentForm(),
+                            baseformProperties
+                    ));
         });
     }
 

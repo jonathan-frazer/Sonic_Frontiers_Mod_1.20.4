@@ -31,10 +31,10 @@ public class Boost {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
             if(!wasShiftDown) baseformProperties.boostLvl = (byte)((baseformProperties.boostLvl+1)%4);
-            else             baseformProperties.boostLvl = (byte)((baseformProperties.boostLvl==0)?3: baseformProperties.boostLvl-1);
+            else              baseformProperties.boostLvl = (byte)((baseformProperties.boostLvl==0)?3: baseformProperties.boostLvl-1);
 
-            if(baseformProperties.boostLvl == 3)
-                StartSprint.sonicBoomEffect(player);
+            //Boost Level 3
+            if(baseformProperties.boostLvl == 3 && !player.isSprinting()) baseformProperties.boosted = false;
 
             if(player.isSprinting())
                 switch(baseformProperties.boostLvl)
@@ -45,7 +45,8 @@ public class Boost {
                              break;
                     case 2 : player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.00);
                              break;
-                    case 3 :player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
+                    case 3 : StartSprint.sonicBoomEffect(player);
+                             player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
                              break;
                 }
 
