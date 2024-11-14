@@ -263,7 +263,7 @@ public class BaseformServer {
                     if (baseformProperties.lightSpeedState == (byte) 1)
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 new DustParticleOptions(new Vector3f(0.0f, 1.2f, 1.0f), 1),
-                                player.getX()+0.00, player.getY()+0.85, player.getZ()+0.00,
+                                player.getX()+0.00, player.getY()+0.35, player.getZ()+0.00,
                                 1.0, 1.00f, 1.00f, 1.00f, 10,
                                 true)
                         );
@@ -713,7 +713,6 @@ public class BaseformServer {
                             //Remove Effect
                             if(player.hasEffect(MobEffects.INVISIBILITY))
                                 player.removeEffect(MobEffects.INVISIBILITY);
-                            System.out.println("End Effect");
 
                             //Kill Any Mirage Cloud Around
                             for(MirageCloud mirageCloud : level.getEntitiesOfClass(MirageCloud.class, new AABB(
@@ -727,6 +726,10 @@ public class BaseformServer {
                     }
                     // Light Speed Assault
                     {
+                        //Remove Light Speed Assault
+                        if(baseformProperties.lightSpeedAssault == -1 && player.onGround())
+                            baseformProperties.lightSpeedAssault = 0;
+
                         //Perform Light Speed Assault
                         if(baseformProperties.lightSpeedAssault > 0)
                         {
@@ -745,37 +748,99 @@ public class BaseformServer {
                                 Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
                                 double distanceFromEnemy = playerPos.distanceTo(enemyPos);
 
-                                //Light Speed Assault
-                                if (baseformProperties.lightSpeedAssault < 45)
+                                //Duration Light Speed Assault
+                                if (baseformProperties.lightSpeedAssault < 105)
                                 {
                                     //Fail
                                     if (distanceFromEnemy > 24.0) {
                                         throw new NullPointerException("Too Far");
                                     }
-                                    //Succeed
-                                    else if (baseformProperties.lightSpeedAssault % 3 == 0) {
-                                        //Damage Enemy
-                                        Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);;
-                                        float yawPitch[] = Utilities.getYawPitchFromVec(tpDir.reverse());
+                                    //Perform Surrounding Strikes
+                                    else if (baseformProperties.lightSpeedAssault <= 55)
+                                    {
+                                        if (baseformProperties.lightSpeedAssault % 4 == 0) {
+                                            //Get Position of in front of enemy
+                                            Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);
+                                            float yawPitch[] = Utilities.getYawPitchFromVec(tpDir.reverse());
 
-                                        //Particle Raycast
-                                        PacketHandler.sendToALLPlayers(
-                                                new ParticleRaycastPacketS2C(
-                                                        new DustParticleOptions(new Vector3f(0f,0f,1f),1)
-                                                        ,playerPos.add(0,1.25,1),enemyPos.add(tpDir).add(0,1.25,0)
-                                                )
-                                        );
-                                        player.teleportTo(player.serverLevel(),
-                                                enemyPos.x() + tpDir.x(),
-                                                enemyPos.y() + tpDir.y(),
-                                                enemyPos.z() + tpDir.z(),
-                                                Collections.emptySet(),
-                                                yawPitch[0], yawPitch[1]);
-                                        player.connection.send(new ClientboundTeleportEntityPacket(player));
-                                        enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
-                                                1.0f);
-                                        enemy.setDeltaMovement(player.getLookAngle().scale(1.0));
-                                        player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                                            //Particle Raycast
+                                            PacketHandler.sendToALLPlayers(
+                                                    new ParticleRaycastPacketS2C(
+                                                            new DustParticleOptions(new Vector3f(0f,0f,1f),1)
+                                                            ,playerPos.add(0,1.25,1),enemyPos.add(tpDir).add(0,1.25,0)
+                                                    )
+                                            );
+
+                                            //Teleport to the Position
+                                            player.teleportTo(player.serverLevel(),
+                                                    enemyPos.x() + tpDir.x(),
+                                                    enemyPos.y() + tpDir.y(),
+                                                    enemyPos.z() + tpDir.z(),
+                                                    Collections.emptySet(),
+                                                    yawPitch[0], yawPitch[1]);
+                                            player.connection.send(new ClientboundTeleportEntityPacket(player));
+
+                                            //Attack the Enemy
+                                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                                    1.0f);
+                                            enemy.setDeltaMovement(player.getLookAngle().scale(0.3));
+                                            player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                                        }
+                                        else if(baseformProperties.lightSpeedAssault % 4 == 2)
+                                        {
+                                            //Find Random Position around Enemy
+                                            double theta = Utilities.random.nextDouble(0,2*Math.PI);
+                                            Vec3 tpLocation = new Vec3(
+                                                    6*Math.cos(theta)+enemyPos.x(),
+                                                    enemyPos.y()+Utilities.random.nextDouble(-1,1),
+                                                    6*Math.sin(theta)+enemyPos.z()
+                                            );
+                                            float yawPitch[] = Utilities.getYawPitchFromVec(enemyPos.subtract(tpLocation));
+
+                                            //Particle Raycast
+                                            PacketHandler.sendToALLPlayers(
+                                                    new ParticleRaycastPacketS2C(
+                                                            new DustParticleOptions(new Vector3f(0f,0f,1f),1)
+                                                            ,playerPos.add(0,1.25,1),tpLocation.add(0,1.25,0)
+                                                    )
+                                            );
+
+                                            //Teleport to Random Position
+                                            player.teleportTo(player.serverLevel(),
+                                                    tpLocation.x(),
+                                                    tpLocation.y(),
+                                                    tpLocation.z(),
+                                                    Collections.emptySet(),
+                                                    yawPitch[0], yawPitch[1]);
+                                            player.connection.send(new ClientboundTeleportEntityPacket(player));
+                                        }
+                                    }
+                                    else //if (baseformProperties.lightSpeedAssault > 55)
+                                    {
+                                        if (baseformProperties.lightSpeedAssault % 3 == 0) {
+                                            //Damage Enemy
+                                            Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);;
+                                            float yawPitch[] = Utilities.getYawPitchFromVec(tpDir.reverse());
+
+                                            //Particle Raycast
+                                            PacketHandler.sendToALLPlayers(
+                                                    new ParticleRaycastPacketS2C(
+                                                            new DustParticleOptions(new Vector3f(0f,0f,1f),1)
+                                                            ,playerPos.add(0,1.25,1),enemyPos.add(tpDir).add(0,1.25,0)
+                                                    )
+                                            );
+                                            player.teleportTo(player.serverLevel(),
+                                                    enemyPos.x() + tpDir.x(),
+                                                    enemyPos.y() + tpDir.y(),
+                                                    enemyPos.z() + tpDir.z(),
+                                                    Collections.emptySet(),
+                                                    yawPitch[0], yawPitch[1]);
+                                            player.connection.send(new ClientboundTeleportEntityPacket(player));
+                                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                                    1.0f);
+                                            enemy.setDeltaMovement(player.getLookAngle().scale(1.0));
+                                            player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                                        }
                                     }
                                 }
                                 else
@@ -802,7 +867,7 @@ public class BaseformServer {
                                     player.connection.send(new ClientboundTeleportEntityPacket(player));
 
                                     //Go Up
-                                    player.setDeltaMovement(0,0.5,0);
+                                    player.setDeltaMovement(0,0.95,0);
                                     player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                                     //Hurt Enemy
@@ -816,9 +881,12 @@ public class BaseformServer {
                             }
                             catch (NullPointerException e)
                             {
+                                //Light Speed Attack
                                 player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
-                                baseformProperties.lightSpeedAssault = 0;
+                                baseformProperties.lightSpeedAssault = -1;
                                 baseformProperties.lightSpeedTarget = new UUID(0L, 0L);
+                                //Cooldown
+                                baseformProperties.setCooldown(BaseformActiveAbility.MIRAGE,(byte)45);
                             }
                         }
                     }

@@ -331,4 +331,15 @@ public class BaseformProperties extends FormProperties {
                 homingAttack || hummingTop || ballform || stomping ||
                 tornadoJump || lightSpeedRush;
     }
+
+    //Ball form
+    public boolean shouldBeInBallform()
+    {
+        boolean regular = this.ballFormState >= 1;
+        boolean homingAttack = this.homingAttackAirTime > 1;
+        boolean tornadoJump = this.tornadoJump > 0;
+        boolean lightSpeed = this.lightSpeedState == 1 || this.lightSpeedAssault == -1;
+
+        return regular || homingAttack || tornadoJump || lightSpeed;
+    }
 }

@@ -23,6 +23,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Sidestep;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCancel;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCharge;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedEffect;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost.PowerBoostDeactivate;
@@ -144,9 +145,9 @@ public class BaseformClient {
 
                     ClientOnlyData.lightSpeedCanceller = Scheduler.scheduleTask(() -> {
                         PacketHandler.sendToServer(new LightspeedEffect());
-                        /*Scheduler.scheduleTask(()->{
+                        Scheduler.scheduleTask(()->{
                             PacketHandler.sendToServer(new LightspeedDecay());
-                        },300);*/
+                        },300);
                     }, 66);
                 }
 

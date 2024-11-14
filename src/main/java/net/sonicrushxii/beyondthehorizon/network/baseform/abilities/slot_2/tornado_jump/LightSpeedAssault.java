@@ -84,7 +84,7 @@ public class LightSpeedAssault
                             //Start Light Speed Assault
                             if(enemyID != null)
                             {
-                                //Homing Attack Data
+                                //Changed Data
                                 baseformProperties.lightSpeedAssault = 1;
                                 baseformProperties.lightSpeedTarget = enemyID;
 
