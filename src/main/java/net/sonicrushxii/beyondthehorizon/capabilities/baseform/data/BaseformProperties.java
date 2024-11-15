@@ -149,7 +149,8 @@ public class BaseformProperties extends FormProperties {
     public byte tornadoJump;
     public short mirageTimer;
     public byte lightSpeedAssault;
-    public UUID lightSpeedTarget;
+    public UUID meleeTarget;
+    public byte loopKick;
 
     public BaseformProperties()
     {
@@ -192,7 +193,8 @@ public class BaseformProperties extends FormProperties {
         tornadoJump = (byte)0;
         mirageTimer = (short)0;
         lightSpeedAssault = (byte)0;
-        lightSpeedTarget = new UUID(0L,0L);
+        meleeTarget = new UUID(0L,0L);
+        loopKick = 0;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -237,7 +239,8 @@ public class BaseformProperties extends FormProperties {
         tornadoJump = nbt.getByte("tornadoJump");
         mirageTimer = nbt.getShort("MirageTimer");
         lightSpeedAssault = nbt.getByte("LSRush");
-        lightSpeedTarget = nbt.getUUID("LightSpeedTarget");
+        meleeTarget = nbt.getUUID("LightSpeedTarget");
+        loopKick = nbt.getByte("LoopKick");
     }
 
     @Override
@@ -285,7 +288,8 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("tornadoJump",tornadoJump);
         nbt.putShort("MirageTimer",mirageTimer);
         nbt.putByte("LSRush",lightSpeedAssault);
-        nbt.putUUID("LightSpeedTarget",lightSpeedTarget);
+        nbt.putUUID("LightSpeedTarget", meleeTarget);
+        nbt.putByte("LoopKick",loopKick);
 
         return nbt;
     }
@@ -308,10 +312,11 @@ public class BaseformProperties extends FormProperties {
         boolean tornadoJump = (this.tornadoJump != 0);
         boolean mirageTimer = (this.mirageTimer > 0);
         boolean lightSpeedRush = (this.lightSpeedAssault > 0);
+        boolean loopKick = (this.loopKick > 36);
 
         return quickCyloop ||
                 ballForm || homingAttack || melee || hummingTop || stomping ||
-                tornadoJump || mirageTimer || lightSpeedRush;
+                tornadoJump || mirageTimer || lightSpeedRush || loopKick;
     }
 
     //Checks if Player is in the middle of another attack
@@ -326,10 +331,11 @@ public class BaseformProperties extends FormProperties {
 
         boolean tornadoJump = (this.tornadoJump != 0);
         boolean lightSpeedRush = (this.lightSpeedAssault > 0);
+        boolean loopKick = (this.loopKick > 0);
 
         return quickCyloop ||
                 homingAttack || hummingTop || ballform || stomping ||
-                tornadoJump || lightSpeedRush;
+                tornadoJump || lightSpeedRush || loopKick;
     }
 
     //Ball form

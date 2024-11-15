@@ -34,6 +34,7 @@ import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -638,7 +639,7 @@ public class BaseformServer {
                     // Tornado Jump
                     {
                         if (baseformProperties.tornadoJump > 0) {
-                            //Increase Stomp time
+                            //Increase Time
                             baseformProperties.tornadoJump += 1;
 
                             //Particle
@@ -739,8 +740,8 @@ public class BaseformServer {
                                 baseformProperties.lightSpeedAssault += 1;
 
                                 //Get Target
-                                assert baseformProperties.lightSpeedTarget != null;
-                                LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.lightSpeedTarget);
+                                assert baseformProperties.meleeTarget != null;
+                                LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.meleeTarget);
 
                                 if(enemy == null)  throw new NullPointerException("Enemy died/doesn't exist anymore");
 
@@ -884,7 +885,7 @@ public class BaseformServer {
                                 //Light Speed Attack
                                 player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                                 baseformProperties.lightSpeedAssault = -1;
-                                baseformProperties.lightSpeedTarget = new UUID(0L, 0L);
+                                baseformProperties.meleeTarget = new UUID(0L, 0L);
                                 //Cooldown
                                 baseformProperties.setCooldown(BaseformActiveAbility.MIRAGE,(byte)45);
                             }
@@ -893,7 +894,98 @@ public class BaseformServer {
 
                     //Loop Kick
                     {
+                        try {
+                            if (baseformProperties.loopKick > 0) {
+                                //Increase Timer
+                                baseformProperties.loopKick += 1;
 
+                                //Looping Portion
+                                if (baseformProperties.loopKick < 36)
+                                {
+                                    //Get X and Z Components from The Player Rotation
+                                    double xComponent = Math.sin(-baseformProperties.atkRotPhase * (Math.PI / 180)) * 0.707;
+                                    double zComponent = Math.cos(baseformProperties.atkRotPhase * (Math.PI / 180)) * 0.707;
+
+                                    //Particle
+                                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                            ParticleTypes.SWEEP_ATTACK,
+                                            player.getX(), player.getY() + 1, player.getZ(),
+                                            0.0, 0.55f, 0.55f, 0.55f, 10,
+                                            false)
+                                    );
+
+                                    //Motion
+                                    Vec3 motionDirection = new Vec3(
+                                            // sin(wt + T)
+                                            xComponent * Math.cos((10.0F * baseformProperties.loopKick) * Math.PI / 180),
+                                            Math.sin((10.0F * baseformProperties.loopKick) * Math.PI / 180),
+                                            // cos(wt + T)
+                                            zComponent * Math.cos((10.0F * baseformProperties.loopKick) * Math.PI / 180)
+                                    );
+                                    player.setDeltaMovement(motionDirection.scale(1.0));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                }
+                                //Scan for enemies
+                                else if (baseformProperties.loopKick == 36)
+                                {
+                                    //Freeze Player
+                                    player.setDeltaMovement(player.getLookAngle().scale(2.0f));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                    //Scan for enemies
+                                    LoopKick.scanFoward(player);
+                                }
+                                //Homing Strike
+                                else if (baseformProperties.loopKick < 72)
+                                {
+                                    //Find Target
+                                    //Move to the nearest entity
+                                    LivingEntity loopKickTarget = (LivingEntity) serverLevel.getEntity(baseformProperties.meleeTarget);
+                                    Vec3 targetPosition = new Vec3(loopKickTarget.getX(),loopKickTarget.getY(),loopKickTarget.getZ());
+                                    double distanceFromEnemySqr = targetPosition.distanceToSqr(player.getX(),player.getY(),player.getZ());
+
+                                    Vec3 motionVector = targetPosition.subtract(player.getX(), player.getY(), player.getZ());
+                                    player.setDeltaMovement(motionVector.scale(0.35f));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                    //Particle
+                                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                            ParticleTypes.CRIT,
+                                            player.getX(), player.getY() + 1, player.getZ(),
+                                            0.0, 0.55f, 0.55f, 0.55f, 10,
+                                            false)
+                                    );
+
+                                    //Out Of Range
+                                    if(distanceFromEnemySqr > 900)  throw new NullPointerException("Enemy out of Range");
+
+                                    //In Range
+                                    else if(distanceFromEnemySqr < 4)
+                                    {
+                                        //Hurt Enemy
+                                        loopKickTarget.setDeltaMovement(motionVector.scale(1.75f));
+                                        loopKickTarget.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                                50.0f);
+                                        player.connection.send(new ClientboundSetEntityMotionPacket(loopKickTarget));
+                                        throw new NullPointerException("Move Successful");
+                                    }
+
+                                }
+                                else {
+                                    throw new NullPointerException("Move Timed Out");
+                                }
+                            }
+                        } catch(NullPointerException|ClassCastException e)
+                        {
+                            baseformProperties.loopKick = -1;
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            baseformProperties.meleeTarget = new UUID(0L, 0L);
+                            //Cooldown
+                            baseformProperties.setCooldown(BaseformActiveAbility.LOOPKICK,(byte)5);
+                        }
+                        //Return to normal animation when on Ground
+                        if (baseformProperties.loopKick == -1 && player.onGround())
+                            baseformProperties.loopKick = 0;
                     }
 
                 }
@@ -934,9 +1026,10 @@ public class BaseformServer {
             }
 
             //Slot 1
-            {
-
-            }
+            {}
+            //Slot 2
+            {}
+            //Slot 3
 
 
             PacketHandler.sendToPlayer(player,

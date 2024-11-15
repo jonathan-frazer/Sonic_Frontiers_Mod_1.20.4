@@ -13,9 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HummingTop;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.Spindash;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.*;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
 
@@ -52,15 +50,71 @@ public class BaseformRenderer
             event.setCanceled(true);
         }
         //Humming Top
-        else if(baseformProperties.hummingTop > 1)
+        else if(baseformProperties.hummingTop > 0)
         {
             //Rotate Player
             poseStack.pushPose();
             poseStack.mulPose(Axis.XP.rotationDegrees(-2F));
             poseStack.mulPose(Axis.YP.rotationDegrees((baseformProperties.hummingTop%7)*51.42F));
         }
-        else if(baseformProperties.mirageTimer > 1)
+        //Mirage
+        else if(baseformProperties.mirageTimer > 0)
         {
+            event.setCanceled(true);
+        }
+        //Loop Kick
+        else if(baseformProperties.loopKick > 0)
+        {
+            poseStack.pushPose();
+
+            // Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            if(baseformProperties.loopKick < 36)
+            {
+                //Apply Rotation & Translation
+                poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+                poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F-baseformProperties.loopKick*10.0F));
+
+                //Render The Custom Model
+                if(baseformProperties.lightSpeedState == 2) ModModelRenderer.renderModel(SonicModelLightSpeed.class, event, poseStack);
+                else if(baseformProperties.powerBoost)      ModModelRenderer.renderModel(SonicModelPowerBoost.class, event, poseStack);
+                else                                        ModModelRenderer.renderModel(SonicModelBase.class, event, poseStack);
+            }
+            else
+            {
+                //Apply Rotation & Translation
+                poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+                poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+                poseStack.translate(0D,-1.5D,0D);
+
+                //Render The Custom Model
+                if(baseformProperties.lightSpeedState == 2) ModModelRenderer.renderModel(LoopKickModelLightSpeed.class, event, poseStack);
+                else if(baseformProperties.powerBoost)      ModModelRenderer.renderModel(LoopKickModelPowerBoost.class, event, poseStack);
+                else                                        ModModelRenderer.renderModel(LoopKickModelBase.class, event, poseStack);
+            }
+
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
+        else if(baseformProperties.loopKick == -1)
+        {
+            poseStack.pushPose();
+
+            // Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+            poseStack.translate(0D,-1.5D,0D);
+
+            //Render The Custom Model
+            if(baseformProperties.lightSpeedState == 2) ModModelRenderer.renderModel(LoopKickModelLightSpeed.class, event, poseStack);
+            else if(baseformProperties.powerBoost)      ModModelRenderer.renderModel(LoopKickModelPowerBoost.class, event, poseStack);
+            else                                        ModModelRenderer.renderModel(LoopKickModelBase.class, event, poseStack);
+
+            poseStack.popPose();
             event.setCanceled(true);
         }
     }

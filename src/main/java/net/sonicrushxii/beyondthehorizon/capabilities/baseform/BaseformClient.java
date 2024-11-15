@@ -36,6 +36,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.LightSpeedAssault;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.Mirage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
@@ -337,6 +338,15 @@ public class BaseformClient {
                         PacketHandler.sendToServer(new LightSpeedAssault(ClientOnlyData.lightSpeedReticle));
                         baseformProperties.lightSpeedAssault = 1;
                     }
+                }
+            }
+
+            //Loop Kick
+            {
+                if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
+                        baseformProperties.getCooldown(BaseformActiveAbility.LOOPKICK) == 0 &&
+                        KeyBindings.INSTANCE.useAbility4.isDown()) {
+                    PacketHandler.sendToServer(new LoopKick());
                 }
             }
         }

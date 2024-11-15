@@ -86,7 +86,7 @@ public class LightSpeedAssault
                             {
                                 //Changed Data
                                 baseformProperties.lightSpeedAssault = 1;
-                                baseformProperties.lightSpeedTarget = enemyID;
+                                baseformProperties.meleeTarget = enemyID;
 
                                 //Remove Gravity
                                 player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);

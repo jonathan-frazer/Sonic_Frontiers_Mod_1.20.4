@@ -20,10 +20,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HomingAttack;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.HummingTop;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.MirageModel;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.Spindash;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.*;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageRenderer;
@@ -143,10 +140,28 @@ public class BeyondTheHorizon
         @SubscribeEvent
         public static void registerModelLayer(EntityRenderersEvent.RegisterLayerDefinitions event)
         {
+            //Sonic Models
+            event.registerLayerDefinition(SonicModelBase.LAYER_LOCATION, SonicModelBase::createBodyLayer);
+            event.registerLayerDefinition(SonicModelLightSpeed.LAYER_LOCATION, SonicModelLightSpeed::createBodyLayer);
+            event.registerLayerDefinition(SonicModelPowerBoost.LAYER_LOCATION, SonicModelPowerBoost::createBodyLayer);
+
+            //Spin Dash
             event.registerLayerDefinition(Spindash.LAYER_LOCATION,Spindash::createBodyLayer);
+
+            //Homing Attack
             event.registerLayerDefinition(HomingAttack.LAYER_LOCATION,HomingAttack::createBodyLayer);
+
+            //Humming Top
             event.registerLayerDefinition(HummingTop.LAYER_LOCATION,HummingTop::createBodyLayer);
+
+            //Mirage
             event.registerLayerDefinition(MirageModel.LAYER_LOCATION, MirageModel::createBodyLayer);
+
+            //Loop Kick
+            event.registerLayerDefinition(LoopKickModelBase.LAYER_LOCATION, LoopKickModelBase::createBodyLayer);
+            event.registerLayerDefinition(LoopKickModelPowerBoost.LAYER_LOCATION, LoopKickModelPowerBoost::createBodyLayer);
+            event.registerLayerDefinition(LoopKickModelLightSpeed.LAYER_LOCATION, LoopKickModelLightSpeed::createBodyLayer);
+
         }
     }
 }
