@@ -984,6 +984,8 @@ public class BaseformServer {
                         {
                             //Reset Timer
                             baseformProperties.wildRushTime = -3;
+                            //Cooldown
+                            baseformProperties.setCooldown(BaseformActiveAbility.WILDRUSH,(byte)5);
                             //Return Gravity
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                         }
@@ -1067,7 +1069,7 @@ public class BaseformServer {
                                     else if(distanceFromEnemySqr < 4)
                                     {
                                         //Hurt Enemy
-                                        loopKickTarget.setDeltaMovement(motionVector.scale(1.75f));
+                                        loopKickTarget.setDeltaMovement(player.getLookAngle().scale(1.75f));
                                         loopKickTarget.hurt(
                                                 ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
                                                 LOOPKICK_DAMAGE

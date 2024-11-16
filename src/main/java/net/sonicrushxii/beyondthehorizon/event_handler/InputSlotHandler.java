@@ -37,8 +37,13 @@ public class InputSlotHandler {
             if(isScrollingUp)    VirtualSlotHandler.scrollUpByOne();
             else                 VirtualSlotHandler.scrollDownByOne();
 
-            if(VirtualSlotHandler.getCurrAbility() == 0)
-                while(KeyBindings.INSTANCE.useAbility1.consumeClick());
+            //Consume All clicks before switching over to another slot
+            while(KeyBindings.INSTANCE.useAbility1.consumeClick());
+            while(KeyBindings.INSTANCE.useAbility2.consumeClick());
+            while(KeyBindings.INSTANCE.useAbility3.consumeClick());
+            while(KeyBindings.INSTANCE.useAbility4.consumeClick());
+            while(KeyBindings.INSTANCE.useAbility5.consumeClick());
+            while(KeyBindings.INSTANCE.useAbility6.consumeClick());
         }
     }
 
@@ -58,8 +63,13 @@ public class InputSlotHandler {
             int key = event.getKey();
             if (key >= InputConstants.KEY_1 && key <= InputConstants.KEY_9) {
                 VirtualSlotHandler.setSlot((byte)(key-InputConstants.KEY_1));
-                if(VirtualSlotHandler.getCurrAbility() == 0)
-                    while(KeyBindings.INSTANCE.useAbility1.consumeClick());
+                //Consume All clicks before switching over to another slot
+                while(KeyBindings.INSTANCE.useAbility1.consumeClick());
+                while(KeyBindings.INSTANCE.useAbility2.consumeClick());
+                while(KeyBindings.INSTANCE.useAbility3.consumeClick());
+                while(KeyBindings.INSTANCE.useAbility4.consumeClick());
+                while(KeyBindings.INSTANCE.useAbility5.consumeClick());
+                while(KeyBindings.INSTANCE.useAbility6.consumeClick());
             }
         }
     }

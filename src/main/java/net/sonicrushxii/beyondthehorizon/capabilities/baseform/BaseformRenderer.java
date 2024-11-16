@@ -84,7 +84,7 @@ public class BaseformRenderer
         }
 
         //Loop Kick
-        else if(baseformProperties.loopKick > 0)
+        else if(baseformProperties.loopKick > 0 && !(baseformProperties.loopKick >= 24 && baseformProperties.loopKick <= 28))
         {
             poseStack.pushPose();
 
