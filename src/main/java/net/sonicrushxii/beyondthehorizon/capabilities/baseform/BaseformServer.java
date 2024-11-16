@@ -1,6 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -35,6 +36,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushParticleS2C;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushRotationSyncS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -51,6 +54,8 @@ public class BaseformServer {
     private static final float HOMING_ATTACK_DAMAGE = 12.0f;
     private static final float BALLFORM_DAMAGE = 6.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
+    private static final float WILDRUSH_DAMAGE = 50.0f;
+    private static final float LOOPKICK_DAMAGE = 40.0f;
 
     public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
 
@@ -853,8 +858,8 @@ public class BaseformServer {
                                     //Particle Raycast
                                     PacketHandler.sendToALLPlayers(
                                             new ParticleRaycastPacketS2C(
-                                                    new DustParticleOptions(new Vector3f(0f,0f,1f),1)
-                                                    ,playerPos.add(0,1.25,1),enemyPos.add(tpDir).add(0,1.25,0)
+                                                    new DustParticleOptions(new Vector3f(0f,0f,1f),1),
+                                                    playerPos.add(0,1.25,1),enemyPos.add(tpDir).add(0,1.25,0)
                                             )
                                     );
 
@@ -892,6 +897,98 @@ public class BaseformServer {
                         }
                     }
 
+                    //Wild Rush
+                    {
+                        try{
+                            if(baseformProperties.wildRushTime != 0)
+                            {
+                                baseformProperties.wildRushTime += 1;
+
+                                if(baseformProperties.wildRushTime > 0 && baseformProperties.wildRushTime < 10)
+                                {
+                                    player.setDeltaMovement(0,0,0);
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                }
+                                else if(baseformProperties.wildRushTime > 0 && baseformProperties.wildRushTime < 80)
+                                {
+                                    //Find Target
+                                    LivingEntity wildRushTarget = (LivingEntity)serverLevel.getEntity(baseformProperties.meleeTarget);
+                                    Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+                                    Vec3 wildRushTargetPos = new Vec3(wildRushTarget.getX(),wildRushTarget.getY()+wildRushTarget.getEyeHeight(),wildRushTarget.getZ());
+
+                                    //Match Lightning Bolt Position
+                                    Vec3 lightningPos = null;
+                                    if(baseformProperties.wildRushPtr < 5)
+                                        lightningPos = new Vec3(
+                                                baseformProperties.wildRushPX[baseformProperties.wildRushPtr],
+                                                baseformProperties.wildRushPY[baseformProperties.wildRushPtr],
+                                                baseformProperties.wildRushPZ[baseformProperties.wildRushPtr]
+                                        );
+                                    //Update Lightning Bolt to move to next Position
+                                    if(lightningPos != null && lightningPos.distanceToSqr(playerPos) < 4)
+                                        baseformProperties.wildRushPtr += 1;
+
+
+                                    //Find Motion Direction
+                                    Vec3 motionDirection;
+                                    if(playerPos.distanceToSqr(wildRushTargetPos) < 20)     motionDirection = wildRushTargetPos.subtract(playerPos).normalize();
+                                    else                                                    motionDirection = lightningPos.subtract(playerPos).normalize();
+                                    //Move in the Direction
+                                    player.setDeltaMovement(motionDirection.scale(1.0));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                    //Update Player model in the direction of the vector
+                                    float[] yawPitch = Utilities.getYawPitchFromVec(motionDirection);
+                                    PacketHandler.sendToALLPlayers(new WildRushRotationSyncS2C(yawPitch[0],yawPitch[1]));
+                                    //Particle
+                                    PacketHandler.sendToALLPlayers(
+                                            new WildRushParticleS2C(
+                                                    player.getX()+motionDirection.x(),
+                                                    player.getY()+motionDirection.y(),
+                                                    player.getZ()+motionDirection.z()
+                                            )
+                                    );
+
+                                    //If player is reached then, Hurt Enemy
+                                    if(playerPos.distanceToSqr(wildRushTargetPos) < 2)
+                                    {
+                                        //Commands
+                                        String command = String.format(
+                                                "summon firework_rocket %.2f %.2f %.2f {Life:0,LifeTime:0,FireworksItem:{id:\"firework_rocket\",Count:1,tag:{Fireworks:{Explosions:[{Type:0,Flicker:1b,Colors:[I;255,16777215],FadeColors:[I;16777215,255]}]}}}}",
+                                                player.getX() + motionDirection.x(),
+                                                player.getY() + motionDirection.y(),
+                                                player.getZ() + motionDirection.z()
+                                        );
+                                        player.setDeltaMovement(motionDirection.add(0,-0.5,0).scale(-0.3));
+                                        player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                        CommandSourceStack commandSourceStack = serverLevel.getServer().createCommandSourceStack().withPermission(4).withSuppressedOutput();
+                                        serverLevel.getServer().
+                                                getCommands().
+                                                performPrefixedCommand(commandSourceStack,command);
+
+                                        //Hurt Enemy
+                                        wildRushTarget.setDeltaMovement(motionDirection.scale(1.75f));
+                                        wildRushTarget.hurt(
+                                                ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                                WILDRUSH_DAMAGE
+                                        );
+                                        player.connection.send(new ClientboundSetEntityMotionPacket(wildRushTarget));
+                                        throw new NullPointerException("Move Successful");
+                                    }
+                                }
+                                else if(baseformProperties.wildRushTime > 0)
+                                    throw new NullPointerException("Time out");
+                            }
+                        } catch(NullPointerException|ClassCastException|ArrayIndexOutOfBoundsException e)
+                        {
+                            //Reset Timer
+                            baseformProperties.wildRushTime = -3;
+                            //Return Gravity
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                        }
+                    }
+
                     //Loop Kick
                     {
                         try {
@@ -900,7 +997,7 @@ public class BaseformServer {
                                 baseformProperties.loopKick += 1;
 
                                 //Looping Portion
-                                if (baseformProperties.loopKick < 36)
+                                if (baseformProperties.loopKick < 24)
                                 {
                                     //Get X and Z Components from The Player Rotation
                                     double xComponent = Math.sin(-baseformProperties.atkRotPhase * (Math.PI / 180)) * 0.707;
@@ -917,16 +1014,23 @@ public class BaseformServer {
                                     //Motion
                                     Vec3 motionDirection = new Vec3(
                                             // sin(wt + T)
-                                            xComponent * Math.cos((10.0F * baseformProperties.loopKick) * Math.PI / 180),
-                                            Math.sin((10.0F * baseformProperties.loopKick) * Math.PI / 180),
+                                            xComponent * Math.cos((15.0F * baseformProperties.loopKick) * Math.PI / 180),
+                                            Math.sin((15.0F * baseformProperties.loopKick) * Math.PI / 180),
                                             // cos(wt + T)
-                                            zComponent * Math.cos((10.0F * baseformProperties.loopKick) * Math.PI / 180)
+                                            zComponent * Math.cos((15.0F * baseformProperties.loopKick) * Math.PI / 180)
                                     );
                                     player.setDeltaMovement(motionDirection.scale(1.0));
                                     player.connection.send(new ClientboundSetEntityMotionPacket(player));
                                 }
+                                //Stay in Place for a bit
+                                else if(baseformProperties.loopKick < 30)
+                                {
+                                    //Motion
+                                    player.setDeltaMovement(new Vec3(0,0,0));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                }
                                 //Scan for enemies
-                                else if (baseformProperties.loopKick == 36)
+                                else if (baseformProperties.loopKick == 30)
                                 {
                                     //Freeze Player
                                     player.setDeltaMovement(player.getLookAngle().scale(2.0f));
@@ -936,7 +1040,7 @@ public class BaseformServer {
                                     LoopKick.scanFoward(player);
                                 }
                                 //Homing Strike
-                                else if (baseformProperties.loopKick < 72)
+                                else if (baseformProperties.loopKick < 66)
                                 {
                                     //Find Target
                                     //Move to the nearest entity
@@ -964,8 +1068,10 @@ public class BaseformServer {
                                     {
                                         //Hurt Enemy
                                         loopKickTarget.setDeltaMovement(motionVector.scale(1.75f));
-                                        loopKickTarget.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
-                                                50.0f);
+                                        loopKickTarget.hurt(
+                                                ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                                LOOPKICK_DAMAGE
+                                        );
                                         player.connection.send(new ClientboundSetEntityMotionPacket(loopKickTarget));
                                         throw new NullPointerException("Move Successful");
                                     }

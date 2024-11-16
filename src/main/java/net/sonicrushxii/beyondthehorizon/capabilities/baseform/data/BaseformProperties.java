@@ -151,6 +151,11 @@ public class BaseformProperties extends FormProperties {
     public byte lightSpeedAssault;
     public UUID meleeTarget;
     public byte loopKick;
+    public byte wildRushTime;
+    public byte wildRushPtr;
+    public int[] wildRushPX;
+    public int[] wildRushPY;
+    public int[] wildRushPZ;
 
     public BaseformProperties()
     {
@@ -195,6 +200,12 @@ public class BaseformProperties extends FormProperties {
         lightSpeedAssault = (byte)0;
         meleeTarget = new UUID(0L,0L);
         loopKick = 0;
+        wildRushTime = 0;
+        wildRushPtr = 0;
+        wildRushPX = new int[]{0,0,0,0,0};
+        wildRushPY = new int[]{0,0,0,0,0};
+        wildRushPZ = new int[]{0,0,0,0,0};
+
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -241,6 +252,11 @@ public class BaseformProperties extends FormProperties {
         lightSpeedAssault = nbt.getByte("LSRush");
         meleeTarget = nbt.getUUID("LightSpeedTarget");
         loopKick = nbt.getByte("LoopKick");
+        wildRushTime = nbt.getByte("WildRushTime");
+        wildRushPtr = nbt.getByte("WildRushPhase");
+        wildRushPX = nbt.getIntArray("wildRushPtrsX");
+        wildRushPY = nbt.getIntArray("wildRushPtrsY");
+        wildRushPZ = nbt.getIntArray("wildRushPtrsZ");
     }
 
     @Override
@@ -290,6 +306,11 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("LSRush",lightSpeedAssault);
         nbt.putUUID("LightSpeedTarget", meleeTarget);
         nbt.putByte("LoopKick",loopKick);
+        nbt.putByte("WildRushTime",wildRushTime);
+        nbt.putByte("WildRushPhase",wildRushPtr);
+        nbt.putIntArray("wildRushPtrsX",wildRushPX);
+        nbt.putIntArray("wildRushPtrsY",wildRushPY);
+        nbt.putIntArray("wildRushPtrsZ",wildRushPZ);
 
         return nbt;
     }
@@ -312,11 +333,12 @@ public class BaseformProperties extends FormProperties {
         boolean tornadoJump = (this.tornadoJump != 0);
         boolean mirageTimer = (this.mirageTimer > 0);
         boolean lightSpeedRush = (this.lightSpeedAssault > 0);
-        boolean loopKick = (this.loopKick > 36);
+        boolean loopKick = (this.loopKick > 24);
+        boolean wildRush = (this.wildRushTime != 0);
 
         return quickCyloop ||
                 ballForm || homingAttack || melee || hummingTop || stomping ||
-                tornadoJump || mirageTimer || lightSpeedRush || loopKick;
+                tornadoJump || mirageTimer || lightSpeedRush || loopKick || wildRush;
     }
 
     //Checks if Player is in the middle of another attack
@@ -331,11 +353,12 @@ public class BaseformProperties extends FormProperties {
 
         boolean tornadoJump = (this.tornadoJump != 0);
         boolean lightSpeedRush = (this.lightSpeedAssault > 0);
+        boolean wildRush = (this.wildRushTime > 0);
         boolean loopKick = (this.loopKick > 0);
 
         return quickCyloop ||
                 homingAttack || hummingTop || ballform || stomping ||
-                tornadoJump || lightSpeedRush || loopKick;
+                tornadoJump || lightSpeedRush || loopKick || wildRush;
     }
 
     //Ball form

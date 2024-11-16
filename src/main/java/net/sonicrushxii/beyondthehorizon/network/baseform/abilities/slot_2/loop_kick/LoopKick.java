@@ -2,6 +2,7 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -83,6 +84,15 @@ public class LoopKick {
             player.setDeltaMovement(new Vec3(0,0,0));
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
+            if(player.onGround()) {
+                player.teleportTo(player.serverLevel(),
+                        player.getX(),
+                        player.getY()+1,
+                        player.getZ(),
+                        Collections.emptySet(),
+                        player.getYRot(), player.getXRot());
+                player.connection.send(new ClientboundTeleportEntityPacket(player));
+            }
             //Modify Data
             baseformProperties.loopKick = 1;
 

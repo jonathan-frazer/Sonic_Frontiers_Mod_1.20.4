@@ -32,6 +32,9 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.LightSpeedAssault;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.Mirage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRush;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushParticleS2C;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushRotationSyncS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
@@ -130,6 +133,11 @@ public class PacketHandler {
                 INSTANCE.messageBuilder(TornadoJump.class,NetworkDirection.PLAY_TO_SERVER).encoder(TornadoJump::encode).decoder(TornadoJump::new).consumerMainThread(TornadoJump::handle).add();
                 INSTANCE.messageBuilder(Mirage.class,NetworkDirection.PLAY_TO_SERVER).encoder(Mirage::encode).decoder(Mirage::new).consumerMainThread(Mirage::handle).add();
                 INSTANCE.messageBuilder(LightSpeedAssault.class,NetworkDirection.PLAY_TO_SERVER).encoder(LightSpeedAssault::encode).decoder(LightSpeedAssault::new).consumerMainThread(LightSpeedAssault::handle).add();
+
+                //Wild Rush
+                INSTANCE.messageBuilder(WildRush.class,NetworkDirection.PLAY_TO_SERVER).encoder(WildRush::encode).decoder(WildRush::new).consumerMainThread(WildRush::handle).add();
+                INSTANCE.messageBuilder(WildRushRotationSyncS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(WildRushRotationSyncS2C::encode).decoder(WildRushRotationSyncS2C::new).consumerMainThread(WildRushRotationSyncS2C::handle).add();
+                INSTANCE.messageBuilder(WildRushParticleS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(WildRushParticleS2C::encode).decoder(WildRushParticleS2C::new).consumerMainThread(WildRushParticleS2C::handle).add();
 
                 //Loop Kick
                 INSTANCE.messageBuilder(LoopKick.class,NetworkDirection.PLAY_TO_SERVER).encoder(LoopKick::encode).decoder(LoopKick::new).consumerMainThread(LoopKick::handle).add();

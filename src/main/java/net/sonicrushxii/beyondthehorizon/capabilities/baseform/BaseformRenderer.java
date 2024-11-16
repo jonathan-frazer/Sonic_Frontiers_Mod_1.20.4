@@ -62,6 +62,27 @@ public class BaseformRenderer
         {
             event.setCanceled(true);
         }
+        //
+        else if(baseformProperties.wildRushTime > 10 || baseformProperties.wildRushTime < 0)
+        {
+            poseStack.pushPose();
+
+            // Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-BaseformClient.ClientOnlyData.wildRushYawPitch[0]));
+            poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F+BaseformClient.ClientOnlyData.wildRushYawPitch[1]));
+
+            //Render The Custom Model
+            if(baseformProperties.lightSpeedState == 2) ModModelRenderer.renderModel(SonicModelLightSpeed.class, event, poseStack);
+            else if(baseformProperties.powerBoost)      ModModelRenderer.renderModel(SonicModelPowerBoost.class, event, poseStack);
+            else                                        ModModelRenderer.renderModel(SonicModelBase.class, event, poseStack);
+
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
+
         //Loop Kick
         else if(baseformProperties.loopKick > 0)
         {
@@ -70,11 +91,11 @@ public class BaseformRenderer
             // Scale
             poseStack.scale(1.0f, 1.0f, 1.0f);
 
-            if(baseformProperties.loopKick < 36)
+            if(baseformProperties.loopKick < 24)
             {
                 //Apply Rotation & Translation
                 poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F-baseformProperties.loopKick*10.0F));
+                poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F-baseformProperties.loopKick*15.0F));
 
                 //Render The Custom Model
                 if(baseformProperties.lightSpeedState == 2) ModModelRenderer.renderModel(SonicModelLightSpeed.class, event, poseStack);
@@ -123,7 +144,7 @@ public class BaseformRenderer
     {
         PoseStack poseStack = event.getPoseStack();
         // Humming Top
-        if(baseformProperties.hummingTop > 1)
+        if(baseformProperties.hummingTop > 0)
         {
             poseStack.popPose();
 
