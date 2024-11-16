@@ -37,6 +37,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spind
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.CycloneKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.LightSpeedAssault;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.Mirage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
@@ -56,6 +57,7 @@ public class BaseformClient {
         public static UUID homingAttackReticle = null;
         public static UUID lightSpeedReticle = null;
         public static UUID wildRushReticle = null;
+        public static UUID cycloneReticle = null;
         public static float[] wildRushYawPitch = {0f,0f};
         private static boolean airBoostLock = false;
     }
@@ -347,13 +349,17 @@ public class BaseformClient {
                 }
             }
 
-            //Loop Kick
+            //Cyclone Kick
             {
                 if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
-                        baseformProperties.getCooldown(BaseformActiveAbility.LOOPKICK) == 0 &&
-                        KeyBindings.INSTANCE.useAbility4.isDown()) {
-                    PacketHandler.sendToServer(new LoopKick());
-                    baseformProperties.loopKick = 1;
+                        baseformProperties.getCooldown(BaseformActiveAbility.CYCLONE_KICK) == 0 && player.isShiftKeyDown() &&
+                        KeyBindings.INSTANCE.useAbility2.isDown())
+                {
+                    CycloneKick.scanFoward(player);
+                    if(ClientOnlyData.cycloneReticle != null) {
+                        PacketHandler.sendToServer(new CycloneKick(ClientOnlyData.cycloneReticle));
+                        baseformProperties.cycloneKick = -60;
+                    }
                 }
             }
 
@@ -368,6 +374,16 @@ public class BaseformClient {
                         PacketHandler.sendToServer(new WildRush(ClientOnlyData.wildRushReticle));
                         baseformProperties.wildRushTime = 1;
                     }
+                }
+            }
+
+            //Loop Kick
+            {
+                if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
+                        baseformProperties.getCooldown(BaseformActiveAbility.LOOPKICK) == 0 &&
+                        KeyBindings.INSTANCE.useAbility4.isDown()) {
+                    PacketHandler.sendToServer(new LoopKick());
+                    baseformProperties.loopKick = 1;
                 }
             }
         }

@@ -150,12 +150,13 @@ public class BaseformProperties extends FormProperties {
     public short mirageTimer;
     public byte lightSpeedAssault;
     public UUID meleeTarget;
-    public byte loopKick;
+    public byte cycloneKick;
     public byte wildRushTime;
     public byte wildRushPtr;
     public int[] wildRushPX;
     public int[] wildRushPY;
     public int[] wildRushPZ;
+    public byte loopKick;
 
     public BaseformProperties()
     {
@@ -199,13 +200,13 @@ public class BaseformProperties extends FormProperties {
         mirageTimer = (short)0;
         lightSpeedAssault = (byte)0;
         meleeTarget = new UUID(0L,0L);
-        loopKick = 0;
+        cycloneKick = (byte)0;
         wildRushTime = 0;
         wildRushPtr = 0;
         wildRushPX = new int[]{0,0,0,0,0};
         wildRushPY = new int[]{0,0,0,0,0};
         wildRushPZ = new int[]{0,0,0,0,0};
-
+        loopKick = 0;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -251,12 +252,13 @@ public class BaseformProperties extends FormProperties {
         mirageTimer = nbt.getShort("MirageTimer");
         lightSpeedAssault = nbt.getByte("LSRush");
         meleeTarget = nbt.getUUID("LightSpeedTarget");
-        loopKick = nbt.getByte("LoopKick");
+        cycloneKick = nbt.getByte("CycloneKick");
         wildRushTime = nbt.getByte("WildRushTime");
         wildRushPtr = nbt.getByte("WildRushPhase");
         wildRushPX = nbt.getIntArray("wildRushPtrsX");
         wildRushPY = nbt.getIntArray("wildRushPtrsY");
         wildRushPZ = nbt.getIntArray("wildRushPtrsZ");
+        loopKick = nbt.getByte("LoopKick");
     }
 
     @Override
@@ -305,12 +307,13 @@ public class BaseformProperties extends FormProperties {
         nbt.putShort("MirageTimer",mirageTimer);
         nbt.putByte("LSRush",lightSpeedAssault);
         nbt.putUUID("LightSpeedTarget", meleeTarget);
-        nbt.putByte("LoopKick",loopKick);
+        nbt.putByte("CycloneKick",cycloneKick);
         nbt.putByte("WildRushTime",wildRushTime);
         nbt.putByte("WildRushPhase",wildRushPtr);
         nbt.putIntArray("wildRushPtrsX",wildRushPX);
         nbt.putIntArray("wildRushPtrsY",wildRushPY);
         nbt.putIntArray("wildRushPtrsZ",wildRushPZ);
+        nbt.putByte("LoopKick",loopKick);
 
         return nbt;
     }
@@ -333,12 +336,13 @@ public class BaseformProperties extends FormProperties {
         boolean tornadoJump = (this.tornadoJump != 0);
         boolean mirageTimer = (this.mirageTimer > 0);
         boolean lightSpeedRush = (this.lightSpeedAssault > 0);
-        boolean loopKick = (this.loopKick > 24);
+        boolean cycloneKick = (this.cycloneKick != 0);
         boolean wildRush = (this.wildRushTime != 0);
+        boolean loopKick = (this.loopKick > 24);
 
         return quickCyloop ||
                 ballForm || homingAttack || melee || hummingTop || stomping ||
-                tornadoJump || mirageTimer || lightSpeedRush || loopKick || wildRush;
+                tornadoJump || mirageTimer || lightSpeedRush || cycloneKick || wildRush || loopKick;
     }
 
     //Checks if Player is in the middle of another attack
@@ -353,12 +357,13 @@ public class BaseformProperties extends FormProperties {
 
         boolean tornadoJump = (this.tornadoJump != 0);
         boolean lightSpeedRush = (this.lightSpeedAssault > 0);
+        boolean cycloneKick = (this.cycloneKick != 0);
         boolean wildRush = (this.wildRushTime > 0);
         boolean loopKick = (this.loopKick > 0);
 
         return quickCyloop ||
                 homingAttack || hummingTop || ballform || stomping ||
-                tornadoJump || lightSpeedRush || loopKick || wildRush;
+                tornadoJump || lightSpeedRush || cycloneKick || wildRush || loopKick;
     }
 
     //Ball form
@@ -368,7 +373,8 @@ public class BaseformProperties extends FormProperties {
         boolean homingAttack = this.homingAttackAirTime > 1;
         boolean tornadoJump = this.tornadoJump > 0;
         boolean lightSpeed = this.lightSpeedState == 1 || this.lightSpeedAssault == -1;
+        boolean cycloneKick = (this.cycloneKick < 0);
 
-        return regular || homingAttack || tornadoJump || lightSpeed;
+        return regular || homingAttack || tornadoJump || lightSpeed || cycloneKick;
     }
 }

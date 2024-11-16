@@ -54,7 +54,7 @@ public class WildRush
         Vec3 lookAngle = player.getLookAngle();
 
         //Scan Forward for enemies
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 12; ++i) {
             //Increment Current Position Forward
             currentPos = currentPos.add(lookAngle);
             AABB boundingBox = new AABB(currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3,

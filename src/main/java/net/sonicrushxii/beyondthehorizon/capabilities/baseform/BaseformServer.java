@@ -897,6 +897,81 @@ public class BaseformServer {
                         }
                     }
 
+                    //Cyclone Kick
+                    {
+                        //Target the Enemy
+                        try
+                        {
+                            if(baseformProperties.cycloneKick < 0)
+                            {
+                                baseformProperties.cycloneKick += 1;
+
+                                //Find Target
+                                LivingEntity cycloneTarget = (LivingEntity)serverLevel.getEntity(baseformProperties.meleeTarget);
+                                Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+                                Vec3 cycloneTargetPos = new Vec3(cycloneTarget.getX(),cycloneTarget.getY()+cycloneTarget.getEyeHeight(),cycloneTarget.getZ());
+
+                                //Find Motion Direction
+                                Vec3 motionDirection = cycloneTargetPos.subtract(playerPos).normalize();
+                                //Move in the Direction
+                                player.setDeltaMovement(motionDirection.scale(1.0));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                //Reach Enemy
+                                if(player.distanceToSqr(cycloneTargetPos) < 4)
+                                {
+                                    player.setDeltaMovement(motionDirection.add(0, -0.5, 0).scale(-0.1));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                    baseformProperties.cycloneKick = 0;
+                                    player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                    Scheduler.scheduleTask(()->{
+                                        //Remove Gravity
+                                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+
+                                        //Set Motion to Zero
+                                        player.setDeltaMovement(new Vec3(0,0,0));
+                                        player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                        baseformProperties.cycloneKick = 1;
+                                    },9);
+                                }
+                            }
+                        }catch(NullPointerException|ClassCastException e)
+                        {
+                            baseformProperties.cycloneKick = 0;
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                        }
+
+                        //Cyclone Part
+                        try{
+                            if(baseformProperties.cycloneKick > 0)
+                            {
+                                baseformProperties.cycloneKick += 1;
+
+                                //Motion
+                                Vec3 motionDirection = new Vec3(
+                                        // sin(wt + T)
+                                        Math.sin((Math.PI / 6) * baseformProperties.cycloneKick + baseformProperties.atkRotPhase * (Math.PI / 180)),
+                                        0.10,
+                                        // cos(wt + T)
+                                        Math.cos((Math.PI / 6) * baseformProperties.cycloneKick + baseformProperties.atkRotPhase * (Math.PI / 180))
+                                );
+                                player.setDeltaMovement(motionDirection.scale(1.0 + ((baseformProperties.cycloneKick < 36)?0.01:-0.01)*baseformProperties.cycloneKick ));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                //End the Move
+                                if(baseformProperties.cycloneKick >= 90)
+                                    throw new NullPointerException("Move Completed Successfully");
+                            }
+                        }catch(NullPointerException|ClassCastException e)
+                        {
+                            baseformProperties.cycloneKick = 0;
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                        }
+
+
+                    }
+
                     //Wild Rush
                     {
                         try{

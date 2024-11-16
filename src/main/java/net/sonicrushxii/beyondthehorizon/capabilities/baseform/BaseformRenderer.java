@@ -49,6 +49,7 @@ public class BaseformRenderer
 
             event.setCanceled(true);
         }
+
         //Humming Top
         else if(baseformProperties.hummingTop > 0)
         {
@@ -57,12 +58,14 @@ public class BaseformRenderer
             poseStack.mulPose(Axis.XP.rotationDegrees(-2F));
             poseStack.mulPose(Axis.YP.rotationDegrees((baseformProperties.hummingTop%7)*51.42F));
         }
+
         //Mirage
         else if(baseformProperties.mirageTimer > 0)
         {
             event.setCanceled(true);
         }
-        //
+
+        //Wild Rush
         else if(baseformProperties.wildRushTime > 10 || baseformProperties.wildRushTime < 0)
         {
             poseStack.pushPose();
@@ -81,6 +84,15 @@ public class BaseformRenderer
 
             poseStack.popPose();
             event.setCanceled(true);
+        }
+
+        //Cyclone Kick
+        else if(baseformProperties.cycloneKick > 0)
+        {
+            //Rotate Player
+            poseStack.pushPose();
+            poseStack.mulPose(Axis.XP.rotationDegrees(60F+baseformProperties.cycloneKick*1.33F));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(-(baseformProperties.cycloneKick%15)*24F));
         }
 
         //Loop Kick
@@ -138,6 +150,8 @@ public class BaseformRenderer
             poseStack.popPose();
             event.setCanceled(true);
         }
+
+
     }
 
     public static void onRenderPlayerModelPost(RenderLivingEvent.Post<?,?> event, Player player, BaseformProperties baseformProperties)
@@ -166,6 +180,13 @@ public class BaseformRenderer
 
             poseStack.popPose();
         }
+
+        //Cyclone Kick
+        if(baseformProperties.cycloneKick > 0)
+        {
+            poseStack.popPose();
+        }
+
     }
 
     public static void onRenderToSelfPre(RenderLivingEvent.Pre<?, ?> event, LivingEntity target, BaseformProperties baseformProperties)
