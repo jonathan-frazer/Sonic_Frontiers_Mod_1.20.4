@@ -9,11 +9,14 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
+import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 
 import java.util.Collections;
 import java.util.List;
@@ -76,14 +79,39 @@ public class CycloneKick {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            //Check if target is real
-            Entity target = player.serverLevel().getEntity(enemyID);
-            if(target == null) return;
+            boolean instantCyclone = (enemyID == null);
 
-            //Set Data
-            baseformProperties.cycloneKick = -60;
+            if(!instantCyclone)
+            {
+                //Check if target is real
+                Entity target = player.serverLevel().getEntity(enemyID);
+                if(target == null)  instantCyclone = true;
+            }
+
+            if(!instantCyclone)
+            {
+                //Set Data
+                baseformProperties.cycloneKick = -60;
+                baseformProperties.meleeTarget = enemyID;
+            }
+            else
+            {
+                //Set Data
+                baseformProperties.cycloneKick = 1;
+                Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+                Scheduler.scheduleTask(()->{
+                    Utilities.summonEntity(ModEntityTypes.CYCLONE_KICK_CLOUD.get(),
+                        player.serverLevel(),
+                        playerPos.add
+                                (Utilities.calculateViewVector(0,player.getYRot()).scale(1.4)),
+                        (aoeCloud) -> {
+                            aoeCloud.setDuration(60);
+                        });
+                },5);
+                baseformProperties.meleeTarget = new UUID(0L,0L);
+            }
+
             baseformProperties.atkRotPhase = -player.getYRot()-135f;
-            baseformProperties.meleeTarget = enemyID;
 
             //Remove Gravity
             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);

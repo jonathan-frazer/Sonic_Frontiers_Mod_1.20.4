@@ -30,6 +30,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProp
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
+import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
@@ -688,10 +689,11 @@ public class BaseformServer {
                         if(baseformProperties.mirageTimer >= 8)
                         {
                             try {
-                                MirageCloud mirageCloud = level.getEntitiesOfClass(MirageCloud.class, new AABB(
+                                List<MirageCloud> mirageClouds = level.getEntitiesOfClass(MirageCloud.class, new AABB(
                                         player.getX() + 6, player.getY() + 6, player.getZ() + 6,
-                                        player.getX() - 6, player.getY() - 6, player.getZ() - 6)).get(0);
-                                if (mirageCloud == null) throw new NullPointerException("No Cloud");
+                                        player.getX() - 6, player.getY() - 6, player.getZ() - 6));
+                                if (mirageClouds.isEmpty()) throw new NullPointerException("No Cloud");
+                                MirageCloud mirageCloud = mirageClouds.get(0);
                                 double newX = mirageCloud.getX()+Utilities.random.nextDouble(-5,5);
                                 double newY = mirageCloud.getY()+Utilities.random.nextDouble(0,1.5);
                                 double newZ = mirageCloud.getZ()+Utilities.random.nextDouble(-5,5);
@@ -897,6 +899,11 @@ public class BaseformServer {
                         }
                     }
 
+                    //Spin Slash
+                    {
+
+                    }
+
                     //Cyclone Kick
                     {
                         //Target the Enemy
@@ -909,7 +916,7 @@ public class BaseformServer {
                                 //Find Target
                                 LivingEntity cycloneTarget = (LivingEntity)serverLevel.getEntity(baseformProperties.meleeTarget);
                                 Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
-                                Vec3 cycloneTargetPos = new Vec3(cycloneTarget.getX(),cycloneTarget.getY()+cycloneTarget.getEyeHeight(),cycloneTarget.getZ());
+                                Vec3 cycloneTargetPos = new Vec3(cycloneTarget.getX(),cycloneTarget.getY()+cycloneTarget.getEyeHeight()/2,cycloneTarget.getZ());
 
                                 //Find Motion Direction
                                 Vec3 motionDirection = cycloneTargetPos.subtract(playerPos).normalize();
@@ -924,6 +931,8 @@ public class BaseformServer {
                                     player.connection.send(new ClientboundSetEntityMotionPacket(player));
                                     baseformProperties.cycloneKick = 0;
                                     player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+
+                                    //Continue to Next Attack
                                     Scheduler.scheduleTask(()->{
                                         //Remove Gravity
                                         player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
@@ -933,7 +942,17 @@ public class BaseformServer {
                                         player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                                         baseformProperties.cycloneKick = 1;
-                                    },9);
+                                    },3);
+
+                                    //Spawn Cyclone Kick Cloud
+                                    Scheduler.scheduleTask(()->{
+                                        Utilities.summonEntity(ModEntityTypes.CYCLONE_KICK_CLOUD.get(),
+                                                player.serverLevel(),
+                                                cycloneTargetPos.add(0,-cycloneTarget.getEyeHeight()/2,0),
+                                                (aoeCloud) -> {
+                                                    aoeCloud.setDuration(60);
+                                                });
+                                    },12);
                                 }
                             }
                         }catch(NullPointerException|ClassCastException e)
@@ -944,23 +963,36 @@ public class BaseformServer {
 
                         //Cyclone Part
                         try{
-                            if(baseformProperties.cycloneKick > 0)
+                            if(baseformProperties.cycloneKick > 0 && baseformProperties.cycloneKick <= 3)
+                                baseformProperties.cycloneKick += 1;
+
+                            else if(baseformProperties.cycloneKick > 3)
                             {
                                 baseformProperties.cycloneKick += 1;
 
+                                byte offSetCycloneKick = (byte) (baseformProperties.cycloneKick-3);
+
                                 //Motion
-                                Vec3 motionDirection = new Vec3(
-                                        // sin(wt + T)
-                                        Math.sin((Math.PI / 6) * baseformProperties.cycloneKick + baseformProperties.atkRotPhase * (Math.PI / 180)),
-                                        0.10,
-                                        // cos(wt + T)
-                                        Math.cos((Math.PI / 6) * baseformProperties.cycloneKick + baseformProperties.atkRotPhase * (Math.PI / 180))
-                                );
-                                player.setDeltaMovement(motionDirection.scale(1.0 + ((baseformProperties.cycloneKick < 36)?0.01:-0.01)*baseformProperties.cycloneKick ));
-                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                if(baseformProperties.cycloneKick <= 63)
+                                {
+                                    Vec3 motionDirection = new Vec3(
+                                            // sin(wt + T)
+                                            Math.sin((Math.PI / 6) * offSetCycloneKick + baseformProperties.atkRotPhase * (Math.PI / 180)),
+                                            0.10,
+                                            // cos(wt + T)
+                                            Math.cos((Math.PI / 6) * offSetCycloneKick + baseformProperties.atkRotPhase * (Math.PI / 180))
+                                    );
+                                    player.setDeltaMovement(motionDirection.scale(1.0 + ((offSetCycloneKick < 36) ? 0.01 : -0.01) * offSetCycloneKick));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                }
+                                if(baseformProperties.cycloneKick == 64)
+                                {
+                                    player.setDeltaMovement(0,1.0,0);
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                }
 
                                 //End the Move
-                                if(baseformProperties.cycloneKick >= 90)
+                                if(baseformProperties.cycloneKick >= 73)
                                     throw new NullPointerException("Move Completed Successfully");
                             }
                         }catch(NullPointerException|ClassCastException e)

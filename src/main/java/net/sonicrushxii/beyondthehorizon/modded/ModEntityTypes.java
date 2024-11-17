@@ -8,6 +8,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.CycloneKickCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.TornadoJumpCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageEntity;
@@ -28,6 +29,10 @@ public class ModEntityTypes {
             () -> EntityType.Builder.<MirageEntity>of(MirageEntity::new, MobCategory.MISC)
                     .sized(1F, 2F)  // Define the size of the entity
                     .build("baseform_mirage"));
+    public static final RegistryObject<EntityType<CycloneKickCloud>> CYCLONE_KICK_CLOUD = ENTITY_TYPES.register("cyclone_kick_cloud",
+            () -> EntityType.Builder.<CycloneKickCloud>of(CycloneKickCloud::new, MobCategory.MISC)
+                    .sized(1F, 5F)  // Define the size of the entity
+                    .build("cyclone_kick_cloud"));
 
     public static void register(IEventBus eventBus){ ENTITY_TYPES.register(eventBus);}
 }

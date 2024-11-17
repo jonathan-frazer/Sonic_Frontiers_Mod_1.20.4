@@ -341,6 +341,7 @@ public class BaseformClient {
                 if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() && baseformProperties.lightSpeedState == 2 &&
                         player.isShiftKeyDown() && player.onGround() && baseformProperties.getCooldown(BaseformActiveAbility.MIRAGE) == 0 &&
                         KeyBindings.INSTANCE.useAbility1.isDown()) {
+                    ClientOnlyData.lightSpeedReticle = null;
                     LightSpeedAssault.scanFoward(player);
                     if(ClientOnlyData.lightSpeedReticle != null) {
                         PacketHandler.sendToServer(new LightSpeedAssault(ClientOnlyData.lightSpeedReticle));
@@ -355,11 +356,9 @@ public class BaseformClient {
                         baseformProperties.getCooldown(BaseformActiveAbility.CYCLONE_KICK) == 0 && player.isShiftKeyDown() &&
                         KeyBindings.INSTANCE.useAbility2.isDown())
                 {
+                    ClientOnlyData.cycloneReticle = null;
                     CycloneKick.scanFoward(player);
-                    if(ClientOnlyData.cycloneReticle != null) {
-                        PacketHandler.sendToServer(new CycloneKick(ClientOnlyData.cycloneReticle));
-                        baseformProperties.cycloneKick = -60;
-                    }
+                    PacketHandler.sendToServer(new CycloneKick(ClientOnlyData.cycloneReticle));
                 }
             }
 

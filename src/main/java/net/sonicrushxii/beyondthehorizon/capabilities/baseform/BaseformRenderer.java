@@ -91,8 +91,19 @@ public class BaseformRenderer
         {
             //Rotate Player
             poseStack.pushPose();
-            poseStack.mulPose(Axis.XP.rotationDegrees(60F+baseformProperties.cycloneKick*1.33F));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(-(baseformProperties.cycloneKick%15)*24F));
+            if(baseformProperties.cycloneKick <= 3)
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60F));
+            else if(baseformProperties.cycloneKick <= 63) {
+                final byte offsetCycloneKick = (byte) (baseformProperties.cycloneKick-5);
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60F + (offsetCycloneKick) * 1.33F));
+                poseStack.mulPose(Axis.XP.rotationDegrees(-(offsetCycloneKick % 15) * 24F));
+                poseStack.mulPose(Axis.YP.rotationDegrees(-(offsetCycloneKick % 15) * 24F));
+            }
+            else {
+                poseStack.mulPose(Axis.ZP.rotationDegrees(180F));
+                poseStack.mulPose(Axis.XP.rotationDegrees(2F));
+                poseStack.mulPose(Axis.YP.rotationDegrees(2F));
+            }
         }
 
         //Loop Kick

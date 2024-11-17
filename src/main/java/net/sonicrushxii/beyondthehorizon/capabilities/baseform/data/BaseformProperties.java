@@ -251,7 +251,7 @@ public class BaseformProperties extends FormProperties {
         tornadoJump = nbt.getByte("tornadoJump");
         mirageTimer = nbt.getShort("MirageTimer");
         lightSpeedAssault = nbt.getByte("LSRush");
-        meleeTarget = nbt.getUUID("LightSpeedTarget");
+        meleeTarget = nbt.getUUID("MeleeTarget");
         cycloneKick = nbt.getByte("CycloneKick");
         wildRushTime = nbt.getByte("WildRushTime");
         wildRushPtr = nbt.getByte("WildRushPhase");
@@ -306,7 +306,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("tornadoJump",tornadoJump);
         nbt.putShort("MirageTimer",mirageTimer);
         nbt.putByte("LSRush",lightSpeedAssault);
-        nbt.putUUID("LightSpeedTarget", meleeTarget);
+        nbt.putUUID("MeleeTarget", meleeTarget);
         nbt.putByte("CycloneKick",cycloneKick);
         nbt.putByte("WildRushTime",wildRushTime);
         nbt.putByte("WildRushPhase",wildRushPtr);

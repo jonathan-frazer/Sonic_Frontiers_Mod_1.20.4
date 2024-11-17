@@ -114,6 +114,7 @@ public class BeyondTheHorizon
             EntityRenderers.register(ModEntityTypes.TORNADO_JUMP_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.MIRAGE_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.SONIC_BASEFORM_MIRAGE.get(), MirageRenderer::new);
+            EntityRenderers.register(ModEntityTypes.CYCLONE_KICK_CLOUD.get(), PointRenderer::new);
         }
 
         @SubscribeEvent
