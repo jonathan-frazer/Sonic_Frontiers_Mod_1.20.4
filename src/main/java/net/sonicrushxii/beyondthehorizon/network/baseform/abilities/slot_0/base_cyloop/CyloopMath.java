@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -70,6 +71,10 @@ public class CyloopMath
             for(byte j = (byte) (i+SKIP_THRESHOLD); j<cyloopPath.length; ++j)
                 if(xzDistSqr((Vec3) cyloopPath[i], (Vec3) cyloopPath[j]) < 1.0)
                 {
+                    //Cyloop Regeneration
+                    if(player.hasEffect(MobEffects.SATURATION)) player.getEffect(MobEffects.SATURATION).update(new MobEffectInstance(MobEffects.SATURATION, 50, 1, false, false));
+                    else                                        player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 50, 1, false, false));
+
                     //Draw a Bounding box from point
                     Vec3 stocPoint = (Vec3) cyloopPath[j-2];
                     AABB targetBox = new AABB(
@@ -127,7 +132,6 @@ public class CyloopMath
 
                         //Sound
                         world.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.MASTER, 1.0f, 2.0f);
-
 
 
                         //Double Cyloop - Launch Down
