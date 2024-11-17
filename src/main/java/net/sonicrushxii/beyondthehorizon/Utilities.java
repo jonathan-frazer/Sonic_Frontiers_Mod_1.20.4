@@ -78,7 +78,6 @@ public class Utilities {
                     "minecraft:acacia_sapling",
                     "minecraft:dark_oak_sapling",
                     "minecraft:beetroots",
-                    "minecraft:water",
                     "minecraft:lava",
                     "minecraft:light",
                     "minecraft:powered_rail",

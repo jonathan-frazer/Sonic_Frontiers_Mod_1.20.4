@@ -638,7 +638,6 @@ public class BaseformServer {
                                 Stomp.performEndStomp(player);
                         }
                     }
-
                 }
 
                 //Slot 3
@@ -1327,6 +1326,11 @@ public class BaseformServer {
                         if (baseformProperties.loopKick == -1 && player.onGround())
                             baseformProperties.loopKick = 0;
                     }
+
+                }
+
+                //Slot 4
+                {
 
                 }
             }
