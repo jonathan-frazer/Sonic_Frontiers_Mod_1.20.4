@@ -9,6 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.CycloneKickCloud;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.SpinSlashCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.TornadoJumpCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageEntity;
@@ -33,6 +34,10 @@ public class ModEntityTypes {
             () -> EntityType.Builder.<CycloneKickCloud>of(CycloneKickCloud::new, MobCategory.MISC)
                     .sized(1F, 5F)  // Define the size of the entity
                     .build("cyclone_kick_cloud"));
+    public static final RegistryObject<EntityType<SpinSlashCloud>> SPIN_SLASH_CLOUD = ENTITY_TYPES.register("spinslash_cloud",
+            () -> EntityType.Builder.<SpinSlashCloud>of(SpinSlashCloud::new, MobCategory.MISC)
+                    .sized(1F, 5F)  // Define the size of the entity
+                    .build("spinslash_cloud"));
 
     public static void register(IEventBus eventBus){ ENTITY_TYPES.register(eventBus);}
 }

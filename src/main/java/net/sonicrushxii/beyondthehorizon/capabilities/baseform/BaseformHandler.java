@@ -63,6 +63,10 @@ public class BaseformHandler {
             if(baseformProperties.wildRushTime != 0 && isFireworkDmg)
                 event.setCanceled(true);
 
+            //Spin Slash
+            if(baseformProperties.spinSlash != 0 && !event.getSource().is(DamageTypes.MAGIC) && !event.getSource().is(DamageTypes.EXPLOSION))
+                event.setCanceled(true);
+
             // Makes you only invulnerable to Direct mob attacks when using this ability. Like weakness but better
             if (baseformProperties.dodgeInvul)
                 event.setCanceled(true);
@@ -188,7 +192,7 @@ public class BaseformHandler {
                         baseformProperties.smashHit*0.5f);
 
                 //Sound
-                damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), ModSounds.SMASH_HIT.get(), SoundSource.MASTER, 1.0f, 1.0f);;
+                damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), ModSounds.SMASH_HIT.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
                 damageGiver.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
                     //Get Data From the Player

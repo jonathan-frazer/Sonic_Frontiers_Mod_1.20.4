@@ -291,13 +291,12 @@ public class Utilities {
         return getYawPitchFromVec(targetPos.subtract(playerPos));
     }
 
-    public static void displayParticle(Player player , ParticleOptions particleType,
+    public static void displayParticle(Level world, ParticleOptions particleType,
                                        double absX, double absY, double absZ,
                                        float radiusX, float radiusY, float radiusZ,
                                        double speedX, double speedY, double speedZ,
-                                       int count, boolean force) {
-        Level world = player.level();
-
+                                       int count, boolean force)
+    {
         for (int i = 0; i < count; i++)
         {
             double x = random.nextGaussian();
@@ -319,13 +318,12 @@ public class Utilities {
         }
     }
 
-    public static void displayParticle(Player player , ParticleOptions particleType,
+    public static void displayParticle(Level world , ParticleOptions particleType,
                                        double absX, double absY, double absZ,
                                        float radiusX, float radiusY, float radiusZ,
                                        double speed,
-                                       int count, boolean force) {
-        Level world = player.level();
-
+                                       int count, boolean force)
+    {
         for (int i = 0; i < count; i++) {
 
             double x = random.nextGaussian();
@@ -366,6 +364,32 @@ public class Utilities {
                     particleX, particleY, particleZ,
                     speedX, speedY, speedZ);
         }
+    }
+
+    public static void displayParticle(Player player , ParticleOptions particleType,
+                                       double absX, double absY, double absZ,
+                                       float radiusX, float radiusY, float radiusZ,
+                                       double speedX, double speedY, double speedZ,
+                                       int count, boolean force) {
+        Level world = player.level();
+        displayParticle(world,particleType,absX,absY,absZ,
+                radiusX,radiusY,radiusZ,
+                speedX,speedY,speedZ,
+                count,force);
+
+    }
+
+    public static void displayParticle(Player player , ParticleOptions particleType,
+                                       double absX, double absY, double absZ,
+                                       float radiusX, float radiusY, float radiusZ,
+                                       double speed,
+                                       int count, boolean force) {
+        Level world = player.level();
+        displayParticle(world,particleType,
+                absX,absY,absZ,
+                radiusX,radiusY,radiusZ,
+                speed,count,force);
+
     }
 
     public static void particleRaycast(Level world, ParticleOptions particleType,

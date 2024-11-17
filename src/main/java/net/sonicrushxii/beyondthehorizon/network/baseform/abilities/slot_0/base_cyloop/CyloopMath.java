@@ -128,27 +128,48 @@ public class CyloopMath
                         //Sound
                         world.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.MASTER, 1.0f, 2.0f);
 
-                        //Damage
-                        enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_CYLOOP.getResourceKey(),player),
-                                CYLOOP_DAMAGE);
 
-                        //Launch up
-                        enemy.setDeltaMovement(0.0,1.1,0.0);
-                        player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
 
-                        //Lock in MidAir for 2 sec
-                        Scheduler.scheduleTask(()->{
-                            //Set Movement to Zero
-                            enemy.setDeltaMovement(0.0,0.02,0.0);
+                        //Double Cyloop - Launch Down
+                        if(enemy.hasEffect(ModEffects.CYLOOPED.get()) && enemy.getEffect(ModEffects.CYLOOPED.get()).getDuration() > 0)
+                        {
+                            //Launch Down
+                            enemy.setDeltaMovement(0.0,-1.1,0.0);
                             player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
 
-                            //Give the Cylooped Effect
-                            if(enemy.hasEffect(ModEffects.CYLOOPED.get()))
-                                enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
-                            else
-                                enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
+                            //Deal Damage
+                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_CYLOOP.getResourceKey(),player),
+                                    CYLOOP_DAMAGE*1.5F);
 
-                        },10);
+                            //Give the Cylooped Effect
+                            enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 20, 0, false, false));
+                        }
+                        //Single Cyloop
+                        else
+                        {
+                            //Damage
+                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_CYLOOP.getResourceKey(),player),
+                                    CYLOOP_DAMAGE);
+
+                            //Launch Up
+                            enemy.setDeltaMovement(0.0,1.1,0.0);
+                            player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+
+                            //Lock in MidAir for 2 sec
+                            Scheduler.scheduleTask(()->{
+                                //Set Movement to Zero
+                                enemy.setDeltaMovement(0.0,0.02,0.0);
+                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+
+                                //Give the Cylooped Effect
+                                if(enemy.hasEffect(ModEffects.CYLOOPED.get()))
+                                    enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
+                                else
+                                    enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
+
+                            },10);
+                        }
+
                     }
 
                     //Skip the Rest of the Comparisons

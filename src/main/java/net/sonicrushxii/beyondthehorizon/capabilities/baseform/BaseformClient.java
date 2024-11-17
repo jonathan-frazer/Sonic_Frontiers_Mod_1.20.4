@@ -38,6 +38,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spind
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.CycloneKick;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.SpinSlash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.LightSpeedAssault;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.Mirage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
@@ -58,6 +59,7 @@ public class BaseformClient {
         public static UUID lightSpeedReticle = null;
         public static UUID wildRushReticle = null;
         public static UUID cycloneReticle = null;
+        public static UUID spinSlashReticle = null;
         public static float[] wildRushYawPitch = {0f,0f};
         private static boolean airBoostLock = false;
     }
@@ -316,7 +318,7 @@ public class BaseformClient {
         {
             //Tornado Jump
             {
-                if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking()
+                if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() && baseformProperties.tornadoJump == 0
                         && !player.isShiftKeyDown() && KeyBindings.INSTANCE.useAbility1.isDown()) {
                     PacketHandler.sendToServer(new TornadoJump());
                     baseformProperties.tornadoJump = 1;
@@ -346,6 +348,20 @@ public class BaseformClient {
                     if(ClientOnlyData.lightSpeedReticle != null) {
                         PacketHandler.sendToServer(new LightSpeedAssault(ClientOnlyData.lightSpeedReticle));
                         baseformProperties.lightSpeedAssault = 1;
+                    }
+                }
+            }
+
+            //Light Speed Assault
+            {
+                if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
+                        !player.isShiftKeyDown() && baseformProperties.getCooldown(BaseformActiveAbility.SPINSLASH) == 0 &&
+                        KeyBindings.INSTANCE.useAbility2.isDown()) {
+                    ClientOnlyData.spinSlashReticle = null;
+                    SpinSlash.scanFoward(player);
+                    if(ClientOnlyData.spinSlashReticle != null) {
+                        PacketHandler.sendToServer(new SpinSlash(ClientOnlyData.spinSlashReticle));
+                        baseformProperties.spinSlash = -60;
                     }
                 }
             }

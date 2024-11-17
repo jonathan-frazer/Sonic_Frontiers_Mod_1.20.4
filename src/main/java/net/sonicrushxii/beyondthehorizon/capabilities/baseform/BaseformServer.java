@@ -27,6 +27,7 @@ import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.SpinSlashCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
@@ -769,7 +770,7 @@ public class BaseformServer {
                                         if (baseformProperties.lightSpeedAssault % 4 == 0) {
                                             //Get Position of in front of enemy
                                             Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);
-                                            float yawPitch[] = Utilities.getYawPitchFromVec(tpDir.reverse());
+                                            float[] yawPitch = Utilities.getYawPitchFromVec(tpDir.reverse());
 
                                             //Particle Raycast
                                             PacketHandler.sendToALLPlayers(
@@ -803,7 +804,7 @@ public class BaseformServer {
                                                     enemyPos.y()+Utilities.random.nextDouble(-1,1),
                                                     6*Math.sin(theta)+enemyPos.z()
                                             );
-                                            float yawPitch[] = Utilities.getYawPitchFromVec(enemyPos.subtract(tpLocation));
+                                            float[] yawPitch = Utilities.getYawPitchFromVec(enemyPos.subtract(tpLocation));
 
                                             //Particle Raycast
                                             PacketHandler.sendToALLPlayers(
@@ -827,8 +828,8 @@ public class BaseformServer {
                                     {
                                         if (baseformProperties.lightSpeedAssault % 3 == 0) {
                                             //Damage Enemy
-                                            Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);;
-                                            float yawPitch[] = Utilities.getYawPitchFromVec(tpDir.reverse());
+                                            Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);
+                                            float[] yawPitch = Utilities.getYawPitchFromVec(tpDir.reverse());
 
                                             //Particle Raycast
                                             PacketHandler.sendToALLPlayers(
@@ -855,7 +856,7 @@ public class BaseformServer {
                                 {
                                     //Damage Enemy
                                     Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);
-                                    float yawPitch[] = Utilities.getYawPitchFromVec(tpDir.reverse());
+                                    float[] yawPitch = Utilities.getYawPitchFromVec(tpDir.reverse());
 
                                     //Particle Raycast
                                     PacketHandler.sendToALLPlayers(
@@ -901,7 +902,131 @@ public class BaseformServer {
 
                     //Spin Slash
                     {
+                        try {
+                            if (baseformProperties.spinSlash < -10)
+                            {
+                                baseformProperties.spinSlash += 1;
 
+                                //Find Target
+                                LivingEntity spinTarget = (LivingEntity)serverLevel.getEntity(baseformProperties.meleeTarget);
+                                Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+                                Vec3 spinTargetPos = new Vec3(spinTarget.getX(),spinTarget.getY()+spinTarget.getEyeHeight()/2,spinTarget.getZ());
+
+                                //Find Motion Direction
+                                Vec3 motionDirection = spinTargetPos.subtract(playerPos).normalize();
+                                //Move in the Direction
+                                player.setDeltaMovement(motionDirection.scale((baseformProperties.spinSlash<-52)?0.0:1.0));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                //Reach Enemy
+                                if(player.distanceToSqr(spinTargetPos) < 4)
+                                {
+                                    //Spin Target, Teleport
+                                    Vec3 bounceDir = (new Vec3(motionDirection.x(), -0.75, motionDirection.z())).scale(-0.35);
+                                    player.teleportTo(spinTargetPos.x()+bounceDir.x(),
+                                            spinTargetPos.y()+bounceDir.y(),
+                                            spinTargetPos.z()+bounceDir.z());
+                                    player.connection.send(new ClientboundTeleportEntityPacket(player));
+
+                                    //Bounce
+                                    player.setDeltaMovement(bounceDir);
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                    baseformProperties.spinSlash = -10;
+                                    player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+
+                                    //Spawn Spin Particles
+                                    Scheduler.scheduleTask(()->{
+                                        Vec3 cloudSpawn = new Vec3(-motionDirection.x(),0,-motionDirection.z());
+
+                                        Utilities.summonEntity(ModEntityTypes.SPIN_SLASH_CLOUD.get(),
+                                                player.serverLevel(),
+                                                spinTargetPos.add(cloudSpawn.scale(0.75)),
+                                                (aoeCloud) -> {
+                                                    aoeCloud.setDuration(58);
+                                                });
+
+                                    },7);
+
+                                    //Continue to Next Attack
+                                    Scheduler.scheduleTask(()->{
+                                        //Remove Gravity
+                                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+
+                                        //Set Attack Rotation Phase
+                                        baseformProperties.atkRotPhase = -player.getYRot()-135f;
+
+                                        //Set Motion to Zero
+                                        player.setDeltaMovement(new Vec3(0,0,0));
+                                        player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                        baseformProperties.spinSlash = 1;
+                                    },11);
+                                }
+                            }
+
+                            if(baseformProperties.spinSlash >= -10 && baseformProperties.spinSlash < 0 && player.onGround())
+                                baseformProperties.spinSlash = 0;
+
+                        }catch(NullPointerException|ClassCastException e)
+                        {
+                            baseformProperties.spinSlash = 0;
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.removeEffect(MobEffects.GLOWING);
+                        }
+
+                        try {
+                            if (baseformProperties.spinSlash > 0)
+                            {
+                                baseformProperties.spinSlash += 1;
+
+                                //Stun Target
+                                try {
+                                    LivingEntity spinTarget = (LivingEntity) serverLevel.getEntity(baseformProperties.meleeTarget);
+                                    spinTarget.setDeltaMovement(0,0,0);
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(spinTarget));
+                                }catch(NullPointerException|ClassCastException ignored){}
+
+
+                                Vec3 jumpBackPos = new Vec3(0,0,0);
+
+                                //Teleport to the crux of the spinSlash
+                                List<SpinSlashCloud> spinSlashClouds = serverLevel.getEntitiesOfClass(SpinSlashCloud.class, new AABB(
+                                        player.getX() + 8, player.getY() + 6, player.getZ() + 8,
+                                        player.getX() - 8, player.getY() - 6, player.getZ() - 8));
+                                if(!spinSlashClouds.isEmpty())
+                                {
+                                    SpinSlashCloud spinSlashCloud = spinSlashClouds.get(0);
+
+                                    player.teleportTo(
+                                            spinSlashCloud.getX()+Math.sin(baseformProperties.spinSlash*(Math.PI/4))*2.75,
+                                            spinSlashCloud.getY(),
+                                            spinSlashCloud.getZ()+Math.cos(baseformProperties.spinSlash*(Math.PI/4))*2.75
+                                    );
+                                    if(baseformProperties.spinSlash >= 53){
+                                        jumpBackPos = (new Vec3(player.getX(),player.getY(),player.getZ())).subtract(new Vec3(spinSlashCloud.getX(),spinSlashCloud.getY(),spinSlashCloud.getZ())).normalize();
+                                        System.out.println(jumpBackPos);
+                                    }
+                                    player.connection.send(new ClientboundTeleportEntityPacket(player));
+                                }
+
+                                //End the Move
+                                if(baseformProperties.spinSlash >= 53) {
+                                    player.setDeltaMovement( (new Vec3(0,0.35,0)).add(jumpBackPos.scale(0.35)) );
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                    throw new NullPointerException("Move Completed Successfully");
+                                }
+                            }
+                        }catch(NullPointerException|ClassCastException e)
+                        {
+                            baseformProperties.spinSlash = 0;
+                            //Cooldown
+                            baseformProperties.setCooldown(BaseformActiveAbility.SPINSLASH,(byte)5);
+                            //Return Gravity
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            //Remove Glowing Effect
+                            player.removeEffect(MobEffects.GLOWING);
+                        }
                     }
 
                     //Cyclone Kick
@@ -945,19 +1070,18 @@ public class BaseformServer {
                                     },3);
 
                                     //Spawn Cyclone Kick Cloud
-                                    Scheduler.scheduleTask(()->{
-                                        Utilities.summonEntity(ModEntityTypes.CYCLONE_KICK_CLOUD.get(),
-                                                player.serverLevel(),
-                                                cycloneTargetPos.add(0,-cycloneTarget.getEyeHeight()/2,0),
-                                                (aoeCloud) -> {
-                                                    aoeCloud.setDuration(60);
-                                                });
-                                    },12);
+                                    Scheduler.scheduleTask(()-> Utilities.summonEntity(ModEntityTypes.CYCLONE_KICK_CLOUD.get(),
+                                            player.serverLevel(),
+                                            cycloneTargetPos.add(0,-cycloneTarget.getEyeHeight()/2,0),
+                                            (aoeCloud) -> {
+                                                aoeCloud.setDuration(60);
+                                            }),12);
                                 }
                             }
                         }catch(NullPointerException|ClassCastException e)
                         {
                             baseformProperties.cycloneKick = 0;
+                            //Return Gravity
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                         }
 
@@ -998,10 +1122,11 @@ public class BaseformServer {
                         }catch(NullPointerException|ClassCastException e)
                         {
                             baseformProperties.cycloneKick = 0;
+                            //Cooldown
+                            baseformProperties.setCooldown(BaseformActiveAbility.CYCLONE_KICK,(byte)5);
+                            //Return Gravity
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                         }
-
-
                     }
 
                     //Wild Rush
@@ -1038,7 +1163,7 @@ public class BaseformServer {
 
                                     //Find Motion Direction
                                     Vec3 motionDirection;
-                                    if(playerPos.distanceToSqr(wildRushTargetPos) < 20)     motionDirection = wildRushTargetPos.subtract(playerPos).normalize();
+                                    if(playerPos.distanceToSqr(wildRushTargetPos) < 36)     motionDirection = wildRushTargetPos.subtract(playerPos).normalize();
                                     else                                                    motionDirection = lightningPos.subtract(playerPos).normalize();
                                     //Move in the Direction
                                     player.setDeltaMovement(motionDirection.scale(1.0));

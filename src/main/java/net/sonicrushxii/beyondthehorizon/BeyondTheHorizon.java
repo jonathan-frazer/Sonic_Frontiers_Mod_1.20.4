@@ -115,6 +115,7 @@ public class BeyondTheHorizon
             EntityRenderers.register(ModEntityTypes.MIRAGE_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.SONIC_BASEFORM_MIRAGE.get(), MirageRenderer::new);
             EntityRenderers.register(ModEntityTypes.CYCLONE_KICK_CLOUD.get(), PointRenderer::new);
+            EntityRenderers.register(ModEntityTypes.SPIN_SLASH_CLOUD.get(), PointRenderer::new);
         }
 
         @SubscribeEvent
@@ -157,6 +158,9 @@ public class BeyondTheHorizon
 
             //Mirage
             event.registerLayerDefinition(MirageModel.LAYER_LOCATION, MirageModel::createBodyLayer);
+
+            //Spin Slash
+            event.registerLayerDefinition(Spinslash.LAYER_LOCATION,Spinslash::createBodyLayer);
 
             //Loop Kick
             event.registerLayerDefinition(LoopKickModelBase.LAYER_LOCATION, LoopKickModelBase::createBodyLayer);
