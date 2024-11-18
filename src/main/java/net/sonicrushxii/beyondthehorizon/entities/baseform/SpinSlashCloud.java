@@ -39,7 +39,7 @@ public class SpinSlashCloud extends PointEntity {
                         0.001, 1, false
                 );
                 Utilities.displayParticle(this.level(),
-                        new DustParticleOptions(new Vector3f(0.20f,0.20f,1f),2f),
+                        new DustParticleOptions(new Vector3f(0.259f,0.387f,1.00f),2f),
                         particleX,particleY,particleZ,
                         1.0f,0.1f,1.0f,
                         0.001, 2, false

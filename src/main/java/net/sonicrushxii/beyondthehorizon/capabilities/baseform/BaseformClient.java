@@ -33,6 +33,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homin
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SetSmashHitChargeC2S;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitzDash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
@@ -43,6 +44,10 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.torna
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.Mirage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRush;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross_slash.CrossSlash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.SonicBoom;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -56,10 +61,16 @@ public class BaseformClient {
     {
         private static ScheduledTask lightSpeedCanceller = null;
         public static UUID homingAttackReticle = null;
+
+        //Melee Reticles
         public static UUID lightSpeedReticle = null;
         public static UUID wildRushReticle = null;
         public static UUID cycloneReticle = null;
         public static UUID spinSlashReticle = null;
+
+        //Ranged Reticles
+        public static UUID crossSlashReticle = null;
+
         public static float[] wildRushYawPitch = {0f,0f};
         private static boolean airBoostLock = false;
     }
@@ -278,7 +289,12 @@ public class BaseformClient {
                 if(VirtualSlotHandler.getCurrAbility() == 1 && baseformProperties.getCooldown(BaseformActiveAbility.SPEED_BLITZ) == (byte)0
                 && KeyBindings.INSTANCE.useAbility3.consumeClick())
                 {
-                    PacketHandler.sendToServer(new SpeedBlitz());
+                    if(!player.isShiftKeyDown())
+                        PacketHandler.sendToServer(new SpeedBlitz());
+                    else if(baseformProperties.speedBlitzDashTimer == 0) {
+                        PacketHandler.sendToServer(new SpeedBlitzDash());
+                        baseformProperties.speedBlitzDashTimer = 1;
+                    }
                     while(KeyBindings.INSTANCE.useAbility3.consumeClick());
                 }
 
@@ -401,6 +417,60 @@ public class BaseformClient {
                     baseformProperties.loopKick = 1;
                 }
             }
+        }
+
+        //Slot 4
+        {
+
+            //Sonic Boom
+            {
+                if (VirtualSlotHandler.getCurrAbility() == 3 && !baseformProperties.isAttacking() &&
+                        baseformProperties.getCooldown(BaseformActiveAbility.SONIC_BOOM) == 0 &&
+                        KeyBindings.INSTANCE.useAbility1.isDown())
+                {
+                    PacketHandler.sendToServer(new SonicBoom());
+                    baseformProperties.sonicBoom = 1;
+                }
+            }
+
+            //Cross Slash
+            {
+                if (VirtualSlotHandler.getCurrAbility() == 3 && !baseformProperties.isAttacking() &&
+                        baseformProperties.getCooldown(BaseformActiveAbility.CROSS_SLASH) == 0 &&
+                        KeyBindings.INSTANCE.useAbility2.isDown())
+                {
+                    PacketHandler.sendToServer(new CrossSlash());
+                    baseformProperties.crossSlash = 1;
+                }
+            }
+
+            //Sonic Wind
+            {
+                if (VirtualSlotHandler.getCurrAbility() == 3 && !baseformProperties.isAttacking() &&
+                        baseformProperties.getCooldown(BaseformActiveAbility.SONIC_WIND) == 0 &&
+                        KeyBindings.INSTANCE.useAbility3.isDown())
+                {
+                    PacketHandler.sendToServer(new SonicWind());
+                    baseformProperties.sonicWind = 1;
+                }
+            }
+
+            //Homing Shot
+            {
+                if (VirtualSlotHandler.getCurrAbility() == 3 && !baseformProperties.isAttacking() &&
+                        baseformProperties.getCooldown(BaseformActiveAbility.HOMING_SHOT) == 0 &&
+                        KeyBindings.INSTANCE.useAbility4.isDown())
+                {
+                    PacketHandler.sendToServer(new HomingShot());
+                    baseformProperties.homingShot = 1;
+                }
+            }
+
+
+
+
+
+
         }
     }
 

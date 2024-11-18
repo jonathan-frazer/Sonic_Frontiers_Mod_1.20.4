@@ -4,6 +4,8 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -76,6 +78,10 @@ public class QuickCyloop {
 
             //Consume Meter
             baseformProperties.qkCyloopMeter -= 50.0;
+
+            //Cyloop Regeneration
+            if(player.hasEffect(MobEffects.SATURATION)) player.getEffect(MobEffects.SATURATION).update(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
+            else                                        player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
 
             //Activate Cyloop
             baseformProperties.quickCyloop = 1;

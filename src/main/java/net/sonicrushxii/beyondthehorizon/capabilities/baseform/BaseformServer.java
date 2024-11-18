@@ -29,6 +29,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActi
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.SpinSlashCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
@@ -585,6 +586,29 @@ public class BaseformServer {
                     }
 
                     //Speed Blitz
+                    {
+                        if(baseformProperties.speedBlitzDashTimer > 0)
+                        {
+                            baseformProperties.speedBlitzDashTimer += 1;
+
+                            if(baseformProperties.speedBlitzDashTimer <= 4)
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    new DustParticleOptions(new Vector3f(0f,1f,1f),2f),
+                                    player.getX()+0.00, player.getY()+1.05, player.getZ()+0.00,
+                                    0.001, 0.15f, 1.05f, 0.15f, 9,
+                                    true));
+                        }
+                        if(baseformProperties.speedBlitzDashTimer == 5)
+                        {
+                            //Set Delta Movement
+                            player.setDeltaMovement(0,0,0);
+                            //Remove Gravity
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                        }
+                        if (baseformProperties.speedBlitzDashTimer > 15)
+                            baseformProperties.speedBlitzDashTimer = 0;
+                    }
 
                     //Smash Hit
                     {
@@ -1162,7 +1186,7 @@ public class BaseformServer {
 
                                     //Find Motion Direction
                                     Vec3 motionDirection;
-                                    if(playerPos.distanceToSqr(wildRushTargetPos) < 36)     motionDirection = wildRushTargetPos.subtract(playerPos).normalize();
+                                    if(playerPos.distanceToSqr(wildRushTargetPos) < 50)     motionDirection = wildRushTargetPos.subtract(playerPos).normalize();
                                     else                                                    motionDirection = lightningPos.subtract(playerPos).normalize();
                                     //Move in the Direction
                                     player.setDeltaMovement(motionDirection.scale(1.0));
@@ -1316,22 +1340,89 @@ public class BaseformServer {
                             }
                         } catch(NullPointerException|ClassCastException e)
                         {
-                            baseformProperties.loopKick = -1;
+                            baseformProperties.loopKick = -40;
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             baseformProperties.meleeTarget = new UUID(0L, 0L);
                             //Cooldown
                             baseformProperties.setCooldown(BaseformActiveAbility.LOOPKICK,(byte)5);
                         }
-                        //Return to normal animation when on Ground
-                        if (baseformProperties.loopKick == -1 && player.onGround())
-                            baseformProperties.loopKick = 0;
+                        //Return to normal animation when on Ground or when it times out
+                        if (baseformProperties.loopKick < 0) {
+                            baseformProperties.loopKick += 1;
+                            if(player.onGround())
+                                baseformProperties.loopKick = 0;
+                        }
                     }
 
                 }
 
                 //Slot 4
                 {
+                    //Sonic Boom
+                    {
 
+                    }
+
+                    //Cross Slash
+                    {
+
+                    }
+
+                    //Sonic Wind
+                    {
+                        //Increment Time
+                        if(baseformProperties.sonicWind > 0)
+                        {
+                            baseformProperties.sonicWind += 1;
+
+                            //Add Particle
+                            if(baseformProperties.sonicWind < 10)
+                            {
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        new DustParticleOptions(new Vector3f(0f, 1f, 1f), 2f),
+                                        player.getX(), player.getY() + 1.05, player.getZ(),
+                                        0.001, 0.55f, 1.05f, 0.55f, 2,
+                                        true));
+                            }
+
+                            //Throw Sonic Wind
+                            if(baseformProperties.sonicWind == 10)
+                            {
+                                Vec3 spawnPos = new Vec3(player.getX()+player.getLookAngle().x,
+                                        player.getY()+player.getLookAngle().y+1.0,
+                                        player.getZ()+player.getLookAngle().z);
+                                level.playSound(null,player.getX(),player.getY(),player.getZ(),
+                                        SoundEvents.EGG_THROW, SoundSource.MASTER, 1.0f, 1.0f);
+                                SonicWind sonicWind = new SonicWind(ModEntityTypes.SONIC_WIND.get(), level);
+
+                                sonicWind.setPos(spawnPos);
+                                sonicWind.setDuration(120);
+                                sonicWind.setMovementDirection(player.getLookAngle());
+                                sonicWind.setDestroyBlocks(player.isShiftKeyDown());
+                                sonicWind.setOwner(player.getUUID());
+
+                                // Add the entity to the world
+                                level.addFreshEntity(sonicWind);
+                            }
+
+                            //End Ability
+                            if(baseformProperties.sonicWind > 20)
+                            {
+                                //Reset Counter to 0
+                                baseformProperties.sonicWind = 0;
+                                //Return Gravity
+                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                //Cooldown
+                                baseformProperties.setCooldown(BaseformActiveAbility.SONIC_WIND,(byte)5);
+
+                            }
+                        }
+                    }
+
+                    //Homing Shot
+                    {
+
+                    }
                 }
             }
 

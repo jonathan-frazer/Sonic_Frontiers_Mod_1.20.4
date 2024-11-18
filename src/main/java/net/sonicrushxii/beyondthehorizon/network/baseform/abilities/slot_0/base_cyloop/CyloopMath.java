@@ -72,8 +72,8 @@ public class CyloopMath
                 if(xzDistSqr((Vec3) cyloopPath[i], (Vec3) cyloopPath[j]) < 1.0)
                 {
                     //Cyloop Regeneration
-                    if(player.hasEffect(MobEffects.SATURATION)) player.getEffect(MobEffects.SATURATION).update(new MobEffectInstance(MobEffects.SATURATION, 50, 1, false, false));
-                    else                                        player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 50, 1, false, false));
+                    if(player.hasEffect(MobEffects.SATURATION)) player.getEffect(MobEffects.SATURATION).update(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
+                    else                                        player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
 
                     //Draw a Bounding box from point
                     Vec3 stocPoint = (Vec3) cyloopPath[j-2];

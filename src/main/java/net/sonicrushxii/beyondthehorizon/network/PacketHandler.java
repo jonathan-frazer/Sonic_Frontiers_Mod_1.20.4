@@ -25,6 +25,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homin
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SetSmashHitChargeC2S;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitzDash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
@@ -37,6 +38,10 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.torna
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRush;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushRotationSyncS2C;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross_slash.CrossSlash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.SonicBoom;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
@@ -123,6 +128,8 @@ public class PacketHandler {
                 INSTANCE.messageBuilder(HummingTop.class,NetworkDirection.PLAY_TO_SERVER).encoder(HummingTop::encode).decoder(HummingTop::new).consumerMainThread(HummingTop::handle).add();
 
                 INSTANCE.messageBuilder(SpeedBlitz.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpeedBlitz::encode).decoder(SpeedBlitz::new).consumerMainThread(SpeedBlitz::handle).add();
+                INSTANCE.messageBuilder(SpeedBlitzDash.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpeedBlitzDash::encode).decoder(SpeedBlitzDash::new).consumerMainThread(SpeedBlitzDash::handle).add();
+
 
                 INSTANCE.messageBuilder(SetSmashHitChargeC2S.class,NetworkDirection.PLAY_TO_SERVER).encoder(SetSmashHitChargeC2S::encode).decoder(SetSmashHitChargeC2S::new).consumerMainThread(SetSmashHitChargeC2S::handle).add();
 
@@ -149,6 +156,21 @@ public class PacketHandler {
 
                 //Loop Kick
                 INSTANCE.messageBuilder(LoopKick.class,NetworkDirection.PLAY_TO_SERVER).encoder(LoopKick::encode).decoder(LoopKick::new).consumerMainThread(LoopKick::handle).add();
+            }
+
+            //Slot 4
+            {
+                //Cross Slash
+                INSTANCE.messageBuilder(CrossSlash.class,NetworkDirection.PLAY_TO_SERVER).encoder(CrossSlash::encode).decoder(CrossSlash::new).consumerMainThread(CrossSlash::handle).add();
+
+                //Homing Shot
+                INSTANCE.messageBuilder(HomingShot.class,NetworkDirection.PLAY_TO_SERVER).encoder(HomingShot::encode).decoder(HomingShot::new).consumerMainThread(HomingShot::handle).add();
+
+                //Sonic Boom
+                INSTANCE.messageBuilder(SonicBoom.class,NetworkDirection.PLAY_TO_SERVER).encoder(SonicBoom::encode).decoder(SonicBoom::new).consumerMainThread(SonicBoom::handle).add();
+
+                //Sonic Wind
+                INSTANCE.messageBuilder(SonicWind.class,NetworkDirection.PLAY_TO_SERVER).encoder(SonicWind::encode).decoder(SonicWind::new).consumerMainThread(SonicWind::handle).add();
             }
         }
 

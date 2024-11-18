@@ -141,6 +141,7 @@ public class BaseformProperties extends FormProperties {
     public boolean dodgeInvul;
     public byte hummingTop;
     public boolean speedBlitz;
+    public byte speedBlitzDashTimer;
     public byte speedBlitzDashes;
     public byte smashHit;
     public byte stomp;
@@ -158,6 +159,13 @@ public class BaseformProperties extends FormProperties {
     public int[] wildRushPY;
     public int[] wildRushPZ;
     public byte loopKick;
+
+    //Slot 4
+    public UUID rangedTarget;
+    public byte crossSlash;
+    public byte homingShot;
+    public byte sonicBoom;
+    public byte sonicWind;
 
     public BaseformProperties()
     {
@@ -192,6 +200,7 @@ public class BaseformProperties extends FormProperties {
         dodgeInvul = false;
         hummingTop = 0;
         speedBlitz = false;
+        speedBlitzDashTimer = (byte)0;
         speedBlitzDashes = 4;
         smashHit = (byte)0;
         stomp = (byte)0;
@@ -209,6 +218,14 @@ public class BaseformProperties extends FormProperties {
         wildRushPY = new int[]{0,0,0,0,0};
         wildRushPZ = new int[]{0,0,0,0,0};
         loopKick = 0;
+
+        //Slot 4
+        rangedTarget = new UUID(0L,0L);
+        crossSlash = (byte)0;
+        homingShot = (byte)0;
+        sonicBoom = (byte)0;
+        sonicWind = (byte)0;
+
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -245,6 +262,7 @@ public class BaseformProperties extends FormProperties {
         dodgeInvul = nbt.getBoolean("isDodging");
         hummingTop = nbt.getByte("hummingTop");
         speedBlitz = nbt.getBoolean("speedBlitzOn");
+        speedBlitzDashTimer = nbt.getByte("speedBlitzDash");
         speedBlitzDashes = nbt.getByte("speedBlitzes");
         smashHit = nbt.getByte("smashHitTime");
         stomp = nbt.getByte("stompTime");
@@ -262,6 +280,13 @@ public class BaseformProperties extends FormProperties {
         wildRushPY = nbt.getIntArray("wildRushPtrsY");
         wildRushPZ = nbt.getIntArray("wildRushPtrsZ");
         loopKick = nbt.getByte("LoopKick");
+
+        //Slot 4
+        rangedTarget = nbt.getUUID("RangedTarget");
+        crossSlash = nbt.getByte("CrossSlash");
+        homingShot = nbt.getByte("HomingShot");
+        sonicBoom = nbt.getByte("SonicBoom");
+        sonicWind = nbt.getByte("SonicWind");
     }
 
     @Override
@@ -301,6 +326,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putBoolean("isDodging",dodgeInvul);
         nbt.putByte("hummingTop", hummingTop);
         nbt.putBoolean("speedBlitzOn",speedBlitz);
+        nbt.putByte("speedBlitzDash",speedBlitzDashTimer);
         nbt.putByte("speedBlitzes",speedBlitzDashes);
         nbt.putByte("smashHitTime",smashHit);
         nbt.putByte("stompTime",stomp);
@@ -319,6 +345,13 @@ public class BaseformProperties extends FormProperties {
         nbt.putIntArray("wildRushPtrsZ",wildRushPZ);
         nbt.putByte("LoopKick",loopKick);
 
+        //Slot 4
+        nbt.putUUID("RangedTarget",rangedTarget);
+        nbt.putByte("CrossSlash",crossSlash);
+        nbt.putByte("HomingShot",homingShot);
+        nbt.putByte("SonicBoom",sonicBoom);
+        nbt.putByte("SonicWind",sonicWind);
+
         return nbt;
     }
 
@@ -332,6 +365,7 @@ public class BaseformProperties extends FormProperties {
     {
         boolean quickCyloop = (this.quickCyloop > 0);
         boolean ballForm = ballFormState > 0;
+        boolean speedBlitzDash = (this.speedBlitzDashTimer > 0);
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 50);
         boolean melee = hitCount > 3;
         boolean hummingTop = this.hummingTop > 0;
@@ -346,7 +380,7 @@ public class BaseformProperties extends FormProperties {
         boolean loopKick = (this.loopKick > 24);
 
         return quickCyloop ||
-                ballForm || homingAttack || melee || hummingTop || stomping ||
+                ballForm || homingAttack || speedBlitzDash || melee || hummingTop || stomping ||
                 tornadoJump || mirageTimer || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick;
     }
 
@@ -356,6 +390,7 @@ public class BaseformProperties extends FormProperties {
         boolean quickCyloop = (this.quickCyloop > 0);
 
         boolean ballform = ballFormState == 1;
+        boolean speedBlitzDash = (this.speedBlitzDashTimer > 0);
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
         boolean hummingTop = (this.hummingTop > 0);
         boolean stomping = (this.stomp > 0);
@@ -367,9 +402,15 @@ public class BaseformProperties extends FormProperties {
         boolean wildRush = (this.wildRushTime > 0);
         boolean loopKick = (this.loopKick > 0);
 
+        boolean crossSlash = (this.crossSlash > 0);
+        boolean homingShot = (this.homingShot > 0);
+        boolean sonicBoom = (this.sonicBoom > 0);
+        boolean sonicWind = (this.sonicWind > 0);
+
         return quickCyloop ||
-                homingAttack || hummingTop || ballform || stomping ||
-                tornadoJump || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick;
+                homingAttack || hummingTop || ballform || speedBlitzDash || stomping ||
+                tornadoJump || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick ||
+                crossSlash || homingShot || sonicBoom || sonicWind;
     }
 
     //Ball form

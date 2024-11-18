@@ -14,6 +14,7 @@ public enum ModDamageTypes
 {
     SONIC_BALL("sonic_ball"),
     SONIC_MELEE("sonic_melee"),
+    SONIC_RANGED("sonic_ranged"),
     SONIC_CYLOOP("sonic_cyloop");
 
     private final ResourceKey<DamageType> dmgResourceKey;

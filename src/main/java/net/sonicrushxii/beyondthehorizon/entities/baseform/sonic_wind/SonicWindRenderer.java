@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.entities.baseform.mirage;
+package net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -13,33 +13,33 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.MirageModel;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.SonicWindModel;
 import org.jetbrains.annotations.NotNull;
 
-public class MirageRenderer extends EntityRenderer<MirageEntity> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/mirage_skin.png");
-    private final EntityModel<MirageEntity> model;
+public class SonicWindRenderer extends EntityRenderer<SonicWind> {
+    private static final ResourceLocation TEXTURE = new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/sonic_wind.png");
+    private final EntityModel<SonicWind> model;
 
-    public MirageRenderer(EntityRendererProvider.Context context) {
+    public SonicWindRenderer(EntityRendererProvider.Context context) {
         super(context);
-        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform_mirage"), "main"));
-        this.model = new MirageModel<>(modelPart);
+        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform_sonic_wind"), "main"));
+        this.model = new SonicWindModel<>(modelPart);
     }
-
     @Override
-    public @NotNull ResourceLocation getTextureLocation(MirageEntity entity) {
+    public @NotNull ResourceLocation getTextureLocation(SonicWind entity) {
         return TEXTURE;
     }
 
     @Override
-    public void render(MirageEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void render(@NotNull SonicWind entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         // Translate and rotate the pose stack as needed
         poseStack.pushPose();
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(this.getTextureLocation(entity)));
 
+        poseStack.scale(1.25F,1.25F,1.25F);
         poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
         poseStack.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
-        poseStack.translate(0D,-1.5D,0D);
+        poseStack.translate(0D,-1.0D,0D);
 
         this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
