@@ -1,7 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind;
 
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -99,7 +98,7 @@ public class SonicWind extends LinearMovingEntity {
     public void tick() {
         super.tick();
         if(this.level().isClientSide) {
-           for(double p = 0; p<= 10.0 ; p += 0.8)
+           for(float p = 0; p<= 10.0F ; p += 0.8F)
            {
                for(double offset = 0; offset <= 2*Math.PI; offset += Math.PI/2)
                {
@@ -107,16 +106,16 @@ public class SonicWind extends LinearMovingEntity {
                    double particleZ = (0.2)*p*Math.cos(offset+p/10);
 
                    Utilities.displayParticle(this.level(),
-                           ParticleTypes.SWEEP_ATTACK,
+                           new DustParticleOptions(new Vector3f(0.00f,0.0f,1f),1f),
                            this.getX()+particleX,this.getY(),this.getZ()+particleZ,
-                           0.1f,0.1f,0.1f,
-                           0.001, 1, false
+                           0.25f-(0.025f)*p,0.25f-(0.025f)*p,0.25f-(0.025f)*p,
+                           0.001, 2, false
                    );
                    Utilities.displayParticle(this.level(),
                            new DustParticleOptions(new Vector3f(0.00f,1f,1f),1f),
                            this.getX()+particleX,this.getY(),this.getZ()+particleZ,
-                           0.1f,0.1f,0.1f,
-                           0.001, 4, false
+                           0.25f-(0.025f)*p,0.25f-(0.025f)*p,0.25f-(0.025f)*p,
+                           0.001, 3, false
                    );
                }
            }
@@ -162,11 +161,11 @@ public class SonicWind extends LinearMovingEntity {
         if(this.isDestroyBlocks() && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))
         {
             this.level().explode(
-                    /* Exploder (null if no specific entity causes it) */ getOwner(),
-                    /* Center x, y, z positions */ this.getX(), this.getY(), this.getZ(),
-                    /* Strength */ STRENGTH,
+                    getOwner(),
+                    this.getX(), this.getY(), this.getZ(),
+                    STRENGTH,
                     /* Causes fire */ false,
-                    /* Block Interaction Mode */ Level.ExplosionInteraction.TNT
+                    Level.ExplosionInteraction.TNT
             );
         }
         else

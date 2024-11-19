@@ -9,6 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.CycloneKickCloud;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.homing_shot.HomingShotProjectile;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.SpinSlashCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.TornadoJumpCloud;
@@ -43,6 +44,10 @@ public class ModEntityTypes {
             () -> EntityType.Builder.<SonicWind>of(SonicWind::new, MobCategory.MISC)
                     .sized(1F, 5F)  // Define the size of the entity
                     .build("baseform_sonic_wind"));
+    public static final RegistryObject<EntityType<HomingShotProjectile>> HOMING_SHOT_PROJECTILE = ENTITY_TYPES.register("baseform_homing_shot",
+            () -> EntityType.Builder.<HomingShotProjectile>of(HomingShotProjectile::new, MobCategory.MISC)
+                    .sized(1F, 5F)  // Define the size of the entity
+                    .build("baseform_homing_shot"));
 
     public static void register(IEventBus eventBus){ ENTITY_TYPES.register(eventBus);}
 }

@@ -379,9 +379,12 @@ public class BaseformProperties extends FormProperties {
         boolean wildRush = (this.wildRushTime != 0);
         boolean loopKick = (this.loopKick > 24);
 
+        boolean homingShot = (this.homingShot > 0);
+
         return quickCyloop ||
                 ballForm || homingAttack || speedBlitzDash || melee || hummingTop || stomping ||
-                tornadoJump || mirageTimer || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick;
+                tornadoJump || mirageTimer || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick ||
+                homingShot;
     }
 
     //Checks if Player is in the middle of another attack
@@ -421,7 +424,8 @@ public class BaseformProperties extends FormProperties {
         boolean tornadoJump = this.tornadoJump > 0;
         boolean lightSpeed = this.lightSpeedState == 1 || this.lightSpeedAssault == -1;
         boolean cycloneKick = (this.cycloneKick < 0);
+        boolean homingShot = (this.homingShot > 0 && this.homingShot < 20);
 
-        return regular || homingAttack || tornadoJump || lightSpeed || cycloneKick;
+        return regular || homingAttack || tornadoJump || lightSpeed || cycloneKick || homingShot;
     }
 }

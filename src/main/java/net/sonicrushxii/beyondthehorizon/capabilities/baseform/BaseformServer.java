@@ -28,6 +28,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.SpinSlashCloud;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.homing_shot.HomingShotProjectile;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
@@ -41,6 +42,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushRotationSyncS2C;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -1421,7 +1423,95 @@ public class BaseformServer {
 
                     //Homing Shot
                     {
+                        try {
+                            if (baseformProperties.homingShot > 0) {
+                                baseformProperties.homingShot += 1;
 
+                                //Ball form
+                                if (baseformProperties.homingShot < 20) {
+                                    player.setDeltaMovement(0, 0, 0);
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                }
+
+                                //Spawn the Homing Shots
+                                if (baseformProperties.homingShot == 10)
+                                {
+                                    for(double theta = 0.0; theta <= 2*Math.PI; theta += Math.PI/5.5)
+                                    {
+                                        double xComponent = Math.sin(-(baseformProperties.atkRotPhase+90) * (Math.PI / 180)) * 0.707;
+                                        double zComponent = Math.cos((baseformProperties.atkRotPhase+90) * (Math.PI / 180)) * 0.707;
+
+                                        //Motion
+                                        Utilities.summonEntity(ModEntityTypes.HOMING_SHOT_PROJECTILE.get(),
+                                                player.serverLevel(),
+                                                new Vec3(
+                                                        // sin(wt + T)
+                                                        player.getX()+ 0.2*xComponent*Math.cos(theta),
+                                                        player.getY()+0.25 + 0.2*Math.sin(theta),
+                                                        // cos(wt + T)
+                                                        player.getZ()+ 0.2*zComponent*Math.cos(theta)
+                                                ),(homingShotProjectile -> {
+                                                    homingShotProjectile.setXRot(player.getXRot());
+                                                    homingShotProjectile.setYRot(baseformProperties.atkRotPhase);
+                                                    homingShotProjectile.setOwner(player.getUUID());
+                                                }));
+                                    }
+                                }
+
+                                //Aim the Homing Shots
+                                if (baseformProperties.homingShot == 30)
+                                {
+                                    HomingShot.scanFoward(player);
+
+                                    try
+                                    {
+                                        LivingEntity homingShotTarget = (LivingEntity) serverLevel.getEntity(baseformProperties.rangedTarget);
+
+                                        //Find Ranged Target and Target
+                                        for(HomingShotProjectile homingShotProjectile : level.getEntitiesOfClass(HomingShotProjectile.class,
+                                                new AABB(player.getX()+64,player.getY()+64,player.getZ()+64,
+                                                        player.getX()-64,player.getY()-64,player.getZ()-64),
+                                                    homingShotProjectile-> homingShotProjectile.getOwnerUUID().equals(player.getUUID())))
+                                        {
+                                            homingShotProjectile.setDeltaMovement(
+                                                    (new Vec3(homingShotTarget.getX(),homingShotTarget.getY()+homingShotTarget.getEyeHeight()/2,homingShotTarget.getZ()))
+                                                            .subtract(new Vec3(homingShotProjectile.getX(),homingShotProjectile.getY(),homingShotProjectile.getZ()))
+                                                            .normalize()
+                                                            .scale(0.75)
+                                            );
+                                        }
+
+                                    }
+                                    catch(NullPointerException|ClassCastException e)
+                                    {
+                                        //Otherwise It'll Launch the Homing Shot in the direction you look
+                                        for(HomingShotProjectile homingShotProjectile : level.getEntitiesOfClass(HomingShotProjectile.class,
+                                                new AABB(player.getX()+64,player.getY()+64,player.getZ()+64,
+                                                        player.getX()-64,player.getY()-64,player.getZ()-64),
+                                                homingShotProjectile-> homingShotProjectile.getOwnerUUID().equals(player.getUUID())))
+                                        {
+                                            homingShotProjectile.setDeltaMovement(
+                                                    Utilities.calculateViewVector(player.getXRot(),player.getYRot()).scale(0.75)
+                                            );
+                                        }
+                                    }
+                                }
+
+
+                                //End Move
+                                if (baseformProperties.homingShot > 50) {
+                                    throw new InterruptedException("Move Successful");
+                                }
+                            }
+                        }catch (InterruptedException|NullPointerException|ClassCastException ignored)
+                        {
+                            //Homing Shot
+                            baseformProperties.homingShot = 0;
+                            //Return Gravity
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            //Cooldown
+                            baseformProperties.setCooldown(BaseformActiveAbility.HOMING_SHOT,(byte)5);
+                        }
                     }
                 }
             }

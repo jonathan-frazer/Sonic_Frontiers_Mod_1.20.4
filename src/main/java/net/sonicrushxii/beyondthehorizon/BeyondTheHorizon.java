@@ -23,6 +23,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.*;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointRenderer;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.homing_shot.HomingShotRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWindRenderer;
 import net.sonicrushxii.beyondthehorizon.event_handler.*;
@@ -118,6 +119,7 @@ public class BeyondTheHorizon
             EntityRenderers.register(ModEntityTypes.CYCLONE_KICK_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.SPIN_SLASH_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.SONIC_WIND.get(), SonicWindRenderer::new);
+            EntityRenderers.register(ModEntityTypes.HOMING_SHOT_PROJECTILE.get(), HomingShotRenderer::new);
         }
 
         @SubscribeEvent
@@ -169,8 +171,11 @@ public class BeyondTheHorizon
             event.registerLayerDefinition(LoopKickModelPowerBoost.LAYER_LOCATION, LoopKickModelPowerBoost::createBodyLayer);
             event.registerLayerDefinition(LoopKickModelLightSpeed.LAYER_LOCATION, LoopKickModelLightSpeed::createBodyLayer);
 
-            //Mirage
+            //Sonic Wind
             event.registerLayerDefinition(SonicWindModel.LAYER_LOCATION, SonicWindModel::createBodyLayer);
+
+            //Homing Shot
+            event.registerLayerDefinition(HomingShotModel.LAYER_LOCATION, HomingShotModel::createBodyLayer);
         }
     }
 }

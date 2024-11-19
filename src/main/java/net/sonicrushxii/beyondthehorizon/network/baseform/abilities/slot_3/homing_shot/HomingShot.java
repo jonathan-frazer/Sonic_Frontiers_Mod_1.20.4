@@ -16,6 +16,7 @@ import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class HomingShot {
 
@@ -41,7 +42,7 @@ public class HomingShot {
             Vec3 currentPos = player.getPosition(0).add(0.0, 1.0, 0.0);
             Vec3 lookAngle = player.getLookAngle();
 
-            baseformProperties.rangedTarget = null;
+            baseformProperties.rangedTarget = new UUID(0L,0L);
 
             //Scan Forward for enemies
             for (int i = 0; i < 12; ++i) {

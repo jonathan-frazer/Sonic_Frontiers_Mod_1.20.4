@@ -37,12 +37,12 @@ public class SonicWind
                             //Changed Data
                             baseformProperties.sonicWind = 1;
 
+                            //Remove Gravity
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+
                             //Set Motion to Zero
                             player.setDeltaMovement(0,0,0);
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
-
-                            //Remove Gravity
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
 
                             //Play Sound
                             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
