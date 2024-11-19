@@ -108,10 +108,10 @@ public class HomingShotProjectile extends Entity {
 
             // Check if the team already exists
             PlayerTeam team = scoreboard.getPlayerTeam("light_blue");
-            if (team == null) {
+            if (team == null)
+            {
                 // Create a new team if it doesn't exist
                 team = scoreboard.addPlayerTeam("light_blue");
-
                 // Set the team's color
                 team.setColor(ChatFormatting.BLUE); // Set team color
             }
