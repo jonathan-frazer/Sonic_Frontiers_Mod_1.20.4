@@ -86,6 +86,9 @@ public class HomingShotProjectile extends Entity {
         final int timeElapsed = 150-getDuration();
 
         this.move(MoverType.SELF, this.getDeltaMovement());
+        final float[] yawPitch = Utilities.getYawPitchFromVec(this.getDeltaMovement());
+        this.setYRot(yawPitch[0]);
+        this.setXRot(yawPitch[1]);
 
         // Custom tick logic - Here, it just counts down the duration and removes the entity
         if (this.entityData.get(DURATION) > 0) {
@@ -95,8 +98,11 @@ public class HomingShotProjectile extends Entity {
         }
 
         //Set Glowing
-        if(timeElapsed == 1){
+        if(timeElapsed == 1)
+        {
+            //Glowing
             this.setGlowingTag(true);
+
             // Get the scoreboard
             Scoreboard scoreboard = this.level().getScoreboard();
 

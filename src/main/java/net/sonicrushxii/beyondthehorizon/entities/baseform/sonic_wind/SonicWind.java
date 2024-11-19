@@ -102,8 +102,8 @@ public class SonicWind extends LinearMovingEntity {
            {
                for(double offset = 0; offset <= 2*Math.PI; offset += Math.PI/2)
                {
-                   double particleX = (0.2)*p*Math.sin(offset+p/10);
-                   double particleZ = (0.2)*p*Math.cos(offset+p/10);
+                   double particleX = (0.2)*p*Math.sin(this.getDuration()/2.0F+offset+p/10);
+                   double particleZ = (0.2)*p*Math.cos(this.getDuration()/2.0F+offset+p/10);
 
                    Utilities.displayParticle(this.level(),
                            new DustParticleOptions(new Vector3f(0.00f,0.0f,1f),1f),
