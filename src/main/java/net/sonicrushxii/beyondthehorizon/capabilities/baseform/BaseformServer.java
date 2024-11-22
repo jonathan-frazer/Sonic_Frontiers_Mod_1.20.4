@@ -15,8 +15,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -47,6 +51,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross_slash.EndCrossSlash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.EndSonicBoom;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWindParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -1453,7 +1458,7 @@ public class BaseformServer {
 
                     //Sonic Wind
                     {
-                        //Increment Time
+                        //Normal Sonic Wind
                         if(baseformProperties.sonicWind > 0)
                         {
                             baseformProperties.sonicWind += 1;
@@ -1498,6 +1503,84 @@ public class BaseformServer {
                                 //Cooldown
                                 baseformProperties.setCooldown(BaseformActiveAbility.SONIC_WIND,(byte)5);
 
+                            }
+                        }
+
+                        //Quick Sonic Wind
+                        if(baseformProperties.profanedWind > 0)
+                        {
+                            //Increment Tick
+                            baseformProperties.profanedWind += 1;
+
+                            //Display Player Particles
+                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    new DustParticleOptions(new Vector3f(0f, 1f, 1f), 2f),
+                                    player.getX(), player.getY() + 1.05, player.getZ(),
+                                    0.001, 0.55f, 1.05f, 0.55f, 2,
+                                    true));
+
+                            //Display Swirling Particles
+                            PacketHandler.sendToALLPlayers(new SonicWindParticleS2C(
+                                    baseformProperties.profanedWindCoords[0],
+                                    baseformProperties.profanedWindCoords[1],
+                                    baseformProperties.profanedWindCoords[2],
+                                    baseformProperties.profanedWind
+                            ));
+
+                            if(baseformProperties.profanedWind == 9)
+                            {
+                                //Particle
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        new DustParticleOptions(new Vector3f(1F,1F,1F),1.5F),
+                                        baseformProperties.profanedWindCoords[0],
+                                        baseformProperties.profanedWindCoords[1],
+                                        baseformProperties.profanedWindCoords[2],
+                                        0.01, 1F, 20, true
+                                ));
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        ParticleTypes.FLASH,
+                                        baseformProperties.profanedWindCoords[0],
+                                        baseformProperties.profanedWindCoords[1],
+                                        baseformProperties.profanedWindCoords[2],
+                                        0.01, 1F, 2, true
+                                ));
+
+                                //Sound
+                                level.playSound(null,player.getX(),player.getY(),player.getZ(),
+                                        SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.MASTER, 1.0f, 1.0f);
+
+                                //Blast
+                                for(LivingEntity enemy : serverLevel.getEntitiesOfClass(LivingEntity.class,
+                                        new AABB(baseformProperties.profanedWindCoords[0]+2.5,baseformProperties.profanedWindCoords[1]+2.5, baseformProperties.profanedWindCoords[2]+2.5,
+                                                baseformProperties.profanedWindCoords[0]-2.5,baseformProperties.profanedWindCoords[1]-2.5, baseformProperties.profanedWindCoords[2]-2.5),
+                                       enemy -> {
+                                        try {
+                                            Player playerEntity = (Player)enemy;
+                                            ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
+                                            if (headItem.getItem() == Items.PLAYER_HEAD &&
+                                                    headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
+                                                return false;
+                                        }
+                                        catch (NullPointerException|ClassCastException ignored){}
+                                        return true;
+                                    }))
+                                {
+                                    if(enemy.hasEffect(ModEffects.WIND_STUNNED.get()))
+                                        enemy.getEffect(ModEffects.WIND_STUNNED.get()).update(new MobEffectInstance(ModEffects.WIND_STUNNED.get(), 40, 0, false, false));
+                                    else
+                                        enemy.addEffect(new MobEffectInstance(ModEffects.WIND_STUNNED.get(), 40, 0, false, false));
+                                }
+                            }
+
+                            //End Ability
+                            if(baseformProperties.profanedWind > 9)
+                            {
+                                //Reset Counter to 0
+                                baseformProperties.profanedWind = 0;
+                                //Return Gravity
+                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                //Cooldown
+                                baseformProperties.setCooldown(BaseformActiveAbility.SONIC_WIND,(byte)5);
                             }
                         }
                     }

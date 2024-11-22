@@ -43,7 +43,9 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.EndSonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.SonicBoom;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.QuickSonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWind;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWindParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
@@ -166,7 +168,6 @@ public class PacketHandler {
                 INSTANCE.messageBuilder(CrossSlash.class,NetworkDirection.PLAY_TO_SERVER).encoder(CrossSlash::encode).decoder(CrossSlash::new).consumerMainThread(CrossSlash::handle).add();
                 INSTANCE.messageBuilder(EndCrossSlash.class,NetworkDirection.PLAY_TO_SERVER).encoder(EndCrossSlash::encode).decoder(EndCrossSlash::new).consumerMainThread(EndCrossSlash::handle).add();
 
-
                 //Homing Shot
                 INSTANCE.messageBuilder(HomingShot.class,NetworkDirection.PLAY_TO_SERVER).encoder(HomingShot::encode).decoder(HomingShot::new).consumerMainThread(HomingShot::handle).add();
 
@@ -176,6 +177,8 @@ public class PacketHandler {
 
                 //Sonic Wind
                 INSTANCE.messageBuilder(SonicWind.class,NetworkDirection.PLAY_TO_SERVER).encoder(SonicWind::encode).decoder(SonicWind::new).consumerMainThread(SonicWind::handle).add();
+                INSTANCE.messageBuilder(QuickSonicWind.class,NetworkDirection.PLAY_TO_SERVER).encoder(QuickSonicWind::encode).decoder(QuickSonicWind::new).consumerMainThread(QuickSonicWind::handle).add();
+                INSTANCE.messageBuilder(SonicWindParticleS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(SonicWindParticleS2C::encode).decoder(SonicWindParticleS2C::new).consumerMainThread(SonicWindParticleS2C::handle).add();
             }
         }
 

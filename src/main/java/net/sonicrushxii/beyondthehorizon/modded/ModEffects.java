@@ -34,6 +34,9 @@ public class ModEffects {
     public static final RegistryObject<MobEffect> MIRAGE_CONFUSE = MOB_EFFECTS.register(
             "mirage_confusion",()->((new MirageConfusion(MobEffectCategory.HARMFUL,0x00FFFF)).addAttributeModifier(Attributes.FOLLOW_RANGE, "12AEAA34-359B-1198-935C-2E7E61020336", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL))
     );
+    public static final RegistryObject<MobEffect> WIND_STUNNED = MOB_EFFECTS.register(
+            "sonic_wind_stun",()->((new WindStunned(MobEffectCategory.HARMFUL,0xFFFFFF)).addAttributeModifier(Attributes.MOVEMENT_SPEED, "12AEAA34-359B-1198-935C-2E7E61020337", -1.0, AttributeModifier.Operation.ADDITION).addAttributeModifier(Attributes.ATTACK_DAMAGE, "12AEAA34-359B-1198-935C-2E7E61020338", -1.0, AttributeModifier.Operation.ADDITION))
+    );
 
 
     public static void register(IEventBus eventBus)

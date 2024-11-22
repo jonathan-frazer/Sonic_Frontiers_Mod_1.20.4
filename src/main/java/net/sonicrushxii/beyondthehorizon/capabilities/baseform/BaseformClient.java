@@ -49,6 +49,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.EndSonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.SonicBoom;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.QuickSonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
@@ -466,8 +467,18 @@ public class BaseformClient {
                         baseformProperties.getCooldown(BaseformActiveAbility.SONIC_WIND) == 0 &&
                         KeyBindings.INSTANCE.useAbility3.isDown())
                 {
-                    PacketHandler.sendToServer(new SonicWind());
-                    baseformProperties.sonicWind = 1;
+                    //Normal Version
+                    if(!player.isShiftKeyDown())
+                    {
+                        PacketHandler.sendToServer(new SonicWind());
+                        baseformProperties.sonicWind = 1;
+                    }
+                    //Quick Version
+                    else
+                    {
+                        PacketHandler.sendToServer(new QuickSonicWind());
+                        baseformProperties.profanedWind = 1;
+                    }
                 }
             }
 
