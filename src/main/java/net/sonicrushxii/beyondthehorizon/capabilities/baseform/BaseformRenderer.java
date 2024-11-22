@@ -120,7 +120,7 @@ public class BaseformRenderer
             poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F+BaseformClient.ClientOnlyData.wildRushYawPitch[1]));
 
             //Render The Custom Model
-            ModModelRenderer.renderPlayerModel(SonicModelBase.class,event,poseStack,baseformProperties);
+            ModModelRenderer.renderPlayerModel(SonicFlatPlayerModel.class,event,poseStack,baseformProperties,null);
 
             poseStack.popPose();
             event.setCanceled(true);
@@ -141,7 +141,7 @@ public class BaseformRenderer
                 poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F-baseformProperties.loopKick*15.0F));
 
                 //Render The Custom Model
-                ModModelRenderer.renderPlayerModel(SonicModelBase.class,event,poseStack,baseformProperties);
+                ModModelRenderer.renderPlayerModel(SonicFlatPlayerModel.class,event,poseStack,baseformProperties,null);
             }
             else
             {
@@ -151,7 +151,7 @@ public class BaseformRenderer
                 poseStack.translate(0D,-1.5D,0D);
 
                 //Render The Custom Model
-                ModModelRenderer.renderPlayerModel(LoopKickModelBase.class,event,poseStack,baseformProperties);
+                ModModelRenderer.renderPlayerModel(LoopKickPlayerModel.class,event,poseStack,baseformProperties,null);
             }
 
             poseStack.popPose();
@@ -170,13 +170,55 @@ public class BaseformRenderer
             poseStack.translate(0D,-1.5D,0D);
 
             //Render The Custom Model
-            ModModelRenderer.renderPlayerModel(LoopKickModelBase.class, event, poseStack,baseformProperties);
+            ModModelRenderer.renderPlayerModel(LoopKickPlayerModel.class, event, poseStack,baseformProperties,null);
 
             poseStack.popPose();
             event.setCanceled(true);
         }
 
+        else if(baseformProperties.sonicBoom > 0)
+        {
+            poseStack.pushPose();
 
+            // Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot() + ((baseformProperties.sonicBoom%6)-2)*36.0F ));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+
+            poseStack.translate(0D,-1.5D,0D);
+
+            //Render The Custom Model
+            ModModelRenderer.renderPlayerModel(SonicBoomPlayerModel.class, event, poseStack, baseformProperties,null);
+
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
+
+        else if(baseformProperties.crossSlash > 0)
+        {
+            poseStack.pushPose();
+
+            // Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+
+            poseStack.translate(0D,-1.5D,0D);
+
+            //Render The Custom Model
+            ModModelRenderer.renderPlayerModel(CrossSlashPlayerModel.class, event, poseStack, baseformProperties,
+                    (modelPart)->{
+                        modelPart.getChild("CrossArm").xRot = player.getXRot()/60;
+                        modelPart.getChild("Head").xRot = player.getXRot()/60;
+                    });
+
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
     }
 
     public static void onRenderPlayerModelPost(RenderLivingEvent.Post<?,?> event, Player player, BaseformProperties baseformProperties)

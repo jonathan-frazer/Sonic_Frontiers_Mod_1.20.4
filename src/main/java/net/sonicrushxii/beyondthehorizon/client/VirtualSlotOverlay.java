@@ -118,6 +118,9 @@ public class VirtualSlotOverlay {
         if(SLOT_ABILITY.sideinfo != null)
             guiComponent.drawString(Minecraft.getInstance().font, SLOT_ABILITY.sideinfo,
                     x+5*textureDimensions[0]/4,y+textureDimensions[1]/3,0xFFFFFF);
+
+        //Return Render Color back to same
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
     private static String shortenName(String currName)
     {

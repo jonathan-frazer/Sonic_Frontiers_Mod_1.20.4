@@ -151,7 +151,7 @@ public class BeyondTheHorizon
         public static void registerModelLayer(EntityRenderersEvent.RegisterLayerDefinitions event)
         {
             //Sonic Model
-            event.registerLayerDefinition(SonicModelBase.LAYER_LOCATION, SonicModelBase::createBodyLayer);
+            event.registerLayerDefinition(SonicFlatPlayerModel.LAYER_LOCATION, SonicFlatPlayerModel::createBodyLayer);
 
             //Spin Dash
             event.registerLayerDefinition(Spindash.LAYER_LOCATION,Spindash::createBodyLayer);
@@ -169,12 +169,14 @@ public class BeyondTheHorizon
             event.registerLayerDefinition(Spinslash.LAYER_LOCATION,Spinslash::createBodyLayer);
 
             //Loop Kick
-            event.registerLayerDefinition(LoopKickModelBase.LAYER_LOCATION, LoopKickModelBase::createBodyLayer);
+            event.registerLayerDefinition(LoopKickPlayerModel.LAYER_LOCATION, LoopKickPlayerModel::createBodyLayer);
 
             //Sonic Boom
+            event.registerLayerDefinition(SonicBoomPlayerModel.LAYER_LOCATION, SonicBoomPlayerModel::createBodyLayer);
             event.registerLayerDefinition(SonicBoomModel.LAYER_LOCATION, SonicBoomModel::createBodyLayer);
 
             //Cross Slash
+            event.registerLayerDefinition(CrossSlashPlayerModel.LAYER_LOCATION, CrossSlashPlayerModel::createBodyLayer);
             event.registerLayerDefinition(CrossSlashModel.LAYER_LOCATION, CrossSlashModel::createBodyLayer);
 
             //Sonic Wind

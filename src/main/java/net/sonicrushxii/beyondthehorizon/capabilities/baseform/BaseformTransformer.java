@@ -3,7 +3,6 @@ package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -16,6 +15,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ForgeMod;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
@@ -23,7 +23,6 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMult
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.VirtualSlotSyncS2C;
-import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 
 import java.util.Iterator;
 
@@ -63,15 +62,6 @@ public class BaseformTransformer {
 
         //Initialize Virtual Slot Handler
         PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)6));
-
-        //Effects
-        {
-            player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
-            player.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, -1, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 1, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 2, false, false));
-        }
 
         //Commands
         {
