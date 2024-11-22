@@ -45,7 +45,9 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.torna
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRush;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross_slash.CrossSlash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross_slash.EndCrossSlash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.EndSonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.SonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
@@ -431,6 +433,13 @@ public class BaseformClient {
                     PacketHandler.sendToServer(new SonicBoom());
                     baseformProperties.sonicBoom = 1;
                 }
+
+                if (VirtualSlotHandler.getCurrAbility() == 3 && baseformProperties.sonicBoom > 0 &&
+                        !KeyBindings.INSTANCE.useAbility1.isDown())
+                {
+                    PacketHandler.sendToServer(new EndSonicBoom());
+                    baseformProperties.sonicBoom = 0;
+                }
             }
 
             //Cross Slash
@@ -441,6 +450,13 @@ public class BaseformClient {
                 {
                     PacketHandler.sendToServer(new CrossSlash());
                     baseformProperties.crossSlash = 1;
+                }
+
+                if (VirtualSlotHandler.getCurrAbility() == 3 && baseformProperties.crossSlash > 0 &&
+                        !KeyBindings.INSTANCE.useAbility2.isDown())
+                {
+                    PacketHandler.sendToServer(new EndCrossSlash());
+                    baseformProperties.crossSlash = 0;
                 }
             }
 

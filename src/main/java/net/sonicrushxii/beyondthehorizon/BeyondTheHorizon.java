@@ -23,8 +23,10 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.*;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointRenderer;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.cross_slash.CrossSlashRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.homing_shot.HomingShotRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageRenderer;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_boom.SonicBoomRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWindRenderer;
 import net.sonicrushxii.beyondthehorizon.event_handler.*;
 import net.sonicrushxii.beyondthehorizon.modded.*;
@@ -116,10 +118,12 @@ public class BeyondTheHorizon
             EntityRenderers.register(ModEntityTypes.TORNADO_JUMP_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.MIRAGE_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.SONIC_BASEFORM_MIRAGE.get(), MirageRenderer::new);
-            EntityRenderers.register(ModEntityTypes.CYCLONE_KICK_CLOUD.get(), PointRenderer::new);
-            EntityRenderers.register(ModEntityTypes.SPIN_SLASH_CLOUD.get(), PointRenderer::new);
-            EntityRenderers.register(ModEntityTypes.SONIC_WIND.get(), SonicWindRenderer::new);
-            EntityRenderers.register(ModEntityTypes.HOMING_SHOT_PROJECTILE.get(), HomingShotRenderer::new);
+            EntityRenderers.register(ModEntityTypes.BASEFORM_CYCLONE_KICK_CLOUD.get(), PointRenderer::new);
+            EntityRenderers.register(ModEntityTypes.BASEFORM_SPIN_SLASH_CLOUD.get(), PointRenderer::new);
+            EntityRenderers.register(ModEntityTypes.BASEFORM_CROSS_SLASH.get(), CrossSlashRenderer::new);
+            EntityRenderers.register(ModEntityTypes.BASEFORM_SONIC_BOOM.get(), SonicBoomRenderer::new);
+            EntityRenderers.register(ModEntityTypes.BASEFORM_SONIC_WIND.get(), SonicWindRenderer::new);
+            EntityRenderers.register(ModEntityTypes.BASEFORM_HOMING_SHOT.get(), HomingShotRenderer::new);
         }
 
         @SubscribeEvent
@@ -146,10 +150,8 @@ public class BeyondTheHorizon
         @SubscribeEvent
         public static void registerModelLayer(EntityRenderersEvent.RegisterLayerDefinitions event)
         {
-            //Sonic Models
+            //Sonic Model
             event.registerLayerDefinition(SonicModelBase.LAYER_LOCATION, SonicModelBase::createBodyLayer);
-            event.registerLayerDefinition(SonicModelLightSpeed.LAYER_LOCATION, SonicModelLightSpeed::createBodyLayer);
-            event.registerLayerDefinition(SonicModelPowerBoost.LAYER_LOCATION, SonicModelPowerBoost::createBodyLayer);
 
             //Spin Dash
             event.registerLayerDefinition(Spindash.LAYER_LOCATION,Spindash::createBodyLayer);
@@ -168,8 +170,12 @@ public class BeyondTheHorizon
 
             //Loop Kick
             event.registerLayerDefinition(LoopKickModelBase.LAYER_LOCATION, LoopKickModelBase::createBodyLayer);
-            event.registerLayerDefinition(LoopKickModelPowerBoost.LAYER_LOCATION, LoopKickModelPowerBoost::createBodyLayer);
-            event.registerLayerDefinition(LoopKickModelLightSpeed.LAYER_LOCATION, LoopKickModelLightSpeed::createBodyLayer);
+
+            //Sonic Boom
+            event.registerLayerDefinition(SonicBoomModel.LAYER_LOCATION, SonicBoomModel::createBodyLayer);
+
+            //Cross Slash
+            event.registerLayerDefinition(CrossSlashModel.LAYER_LOCATION, CrossSlashModel::createBodyLayer);
 
             //Sonic Wind
             event.registerLayerDefinition(SonicWindModel.LAYER_LOCATION, SonicWindModel::createBodyLayer);

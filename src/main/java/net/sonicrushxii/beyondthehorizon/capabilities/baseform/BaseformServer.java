@@ -28,8 +28,10 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.SpinSlashCloud;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.cross_slash.CrossSlashProjectile;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.homing_shot.HomingShotProjectile;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_boom.SonicBoomProjectile;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
@@ -42,7 +44,9 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushRotationSyncS2C;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross_slash.EndCrossSlash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.EndSonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -402,7 +406,6 @@ public class BaseformServer {
 
                                 }, 10);
 
-                                System.out.println("End Qk Cyloop");
                             }
                         }catch(NullPointerException ignored){}
                     }
@@ -964,7 +967,7 @@ public class BaseformServer {
                                     Scheduler.scheduleTask(()->{
                                         Vec3 cloudSpawn = new Vec3(-motionDirection.x(),0,-motionDirection.z());
 
-                                        Utilities.summonEntity(ModEntityTypes.SPIN_SLASH_CLOUD.get(),
+                                        Utilities.summonEntity(ModEntityTypes.BASEFORM_SPIN_SLASH_CLOUD.get(),
                                                 player.serverLevel(),
                                                 spinTargetPos.add(cloudSpawn.scale(0.75)),
                                                 (aoeCloud) -> {
@@ -1030,7 +1033,6 @@ public class BaseformServer {
                                     );
                                     if(baseformProperties.spinSlash >= 53){
                                         jumpBackPos = (new Vec3(player.getX(),player.getY(),player.getZ())).subtract(new Vec3(spinSlashCloud.getX(),spinSlashCloud.getY(),spinSlashCloud.getZ())).normalize();
-                                        System.out.println(jumpBackPos);
                                     }
                                     player.connection.send(new ClientboundTeleportEntityPacket(player));
                                 }
@@ -1095,7 +1097,7 @@ public class BaseformServer {
                                     },3);
 
                                     //Spawn Cyclone Kick Cloud
-                                    Scheduler.scheduleTask(()-> Utilities.summonEntity(ModEntityTypes.CYCLONE_KICK_CLOUD.get(),
+                                    Scheduler.scheduleTask(()-> Utilities.summonEntity(ModEntityTypes.BASEFORM_CYCLONE_KICK_CLOUD.get(),
                                             player.serverLevel(),
                                             cycloneTargetPos.add(0,-cycloneTarget.getEyeHeight()/2,0),
                                             (aoeCloud) -> {
@@ -1351,8 +1353,7 @@ public class BaseformServer {
                         //Return to normal animation when on Ground or when it times out
                         if (baseformProperties.loopKick < 0) {
                             baseformProperties.loopKick += 1;
-                            if(player.onGround())
-                                baseformProperties.loopKick = 0;
+                            if(player.onGround())  baseformProperties.loopKick = 0;
                         }
                     }
 
@@ -1362,12 +1363,92 @@ public class BaseformServer {
                 {
                     //Sonic Boom
                     {
+                        try {
+                            if (baseformProperties.sonicBoom > 0) {
+                                baseformProperties.sonicBoom += 1;
+                                player.setDeltaMovement(0, -0.01, 0);
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
+                                if (baseformProperties.sonicBoom % 3 == 0) {
+                                    //Motion Dir
+                                    Vec3 motionDir = player.getLookAngle().scale(0.75);
+
+                                    //Set Spawn position
+                                    Vec3 spawnPos = new Vec3(player.getX() + motionDir.x,
+                                            player.getY() + motionDir.y + player.getEyeHeight()/3,
+                                            player.getZ() + motionDir.z);
+                                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                                            SoundEvents.EGG_THROW, SoundSource.MASTER, 1.0f, 1.0f);
+
+                                    SonicBoomProjectile sonicBoomProjectile = new SonicBoomProjectile(ModEntityTypes.BASEFORM_SONIC_BOOM.get(), level);
+
+                                    sonicBoomProjectile.setPos(spawnPos);
+                                    sonicBoomProjectile.setDuration(120);
+                                    sonicBoomProjectile.setXRot(player.getXRot());
+                                    sonicBoomProjectile.setYRot(player.getYRot());
+                                    sonicBoomProjectile.setMovementDirection(player.getLookAngle());
+                                    sonicBoomProjectile.setDestroyBlocks(player.isShiftKeyDown());
+                                    sonicBoomProjectile.setOwner(player.getUUID());
+
+                                    // Add the entity to the world
+                                    level.addFreshEntity(sonicBoomProjectile);
+                                }
+
+                                //End Ability
+                                if (baseformProperties.sonicBoom > 120) {
+                                    throw new NullPointerException("Duration End");
+
+                                }
+                            }
+                        }catch (NullPointerException|ClassCastException e)
+                        {
+                            EndSonicBoom.performEndSonicBoom(player);
+                        }
                     }
 
                     //Cross Slash
                     {
+                        try {
+                            if (baseformProperties.crossSlash > 0)
+                            {
+                                baseformProperties.crossSlash += 1;
+                                player.setDeltaMovement(0.0, 0.0, 0.0);
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
+                                if (baseformProperties.crossSlash % 3 == 0) {
+                                    //Motion Dir
+                                    Vec3 motionDir = player.getLookAngle().scale(0.75);
+
+                                    //Set Spawn position
+                                    Vec3 spawnPos = new Vec3(player.getX() + motionDir.x,
+                                            player.getY() + motionDir.y + (player.getEyeHeight()-player.getEyeHeight()/3),
+                                            player.getZ() + motionDir.z);
+                                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                                            SoundEvents.EGG_THROW, SoundSource.MASTER, 1.0f, 1.0f);
+
+                                    CrossSlashProjectile crossSlashProjectile = new CrossSlashProjectile(ModEntityTypes.BASEFORM_CROSS_SLASH.get(), level);
+
+                                    crossSlashProjectile.setPos(spawnPos);
+                                    crossSlashProjectile.setDuration(120);
+                                    crossSlashProjectile.setXRot(player.getXRot());
+                                    crossSlashProjectile.setYRot(player.getYRot());
+                                    crossSlashProjectile.setMovementDirection(player.getLookAngle());
+                                    crossSlashProjectile.setDestroyBlocks(player.isShiftKeyDown());
+                                    crossSlashProjectile.setOwner(player.getUUID());
+
+                                    // Add the entity to the world
+                                    level.addFreshEntity(crossSlashProjectile);
+                                }
+
+                                //End Ability
+                                if (baseformProperties.crossSlash > 120) {
+                                    throw new NullPointerException("Duration End");
+                                }
+                            }
+                        }catch (NullPointerException|ClassCastException e)
+                        {
+                            EndCrossSlash.performEndCrossSlash(player);
+                        }
                     }
 
                     //Sonic Wind
@@ -1395,7 +1476,7 @@ public class BaseformServer {
                                         player.getZ()+player.getLookAngle().z);
                                 level.playSound(null,player.getX(),player.getY(),player.getZ(),
                                         SoundEvents.EGG_THROW, SoundSource.MASTER, 1.0f, 1.0f);
-                                SonicWind sonicWind = new SonicWind(ModEntityTypes.SONIC_WIND.get(), level);
+                                SonicWind sonicWind = new SonicWind(ModEntityTypes.BASEFORM_SONIC_WIND.get(), level);
 
                                 sonicWind.setPos(spawnPos);
                                 sonicWind.setDuration(120);
@@ -1423,6 +1504,40 @@ public class BaseformServer {
 
                     //Homing Shot
                     {
+                        //Home, the Homing Shots towards your enemy
+                        try
+                        {
+                            LivingEntity homingShotTarget = (LivingEntity) serverLevel.getEntity(baseformProperties.rangedTarget);
+
+                            //Find Ranged Target and Target
+                            for(HomingShotProjectile homingShotProjectile : level.getEntitiesOfClass(HomingShotProjectile.class,
+                                    new AABB(player.getX()+64,player.getY()+64,player.getZ()+64,
+                                            player.getX()-64,player.getY()-64,player.getZ()-64),
+                                    homingShotProjectile-> homingShotProjectile.getOwnerUUID().equals(player.getUUID())))
+                            {
+                                homingShotProjectile.setDeltaMovement(
+                                        (new Vec3(homingShotTarget.getX(),homingShotTarget.getY()+homingShotTarget.getEyeHeight()/2,homingShotTarget.getZ()))
+                                                .subtract(new Vec3(homingShotProjectile.getX(),homingShotProjectile.getY(),homingShotProjectile.getZ()))
+                                                .normalize()
+                                                .scale(0.75)
+                                );
+                            }
+
+                        }
+                        catch(NullPointerException|ClassCastException e)
+                        {
+                            //Otherwise It'll Launch the Homing Shot in the direction you look
+                            for(HomingShotProjectile homingShotProjectile : level.getEntitiesOfClass(HomingShotProjectile.class,
+                                    new AABB(player.getX()+64,player.getY()+64,player.getZ()+64,
+                                            player.getX()-64,player.getY()-64,player.getZ()-64),
+                                    homingShotProjectile-> homingShotProjectile.getOwnerUUID().equals(player.getUUID())))
+                            {
+                                homingShotProjectile.setDeltaMovement(
+                                        Utilities.calculateViewVector(player.getXRot(),player.getYRot()).scale(0.75)
+                                );
+                            }
+                        }
+
                         try {
                             if (baseformProperties.homingShot > 0) {
                                 baseformProperties.homingShot += 1;
@@ -1442,7 +1557,7 @@ public class BaseformServer {
                                         double zComponent = Math.cos((baseformProperties.atkRotPhase+90) * (Math.PI / 180)) * 0.707;
 
                                         //Motion
-                                        Utilities.summonEntity(ModEntityTypes.HOMING_SHOT_PROJECTILE.get(),
+                                        Utilities.summonEntity(ModEntityTypes.BASEFORM_HOMING_SHOT.get(),
                                                 player.serverLevel(),
                                                 new Vec3(
                                                         // sin(wt + T)
@@ -1462,46 +1577,13 @@ public class BaseformServer {
                                 if (baseformProperties.homingShot == 30)
                                 {
                                     HomingShot.scanFoward(player);
-
-                                    try
-                                    {
-                                        LivingEntity homingShotTarget = (LivingEntity) serverLevel.getEntity(baseformProperties.rangedTarget);
-
-                                        //Find Ranged Target and Target
-                                        for(HomingShotProjectile homingShotProjectile : level.getEntitiesOfClass(HomingShotProjectile.class,
-                                                new AABB(player.getX()+64,player.getY()+64,player.getZ()+64,
-                                                        player.getX()-64,player.getY()-64,player.getZ()-64),
-                                                    homingShotProjectile-> homingShotProjectile.getOwnerUUID().equals(player.getUUID())))
-                                        {
-                                            homingShotProjectile.setDeltaMovement(
-                                                    (new Vec3(homingShotTarget.getX(),homingShotTarget.getY()+homingShotTarget.getEyeHeight()/2,homingShotTarget.getZ()))
-                                                            .subtract(new Vec3(homingShotProjectile.getX(),homingShotProjectile.getY(),homingShotProjectile.getZ()))
-                                                            .normalize()
-                                                            .scale(0.75)
-                                            );
-                                        }
-
-                                    }
-                                    catch(NullPointerException|ClassCastException e)
-                                    {
-                                        //Otherwise It'll Launch the Homing Shot in the direction you look
-                                        for(HomingShotProjectile homingShotProjectile : level.getEntitiesOfClass(HomingShotProjectile.class,
-                                                new AABB(player.getX()+64,player.getY()+64,player.getZ()+64,
-                                                        player.getX()-64,player.getY()-64,player.getZ()-64),
-                                                homingShotProjectile-> homingShotProjectile.getOwnerUUID().equals(player.getUUID())))
-                                        {
-                                            homingShotProjectile.setDeltaMovement(
-                                                    Utilities.calculateViewVector(player.getXRot(),player.getYRot()).scale(0.75)
-                                            );
-                                        }
-                                    }
                                 }
 
+                            }
 
-                                //End Move
-                                if (baseformProperties.homingShot > 50) {
-                                    throw new InterruptedException("Move Successful");
-                                }
+                            //End Move
+                            if (baseformProperties.homingShot > 50) {
+                                throw new InterruptedException("Move Successful");
                             }
                         }catch (InterruptedException|NullPointerException|ClassCastException ignored)
                         {

@@ -7,6 +7,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -14,6 +15,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
+import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
 
 import java.lang.reflect.Field;
@@ -65,6 +68,70 @@ public class ModModelRenderer {
             VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(new ResourceLocation(BeyondTheHorizon.MOD_ID, getTextureLocation(textures,animationLength))));
             EntityModel model = modelClass.getConstructor(ModelPart.class).newInstance(modelPart);
             model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
+        }
+
+        catch (NullPointerException | ClassCastException | NoSuchMethodError | NoSuchFieldException |
+               NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ignored) {}
+    }
+
+    public static void renderPlayerModel(Class<? extends EntityModel> modelClass, RenderLivingEvent<?, ?> event, PoseStack poseStack, FormProperties formProperties)
+    {
+        MultiBufferSource buffer = event.getMultiBufferSource();
+        LocalPlayer player = (LocalPlayer) event.getEntity();
+        int packedLight = event.getPackedLight();
+
+        // Render the custom model
+        try {
+            //Get Layer Location
+            Field layerField = modelClass.getDeclaredField("LAYER_LOCATION");
+            ModelLayerLocation layerLocation = (ModelLayerLocation) layerField.get(null);
+
+            //Get Texture Location
+            Field textureField = modelClass.getDeclaredField("TEXTURE_LOCATIONS");
+            Texture[] textures = (Texture[])textureField.get(null);
+            Field animLengthField = modelClass.getDeclaredField("ANIMATION_LENGTH");
+            byte animationLength = (byte)animLengthField.get(null);
+
+            EntityModelSet entityModelSet = Minecraft.getInstance().getEntityModels();
+            ModelPart modelPart = entityModelSet.bakeLayer(layerLocation);
+
+            StringBuilder texturePath = new StringBuilder();
+
+            //Handle Baseform Rendering
+            if(formProperties instanceof BaseformProperties baseformProperties)
+            {
+                texturePath.append("baseform/");
+                //Render The Custom Model
+                if(baseformProperties.lightSpeedState == 2) texturePath.append("lightspeed_skin");
+                else if(baseformProperties.powerBoost)      texturePath.append("powerboost_skin");
+                else                                        texturePath.append("base_skin");
+            }
+
+            //Handle Superform Rendering
+
+            //Handle Starfall Rendering
+
+            //Handle HyperForm Rendering
+
+
+            VertexConsumer vertexConsumer;
+            //Handle Default Player Rendering
+            if(texturePath.isEmpty())
+            {
+                vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(
+                        player.getSkin().texture()
+                ));
+            }
+            //Handle Custom Rendering
+            else
+            {
+                vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(
+                        new ResourceLocation(BeyondTheHorizon.MOD_ID, String.format("textures/custom_model/%s.png", texturePath))
+                ));
+            }
+
+            EntityModel model = modelClass.getConstructor(ModelPart.class).newInstance(modelPart);
+            model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(player, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
         }
 
         catch (NullPointerException | ClassCastException | NoSuchMethodError | NoSuchFieldException |

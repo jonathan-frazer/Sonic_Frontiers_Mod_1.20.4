@@ -3,9 +3,6 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.soni
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
@@ -13,9 +10,6 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProp
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
-
-import java.util.Collections;
-import java.util.List;
 
 public class SonicBoom
 {
@@ -30,7 +24,7 @@ public class SonicBoom
 
     public void encode(FriendlyByteBuf buffer){
     }
-
+/*
     //Server-Side Scan
     public static void scanFoward(ServerPlayer player)
     {
@@ -41,7 +35,7 @@ public class SonicBoom
             Vec3 currentPos = player.getPosition(0).add(0.0, 1.0, 0.0);
             Vec3 lookAngle = player.getLookAngle();
 
-            baseformProperties.rangedTarget = null;
+            baseformProperties.rangedTarget = new UUID(0L,0L);
 
             //Scan Forward for enemies
             for (int i = 0; i < 12; ++i) {
@@ -74,7 +68,7 @@ public class SonicBoom
                     ));
         });
     }
-
+*/
 
 
     public void handle(CustomPayloadEvent.Context ctx){
@@ -84,9 +78,6 @@ public class SonicBoom
                     if(player != null){
                         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
                             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
-
-                            //Start Cross Slash
-                            scanFoward(player);
 
                             //Changed Data
                             baseformProperties.sonicBoom = 1;

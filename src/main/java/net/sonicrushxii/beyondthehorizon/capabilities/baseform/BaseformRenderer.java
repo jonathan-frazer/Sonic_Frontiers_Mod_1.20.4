@@ -120,9 +120,7 @@ public class BaseformRenderer
             poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F+BaseformClient.ClientOnlyData.wildRushYawPitch[1]));
 
             //Render The Custom Model
-            if(baseformProperties.lightSpeedState == 2) ModModelRenderer.renderModel(SonicModelLightSpeed.class, event, poseStack);
-            else if(baseformProperties.powerBoost)      ModModelRenderer.renderModel(SonicModelPowerBoost.class, event, poseStack);
-            else                                        ModModelRenderer.renderModel(SonicModelBase.class, event, poseStack);
+            ModModelRenderer.renderPlayerModel(SonicModelBase.class,event,poseStack,baseformProperties);
 
             poseStack.popPose();
             event.setCanceled(true);
@@ -143,9 +141,7 @@ public class BaseformRenderer
                 poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F-baseformProperties.loopKick*15.0F));
 
                 //Render The Custom Model
-                if(baseformProperties.lightSpeedState == 2) ModModelRenderer.renderModel(SonicModelLightSpeed.class, event, poseStack);
-                else if(baseformProperties.powerBoost)      ModModelRenderer.renderModel(SonicModelPowerBoost.class, event, poseStack);
-                else                                        ModModelRenderer.renderModel(SonicModelBase.class, event, poseStack);
+                ModModelRenderer.renderPlayerModel(SonicModelBase.class,event,poseStack,baseformProperties);
             }
             else
             {
@@ -155,15 +151,13 @@ public class BaseformRenderer
                 poseStack.translate(0D,-1.5D,0D);
 
                 //Render The Custom Model
-                if(baseformProperties.lightSpeedState == 2) ModModelRenderer.renderModel(LoopKickModelLightSpeed.class, event, poseStack);
-                else if(baseformProperties.powerBoost)      ModModelRenderer.renderModel(LoopKickModelPowerBoost.class, event, poseStack);
-                else                                        ModModelRenderer.renderModel(LoopKickModelBase.class, event, poseStack);
+                ModModelRenderer.renderPlayerModel(LoopKickModelBase.class,event,poseStack,baseformProperties);
             }
 
             poseStack.popPose();
             event.setCanceled(true);
         }
-        else if(baseformProperties.loopKick == -1)
+        else if(baseformProperties.loopKick < 0)
         {
             poseStack.pushPose();
 
@@ -176,9 +170,7 @@ public class BaseformRenderer
             poseStack.translate(0D,-1.5D,0D);
 
             //Render The Custom Model
-            if(baseformProperties.lightSpeedState == 2) ModModelRenderer.renderModel(LoopKickModelLightSpeed.class, event, poseStack);
-            else if(baseformProperties.powerBoost)      ModModelRenderer.renderModel(LoopKickModelPowerBoost.class, event, poseStack);
-            else                                        ModModelRenderer.renderModel(LoopKickModelBase.class, event, poseStack);
+            ModModelRenderer.renderPlayerModel(LoopKickModelBase.class, event, poseStack,baseformProperties);
 
             poseStack.popPose();
             event.setCanceled(true);

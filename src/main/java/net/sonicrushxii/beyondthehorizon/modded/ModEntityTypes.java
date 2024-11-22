@@ -9,12 +9,14 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.CycloneKickCloud;
-import net.sonicrushxii.beyondthehorizon.entities.baseform.homing_shot.HomingShotProjectile;
-import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.SpinSlashCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.TornadoJumpCloud;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.cross_slash.CrossSlashProjectile;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.homing_shot.HomingShotProjectile;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageEntity;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_boom.SonicBoomProjectile;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWind;
 
 @Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEntityTypes {
@@ -32,22 +34,31 @@ public class ModEntityTypes {
             () -> EntityType.Builder.<MirageEntity>of(MirageEntity::new, MobCategory.MISC)
                     .sized(1F, 2F)  // Define the size of the entity
                     .build("baseform_mirage"));
-    public static final RegistryObject<EntityType<CycloneKickCloud>> CYCLONE_KICK_CLOUD = ENTITY_TYPES.register("cyclone_kick_cloud",
+    public static final RegistryObject<EntityType<CycloneKickCloud>> BASEFORM_CYCLONE_KICK_CLOUD = ENTITY_TYPES.register("cyclone_kick_cloud",
             () -> EntityType.Builder.<CycloneKickCloud>of(CycloneKickCloud::new, MobCategory.MISC)
                     .sized(1F, 5F)  // Define the size of the entity
                     .build("cyclone_kick_cloud"));
-    public static final RegistryObject<EntityType<SpinSlashCloud>> SPIN_SLASH_CLOUD = ENTITY_TYPES.register("spinslash_cloud",
+    public static final RegistryObject<EntityType<SpinSlashCloud>> BASEFORM_SPIN_SLASH_CLOUD = ENTITY_TYPES.register("spinslash_cloud",
             () -> EntityType.Builder.<SpinSlashCloud>of(SpinSlashCloud::new, MobCategory.MISC)
                     .sized(1F, 5F)  // Define the size of the entity
                     .build("spinslash_cloud"));
-    public static final RegistryObject<EntityType<SonicWind>> SONIC_WIND = ENTITY_TYPES.register("baseform_sonic_wind",
+    public static final RegistryObject<EntityType<SonicBoomProjectile>> BASEFORM_SONIC_BOOM = ENTITY_TYPES.register("baseform_sonic_boom",
+            () -> EntityType.Builder.<SonicBoomProjectile>of(SonicBoomProjectile::new, MobCategory.MISC)
+                    .sized(1F, 5F)  // Define the size of the entity
+                    .build("baseform_sonic_boom"));
+    public static final RegistryObject<EntityType<CrossSlashProjectile>> BASEFORM_CROSS_SLASH = ENTITY_TYPES.register("baseform_cross_slash",
+            () -> EntityType.Builder.<CrossSlashProjectile>of(CrossSlashProjectile::new, MobCategory.MISC)
+                    .sized(1F, 5F)  // Define the size of the entity
+                    .build("baseform_cross_slash"));
+    public static final RegistryObject<EntityType<SonicWind>> BASEFORM_SONIC_WIND = ENTITY_TYPES.register("baseform_sonic_wind",
             () -> EntityType.Builder.<SonicWind>of(SonicWind::new, MobCategory.MISC)
                     .sized(1F, 5F)  // Define the size of the entity
                     .build("baseform_sonic_wind"));
-    public static final RegistryObject<EntityType<HomingShotProjectile>> HOMING_SHOT_PROJECTILE = ENTITY_TYPES.register("baseform_homing_shot",
+    public static final RegistryObject<EntityType<HomingShotProjectile>> BASEFORM_HOMING_SHOT = ENTITY_TYPES.register("baseform_homing_shot",
             () -> EntityType.Builder.<HomingShotProjectile>of(HomingShotProjectile::new, MobCategory.MISC)
                     .sized(1F, 5F)  // Define the size of the entity
                     .build("baseform_homing_shot"));
+
 
     public static void register(IEventBus eventBus){ ENTITY_TYPES.register(eventBus);}
 }

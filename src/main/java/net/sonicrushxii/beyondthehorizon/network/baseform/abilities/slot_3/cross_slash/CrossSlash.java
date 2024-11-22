@@ -1,44 +1,26 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross_slash;
 
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
-import org.joml.Vector3f;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 public class CrossSlash
 {
+    public CrossSlash() {}
 
-    public CrossSlash() {
+    public CrossSlash(FriendlyByteBuf buffer){}
 
-    }
-
-    public CrossSlash(FriendlyByteBuf buffer){
-
-    }
-
-    public void encode(FriendlyByteBuf buffer){
-    }
+    public void encode(FriendlyByteBuf buffer){}
 
     //Server-Side Scan
+    /*
     public static void scanFoward(ServerPlayer player)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
@@ -81,7 +63,8 @@ public class CrossSlash
                     ));
         });
     }
-
+    */
+/*
     public static void tpToTarget(ServerPlayer player, UUID enemyID)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
@@ -125,7 +108,7 @@ public class CrossSlash
             }
         });
     }
-
+*/
 
     public void handle(CustomPayloadEvent.Context ctx){
         ctx.enqueueWork(
@@ -135,21 +118,14 @@ public class CrossSlash
                         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
                             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                            //Start Cross Slash
-                            scanFoward(player);
-
                             //Changed Data
                             baseformProperties.crossSlash = 1;
-                            //If Ranged Target is there Tp to the ranged target
-                            if(baseformProperties.rangedTarget != null)
-                                tpToTarget(player,baseformProperties.rangedTarget);
 
                             //Remove Gravity
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
 
                             //Play Sound
                             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
-
 
                             PacketHandler.sendToPlayer(player,
                                     new SyncPlayerFormS2C(

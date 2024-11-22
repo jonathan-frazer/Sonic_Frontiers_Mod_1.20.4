@@ -100,7 +100,7 @@ public class CycloneKick {
                 baseformProperties.cycloneKick = 1;
                 Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
                 Scheduler.scheduleTask(()->{
-                    Utilities.summonEntity(ModEntityTypes.CYCLONE_KICK_CLOUD.get(),
+                    Utilities.summonEntity(ModEntityTypes.BASEFORM_CYCLONE_KICK_CLOUD.get(),
                         player.serverLevel(),
                         playerPos.add
                                 (Utilities.calculateViewVector(0,player.getYRot()).scale(1.4)),
