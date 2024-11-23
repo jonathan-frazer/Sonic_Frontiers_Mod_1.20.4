@@ -199,6 +199,7 @@ public class BaseformTransformer {
         player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
         player.removeEffect(MobEffects.DAMAGE_BOOST);
         player.removeEffect(MobEffects.DIG_SPEED);
+        player.removeEffect(MobEffects.ABSORPTION);
 
         //Commands
         CommandSourceStack commandSourceStack = player.createCommandSourceStack().withPermission(4).withSuppressedOutput();

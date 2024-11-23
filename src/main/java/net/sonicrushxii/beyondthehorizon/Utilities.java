@@ -210,6 +210,29 @@ public class Utilities {
                     "minecraft:large_fern")
             );
 
+    public static final HashSet<String> unbreakableBlocks =
+            new HashSet<>(Arrays.asList(
+                    "minecraft:bedrock",
+                    "minecraft:obsidian",
+                    "minecraft:end_portal_frame",
+                    "chaos_emerald:master_emerald",
+                    "chaos_emerald:chaos_emerald/aqua_emerald",
+                    "chaos_emerald:chaos_emerald/blue_emerald",
+                    "chaos_emerald:chaos_emerald/green_emerald",
+                    "chaos_emerald:chaos_emerald/grey_emerald",
+                    "chaos_emerald:chaos_emerald/purple_emerald",
+                    "chaos_emerald:chaos_emerald/red_emerald",
+                    "chaos_emerald:chaos_emerald/yellow_emerald",
+                    "chaos_emerald:super_emerald/aqua_emerald",
+                    "chaos_emerald:super_emerald/blue_emerald",
+                    "chaos_emerald:super_emerald/green_emerald",
+                    "chaos_emerald:super_emerald/grey_emerald",
+                    "chaos_emerald:super_emerald/purple_emerald",
+                    "chaos_emerald:super_emerald/red_emerald",
+                    "chaos_emerald:super_emerald/yellow_emerald"
+            )
+            );
+
     /** Method to summon an entity in a given world at specified coordinates
      * Mob specifies the mob to be summon, Eg: EntityType.ZOMBIE
      * ServerLevel determines the world in which the entity is summoned

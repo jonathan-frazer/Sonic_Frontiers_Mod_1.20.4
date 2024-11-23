@@ -169,6 +169,10 @@ public class BaseformProperties extends FormProperties {
     public byte profanedWind;
     public int[] profanedWindCoords;
 
+    //Slot 5
+    public byte parryTime;
+    public boolean parryTimeSlow;
+
     public BaseformProperties()
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
@@ -229,6 +233,9 @@ public class BaseformProperties extends FormProperties {
         sonicWind = (byte)0;
         profanedWind = (byte)0;
         profanedWindCoords = new int[]{0,0,0};
+
+        //Slot 5
+        parryTime = (byte)0;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -292,6 +299,9 @@ public class BaseformProperties extends FormProperties {
         sonicWind = nbt.getByte("SonicWind");
         profanedWind = nbt.getByte("SonicQWind");
         profanedWindCoords = nbt.getIntArray("SonicQWindPos");
+
+        //Slot 5
+        parryTime = nbt.getByte("ParryTime");
     }
 
     @Override
@@ -359,6 +369,9 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("SonicQWind",profanedWind);
         nbt.putIntArray("SonicQWindPos",profanedWindCoords);
 
+        //Slot 5
+        nbt.putByte("ParryTime",parryTime);
+
         return nbt;
     }
 
@@ -416,11 +429,13 @@ public class BaseformProperties extends FormProperties {
         boolean homingShot = (this.homingShot > 0);
         boolean sonicBoom = (this.sonicBoom > 0);
         boolean sonicWind = (this.sonicWind > 0) && (this.profanedWind > 0);
+        boolean parry = (this.parryTime > 0);
 
         return quickCyloop ||
                 homingAttack || hummingTop || ballform || speedBlitzDash || stomping ||
                 tornadoJump || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick ||
-                crossSlash || homingShot || sonicBoom || sonicWind;
+                crossSlash || homingShot || sonicBoom || sonicWind ||
+                parry;
     }
 
     //Ball form

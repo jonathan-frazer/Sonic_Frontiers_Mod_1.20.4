@@ -2,6 +2,8 @@ package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -23,6 +25,8 @@ import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.StopParry;
+import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleDirPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -73,6 +77,24 @@ public class BaseformHandler {
             if ((baseformProperties.selectiveInvul() || receiver.hasEffect(ModEffects.SPEED_BLITZING.get())) &&
                     !(damageGiver instanceof Player) && !event.getSource().isIndirect())
                 event.setCanceled(true);
+
+            //Parry
+            if(baseformProperties.parryTime > 0)
+            {
+                Vec3 motionDir =  (new Vec3(damageGiver.getX(),damageGiver.getY(),damageGiver.getZ()))
+                        .subtract(new Vec3(receiver.getX(),receiver.getY(),receiver.getZ())).normalize();
+
+                //Particle
+                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                        ParticleTypes.FLASH,
+                        damageGiver.getX(),damageGiver.getY()+damageGiver.getEyeHeight()/2,damageGiver.getZ(),
+                        0.001,0.01F,damageGiver.getEyeHeight()/2,0.01F,1,true));
+
+                StopParry.performParrySuccess(receiver);
+                damageGiver.setDeltaMovement(motionDir.scale(1.0));
+                event.setCanceled(true);
+            }
+
 
         }catch(NullPointerException ignored){}
     }
@@ -125,6 +147,8 @@ public class BaseformHandler {
                         else if(damageGiver.getXRot() > 0)
                         {
                             //Sonic Eagle
+                            damageGiver.displayClientMessage(Component.translatable("Sonic Eagle").withStyle(Style.EMPTY.withColor(0xFFA500)),true);
+
                             PacketHandler.sendToALLPlayers(new ParticleDirPacketS2C(
                                     ParticleTypes.FLAME,
                                     damageTaker.getX(), damageTaker.getY()+damageTaker.getEyeHeight(), damageTaker.getZ(),

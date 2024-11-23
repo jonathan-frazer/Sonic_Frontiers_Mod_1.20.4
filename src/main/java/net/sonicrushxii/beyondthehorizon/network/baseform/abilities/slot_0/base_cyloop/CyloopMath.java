@@ -65,6 +65,7 @@ public class CyloopMath
     public static void cyloopEffect(ServerPlayer player, Object[] cyloopPath)
     {
         final byte SKIP_THRESHOLD = 10;
+        boolean regened = false;
 
         //Remember to cast all the Objects to Vec3's
         for(byte i=0;i<cyloopPath.length-SKIP_THRESHOLD;++i)
@@ -72,8 +73,16 @@ public class CyloopMath
                 if(xzDistSqr((Vec3) cyloopPath[i], (Vec3) cyloopPath[j]) < 1.0)
                 {
                     //Cyloop Regeneration
-                    if(player.hasEffect(MobEffects.SATURATION)) player.getEffect(MobEffects.SATURATION).update(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
-                    else                                        player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
+                    if(!regened)
+                    {
+                        int absorptionAmt = (int) Math.ceil(player.getAbsorptionAmount());
+                        int amplifier = -1 + (1+absorptionAmt/8)*2;
+                        if(amplifier != -1 && amplifier < 10) {
+                            if(player.hasEffect(MobEffects.ABSORPTION))     player.removeEffect(MobEffects.ABSORPTION);
+                            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, -1, amplifier, false, false));
+                        }
+                        regened = true;
+                    }
 
                     //Draw a Bounding box from point
                     Vec3 stocPoint = (Vec3) cyloopPath[j-2];

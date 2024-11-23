@@ -23,6 +23,12 @@ public class KeyBindings {
             InputConstants.getKey(InputConstants.KEY_P,-1),
             CATEGORY
     );
+    public final KeyMapping parryKey = new KeyMapping(
+            "key."+ BeyondTheHorizon.MOD_ID+".ParryKey",
+            KeyConflictContext.IN_GAME,
+            InputConstants.getKey(InputConstants.KEY_GRAVE,-1),
+            CATEGORY
+    );
     public final KeyMapping virtualSlotUse = new KeyMapping(
             "key."+ BeyondTheHorizon.MOD_ID+".FrontiersSlot",
             KeyConflictContext.IN_GAME,

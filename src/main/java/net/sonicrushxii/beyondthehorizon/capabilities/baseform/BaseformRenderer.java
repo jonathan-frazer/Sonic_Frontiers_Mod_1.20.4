@@ -176,6 +176,7 @@ public class BaseformRenderer
             event.setCanceled(true);
         }
 
+        //Sonic Boom
         else if(baseformProperties.sonicBoom > 0)
         {
             poseStack.pushPose();
@@ -196,6 +197,7 @@ public class BaseformRenderer
             event.setCanceled(true);
         }
 
+        //Cross Slash
         else if(baseformProperties.crossSlash > 0)
         {
             poseStack.pushPose();
@@ -214,6 +216,55 @@ public class BaseformRenderer
                     (modelPart)->{
                         modelPart.getChild("CrossArm").xRot = player.getXRot()/60;
                         modelPart.getChild("Head").xRot = player.getXRot()/60;
+                    });
+
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
+
+        else if(baseformProperties.parryTime > 0)
+        {
+            poseStack.pushPose();
+
+            //Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+
+            poseStack.translate(0D,-1.5D,0D);
+
+            //Render The Custom Model
+            ModModelRenderer.renderPlayerModel(ParryModelPre.class, event, poseStack, baseformProperties,null);
+
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
+
+        //Parry
+        else if(baseformProperties.parryTime <= -50)
+        {
+            byte animationFrame = (byte)(baseformProperties.parryTime+60);
+
+            poseStack.pushPose();
+
+            // Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+
+            poseStack.translate(0D,-1.5D,0D);
+
+            //Render The Custom Model
+            ModModelRenderer.renderPlayerModel(ParryModelPost.class, event, poseStack, baseformProperties,
+                    (modelPart)->{
+                        modelPart.getChild("RightArm").yRot -= Math.min(5,animationFrame)/15.0F;
+                        modelPart.getChild("LeftArm").yRot  -= Math.min(5,animationFrame)/1.42F;
+                        modelPart.getChild("Head").yRot     -= Math.min(5,animationFrame)/7.0F;
+                        modelPart.getChild("Body").yRot     -= Math.min(5,animationFrame)/5.0F;
                     });
 
             poseStack.popPose();

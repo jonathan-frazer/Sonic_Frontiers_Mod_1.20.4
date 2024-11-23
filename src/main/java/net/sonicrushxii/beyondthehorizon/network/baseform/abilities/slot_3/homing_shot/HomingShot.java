@@ -40,16 +40,17 @@ public class HomingShot {
 
             //Get Position
             Vec3 currentPos = player.getPosition(0).add(0.0, 1.0, 0.0);
-            Vec3 lookAngle = player.getLookAngle();
+            Vec3 lookAngle = player.getLookAngle().scale(2.0);
 
             baseformProperties.rangedTarget = new UUID(0L,0L);
 
             //Scan Forward for enemies
-            for (int i = 0; i < 12; ++i) {
+            for (int i = 0; i < 12; ++i)
+            {
                 //Increment Current Position Forward
                 currentPos = currentPos.add(lookAngle);
-                AABB boundingBox = new AABB(currentPos.x() + 4, currentPos.y() + 4, currentPos.z() + 4,
-                        currentPos.x() - 4, currentPos.y() - 4, currentPos.z() - 4);
+                AABB boundingBox = new AABB(currentPos.x() + 5, currentPos.y() + 5, currentPos.z() + 5,
+                                            currentPos.x() - 5, currentPos.y() - 5, currentPos.z() - 5);
 
                 List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
                         LivingEntity.class, boundingBox,
@@ -58,7 +59,8 @@ public class HomingShot {
                 //If enemy is found then Target it
                 if (!nearbyEntities.isEmpty()) {
                     //Select Closest target
-                    baseformProperties.rangedTarget = Collections.min(nearbyEntities, (e1, e2) -> {
+                    baseformProperties.rangedTarget = Collections.min(
+                            nearbyEntities, (e1, e2) -> {
                         Vec3 e1Pos = new Vec3(e1.getX(), e1.getY(), e1.getZ());
                         Vec3 e2Pos = new Vec3(e2.getX(), e2.getY(), e2.getZ());
 

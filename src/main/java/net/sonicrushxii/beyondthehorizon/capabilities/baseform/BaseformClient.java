@@ -7,6 +7,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
@@ -51,6 +52,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.SonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.QuickSonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWind;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.Parry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -111,6 +114,7 @@ public class BaseformClient {
                         && playerNBT.getCompound("abilities").getByte("flying") == 0
                         && !baseformProperties.isAttacking()) {
                     PacketHandler.sendToServer(new DoubleJump());
+                    while(KeyBindings.INSTANCE.doubleJump.consumeClick());
                 }
             }
             //Auto Step
@@ -468,14 +472,16 @@ public class BaseformClient {
                         KeyBindings.INSTANCE.useAbility3.isDown())
                 {
                     //Normal Version
-                    if(!player.isShiftKeyDown())
+                    if(!player.isShiftKeyDown() && baseformProperties.sonicWind == 0)
                     {
+                        player.displayClientMessage(Component.translatable("Sonic Wind!").withStyle(Style.EMPTY.withColor(0x00EEFF)),true);
                         PacketHandler.sendToServer(new SonicWind());
                         baseformProperties.sonicWind = 1;
                     }
                     //Quick Version
-                    else
+                    if(player.isShiftKeyDown() && baseformProperties.profanedWind == 0)
                     {
+                        player.displayClientMessage(Component.translatable("Sonic Wind").withStyle(Style.EMPTY.withColor(0x00FFFF)),true);
                         PacketHandler.sendToServer(new QuickSonicWind());
                         baseformProperties.profanedWind = 1;
                     }
@@ -492,11 +498,21 @@ public class BaseformClient {
                     baseformProperties.homingShot = 1;
                 }
             }
+        }
 
+        //Slot 5
+        {
+            if(!baseformProperties.isAttacking() && KeyBindings.INSTANCE.parryKey.isDown())
+            {
+                PacketHandler.sendToServer(new Parry());
+                baseformProperties.parryTime = 1;
+            }
 
-
-
-
+            if (baseformProperties.parryTime > 0 && !KeyBindings.INSTANCE.parryKey.isDown())
+            {
+                PacketHandler.sendToServer(new StopParry());
+                baseformProperties.parryTime = 0;
+            }
 
         }
     }

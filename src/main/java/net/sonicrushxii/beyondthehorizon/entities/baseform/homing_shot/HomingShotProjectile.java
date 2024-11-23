@@ -30,6 +30,7 @@ import java.util.UUID;
 public class HomingShotProjectile extends Entity {
     public static final EntityDataAccessor<Integer> DURATION = SynchedEntityData.defineId(HomingShotProjectile.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(HomingShotProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
+    public static final EntityDataAccessor<Integer> TARGET = SynchedEntityData.defineId(HomingShotProjectile.class, EntityDataSerializers.INT);
     private static final float STRENGTH = 1.0f;
     private static final float HOMING_SHOT_DAMAGE = 35.0f;
 
@@ -41,14 +42,14 @@ public class HomingShotProjectile extends Entity {
     protected void defineSynchedData() {
         this.entityData.define(DURATION, 150);
         this.entityData.define(OWNER,Optional.empty());
+        this.entityData.define(TARGET,-1);
     }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
-        if (tag.contains("Duration")) {
-            this.entityData.set(DURATION,tag.getInt("Duration"));
-        }
+        if (tag.contains("Duration")) this.entityData.set(DURATION,tag.getInt("Duration"));
         if (tag.hasUUID("OwnerUUID")) this.setOwner(tag.getUUID("OwnerUUID"));
+        if (tag.hasUUID("TargetID")) this.entityData.set(TARGET,tag.getInt("TargetID"));
 
     }
 
@@ -57,6 +58,15 @@ public class HomingShotProjectile extends Entity {
         tag.putInt("Duration", this.entityData.get(DURATION));
         UUID ownerUuid = getOwnerUUID();
         if (ownerUuid != null) tag.putUUID("OwnerUUID", ownerUuid);
+        tag.putInt("TargetID", this.entityData.get(TARGET));
+    }
+
+    // Sets the owner by UUID
+    public void setTarget(int targetId) { this.entityData.set(TARGET, targetId); }
+
+    public int getTarget()
+    {
+        return this.entityData.get(TARGET);
     }
 
     // Sets the owner by UUID
@@ -169,8 +179,29 @@ public class HomingShotProjectile extends Entity {
         //Time Elapsed
         else if(timeElapsed > 12)
         {
+            //Traverse
+            try {
+                LivingEntity homingShotTarget = (LivingEntity) this.level().getEntity(getTarget());
+                this.setDeltaMovement(
+                        (new Vec3(homingShotTarget.getX(), homingShotTarget.getY() + homingShotTarget.getEyeHeight() / 2, homingShotTarget.getZ()))
+                                .subtract(new Vec3(this.getX(), this.getY(), this.getZ()))
+                                .normalize()
+                                .scale(0.75)
+                );
+            }
+            catch (NullPointerException e)
+            {
+                try {
+                    Player owner = (Player) this.getOwner();
+                    this.setDeltaMovement(owner.getLookAngle().scale(0.75));
+                }
+                catch (NullPointerException f) {
+                    this.setDeltaMovement(Utilities.calculateViewVector(this.getXRot(),this.getYRot()).scale(0.75));
+                }
+            }
+
             // Check for collision
-            if(this.onGround() || this.horizontalCollision || this.verticalCollision && this.getDeltaMovement().y > 0)  explode();
+            if(this.horizontalCollision || this.verticalCollision && this.getDeltaMovement().y > 0) explode();
 
             // Check for entity collisions and apply damage
             List<LivingEntity> enemies = this.level().getEntitiesOfClass(LivingEntity.class,
@@ -197,7 +228,13 @@ public class HomingShotProjectile extends Entity {
                                 HOMING_SHOT_DAMAGE
                         );
                     }
+
                 }catch(NullPointerException ignored){}
+                // Kill all other projectiles
+                for(HomingShotProjectile siblings : this.level().getEntitiesOfClass(HomingShotProjectile.class,
+                        new AABB(this.getX() - 6.0, this.getY() - 6.0, this.getZ() - 6.0,
+                                this.getX() + 6.0, this.getY() + 6.0, this.getZ() + 6.0)))
+                    siblings.kill();
                 explode();
             }
         }
@@ -213,12 +250,6 @@ public class HomingShotProjectile extends Entity {
                 0.0, 0.55f, 0.55f, 0.55f, 10,
                 false)
         );
-
-        // Kill all other projectiles
-        for(HomingShotProjectile siblings : this.level().getEntitiesOfClass(HomingShotProjectile.class,
-                new AABB(this.getX() - 6.0, this.getY() - 6.0, this.getZ() - 6.0,
-                        this.getX() + 6.0, this.getY() + 6.0, this.getZ() + 6.0)))
-            siblings.kill();
 
         //Deal Damage and Use Particle Effects
         this.level().explode(

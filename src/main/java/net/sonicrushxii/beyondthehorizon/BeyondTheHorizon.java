@@ -144,6 +144,7 @@ public class BeyondTheHorizon
             event.register(KeyBindings.INSTANCE.useAbility4);
             event.register(KeyBindings.INSTANCE.useAbility5);
             event.register(KeyBindings.INSTANCE.useAbility6);
+            event.register(KeyBindings.INSTANCE.parryKey);
             event.register(KeyBindings.INSTANCE.useSingleAbility);
         }
 
@@ -152,6 +153,10 @@ public class BeyondTheHorizon
         {
             //Sonic Model
             event.registerLayerDefinition(SonicFlatPlayerModel.LAYER_LOCATION, SonicFlatPlayerModel::createBodyLayer);
+
+            //Parry Model
+            event.registerLayerDefinition(ParryModelPre.LAYER_LOCATION, ParryModelPre::createBodyLayer);
+            event.registerLayerDefinition(ParryModelPost.LAYER_LOCATION, ParryModelPost::createBodyLayer);
 
             //Spin Dash
             event.registerLayerDefinition(Spindash.LAYER_LOCATION,Spindash::createBodyLayer);

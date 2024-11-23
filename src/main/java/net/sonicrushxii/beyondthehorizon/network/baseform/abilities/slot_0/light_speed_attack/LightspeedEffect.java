@@ -75,6 +75,7 @@ public class LightspeedEffect {
         }
         //Remove Slowdown
         player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+
         //Add Speed Boost
         if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.LIGHTSPEED_MODE))
             player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.LIGHTSPEED_MODE);

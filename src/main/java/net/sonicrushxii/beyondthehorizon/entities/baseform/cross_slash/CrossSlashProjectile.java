@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.entities.baseform.cross_slash;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -12,8 +13,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.entities.all.LinearMovingEntity;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
@@ -28,8 +31,8 @@ public class CrossSlashProjectile extends LinearMovingEntity {
     public static final EntityDataAccessor<Boolean> DESTROY_BLOCKS = SynchedEntityData.defineId(CrossSlashProjectile.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(CrossSlashProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
     private int MAX_DURATION = 50;
-    private static float STRENGTH = 0.5f;
-    private static float CROSS_SLASH_DAMAGE = 12.0f;
+    private static final float STRENGTH = 0.5f;
+    private static final float CROSS_SLASH_DAMAGE = 12.0f;
 
     public CrossSlashProjectile(EntityType<? extends PointEntity> type, Level world) {
         super(type, world);
@@ -144,6 +147,24 @@ public class CrossSlashProjectile extends LinearMovingEntity {
     private void explode()
     {
         this.kill();
+
+        Vec3 blockDirection = movementDirection.scale(2);
+
+        //Break Blocks
+        BlockPos start = this.blockPosition();
+        BlockPos end = this.blockPosition().offset(
+                (int) Math.ceil(blockDirection.x()),
+                (int) Math.ceil(blockDirection.y()),
+                (int) Math.ceil(blockDirection.z())
+        );
+
+        // Use BlockPos.betweenClosed to iterate over all positions in the cube
+        for (BlockPos pos : BlockPos.betweenClosed(start, end)) {
+            BlockState blockState = this.level().getBlockState(pos);
+            if(!Utilities.unbreakableBlocks.contains(ForgeRegistries.BLOCKS.getKey(blockState.getBlock())+""))
+                this.level().destroyBlock(pos,true);
+        }
+
         /*
         if(this.isDestroyBlocks() && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))
         {

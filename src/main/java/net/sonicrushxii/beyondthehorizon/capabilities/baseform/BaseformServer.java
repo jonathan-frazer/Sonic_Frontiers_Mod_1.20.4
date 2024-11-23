@@ -52,6 +52,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.EndSonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWindParticleS2C;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -390,26 +391,45 @@ public class BaseformServer {
                                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.MASTER, 1.0f, 2.0f);
 
                                 //Damage
-                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_CYLOOP.getResourceKey(), player),
-                                        QK_CYLOOP_DAMAGE);
-
-                                //Launch up
-                                enemy.setDeltaMovement(0.0, 1.1, 0.0);
-                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
-
-                                //Lock in MidAir for 2 sec
-                                Scheduler.scheduleTask(() -> {
-                                    //Set Movement to Zero
-                                    enemy.setDeltaMovement(0.0, 0.02, 0.0);
+                                //Double Cyloop - Launch Down
+                                if(enemy.hasEffect(ModEffects.CYLOOPED.get()) && enemy.getEffect(ModEffects.CYLOOPED.get()).getDuration() > 0)
+                                {
+                                    //Launch Down
+                                    enemy.setDeltaMovement(0.0,-1.1,0.0);
                                     player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
 
-                                    //Give the Cylooped Effect
-                                    if (enemy.hasEffect(ModEffects.CYLOOPED.get()))
-                                        enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
-                                    else
-                                        enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
+                                    //Deal Damage
+                                    enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_CYLOOP.getResourceKey(),player),
+                                            QK_CYLOOP_DAMAGE*1.5F);
 
-                                }, 10);
+                                    //Give the Cylooped Effect
+                                    enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 20, 0, false, false));
+                                }
+                                //Single Cyloop
+                                else
+                                {
+                                    //Damage
+                                    enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_CYLOOP.getResourceKey(),player),
+                                            QK_CYLOOP_DAMAGE);
+
+                                    //Launch Up
+                                    enemy.setDeltaMovement(0.0,1.1,0.0);
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+
+                                    //Lock in MidAir for 2 sec
+                                    Scheduler.scheduleTask(()->{
+                                        //Set Movement to Zero
+                                        enemy.setDeltaMovement(0.0,0.02,0.0);
+                                        player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+
+                                        //Give the Cylooped Effect
+                                        if(enemy.hasEffect(ModEffects.CYLOOPED.get()))
+                                            enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
+                                        else
+                                            enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
+
+                                    },10);
+                                }
 
                             }
                         }catch(NullPointerException ignored){}
@@ -1566,9 +1586,9 @@ public class BaseformServer {
                                     }))
                                 {
                                     if(enemy.hasEffect(ModEffects.WIND_STUNNED.get()))
-                                        enemy.getEffect(ModEffects.WIND_STUNNED.get()).update(new MobEffectInstance(ModEffects.WIND_STUNNED.get(), 40, 0, false, false));
+                                        enemy.getEffect(ModEffects.WIND_STUNNED.get()).update(new MobEffectInstance(ModEffects.WIND_STUNNED.get(), 80, 0, false, false));
                                     else
-                                        enemy.addEffect(new MobEffectInstance(ModEffects.WIND_STUNNED.get(), 40, 0, false, false));
+                                        enemy.addEffect(new MobEffectInstance(ModEffects.WIND_STUNNED.get(), 80, 0, false, false));
                                 }
                             }
 
@@ -1587,40 +1607,6 @@ public class BaseformServer {
 
                     //Homing Shot
                     {
-                        //Home, the Homing Shots towards your enemy
-                        try
-                        {
-                            LivingEntity homingShotTarget = (LivingEntity) serverLevel.getEntity(baseformProperties.rangedTarget);
-
-                            //Find Ranged Target and Target
-                            for(HomingShotProjectile homingShotProjectile : level.getEntitiesOfClass(HomingShotProjectile.class,
-                                    new AABB(player.getX()+64,player.getY()+64,player.getZ()+64,
-                                            player.getX()-64,player.getY()-64,player.getZ()-64),
-                                    homingShotProjectile-> homingShotProjectile.getOwnerUUID().equals(player.getUUID())))
-                            {
-                                homingShotProjectile.setDeltaMovement(
-                                        (new Vec3(homingShotTarget.getX(),homingShotTarget.getY()+homingShotTarget.getEyeHeight()/2,homingShotTarget.getZ()))
-                                                .subtract(new Vec3(homingShotProjectile.getX(),homingShotProjectile.getY(),homingShotProjectile.getZ()))
-                                                .normalize()
-                                                .scale(0.75)
-                                );
-                            }
-
-                        }
-                        catch(NullPointerException|ClassCastException e)
-                        {
-                            //Otherwise It'll Launch the Homing Shot in the direction you look
-                            for(HomingShotProjectile homingShotProjectile : level.getEntitiesOfClass(HomingShotProjectile.class,
-                                    new AABB(player.getX()+64,player.getY()+64,player.getZ()+64,
-                                            player.getX()-64,player.getY()-64,player.getZ()-64),
-                                    homingShotProjectile-> homingShotProjectile.getOwnerUUID().equals(player.getUUID())))
-                            {
-                                homingShotProjectile.setDeltaMovement(
-                                        Utilities.calculateViewVector(player.getXRot(),player.getYRot()).scale(0.75)
-                                );
-                            }
-                        }
-
                         try {
                             if (baseformProperties.homingShot > 0) {
                                 baseformProperties.homingShot += 1;
@@ -1657,10 +1643,16 @@ public class BaseformServer {
                                 }
 
                                 //Aim the Homing Shots
-                                if (baseformProperties.homingShot == 30)
-                                {
-                                    HomingShot.scanFoward(player);
-                                }
+                                try {
+                                    if (baseformProperties.homingShot == 21) {
+                                        HomingShot.scanFoward(player);
+                                        for (HomingShotProjectile homingShotProjectile : level.getEntitiesOfClass(HomingShotProjectile.class,
+                                                new AABB(player.getX() + 6.0, player.getY() + 6.0, player.getZ() + 6.0,
+                                                        player.getX() - 6.0, player.getY() - 6.0, player.getZ() - 6.0))) {
+                                            homingShotProjectile.setTarget(serverLevel.getEntity(baseformProperties.rangedTarget).getId());
+                                        }
+                                    }
+                                }catch(NullPointerException ignored){}
 
                             }
 
@@ -1677,6 +1669,45 @@ public class BaseformServer {
                             //Cooldown
                             baseformProperties.setCooldown(BaseformActiveAbility.HOMING_SHOT,(byte)5);
                         }
+                    }
+                }
+
+                //Slot 5
+                {
+                    //Parry
+                    {
+                        try {
+                            if (baseformProperties.parryTime > 0)
+                            {
+                                //
+                                baseformProperties.parryTime += 1;
+                                player.setDeltaMovement(0.0, 0.0, 0.0);
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                // End Ability
+                                if (baseformProperties.parryTime == Byte.MAX_VALUE) {
+                                    throw new InterruptedException("Duration End");
+                                }
+                            }
+                        } catch(NullPointerException|ClassCastException|InterruptedException e)
+                        {
+                            StopParry.performStopParry(player);
+                        }
+
+                        //Parry Cooldown Handling
+                        if(baseformProperties.parryTime < 0)
+                        {
+                            baseformProperties.parryTime += 1;
+
+                            //Reset The Parry Cooldown
+                            if(player.onGround() && baseformProperties.parryTime > -50)
+                                baseformProperties.parryTime = 0;
+                        }
+                    }
+
+                    //Counter
+                    {
+
                     }
                 }
             }
