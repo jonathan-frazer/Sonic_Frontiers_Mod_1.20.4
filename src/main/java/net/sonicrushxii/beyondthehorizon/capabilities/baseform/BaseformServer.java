@@ -52,7 +52,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.EndSonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWindParticleS2C;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.StopParry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
@@ -1704,11 +1704,98 @@ public class BaseformServer {
                             if(player.onGround() && baseformProperties.parryTime > -50)
                                 baseformProperties.parryTime = 0;
                         }
+
+                        //Slow Down Time for 1.5sec
+                        if(baseformProperties.parryTimeSlow > 0)    baseformProperties.parryTimeSlow += 1;
+                        if(baseformProperties.parryTimeSlow > 30)   StopParry.returnFromParryTime(player);
                     }
 
-                    //Counter
+                    //Grandslam
                     {
+                        LivingEntity counterTarget;
+                        try
+                        {
+                            counterTarget = (LivingEntity) serverLevel.getEntity(baseformProperties.counteredEntity);
+                            Vec3 counterTargetPos = new Vec3(counterTarget.getX(),counterTarget.getY()+counterTarget.getEyeHeight()/3,counterTarget.getZ());
+                            Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+                            Vec3 tpDir = playerPos.subtract(counterTargetPos).normalize();
 
+                            //Make Target Glow
+                            if (!counterTarget.hasEffect(MobEffects.GLOWING) && baseformProperties.parryTimeSlow > 0)
+                                counterTarget.addEffect(new MobEffectInstance(MobEffects.GLOWING, 5, 13, false, false));
+
+                            //Execute GrandSlam
+                            if(baseformProperties.grandSlamTime > 0)
+                                baseformProperties.grandSlamTime += 1;
+
+                            if(baseformProperties.grandSlamTime == 2)
+                            {
+                                float[] yawPitch = Utilities.getYawPitchFromVec(tpDir.reverse());
+                                baseformProperties.atkRotPhase = yawPitch[0];
+                                player.teleportTo(player.serverLevel(),
+                                        counterTargetPos.x() + tpDir.x(),
+                                        counterTargetPos.y() + tpDir.y(),
+                                        counterTargetPos.z() + tpDir.z(),
+                                        Collections.emptySet(),
+                                        yawPitch[0], yawPitch[1]);
+                            }
+
+                            if(baseformProperties.grandSlamTime > 1 && baseformProperties.grandSlamTime <= 40)
+                            {
+                                Vec3 motionDir = Utilities.calculateViewVector(-30,baseformProperties.atkRotPhase);
+                                //Teleport the player
+                                player.setDeltaMovement(motionDir.scale(
+                                        Math.max(0.1,
+                                                1.0/(Math.max(1,baseformProperties.grandSlamTime/2))
+                                        )));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                //Teleport the Target in Front of you
+                                counterTarget.teleportTo(player.getX() + motionDir.x()*2,
+                                                        player.getY() + motionDir.y(),
+                                                        player.getZ() + motionDir.z()*2);
+                                player.connection.send(new ClientboundTeleportEntityPacket(counterTarget));
+                            }
+
+                            if(baseformProperties.grandSlamTime == 40)
+                            {
+                                //Knock Counter Target away
+                                counterTarget.setDeltaMovement(
+                                        Utilities.calculateViewVector(
+                                                Math.min(90.0F,player.getXRot()+45.0F),
+                                                player.getYRot()
+                                        ).scale(2.0)
+                                );
+                                //Knock yourself back
+                                player.setDeltaMovement(
+                                        Utilities.calculateViewVector(
+                                                Math.min(90.0F,player.getXRot()+45.0F),
+                                                player.getYRot()
+                                        ).scale(-0.75)
+                                );
+                                //Particle
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        ParticleTypes.FLASH,
+                                        player.getX(),player.getY()+player.getEyeHeight()/2,player.getZ(),
+                                        0.001,0.01F,player.getEyeHeight()/2,0.01F,
+                                        1,true));
+                                //Throw the Entity in our desired direction
+                                player.connection.send(new ClientboundSetEntityMotionPacket(counterTarget));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                            }
+
+                            if(baseformProperties.grandSlamTime > 40)
+                            {
+                                //If Timer Expires remove the slam time and Countered Tag
+                                baseformProperties.grandSlamTime = 0;
+                                baseformProperties.counteredEntity = new UUID(0L,0L);
+                            }
+                        }
+                        catch (NullPointerException|ClassCastException ignored)
+                        {
+                            counterTarget = null;
+                            baseformProperties.grandSlamTime = 0;
+                        }
                     }
                 }
             }

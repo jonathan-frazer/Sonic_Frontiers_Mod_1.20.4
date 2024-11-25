@@ -1,7 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -52,8 +51,9 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.SonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.QuickSonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWind;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.Parry;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.StopParry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.grand_slam.GrandSlam;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.Parry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -199,8 +199,7 @@ public class BaseformClient {
             }
 
             //Base Cyloop
-            KeyMapping rightClick = minecraft.options.keyUse;
-            if(VirtualSlotHandler.getCurrAbility() == 0 && isMoving && !baseformProperties.isAttacking() && rightClick.isDown() && !player.isShiftKeyDown()) {
+            if(VirtualSlotHandler.getCurrAbility() == 0 && isMoving && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useSingleAbility.isDown() && !player.isShiftKeyDown()) {
                 if(!baseformProperties.cylooping){
                     PacketHandler.sendToServer(new Cyloop(true));
                     baseformProperties.cylooping = true;
@@ -213,7 +212,7 @@ public class BaseformClient {
 
             //Quick Cyloop
             if(VirtualSlotHandler.getCurrAbility() == 0 && !baseformProperties.isAttacking() &&
-                    rightClick.isDown() && player.isShiftKeyDown() && baseformProperties.qkCyloopMeter > 50.0)
+                    KeyBindings.INSTANCE.useSingleAbility.isDown() && player.isShiftKeyDown() && baseformProperties.qkCyloopMeter > 50.0)
             {
                 PacketHandler.sendToServer(new QuickCyloop());
                 baseformProperties.quickCyloop = 1;
@@ -502,16 +501,23 @@ public class BaseformClient {
 
         //Slot 5
         {
+            //Parry
             if(!baseformProperties.isAttacking() && KeyBindings.INSTANCE.parryKey.isDown())
             {
                 PacketHandler.sendToServer(new Parry());
                 baseformProperties.parryTime = 1;
             }
-
             if (baseformProperties.parryTime > 0 && !KeyBindings.INSTANCE.parryKey.isDown())
             {
                 PacketHandler.sendToServer(new StopParry());
                 baseformProperties.parryTime = 0;
+            }
+
+            //GrandSlam
+            if((!baseformProperties.isAttacking() || baseformProperties.parryTime < 0) && VirtualSlotHandler.getCurrAbility() == 4
+               && KeyBindings.INSTANCE.useSingleAbility.isDown())
+            {
+                PacketHandler.sendToServer(new GrandSlam());
             }
 
         }

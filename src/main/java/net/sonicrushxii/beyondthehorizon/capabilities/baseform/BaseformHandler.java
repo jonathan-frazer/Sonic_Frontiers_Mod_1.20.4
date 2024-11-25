@@ -25,7 +25,7 @@ import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.StopParry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleDirPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -87,13 +87,18 @@ public class BaseformHandler {
                 //Particle
                 PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                         ParticleTypes.FLASH,
-                        damageGiver.getX(),damageGiver.getY()+damageGiver.getEyeHeight()/2,damageGiver.getZ(),
+                        receiver.getX(),receiver.getY()+receiver.getEyeHeight()/2,receiver.getZ(),
                         0.001,0.01F,damageGiver.getEyeHeight()/2,0.01F,1,true));
 
-                StopParry.performParrySuccess(receiver);
+                //Succeed Parry
+                StopParry.performParrySuccess(receiver, damageGiver.getUUID());
                 damageGiver.setDeltaMovement(motionDir.scale(1.0));
                 event.setCanceled(true);
             }
+
+            //Grand Slam
+            if(baseformProperties.grandSlamTime > 0)
+                event.setCanceled(true);
 
 
         }catch(NullPointerException ignored){}

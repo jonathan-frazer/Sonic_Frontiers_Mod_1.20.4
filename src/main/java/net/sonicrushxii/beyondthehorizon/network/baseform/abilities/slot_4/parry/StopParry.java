@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4;
+package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,7 +11,8 @@ import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.sync.GoToVirtualSlotS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
-import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
+
+import java.util.UUID;
 
 public class StopParry
 {
@@ -48,7 +49,7 @@ public class StopParry
         });
     }
 
-    public static void performParrySuccess(ServerPlayer player)
+    public static void performParrySuccess(ServerPlayer player, UUID parryTargetId)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
@@ -60,17 +61,35 @@ public class StopParry
 
             //Perform Timeslow
             baseformProperties.counterReady = true;
+            baseformProperties.parryTimeSlow = 1;
+            baseformProperties.counteredEntity = parryTargetId;
             if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED))
                 player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.PARRY_SPEED);
 
-            Scheduler.scheduleTask(()->{
-                //Stop Timeslow
-                baseformProperties.counterReady = false;
 
-                //Remove
-                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED))
-                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_SPEED.getId());
-            },30);
+            PacketHandler.sendToPlayer(player,
+                    new SyncPlayerFormS2C(
+                            playerSonicForm.getCurrentForm(),
+                            baseformProperties
+                    ));
+        });
+    }
+
+    public static void returnFromParryTime(ServerPlayer player)
+    {
+        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+
+            //Reset Data
+            baseformProperties.parryTimeSlow = 0;
+
+            //Stop Timeslow
+            baseformProperties.counterReady = false;
+            baseformProperties.counteredEntity = new UUID(0L,0L);
+
+            //Remove Attributes
+            if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED))
+                player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_SPEED.getId());
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(

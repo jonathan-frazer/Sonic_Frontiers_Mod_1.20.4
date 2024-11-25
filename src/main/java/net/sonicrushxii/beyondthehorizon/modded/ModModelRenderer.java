@@ -44,7 +44,7 @@ public class ModModelRenderer {
         }
     }
 
-    public static void renderModel(Class<? extends EntityModel> modelClass, RenderLivingEvent<?, ?> event, PoseStack poseStack) {
+    public static void renderModel(Class<? extends EntityModel> modelClass, RenderLivingEvent<?, ?> event, PoseStack poseStack, Consumer<ModelPart> customTransform) {
         MultiBufferSource buffer = event.getMultiBufferSource();
         LivingEntity entity = event.getEntity();
         int packedLight = event.getPackedLight();
@@ -61,8 +61,12 @@ public class ModModelRenderer {
             Field animLengthField = modelClass.getDeclaredField("ANIMATION_LENGTH");
             byte animationLength = (byte) animLengthField.get(null);
 
+            //Instantiate Model
             EntityModelSet entityModelSet = Minecraft.getInstance().getEntityModels();
             ModelPart modelPart = entityModelSet.bakeLayer(layerLocation);
+
+            //Perform Custom Transform
+            if (customTransform != null) customTransform.accept(modelPart);
 
             VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(new ResourceLocation(BeyondTheHorizon.MOD_ID, getTextureLocation(textures, animationLength))));
             EntityModel model = modelClass.getConstructor(ModelPart.class).newInstance(modelPart);
@@ -95,9 +99,11 @@ public class ModModelRenderer {
             StringBuilder texturePath = new StringBuilder();
 
             //Handle Baseform Rendering
-            if (formProperties instanceof BaseformProperties baseformProperties) {
+            if (formProperties instanceof BaseformProperties baseformProperties)
+            {
                 texturePath.append("baseform/");
-                //Render The Custom Model
+
+                //Find Texture based on Condition
                 if (baseformProperties.lightSpeedState == 2) texturePath.append("lightspeed_skin");
                 else if (baseformProperties.powerBoost) texturePath.append("powerboost_skin");
                 else texturePath.append("base_skin");

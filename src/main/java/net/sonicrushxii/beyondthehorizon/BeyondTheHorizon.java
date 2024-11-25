@@ -189,6 +189,9 @@ public class BeyondTheHorizon
 
             //Homing Shot
             event.registerLayerDefinition(HomingShotModel.LAYER_LOCATION, HomingShotModel::createBodyLayer);
+
+            //Grand Slam
+            event.registerLayerDefinition(GrandSlamModel.LAYER_LOCATION,GrandSlamModel::createBodyLayer);
         }
     }
 }

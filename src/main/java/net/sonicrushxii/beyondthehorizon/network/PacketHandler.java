@@ -47,9 +47,9 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.QuickSonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWindParticleS2C;
-import net.sonicrushxii.beyondthehorizon.network.sync.GoToVirtualSlotS2C;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.Parry;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.StopParry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.grand_slam.GrandSlam;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.Parry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
@@ -77,6 +77,7 @@ public class PacketHandler {
             INSTANCE.messageBuilder(PlayerStopSoundPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(PlayerStopSoundPacketS2C::encode).decoder(PlayerStopSoundPacketS2C::new).consumerMainThread(PlayerStopSoundPacketS2C::handle).add();
             INSTANCE.messageBuilder(VirtualSlotSyncS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(VirtualSlotSyncS2C::encode).decoder(VirtualSlotSyncS2C::new).consumerMainThread(VirtualSlotSyncS2C::handle).add();
             INSTANCE.messageBuilder(TimeProjSync.class, NetworkDirection.PLAY_TO_CLIENT).encoder(TimeProjSync::encode).decoder(TimeProjSync::new).consumerMainThread(TimeProjSync::handle).add();
+            INSTANCE.messageBuilder(GoToVirtualSlotS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(GoToVirtualSlotS2C::encode).decoder(GoToVirtualSlotS2C::new).consumerMainThread(GoToVirtualSlotS2C::handle).add();
         }
 
         //Base form
@@ -197,7 +198,9 @@ public class PacketHandler {
                 //Parry
                 INSTANCE.messageBuilder(Parry.class,NetworkDirection.PLAY_TO_SERVER).encoder(Parry::encode).decoder(Parry::new).consumerMainThread(Parry::handle).add();
                 INSTANCE.messageBuilder(StopParry.class,NetworkDirection.PLAY_TO_SERVER).encoder(StopParry::encode).decoder(StopParry::new).consumerMainThread(StopParry::handle).add();
-                INSTANCE.messageBuilder(GoToVirtualSlotS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(GoToVirtualSlotS2C::encode).decoder(GoToVirtualSlotS2C::new).consumerMainThread(GoToVirtualSlotS2C::handle).add();
+
+                //Grand Slam
+                INSTANCE.messageBuilder(GrandSlam.class,NetworkDirection.PLAY_TO_SERVER).encoder(GrandSlam::encode).decoder(GrandSlam::new).consumerMainThread(GrandSlam::handle).add();
             }
         }
 

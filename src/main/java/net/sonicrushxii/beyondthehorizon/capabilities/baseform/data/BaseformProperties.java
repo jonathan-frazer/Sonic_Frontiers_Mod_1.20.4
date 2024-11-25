@@ -171,7 +171,9 @@ public class BaseformProperties extends FormProperties {
 
     //Slot 5
     public byte parryTime;
+    public byte parryTimeSlow;
     public boolean counterReady;
+    public UUID counteredEntity;
     public byte grandSlamTime;
 
     public BaseformProperties()
@@ -237,7 +239,9 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 5
         parryTime = (byte)0;
+        parryTimeSlow = (byte)0;
         counterReady = false;
+        counteredEntity = new UUID(0L,0L);
         grandSlamTime = (byte)0;
     }
 
@@ -305,7 +309,9 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 5
         parryTime = nbt.getByte("ParryTime");
+        parryTimeSlow = nbt.getByte("parryTimeSlow");
         counterReady = nbt.getBoolean("CounterReady");
+        counteredEntity = nbt.getUUID("CounteredEntity");
         grandSlamTime = nbt.getByte("GrandSlamTime");
     }
 
@@ -376,7 +382,9 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 5
         nbt.putByte("ParryTime",parryTime);
+        nbt.putByte("parryTimeSlow",parryTimeSlow);
         nbt.putBoolean("CounterReady",counterReady);
+        nbt.putUUID("CounteredEntity",counteredEntity);
         nbt.putByte("GrandSlamTime",grandSlamTime);
 
         return nbt;

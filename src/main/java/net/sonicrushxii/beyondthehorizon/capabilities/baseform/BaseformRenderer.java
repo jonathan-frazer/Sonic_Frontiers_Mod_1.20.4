@@ -44,7 +44,7 @@ public class BaseformRenderer
             poseStack.mulPose(Axis.YP.rotationDegrees(-playerYaw));
 
             //Render The Custom Model
-            ModModelRenderer.renderModel(Spindash.class, event, poseStack);
+            ModModelRenderer.renderModel(Spindash.class, event, poseStack,null);
             poseStack.popPose();
 
             event.setCanceled(true);
@@ -81,7 +81,7 @@ public class BaseformRenderer
             poseStack.mulPose(Axis.YP.rotationDegrees(-playerYaw));
 
             //Render The Custom Model
-            ModModelRenderer.renderModel(Spinslash.class, event, poseStack);
+            ModModelRenderer.renderModel(Spinslash.class, event, poseStack,null);
             poseStack.popPose();
 
             event.setCanceled(true);
@@ -271,7 +271,53 @@ public class BaseformRenderer
         }
 
         //Grand Slam
-        else if(baseformProperties.grandSlamTime > 0){}
+        else if(baseformProperties.grandSlamTime > 0)
+        {
+            //Render The Slamming enemy upward
+            if(baseformProperties.grandSlamTime < 30)
+            {
+                poseStack.pushPose();
+
+                //Translate
+                poseStack.translate(0.0D, -0.65D, 0.0D);
+
+                // Scale
+                poseStack.scale(1.15f, 1.15f, 1.15f);
+
+                //Apply Rotation
+                float playerYaw = (baseformProperties.atkRotPhase > 180.0) ? baseformProperties.atkRotPhase - 180.0f : baseformProperties.atkRotPhase + 180.0f;
+                poseStack.mulPose(Axis.YP.rotationDegrees(-playerYaw));
+
+                ModModelRenderer.renderModel(GrandSlamModel.class, event, poseStack,(modelPart -> {
+                    modelPart.getChild("SpikeAura").xRot += (float) ((baseformProperties.grandSlamTime%10)*(Math.PI/5));
+                }));
+
+                poseStack.popPose();
+
+                event.setCanceled(true);
+            }
+
+            else if(baseformProperties.grandSlamTime > 35)
+            {
+                poseStack.pushPose();
+
+                // Scale
+                poseStack.scale(1.0f, 1.0f, 1.0f);
+
+                //Apply Rotation & Translation
+                poseStack.mulPose(Axis.YP.rotationDegrees(-(player.getYRot()+((baseformProperties.grandSlamTime>=39)?18.0F*(40-baseformProperties.grandSlamTime):36.0F))));
+                poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+
+                poseStack.translate(0D,-1.5D,0D);
+
+                //Render The Custom Model
+                ModModelRenderer.renderPlayerModel(SonicBoomPlayerModel.class, event, poseStack, baseformProperties,null);
+
+                poseStack.popPose();
+                event.setCanceled(true);
+            }
+
+        }
     }
 
     public static void onRenderPlayerModelPost(RenderLivingEvent.Post<?,?> event, Player player, BaseformProperties baseformProperties)
@@ -296,7 +342,7 @@ public class BaseformRenderer
             poseStack.mulPose(Axis.YP.rotationDegrees((float)-(player.getY()-(baseformProperties.hummingTop%7)*51.42F)));
 
             // Render the custom model
-            ModModelRenderer.renderModel(HummingTop.class, event, poseStack);
+            ModModelRenderer.renderModel(HummingTop.class, event, poseStack,null);
 
             poseStack.popPose();
         }
@@ -341,7 +387,7 @@ public class BaseformRenderer
                 poseStack.mulPose(Axis.XP.rotationDegrees(yawPitch[1]));
 
                 // Render the custom model
-                ModModelRenderer.renderModel(HomingAttack.class, event, poseStack);
+                ModModelRenderer.renderModel(HomingAttack.class, event, poseStack,null);
 
                 poseStack.popPose();
             }
