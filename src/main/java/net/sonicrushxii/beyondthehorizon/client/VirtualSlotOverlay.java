@@ -214,18 +214,18 @@ public class VirtualSlotOverlay {
                 break;
 
             case 4 :
-                slotName = "Parry";
+                slotName = "Counter";
                 iconTextures = (Arrays.asList(
-                        new Ability(PARRY_SLOT,null,cooldownArray[BaseformActiveAbility.PARRY.ordinal()],null,null),
                         new Ability(GRAND_SLAM_SLOT,null,cooldownArray[BaseformActiveAbility.GRAND_SLAM.ordinal()],null,null))
                 );
+                keyBindings.set(0,KeyBindings.INSTANCE.useSingleAbility.getKey());
                 break;
 
             case 5 :
                 slotName = "Ultimate";
                 iconTextures = (Arrays.asList(
-                        new Ability(PHANTOM_RUSH_SLOT,null,cooldownArray[BaseformActiveAbility.PHANTOM_RUSH.ordinal()],null,null)
-                ));
+                        new Ability(PHANTOM_RUSH_SLOT,null,cooldownArray[BaseformActiveAbility.PHANTOM_RUSH.ordinal()],null,null))
+                );
                 keyBindings.set(0,KeyBindings.INSTANCE.useSingleAbility.getKey());
                 break;
 

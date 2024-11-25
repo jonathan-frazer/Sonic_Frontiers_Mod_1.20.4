@@ -26,6 +26,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.hummi
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SetSmashHitChargeC2S;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitzDash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitzOff;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
@@ -46,7 +47,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.QuickSonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWindParticleS2C;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.GoToParrySlotS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.GoToVirtualSlotS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.Parry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
@@ -125,21 +126,28 @@ public class PacketHandler {
 
             //Slot 2
             {
+                //Spin Dash
                 INSTANCE.messageBuilder(ChargeSpindash.class, NetworkDirection.PLAY_TO_SERVER).encoder(ChargeSpindash::encode).decoder(ChargeSpindash::new).consumerMainThread(ChargeSpindash::handle).add();
                 INSTANCE.messageBuilder(LaunchSpindash.class, NetworkDirection.PLAY_TO_SERVER).encoder(LaunchSpindash::encode).decoder(LaunchSpindash::new).consumerMainThread(LaunchSpindash::handle).add();
 
+                //Homing Attack
                 INSTANCE.messageBuilder(HomingAttack.class, NetworkDirection.PLAY_TO_SERVER).encoder(HomingAttack::encode).decoder(HomingAttack::new).consumerMainThread(HomingAttack::handle).add();
 
+                //Dodge
                 INSTANCE.messageBuilder(Dodge.class,NetworkDirection.PLAY_TO_SERVER).encoder(Dodge::encode).decoder(Dodge::new).consumerMainThread(Dodge::handle).add();
 
+                //Humming Top
                 INSTANCE.messageBuilder(HummingTop.class,NetworkDirection.PLAY_TO_SERVER).encoder(HummingTop::encode).decoder(HummingTop::new).consumerMainThread(HummingTop::handle).add();
 
+                //Speed Blitz
                 INSTANCE.messageBuilder(SpeedBlitz.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpeedBlitz::encode).decoder(SpeedBlitz::new).consumerMainThread(SpeedBlitz::handle).add();
                 INSTANCE.messageBuilder(SpeedBlitzDash.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpeedBlitzDash::encode).decoder(SpeedBlitzDash::new).consumerMainThread(SpeedBlitzDash::handle).add();
+                INSTANCE.messageBuilder(SpeedBlitzOff.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpeedBlitzOff::encode).decoder(SpeedBlitzOff::new).consumerMainThread(SpeedBlitzOff::handle).add();
 
-
+                //Set Smash Hit Charge
                 INSTANCE.messageBuilder(SetSmashHitChargeC2S.class,NetworkDirection.PLAY_TO_SERVER).encoder(SetSmashHitChargeC2S::encode).decoder(SetSmashHitChargeC2S::new).consumerMainThread(SetSmashHitChargeC2S::handle).add();
 
+                //Stomp
                 INSTANCE.messageBuilder(Stomp.class,NetworkDirection.PLAY_TO_SERVER).encoder(Stomp::encode).decoder(Stomp::new).consumerMainThread(Stomp::handle).add();
             }
 
@@ -189,7 +197,7 @@ public class PacketHandler {
                 //Parry
                 INSTANCE.messageBuilder(Parry.class,NetworkDirection.PLAY_TO_SERVER).encoder(Parry::encode).decoder(Parry::new).consumerMainThread(Parry::handle).add();
                 INSTANCE.messageBuilder(StopParry.class,NetworkDirection.PLAY_TO_SERVER).encoder(StopParry::encode).decoder(StopParry::new).consumerMainThread(StopParry::handle).add();
-                INSTANCE.messageBuilder(GoToParrySlotS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(GoToParrySlotS2C::encode).decoder(GoToParrySlotS2C::new).consumerMainThread(GoToParrySlotS2C::handle).add();
+                INSTANCE.messageBuilder(GoToVirtualSlotS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(GoToVirtualSlotS2C::encode).decoder(GoToVirtualSlotS2C::new).consumerMainThread(GoToVirtualSlotS2C::handle).add();
             }
         }
 

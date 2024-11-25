@@ -75,7 +75,7 @@ public class Parry
                         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
                             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                            if(baseformProperties.parryTime >= 0)
+                            if(baseformProperties.parryTime == 0)
                             {
                                 //Changed Data
                                 baseformProperties.parryTime = 1;

@@ -9,6 +9,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
+import net.sonicrushxii.beyondthehorizon.network.sync.GoToVirtualSlotS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 
@@ -52,23 +53,19 @@ public class StopParry
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            //Reset Counter to 0
-            baseformProperties.parryTime = -60;
-            //Return Gravity
-            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+            //Move to Counter Slot
+            PacketHandler.sendToPlayer(player,new GoToVirtualSlotS2C((byte)4));
 
-            //Remove Movement Speed Modifier
-            if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_HOLD))
-                player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_HOLD.getId());
+            performStopParry(player);
 
             //Perform Timeslow
-            baseformProperties.parryTimeSlow = true;
+            baseformProperties.counterReady = true;
             if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED))
                 player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.PARRY_SPEED);
 
             Scheduler.scheduleTask(()->{
                 //Stop Timeslow
-                baseformProperties.parryTimeSlow = false;
+                baseformProperties.counterReady = false;
 
                 //Remove
                 if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED))

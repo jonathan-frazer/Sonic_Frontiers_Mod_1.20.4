@@ -10,8 +10,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
+import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitzOff;
 
 @Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class InputSlotHandler {
@@ -33,6 +36,17 @@ public class InputSlotHandler {
         {
             // Cancel the event to prevent the hotbar from scrolling
             event.setCanceled(true);
+
+            //If was on Second Slot then turn off Speed Blitz
+            try
+            {
+                BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
+                if(baseformProperties.speedBlitz && VirtualSlotHandler.getCurrAbility() == (byte)1)
+                {
+                    PacketHandler.sendToServer(new SpeedBlitzOff());
+                }
+            }catch (ClassCastException|NullPointerException ignored){}
+
 
             if(isScrollingUp)    VirtualSlotHandler.scrollUpByOne();
             else                 VirtualSlotHandler.scrollDownByOne();

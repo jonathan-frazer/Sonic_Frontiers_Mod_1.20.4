@@ -1,4 +1,4 @@
-package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4;
+package net.sonicrushxii.beyondthehorizon.network.sync;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -10,13 +10,21 @@ import net.minecraftforge.fml.DistExecutor;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 
-public class GoToParrySlotS2C {
+public class GoToVirtualSlotS2C {
 
-    public GoToParrySlotS2C() {}
+    byte targetSlot;
 
-    public GoToParrySlotS2C(FriendlyByteBuf buf) {}
+    public GoToVirtualSlotS2C(byte targetSlot) {
+        this.targetSlot = targetSlot;
+    }
 
-    public void encode(FriendlyByteBuf buf) {}
+    public GoToVirtualSlotS2C(FriendlyByteBuf buf) {
+        this.targetSlot = buf.readByte();
+    }
+
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeByte(this.targetSlot);
+    }
 
     public void handle(CustomPayloadEvent.Context ctx) {
         ctx.enqueueWork(() -> {
@@ -27,7 +35,7 @@ public class GoToParrySlotS2C {
                 LocalPlayer player = mc.player;
 
                 if (player != null && world != null) {
-                    VirtualSlotHandler.setSlot((byte)(5));
+                    VirtualSlotHandler.setSlot(this.targetSlot);
                     //Consume All clicks before switching over to another slot
                     while(KeyBindings.INSTANCE.useAbility1.consumeClick());
                     while(KeyBindings.INSTANCE.useAbility2.consumeClick());

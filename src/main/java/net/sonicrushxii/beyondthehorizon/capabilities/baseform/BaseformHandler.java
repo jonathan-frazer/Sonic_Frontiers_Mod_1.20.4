@@ -180,7 +180,8 @@ public class BaseformHandler {
                                 System.out.println("Reset Combo");
                             }, COMBO_TIME)
                     );
-                } else if (DamageHandler.isDamageSourceModded(event.getSource())) {
+                }
+                else if (DamageHandler.isDamageSourceModded(event.getSource())) {
                     //Cancel Combo, if you do any other modded Attack
                     ScheduledTask currentSchedule = hitSchedule.get(damageGiver.getUUID());
                     if (currentSchedule != null && !currentSchedule.isCancelled()) {

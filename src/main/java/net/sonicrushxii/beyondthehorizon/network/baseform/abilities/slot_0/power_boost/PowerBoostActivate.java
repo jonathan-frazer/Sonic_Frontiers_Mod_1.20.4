@@ -61,7 +61,7 @@ public class PowerBoostActivate {
             baseformProperties.powerBoost = true;
             player.setDeltaMovement(0.0,0.0,0.0);
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
-            player.addEffect(new MobEffectInstance(ModEffects.INITATE_POWER_BOOST.get(),10,0,false,false,false));
+            player.addEffect(new MobEffectInstance(ModEffects.INITATE_POWER_BOOST.get(),6,0,false,false,false));
 
             //Perform Blast
             {

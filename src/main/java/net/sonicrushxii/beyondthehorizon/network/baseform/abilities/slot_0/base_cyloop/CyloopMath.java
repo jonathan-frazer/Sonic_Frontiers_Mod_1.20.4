@@ -62,132 +62,140 @@ public class CyloopMath
         return false;
     }
 
+
+
     public static void cyloopEffect(ServerPlayer player, Object[] cyloopPath)
     {
         final byte SKIP_THRESHOLD = 10;
-        boolean regened = false;
 
         //Remember to cast all the Objects to Vec3's
+        boolean cyloopClosed = false;
+        boolean enemyHit = false;
+
         for(byte i=0;i<cyloopPath.length-SKIP_THRESHOLD;++i)
-            for(byte j = (byte) (i+SKIP_THRESHOLD); j<cyloopPath.length; ++j)
-                if(xzDistSqr((Vec3) cyloopPath[i], (Vec3) cyloopPath[j]) < 1.0)
-                {
-                    //Cyloop Regeneration
-                    if(!regened)
-                    {
-                        int absorptionAmt = (int) Math.ceil(player.getAbsorptionAmount());
-                        int amplifier = -1 + (1+absorptionAmt/8)*2;
-                        if(amplifier != -1 && amplifier < 10) {
-                            if(player.hasEffect(MobEffects.ABSORPTION))     player.removeEffect(MobEffects.ABSORPTION);
-                            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, -1, amplifier, false, false));
-                        }
-                        regened = true;
-                    }
+        {
+            for (byte j = (byte) (i + SKIP_THRESHOLD); j < cyloopPath.length; ++j)
+                if (xzDistSqr((Vec3) cyloopPath[i], (Vec3) cyloopPath[j]) < 1.0) {
+                    //Means the Cyloop is closed
+                    cyloopClosed = true;
 
                     //Draw a Bounding box from point
-                    Vec3 stocPoint = (Vec3) cyloopPath[j-2];
+                    Vec3 stocPoint = (Vec3) cyloopPath[j - 2];
                     AABB targetBox = new AABB(
-                            stocPoint.x+32.0,stocPoint.y+32.0,stocPoint.z+32.0,
-                            stocPoint.x-32.0,stocPoint.y-32.0,stocPoint.z-32.0
+                            stocPoint.x + 32.0, stocPoint.y + 32.0, stocPoint.z + 32.0,
+                            stocPoint.x - 32.0, stocPoint.y - 32.0, stocPoint.z - 32.0
                     );
 
                     //Find all viable targets
                     Level world = player.level();
                     byte finalJ = j;
                     byte finalI = i;
-                    for(LivingEntity enemy : world.getEntitiesOfClass(LivingEntity.class,targetBox,
-                            (entity)->{
-                                if(entity.is(player))   return false;
-                                Vec3 entityPos = new Vec3(entity.getX(),0.0,entity.getZ());
-                                return  (
-                                            cyloopisOnSide(Direction.RIGHT,
-                                            entityPos,
-                                            cyloopPath, finalI, finalJ)
+                    for (LivingEntity enemy : world.getEntitiesOfClass(LivingEntity.class, targetBox,
+                            (entity) -> {
+                                if (entity.is(player)) return false;
+                                Vec3 entityPos = new Vec3(entity.getX(), 0.0, entity.getZ());
+                                return (
+                                        cyloopisOnSide(Direction.RIGHT,
+                                                entityPos,
+                                                cyloopPath, finalI, finalJ)
+                                )
+                                        &&
+                                        (
+                                                cyloopisOnSide(Direction.LEFT,
+                                                        entityPos,
+                                                        cyloopPath, finalI, finalJ)
                                         )
                                         &&
                                         (
-                                            cyloopisOnSide(Direction.LEFT,
-                                                    entityPos,
-                                            cyloopPath, finalI, finalJ)
+                                                cyloopisOnSide(Direction.UP,
+                                                        entityPos,
+                                                        cyloopPath, finalI, finalJ)
                                         )
                                         &&
                                         (
-                                            cyloopisOnSide(Direction.UP,
-                                                    entityPos,
-                                            cyloopPath, finalI, finalJ)
-                                        )
-                                        &&
-                                        (
-                                            cyloopisOnSide(Direction.DOWN,
-                                                    entityPos,
-                                            cyloopPath, finalI, finalJ)
+                                                cyloopisOnSide(Direction.DOWN,
+                                                        entityPos,
+                                                        cyloopPath, finalI, finalJ)
                                         );
 
-                            }))
-                    {
-                        Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
+                            })) {
+                        Vec3 enemyPos = new Vec3(enemy.getX(), enemy.getY(), enemy.getZ());
+
+
 
                         //Play Particle
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 ParticleTypes.FLASH,
-                                enemyPos.x(), enemyPos.y()+player.getEyeHeight()/2, enemyPos.z(),
+                                enemyPos.x(), enemyPos.y() + player.getEyeHeight() / 2, enemyPos.z(),
                                 0.0, 0.2f, 0.2f, 0.2f, 1, true)
                         );
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 ParticleTypes.EXPLOSION,
-                                enemyPos.x(), enemyPos.y()+player.getEyeHeight()/2, enemyPos.z(),
+                                enemyPos.x(), enemyPos.y() + player.getEyeHeight() / 2, enemyPos.z(),
                                 0.0, 0.2f, 0.2f, 0.2f, 1, true)
                         );
 
                         //Sound
-                        world.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.MASTER, 1.0f, 2.0f);
+                        world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.MASTER, 1.0f, 2.0f);
 
+                        //Mark Enemy to be Hit
+                        enemyHit = true;
 
                         //Double Cyloop - Launch Down
-                        if(enemy.hasEffect(ModEffects.CYLOOPED.get()) && enemy.getEffect(ModEffects.CYLOOPED.get()).getDuration() > 0)
-                        {
+                        if (enemy.hasEffect(ModEffects.CYLOOPED.get()) && enemy.getEffect(ModEffects.CYLOOPED.get()).getDuration() > 0) {
                             //Launch Down
-                            enemy.setDeltaMovement(0.0,-1.1,0.0);
+                            enemy.setDeltaMovement(0.0, -1.1, 0.0);
                             player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
 
                             //Deal Damage
-                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_CYLOOP.getResourceKey(),player),
-                                    CYLOOP_DAMAGE*1.5F);
+                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_CYLOOP.getResourceKey(), player),
+                                    CYLOOP_DAMAGE * 1.5F);
 
                             //Give the Cylooped Effect
                             enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 20, 0, false, false));
                         }
                         //Single Cyloop
-                        else
-                        {
+                        else {
                             //Damage
-                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_CYLOOP.getResourceKey(),player),
+                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_CYLOOP.getResourceKey(), player),
                                     CYLOOP_DAMAGE);
 
                             //Launch Up
-                            enemy.setDeltaMovement(0.0,1.1,0.0);
+                            enemy.setDeltaMovement(0.0, 1.1, 0.0);
                             player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
 
                             //Lock in MidAir for 2 sec
-                            Scheduler.scheduleTask(()->{
+                            Scheduler.scheduleTask(() -> {
                                 //Set Movement to Zero
-                                enemy.setDeltaMovement(0.0,0.02,0.0);
+                                enemy.setDeltaMovement(0.0, 0.02, 0.0);
                                 player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
 
                                 //Give the Cylooped Effect
-                                if(enemy.hasEffect(ModEffects.CYLOOPED.get()))
+                                if (enemy.hasEffect(ModEffects.CYLOOPED.get()))
                                     enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
                                 else
                                     enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
 
-                            },10);
+                            }, 10);
                         }
 
                     }
 
                     //Skip the Rest of the Comparisons
-                    i = (byte) (j+1);
+                    i = (byte) (j + 1);
                 }
+        }
+
+        //If Cyloop is closed and no enemies were hit, Give Absorption
+        if(cyloopClosed && !enemyHit)
+        {
+            int absorptionAmt = (int) Math.ceil(player.getAbsorptionAmount());
+            int amplifier = -1 + (1+absorptionAmt/8)*2;
+            if(amplifier != -1 && amplifier < 10) {
+                if(player.hasEffect(MobEffects.ABSORPTION))     player.removeEffect(MobEffects.ABSORPTION);
+                player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, -1, amplifier, false, false));
+            }
+        }
 
     }
 }

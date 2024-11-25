@@ -171,7 +171,8 @@ public class BaseformProperties extends FormProperties {
 
     //Slot 5
     public byte parryTime;
-    public boolean parryTimeSlow;
+    public boolean counterReady;
+    public byte grandSlamTime;
 
     public BaseformProperties()
     {
@@ -236,6 +237,8 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 5
         parryTime = (byte)0;
+        counterReady = false;
+        grandSlamTime = (byte)0;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -302,6 +305,8 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 5
         parryTime = nbt.getByte("ParryTime");
+        counterReady = nbt.getBoolean("CounterReady");
+        grandSlamTime = nbt.getByte("GrandSlamTime");
     }
 
     @Override
@@ -371,6 +376,8 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 5
         nbt.putByte("ParryTime",parryTime);
+        nbt.putBoolean("CounterReady",counterReady);
+        nbt.putByte("GrandSlamTime",grandSlamTime);
 
         return nbt;
     }
@@ -429,13 +436,14 @@ public class BaseformProperties extends FormProperties {
         boolean homingShot = (this.homingShot > 0);
         boolean sonicBoom = (this.sonicBoom > 0);
         boolean sonicWind = (this.sonicWind > 0) && (this.profanedWind > 0);
-        boolean parry = (this.parryTime > 0);
+        boolean parry = (this.parryTime > 0 || this.parryTime < -49);
+        boolean grandSlam = (this.grandSlamTime > 0);
 
         return quickCyloop ||
                 homingAttack || hummingTop || ballform || speedBlitzDash || stomping ||
                 tornadoJump || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick ||
                 crossSlash || homingShot || sonicBoom || sonicWind ||
-                parry;
+                parry || grandSlam;
     }
 
     //Ball form

@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public enum TimeAffector
 {
     //Add New Time Slowing Abilities in here
-    POWER_BOOST("powerBoost",2.5F),
-    PARRY("parryTimeSlow",2.5F);
+    POWER_BOOST("powerBoost",1.5F),
+    PARRY("counterReady",2.5F);
 
     private final String fieldname;
     public final AtomicBoolean noPlayerPresent;

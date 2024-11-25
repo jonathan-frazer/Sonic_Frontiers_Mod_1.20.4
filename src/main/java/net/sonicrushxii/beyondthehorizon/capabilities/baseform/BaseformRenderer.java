@@ -222,6 +222,7 @@ public class BaseformRenderer
             event.setCanceled(true);
         }
 
+        //Parry
         else if(baseformProperties.parryTime > 0)
         {
             poseStack.pushPose();
@@ -241,8 +242,6 @@ public class BaseformRenderer
             poseStack.popPose();
             event.setCanceled(true);
         }
-
-        //Parry
         else if(baseformProperties.parryTime <= -50)
         {
             byte animationFrame = (byte)(baseformProperties.parryTime+60);
@@ -270,6 +269,9 @@ public class BaseformRenderer
             poseStack.popPose();
             event.setCanceled(true);
         }
+
+        //Grand Slam
+        else if(baseformProperties.grandSlamTime > 0){}
     }
 
     public static void onRenderPlayerModelPost(RenderLivingEvent.Post<?,?> event, Player player, BaseformProperties baseformProperties)

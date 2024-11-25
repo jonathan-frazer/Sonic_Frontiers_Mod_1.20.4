@@ -53,6 +53,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homin
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.EndSonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWindParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.StopParry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
@@ -1774,6 +1775,15 @@ public class BaseformServer {
             //Slot 2
             {}
             //Slot 3
+            {}
+            //Slot 4
+            {}
+            //Slot 5
+            {
+                //Movement Speed Removal, In the case that it trips
+                if(baseformProperties.parryTime <= 0 && player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_HOLD))
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_HOLD.getId());
+            }
 
 
             PacketHandler.sendToPlayer(player,
