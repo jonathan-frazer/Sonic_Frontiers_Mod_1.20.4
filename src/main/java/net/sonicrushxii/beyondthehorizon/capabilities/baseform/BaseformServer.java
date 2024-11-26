@@ -67,11 +67,12 @@ import org.joml.Vector3f;
 import java.util.*;
 
 public class BaseformServer {
-    private static final float HOMING_ATTACK_DAMAGE = 12.0f;
+    private static final float HOMING_ATTACK_DAMAGE = 9.0f;
     private static final float BALLFORM_DAMAGE = 6.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
-    private static final float WILDRUSH_DAMAGE = 50.0f;
-    private static final float LOOPKICK_DAMAGE = 40.0f;
+    private static final float WILDRUSH_DAMAGE = 10.0f;
+    private static final float LOOPKICK_DAMAGE = 12.0f;
+    private static final float GRAND_SLAM_DMG = 17.0f;
 
     public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
 
@@ -1712,10 +1713,9 @@ public class BaseformServer {
 
                     //Grandslam
                     {
-                        LivingEntity counterTarget;
                         try
                         {
-                            counterTarget = (LivingEntity) serverLevel.getEntity(baseformProperties.counteredEntity);
+                            LivingEntity counterTarget = (LivingEntity) serverLevel.getEntity(baseformProperties.counteredEntity);
                             Vec3 counterTargetPos = new Vec3(counterTarget.getX(),counterTarget.getY()+counterTarget.getEyeHeight()/3,counterTarget.getZ());
                             Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
                             Vec3 tpDir = playerPos.subtract(counterTargetPos).normalize();
@@ -1755,10 +1755,18 @@ public class BaseformServer {
                                                         player.getY() + motionDir.y(),
                                                         player.getZ() + motionDir.z()*2);
                                 player.connection.send(new ClientboundTeleportEntityPacket(counterTarget));
+
+                                //Damage Player
+                                counterTarget.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
+                                        1.0F);
                             }
 
                             if(baseformProperties.grandSlamTime == 40)
                             {
+                                //Damage Target
+                                counterTarget.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),player),
+                                        GRAND_SLAM_DMG);
+
                                 //Knock Counter Target away
                                 counterTarget.setDeltaMovement(
                                         Utilities.calculateViewVector(
@@ -1793,7 +1801,6 @@ public class BaseformServer {
                         }
                         catch (NullPointerException|ClassCastException ignored)
                         {
-                            counterTarget = null;
                             baseformProperties.grandSlamTime = 0;
                         }
                     }
