@@ -285,11 +285,11 @@ public class BaseformRenderer
                 poseStack.scale(1.15f, 1.15f, 1.15f);
 
                 //Apply Rotation
-                float playerYaw = (baseformProperties.atkRotPhase > 180.0) ? baseformProperties.atkRotPhase - 180.0f : baseformProperties.atkRotPhase + 180.0f;
-                poseStack.mulPose(Axis.YP.rotationDegrees(-playerYaw));
+                poseStack.mulPose(Axis.YP.rotationDegrees(-baseformProperties.atkRotPhase));
 
                 ModModelRenderer.renderModel(GrandSlamModel.class, event, poseStack,(modelPart -> {
-                    modelPart.getChild("SpikeAura").xRot += (float) ((baseformProperties.grandSlamTime%10)*(Math.PI/5));
+                    modelPart.getChild("SpikeAura").yRot += (float) Math.PI;
+                    modelPart.getChild("SpikeAura").xRot -= (float) ((baseformProperties.grandSlamTime%10)*(Math.PI/5));
                 }));
 
                 poseStack.popPose();

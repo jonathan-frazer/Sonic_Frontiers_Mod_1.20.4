@@ -14,7 +14,7 @@ public class AttributeMultipliers {
     public static final AttributeModifier SMASH_HIT = new AttributeModifier(new UUID(0x1234767890AB9DEFL, 0xFEBCBA09F7654C21L),
             "Smash_Hit", -1.0F, AttributeModifier.Operation.ADDITION);
     public static final AttributeModifier PARRY_HOLD = new AttributeModifier(new UUID(0x1234767890AC0DEFL, 0xFEBCBA09F7654C21L),
-            "Parry_FOV", -0.5F, AttributeModifier.Operation.ADDITION);
+            "Parry_FOV", -1.5F, AttributeModifier.Operation.ADDITION);
     public static final AttributeModifier PARRY_SPEED = new AttributeModifier(new UUID(0x1234767890AC1DEFL, 0xFEBCBA09F7654C21L),
             "Parry_Speed", 0.60F, AttributeModifier.Operation.ADDITION);
 }

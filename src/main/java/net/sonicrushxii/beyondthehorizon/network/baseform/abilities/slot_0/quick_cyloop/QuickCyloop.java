@@ -66,13 +66,11 @@ public class QuickCyloop {
 
     public static void performQkCyloop(ServerPlayer player)
     {
-
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
             LivingEntity enemy = scanFoward(player);
 
-            System.out.print("Scan Enemies: ");
             if(enemy == null)
                 return;
 
@@ -86,7 +84,6 @@ public class QuickCyloop {
             //Activate Cyloop
             baseformProperties.quickCyloop = 1;
             baseformProperties.atkRotPhase = -player.getYRot()-135f;
-            System.out.println(baseformProperties.atkRotPhase);
 
             //Target Enemy
             baseformProperties.qkCyloopTarget = enemy.getUUID();
@@ -108,8 +105,6 @@ public class QuickCyloop {
             player.teleportTo(destX, destY, destZ);
             PacketHandler.sendToALLPlayers(new CyloopParticleS2C(new Vec3(destX, destY, destZ)));
             player.connection.send(new ClientboundTeleportEntityPacket(player));
-
-            System.out.println("Start Qk Cyloop");
 
             PacketHandler.sendToPlayer(player,
                     new SyncPlayerFormS2C(

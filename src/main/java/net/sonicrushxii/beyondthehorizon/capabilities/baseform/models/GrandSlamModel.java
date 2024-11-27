@@ -82,143 +82,143 @@ public class GrandSlamModel<T extends Entity> extends EntityModel<T> {
 		PartDefinition Ballform = partdefinition.addOrReplaceChild("Ballform", CubeListBuilder.create(), PartPose.offsetAndRotation(0.0F, 29.0F, 0.0F, 0.0F, 0.0F, 1.5708F));
 
 		PartDefinition hexadecagon1 = Ballform.addOrReplaceChild("hexadecagon1", CubeListBuilder.create().texOffs(38, 0).addBox(-1.6012F, 0.1466F, -8.05F, 3.2025F, 7.9734F, 16.1F, new CubeDeformation(0.0F))
-		.texOffs(52, 121).addBox(-8.05F, 0.1466F, -1.6012F, 16.1F, 7.9734F, 3.2025F, new CubeDeformation(0.0F)), PartPose.offset(-13.0F, -4.0F, 0.0F));
+				.texOffs(52, 121).addBox(-8.05F, 0.1466F, -1.6012F, 16.1F, 7.9734F, 3.2025F, new CubeDeformation(0.0F)), PartPose.offset(-13.0F, -4.0F, 0.0F));
 
 		PartDefinition hexadecagon12_r1 = hexadecagon1.addOrReplaceChild("hexadecagon12_r1", CubeListBuilder.create().texOffs(90, 121).addBox(-8.05F, -3.8534F, -1.6012F, 16.1F, 7.9734F, 3.2025F, new CubeDeformation(0.0F))
-		.texOffs(38, 24).addBox(-1.6012F, -3.8534F, -8.05F, 3.2025F, 7.9734F, 16.1F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.0F, 0.0F, 0.0F, -0.3927F, 0.0F));
+				.texOffs(38, 24).addBox(-1.6012F, -3.8534F, -8.05F, 3.2025F, 7.9734F, 16.1F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.0F, 0.0F, 0.0F, -0.3927F, 0.0F));
 
 		PartDefinition hexadecagon10_r1 = hexadecagon1.addOrReplaceChild("hexadecagon10_r1", CubeListBuilder.create().texOffs(102, 75).addBox(-8.05F, -3.8534F, -1.6012F, 16.1F, 7.9734F, 3.2025F, new CubeDeformation(0.0F))
-		.texOffs(0, 24).addBox(-1.6012F, -3.8534F, -8.05F, 3.2025F, 7.9734F, 16.1F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.0F, 0.0F, 0.0F, 0.3927F, 0.0F));
+				.texOffs(0, 24).addBox(-1.6012F, -3.8534F, -8.05F, 3.2025F, 7.9734F, 16.1F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.0F, 0.0F, 0.0F, 0.3927F, 0.0F));
 
 		PartDefinition hexadecagon9_r1 = hexadecagon1.addOrReplaceChild("hexadecagon9_r1", CubeListBuilder.create().texOffs(0, 48).addBox(-1.6012F, -3.8534F, -8.05F, 3.2025F, 7.9734F, 16.1F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.0F, 0.0F, 0.0F, -0.7854F, 0.0F));
 
 		PartDefinition hexadecagon5_r1 = hexadecagon1.addOrReplaceChild("hexadecagon5_r1", CubeListBuilder.create().texOffs(0, 0).addBox(-1.6012F, -3.8534F, -8.05F, 3.2025F, 7.9734F, 16.1F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.0F, 0.0F, 0.0F, 0.7854F, 0.0F));
 
 		PartDefinition hexadecagon2 = Ballform.addOrReplaceChild("hexadecagon2", CubeListBuilder.create().texOffs(34, 72).addBox(-1.4411F, -0.9662F, -7.245F, 2.8822F, 10.0522F, 14.49F, new CubeDeformation(0.0F))
-		.texOffs(128, 99).addBox(-7.245F, -0.9662F, -1.4411F, 14.49F, 10.0522F, 2.8822F, new CubeDeformation(0.0F)), PartPose.offset(-13.0F, -4.0F, 0.0F));
+				.texOffs(128, 99).addBox(-7.245F, -0.9662F, -1.4411F, 14.49F, 10.0522F, 2.8822F, new CubeDeformation(0.0F)), PartPose.offset(-13.0F, -4.0F, 0.0F));
 
 		PartDefinition hexadecagon20_r1 = hexadecagon2.addOrReplaceChild("hexadecagon20_r1", CubeListBuilder.create().texOffs(128, 112).addBox(-7.245F, 57.1798F, -1.4411F, 14.49F, 10.0522F, 2.8822F, new CubeDeformation(0.0F))
-		.texOffs(72, 48).addBox(-1.4411F, 57.1798F, -7.245F, 2.8822F, 10.0522F, 14.49F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -58.146F, 0.0F, 0.0F, -0.3927F, 0.0F));
+				.texOffs(72, 48).addBox(-1.4411F, 57.1798F, -7.245F, 2.8822F, 10.0522F, 14.49F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -58.146F, 0.0F, 0.0F, -0.3927F, 0.0F));
 
 		PartDefinition hexadecagon18_r1 = hexadecagon2.addOrReplaceChild("hexadecagon18_r1", CubeListBuilder.create().texOffs(128, 86).addBox(-7.245F, 57.1798F, -1.4411F, 14.49F, 10.0522F, 2.8822F, new CubeDeformation(0.0F))
-		.texOffs(0, 72).addBox(-1.4411F, 57.1798F, -7.245F, 2.8822F, 10.0522F, 14.49F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -58.146F, 0.0F, 0.0F, 0.3927F, 0.0F));
+				.texOffs(0, 72).addBox(-1.4411F, 57.1798F, -7.245F, 2.8822F, 10.0522F, 14.49F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -58.146F, 0.0F, 0.0F, 0.3927F, 0.0F));
 
 		PartDefinition hexadecagon17_r1 = hexadecagon2.addOrReplaceChild("hexadecagon17_r1", CubeListBuilder.create().texOffs(68, 72).addBox(-1.4411F, 57.1798F, -7.245F, 2.8822F, 10.0522F, 14.49F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -58.146F, 0.0F, 0.0F, -0.7854F, 0.0F));
 
 		PartDefinition hexadecagon13_r1 = hexadecagon2.addOrReplaceChild("hexadecagon13_r1", CubeListBuilder.create().texOffs(38, 48).addBox(-1.4411F, 57.1798F, -7.245F, 2.8822F, 10.0522F, 14.49F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -58.146F, 0.0F, 0.0F, 0.7854F, 0.0F));
 
 		PartDefinition hexadecagon3 = Ballform.addOrReplaceChild("hexadecagon3", CubeListBuilder.create().texOffs(32, 96).addBox(-1.281F, -2.0919F, -6.44F, 2.562F, 12.4659F, 12.88F, new CubeDeformation(0.0F))
-		.texOffs(132, 25).addBox(-6.44F, -2.0919F, -1.281F, 12.88F, 12.4659F, 2.562F, new CubeDeformation(0.0F)), PartPose.offset(-13.0F, -4.0F, 0.0F));
+				.texOffs(132, 25).addBox(-6.44F, -2.0919F, -1.281F, 12.88F, 12.4659F, 2.562F, new CubeDeformation(0.0F)), PartPose.offset(-13.0F, -4.0F, 0.0F));
 
 		PartDefinition hexadecagon28_r1 = hexadecagon3.addOrReplaceChild("hexadecagon28_r1", CubeListBuilder.create().texOffs(132, 40).addBox(-6.44F, -6.4139F, -1.281F, 12.88F, 12.4659F, 2.562F, new CubeDeformation(0.0F))
-		.texOffs(64, 96).addBox(-1.281F, -6.4139F, -6.44F, 2.562F, 12.4659F, 12.88F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.322F, 0.0F, 0.0F, -0.3927F, 0.0F));
+				.texOffs(64, 96).addBox(-1.281F, -6.4139F, -6.44F, 2.562F, 12.4659F, 12.88F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.322F, 0.0F, 0.0F, -0.3927F, 0.0F));
 
 		PartDefinition hexadecagon26_r1 = hexadecagon3.addOrReplaceChild("hexadecagon26_r1", CubeListBuilder.create().texOffs(128, 125).addBox(-6.44F, -6.4139F, -1.281F, 12.88F, 12.4659F, 2.562F, new CubeDeformation(0.0F))
-		.texOffs(0, 96).addBox(-1.281F, -6.4139F, -6.44F, 2.562F, 12.4659F, 12.88F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.322F, 0.0F, 0.0F, 0.3927F, 0.0F));
+				.texOffs(0, 96).addBox(-1.281F, -6.4139F, -6.44F, 2.562F, 12.4659F, 12.88F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.322F, 0.0F, 0.0F, 0.3927F, 0.0F));
 
 		PartDefinition hexadecagon25_r1 = hexadecagon3.addOrReplaceChild("hexadecagon25_r1", CubeListBuilder.create().texOffs(96, 96).addBox(-1.281F, -6.4139F, -6.44F, 2.562F, 12.4659F, 12.88F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.322F, 0.0F, 0.0F, -0.7854F, 0.0F));
 
 		PartDefinition hexadecagon21_r1 = hexadecagon3.addOrReplaceChild("hexadecagon21_r1", CubeListBuilder.create().texOffs(76, 0).addBox(-1.281F, -6.4139F, -6.44F, 2.562F, 12.4659F, 12.88F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.322F, 0.0F, 0.0F, 0.7854F, 0.0F));
 
 		PartDefinition hexadecagon4 = Ballform.addOrReplaceChild("hexadecagon4", CubeListBuilder.create().texOffs(108, 0).addBox(-1.0568F, -2.9967F, -5.313F, 2.1137F, 14.3367F, 10.626F, new CubeDeformation(0.0F))
-		.texOffs(52, 132).addBox(-5.313F, -2.9967F, -1.0568F, 10.626F, 14.3367F, 2.1137F, new CubeDeformation(0.0F)), PartPose.offset(-13.0F, -4.0F, 0.0F));
+				.texOffs(52, 132).addBox(-5.313F, -2.9967F, -1.0568F, 10.626F, 14.3367F, 2.1137F, new CubeDeformation(0.0F)), PartPose.offset(-13.0F, -4.0F, 0.0F));
 
 		PartDefinition hexadecagon36_r1 = hexadecagon4.addOrReplaceChild("hexadecagon36_r1", CubeListBuilder.create().texOffs(132, 55).addBox(-5.313F, 27.4573F, -1.0568F, 10.626F, 14.3367F, 2.1137F, new CubeDeformation(0.0F))
-		.texOffs(0, 121).addBox(-1.0568F, 27.4573F, -5.313F, 2.1137F, 14.3367F, 10.626F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -30.454F, 0.0F, 0.0F, -0.3927F, 0.0F));
+				.texOffs(0, 121).addBox(-1.0568F, 27.4573F, -5.313F, 2.1137F, 14.3367F, 10.626F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -30.454F, 0.0F, 0.0F, -0.3927F, 0.0F));
 
 		PartDefinition hexadecagon34_r1 = hexadecagon4.addOrReplaceChild("hexadecagon34_r1", CubeListBuilder.create().texOffs(76, 25).addBox(-5.313F, 27.4573F, -1.0568F, 10.626F, 14.3367F, 2.1137F, new CubeDeformation(0.0F))
-		.texOffs(106, 50).addBox(-1.0568F, 27.4573F, -5.313F, 2.1137F, 14.3367F, 10.626F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -30.454F, 0.0F, 0.0F, 0.3927F, 0.0F));
+				.texOffs(106, 50).addBox(-1.0568F, 27.4573F, -5.313F, 2.1137F, 14.3367F, 10.626F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -30.454F, 0.0F, 0.0F, 0.3927F, 0.0F));
 
 		PartDefinition hexadecagon33_r1 = hexadecagon4.addOrReplaceChild("hexadecagon33_r1", CubeListBuilder.create().texOffs(26, 121).addBox(-1.0568F, 27.4573F, -5.313F, 2.1137F, 14.3367F, 10.626F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -30.454F, 0.0F, 0.0F, -0.7854F, 0.0F));
 
 		PartDefinition hexadecagon29_r1 = hexadecagon4.addOrReplaceChild("hexadecagon29_r1", CubeListBuilder.create().texOffs(106, 25).addBox(-1.0568F, 27.4573F, -5.313F, 2.1137F, 14.3367F, 10.626F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -30.454F, 0.0F, 0.0F, 0.7854F, 0.0F));
 
-		PartDefinition SpikeAura = partdefinition.addOrReplaceChild("SpikeAura", CubeListBuilder.create(), PartPose.offset(10.0F, 16.0F, 0.0F));
+		PartDefinition SpikeAura = partdefinition.addOrReplaceChild("SpikeAura", CubeListBuilder.create(), PartPose.offsetAndRotation(0.0F, 16.0F, 0.0F, 0.0F, 3.1416F, 0.0F));
 
 		PartDefinition spike16 = SpikeAura.addOrReplaceChild("spike16", CubeListBuilder.create().texOffs(163, 0).addBox(-0.959F, -3.54F, -4.0F, 4.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.541F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.5F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, 5.0F, 9.0F, -0.3054F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.541F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.5F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, 5.0F, 9.0F, -0.3054F, 0.0F, 0.0F));
 
 		PartDefinition spike15 = SpikeAura.addOrReplaceChild("spike15", CubeListBuilder.create().texOffs(163, 0).addBox(-0.959F, -3.54F, -4.0F, 4.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.541F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.5F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, 8.0F, 7.0F, -0.5672F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.541F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.5F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, 8.0F, 7.0F, -0.5672F, 0.0F, 0.0F));
 
 		PartDefinition spike14 = SpikeAura.addOrReplaceChild("spike14", CubeListBuilder.create().texOffs(163, 0).addBox(-0.959F, -3.54F, -4.0F, 4.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.541F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.5F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, 10.0F, 3.0F, -1.0908F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.541F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.5F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, 10.0F, 3.0F, -1.0908F, 0.0F, 0.0F));
 
 		PartDefinition spike13 = SpikeAura.addOrReplaceChild("spike13", CubeListBuilder.create().texOffs(163, 0).addBox(-0.959F, -4.0F, -4.0F, 4.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -3.0F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -2.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, 10.0F, -2.0F, -1.5708F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -3.0F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -2.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, 10.0F, -2.0F, -1.5708F, 0.0F, 0.0F));
 
 		PartDefinition spike12 = SpikeAura.addOrReplaceChild("spike12", CubeListBuilder.create().texOffs(163, 0).addBox(-0.959F, -3.54F, -4.0F, 4.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.541F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.5F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, 9.0F, -6.0F, -2.0071F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.541F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.5F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, 9.0F, -6.0F, -2.0071F, 0.0F, 0.0F));
 
 		PartDefinition spike11 = SpikeAura.addOrReplaceChild("spike11", CubeListBuilder.create().texOffs(163, 0).addBox(-0.959F, -3.041F, -5.0F, 4.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -2.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, -1.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, 7.0F, -9.0F, -2.3126F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -2.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, -1.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, 7.0F, -9.0F, -2.3126F, 0.0F, 0.0F));
 
 		PartDefinition spike10 = SpikeAura.addOrReplaceChild("spike10", CubeListBuilder.create().texOffs(163, 0).addBox(-0.959F, -3.041F, -5.0F, 4.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -2.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, -1.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, 3.0F, -11.0F, -2.7925F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -2.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, -1.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, 3.0F, -11.0F, -2.7925F, 0.0F, 0.0F));
 
 		PartDefinition spike9 = SpikeAura.addOrReplaceChild("spike9", CubeListBuilder.create().texOffs(164, 1).addBox(-0.959F, -3.041F, -3.5F, 4.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.5F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, -0.5F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, -1.0F, -11.0F, -3.0543F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.5F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, -0.5F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, -1.0F, -11.0F, -3.0543F, 0.0F, 0.0F));
 
 		PartDefinition spike8 = SpikeAura.addOrReplaceChild("spike8", CubeListBuilder.create().texOffs(164, 1).addBox(-0.959F, -3.041F, -3.5F, 4.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.5F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, -0.5F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, -5.0F, -10.0F, 2.8362F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.5F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, -0.5F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, -5.0F, -10.0F, 2.8362F, 0.0F, 0.0F));
 
 		PartDefinition spike7 = SpikeAura.addOrReplaceChild("spike7", CubeListBuilder.create().texOffs(164, 1).addBox(-0.959F, -3.041F, -3.5F, 4.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.5F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, -0.5F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, -8.0F, -7.0F, 2.3998F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.5F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, -0.5F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, -8.0F, -7.0F, 2.3998F, 0.0F, 0.0F));
 
 		PartDefinition spike6 = SpikeAura.addOrReplaceChild("spike6", CubeListBuilder.create().texOffs(164, 1).addBox(-0.959F, -3.041F, -3.5F, 4.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.5F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, -0.5F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, -10.0F, -3.0F, 1.9635F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.5F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, -0.5F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, -10.0F, -3.0F, 1.9635F, 0.0F, 0.0F));
 
 		PartDefinition spike5 = SpikeAura.addOrReplaceChild("spike5", CubeListBuilder.create().texOffs(164, 1).addBox(-0.959F, -3.041F, -3.0F, 4.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, -10.0F, 1.0F, 1.6581F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, -10.0F, 1.0F, 1.6581F, 0.0F, 0.0F));
 
 		PartDefinition spike4 = SpikeAura.addOrReplaceChild("spike4", CubeListBuilder.create().texOffs(164, 1).addBox(-0.959F, -3.041F, -3.0F, 4.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, -9.0F, 5.0F, 1.2654F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, -9.0F, 5.0F, 1.2654F, 0.0F, 0.0F));
 
 		PartDefinition spike3 = SpikeAura.addOrReplaceChild("spike3", CubeListBuilder.create().texOffs(164, 1).addBox(-0.959F, -3.041F, -3.0F, 4.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, -7.0F, 8.0F, 0.9163F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, -7.0F, 8.0F, 0.9163F, 0.0F, 0.0F));
 
 		PartDefinition spike2 = SpikeAura.addOrReplaceChild("spike2", CubeListBuilder.create().texOffs(164, 1).addBox(-0.959F, -3.041F, -3.0F, 4.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-11.0F, -3.0F, 10.0F, 0.4363F, 0.0F, 0.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.0F, -3.0F, 10.0F, 0.4363F, 0.0F, 0.0F));
 
 		PartDefinition spike = SpikeAura.addOrReplaceChild("spike", CubeListBuilder.create().texOffs(164, 1).addBox(-0.959F, -3.041F, -3.0F, 4.0F, 1.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(169, 3).addBox(0.5F, -1.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(-11.0F, 1.0F, 10.0F));
+				.texOffs(165, 2).addBox(-0.459F, -2.041F, -1.0F, 3.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(169, 3).addBox(0.5F, -1.0F, 0.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(-1.0F, 1.0F, 10.0F));
 
 		PartDefinition hexadecagon = SpikeAura.addOrReplaceChild("hexadecagon", CubeListBuilder.create().texOffs(162, 1).addBox(-4.5F, -1.6908F, -8.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, -1.6908F, 7.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, 7.5F, -1.6908F, 5.0F, 1.0F, 3.3815F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, -8.5F, -1.6908F, 5.0F, 1.0F, 3.3815F, new CubeDeformation(0.0F)), PartPose.offset(-8.0F, 0.0F, 0.0F));
+				.texOffs(162, 1).addBox(-4.5F, -1.6908F, 7.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(162, 1).addBox(-4.5F, 7.5F, -1.6908F, 5.0F, 1.0F, 3.3815F, new CubeDeformation(0.0F))
+				.texOffs(162, 1).addBox(-4.5F, -8.5F, -1.6908F, 5.0F, 1.0F, 3.3815F, new CubeDeformation(0.0F)), PartPose.offset(2.0F, 0.0F, 0.0F));
 
 		PartDefinition hexadecagon_r1 = hexadecagon.addOrReplaceChild("hexadecagon_r1", CubeListBuilder.create().texOffs(162, 1).addBox(-4.5F, -8.5F, -1.6908F, 5.0F, 1.0F, 3.3815F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, 7.5F, -1.6908F, 5.0F, 1.0F, 3.3815F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, -1.6908F, 7.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, -1.6908F, -8.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.3927F, 0.0F, 0.0F));
+				.texOffs(162, 1).addBox(-4.5F, 7.5F, -1.6908F, 5.0F, 1.0F, 3.3815F, new CubeDeformation(0.0F))
+				.texOffs(162, 1).addBox(-4.5F, -1.6908F, 7.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(162, 1).addBox(-4.5F, -1.6908F, -8.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.3927F, 0.0F, 0.0F));
 
 		PartDefinition hexadecagon_r2 = hexadecagon.addOrReplaceChild("hexadecagon_r2", CubeListBuilder.create().texOffs(162, 1).addBox(-4.5F, -8.5F, -1.6908F, 5.0F, 1.0F, 3.3815F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, 7.5F, -1.6908F, 5.0F, 1.0F, 3.3815F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, -1.6908F, 7.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, -1.6908F, -8.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.3927F, 0.0F, 0.0F));
+				.texOffs(162, 1).addBox(-4.5F, 7.5F, -1.6908F, 5.0F, 1.0F, 3.3815F, new CubeDeformation(0.0F))
+				.texOffs(162, 1).addBox(-4.5F, -1.6908F, 7.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F))
+				.texOffs(162, 1).addBox(-4.5F, -1.6908F, -8.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.3927F, 0.0F, 0.0F));
 
 		PartDefinition hexadecagon_r3 = hexadecagon.addOrReplaceChild("hexadecagon_r3", CubeListBuilder.create().texOffs(162, 1).addBox(-4.5F, -1.6908F, 7.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, -1.6908F, -8.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.7854F, 0.0F, 0.0F));
+				.texOffs(162, 1).addBox(-4.5F, -1.6908F, -8.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.7854F, 0.0F, 0.0F));
 
 		PartDefinition hexadecagon_r4 = hexadecagon.addOrReplaceChild("hexadecagon_r4", CubeListBuilder.create().texOffs(162, 1).addBox(-4.5F, -1.6908F, 7.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(162, 1).addBox(-4.5F, -1.6908F, -8.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.7854F, 0.0F, 0.0F));
+				.texOffs(162, 1).addBox(-4.5F, -1.6908F, -8.5F, 5.0F, 3.3815F, 1.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.7854F, 0.0F, 0.0F));
 
 		return LayerDefinition.create(meshdefinition, 256, 256);
 	}

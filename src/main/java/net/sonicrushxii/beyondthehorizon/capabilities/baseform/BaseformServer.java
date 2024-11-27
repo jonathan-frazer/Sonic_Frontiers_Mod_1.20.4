@@ -1836,13 +1836,14 @@ public class BaseformServer {
             //Effects
             {
                 //Speed
-                player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
+                if(baseformProperties.boostLvl == 0)
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
 
                 //Jump
                 if(!player.hasEffect(MobEffects.JUMP)) player.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));
                 else player.getEffect(MobEffects.JUMP).update(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));
 
-                //Jump
+                //Resistance
                 if(!player.hasEffect(MobEffects.DAMAGE_RESISTANCE)) player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, -1, 3, false, false));
                 else player.getEffect(MobEffects.DAMAGE_RESISTANCE).update(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, -1, 3, false, false));
 
@@ -1853,6 +1854,12 @@ public class BaseformServer {
                 //Haste
                 if(!player.hasEffect(MobEffects.DIG_SPEED)) player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false));
                 else player.getEffect(MobEffects.DIG_SPEED).update(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false));
+
+                //Immunities: Slowdown
+                if(!player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, -1, 1, false, false));
+
+                //Immunities: Mining Fatigue
+                if(!player.hasEffect(MobEffects.DIG_SLOWDOWN))      player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false));
             }
 
             //Passive Abilities

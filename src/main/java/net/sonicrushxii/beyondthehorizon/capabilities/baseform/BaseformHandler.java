@@ -182,7 +182,6 @@ public class BaseformHandler {
                     hitSchedule.put(damageGiver.getUUID(), Scheduler.scheduleTask(() -> {
                                 baseformProperties.hitCount = 0;
                                 damageGiver.removeEffect(MobEffects.SLOW_FALLING);
-                                System.out.println("Reset Combo");
                             }, COMBO_TIME)
                     );
                 }
@@ -193,7 +192,6 @@ public class BaseformHandler {
                         currentSchedule.cancel();
                         damageGiver.removeEffect(MobEffects.SLOW_FALLING);
                         baseformProperties.hitCount = 0;
-                        System.out.println("Interrupt Combo");
                     }
                 }
             }
