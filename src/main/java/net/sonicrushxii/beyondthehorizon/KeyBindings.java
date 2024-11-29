@@ -79,4 +79,10 @@ public class KeyBindings {
             InputConstants.MOUSE_BUTTON_RIGHT,
             CATEGORY
     );
+    public final KeyMapping useUltimateAbility = new KeyMapping(
+            "key."+ BeyondTheHorizon.MOD_ID+".FrontiersUltUse",
+            KeyConflictContext.IN_GAME,
+            InputConstants.getKey(InputConstants.KEY_U,-1),
+            CATEGORY
+    );
 }

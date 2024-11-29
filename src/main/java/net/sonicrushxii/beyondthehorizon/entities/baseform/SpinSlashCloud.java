@@ -2,6 +2,10 @@ package net.sonicrushxii.beyondthehorizon.entities.baseform;
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,14 +15,62 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_boom.SonicBoomProjectile;
+import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class SpinSlashCloud extends PointEntity {
     public SpinSlashCloud(EntityType<? extends PointEntity> entityType, Level world) {
         super(entityType, world);
+    }
+
+    public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(SonicBoomProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(OWNER,Optional.empty());
+    }
+
+    @Override
+    protected void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        // Load the owner's UUID
+        if (tag.hasUUID("OwnerUUID")) this.setOwner(tag.getUUID("OwnerUUID"));
+    }
+
+    @Override
+    protected void addAdditionalSaveData(CompoundTag tag) {
+        // Save the owner's UUID
+        super.addAdditionalSaveData(tag);
+        UUID ownerUuid = getOwnerUUID();
+        if (ownerUuid != null) tag.putUUID("OwnerUUID", ownerUuid);
+    }
+
+    // Sets the owner by UUID
+    public void setOwner(UUID ownerUuid) {
+        this.entityData.set(OWNER, Optional.of(ownerUuid));
+    }
+
+    // Retrieves the owner's UUID, if it exists
+    @Nullable
+    public UUID getOwnerUUID() {
+        return this.entityData.get(OWNER).orElse(null);
+    }
+
+    // Gets the actual owner Entity, if they are loaded in the world
+    @Nullable
+    public LivingEntity getOwner() {
+        UUID ownerUuid = getOwnerUUID();
+        if (ownerUuid != null) return this.level().getPlayerByUUID(ownerUuid);
+        return null;
     }
 
     @Override
@@ -81,7 +133,10 @@ public class SpinSlashCloud extends PointEntity {
                 }))
         {
             //Damage Enemy
-            enemy.hurt(this.level().damageSources().generic(), 6.0f);
+            enemy.hurt(
+                    ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(),this.getOwner()),
+                    BaseformServer.SPINSLASH_DAMAGE
+            );
         }
     }
 }

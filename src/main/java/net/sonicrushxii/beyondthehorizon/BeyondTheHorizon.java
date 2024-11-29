@@ -146,6 +146,7 @@ public class BeyondTheHorizon
             event.register(KeyBindings.INSTANCE.useAbility6);
             event.register(KeyBindings.INSTANCE.parryKey);
             event.register(KeyBindings.INSTANCE.useSingleAbility);
+            event.register(KeyBindings.INSTANCE.useUltimateAbility);
         }
 
         @SubscribeEvent

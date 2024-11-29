@@ -54,6 +54,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.grand_slam.GrandSlam;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.Parry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability.UltimateActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -76,6 +77,9 @@ public class BaseformClient {
 
         //Ranged Reticles
         public static UUID crossSlashReticle = null;
+
+        //Ultimate Reticle
+        public static UUID ultTargetReticle = null;
 
         public static float[] wildRushYawPitch = {0f,0f};
         private static boolean airBoostLock = false;
@@ -374,7 +378,7 @@ public class BaseformClient {
                 }
             }
 
-            //Light Speed Assault
+            //Spin Slash
             {
                 if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
                         !player.isShiftKeyDown() && baseformProperties.getCooldown(BaseformActiveAbility.SPINSLASH) == 0 &&
@@ -520,6 +524,22 @@ public class BaseformClient {
                 PacketHandler.sendToServer(new GrandSlam());
             }
 
+        }
+
+        //Slot 6
+        {
+            //Ultimate Ability
+            if(!baseformProperties.isAttacking() && baseformProperties.ultReady &&
+                    KeyBindings.INSTANCE.useUltimateAbility.isDown())
+            {
+                ClientOnlyData.ultTargetReticle = null;
+                UltimateActivate.scanFoward(player);
+                if(ClientOnlyData.ultTargetReticle != null)
+                {
+                    PacketHandler.sendToServer(new UltimateActivate(ClientOnlyData.ultTargetReticle));
+                    baseformProperties.ultimateUse = 1;
+                }
+            }
         }
     }
 

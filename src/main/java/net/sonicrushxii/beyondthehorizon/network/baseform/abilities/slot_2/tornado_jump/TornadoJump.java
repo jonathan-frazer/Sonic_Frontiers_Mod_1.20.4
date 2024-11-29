@@ -50,6 +50,7 @@ public class TornadoJump {
                                 (Utilities.calculateViewVector(0,-baseformProperties.atkRotPhase+180).scale(1.4)),
                         (aoeCloud) -> {
                             aoeCloud.setDuration(100);
+                            aoeCloud.setOwner(player.getUUID());
                         });
             },5);
 

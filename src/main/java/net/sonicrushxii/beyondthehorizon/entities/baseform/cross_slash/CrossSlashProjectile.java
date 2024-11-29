@@ -18,6 +18,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.entities.all.LinearMovingEntity;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
@@ -32,7 +33,6 @@ public class CrossSlashProjectile extends LinearMovingEntity {
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(CrossSlashProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
     private int MAX_DURATION = 50;
     private static final float STRENGTH = 0.5f;
-    private static final float CROSS_SLASH_DAMAGE = 12.0f;
 
     public CrossSlashProjectile(EntityType<? extends PointEntity> type, Level world) {
         super(type, world);
@@ -135,7 +135,7 @@ public class CrossSlashProjectile extends LinearMovingEntity {
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(
                                 ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), this.getOwner()),
-                                CROSS_SLASH_DAMAGE
+                                BaseformServer.CROSS_SLASH_DAMAGE
                         );
                     }
                 }catch(NullPointerException ignored){}

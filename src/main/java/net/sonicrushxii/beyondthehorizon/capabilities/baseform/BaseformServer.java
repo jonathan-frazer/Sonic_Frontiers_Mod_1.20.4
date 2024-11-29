@@ -67,12 +67,28 @@ import org.joml.Vector3f;
 import java.util.*;
 
 public class BaseformServer {
+    //Combo
     private static final float HOMING_ATTACK_DAMAGE = 9.0f;
     private static final float BALLFORM_DAMAGE = 6.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
+
+    //Melee
+    public static final float TORNADO_JUMP_DMG = 1.0f;
     private static final float WILDRUSH_DAMAGE = 10.0f;
     private static final float LOOPKICK_DAMAGE = 12.0f;
+    public static final float SPINSLASH_DAMAGE = 6.0f;
+
+    //Ranged
+    public static final float SONIC_BOOM_DAMAGE = 6.0f;
+    public static final float SONIC_WIND_DAMAGE = 18.0f;
+    public static final float HOMING_SHOT_DAMAGE = 35.0f;
+    public static final float CROSS_SLASH_DAMAGE = 12.0f;
+
+    //Counter
     private static final float GRAND_SLAM_DMG = 17.0f;
+
+    //Ultimate
+    private static final double ULT_DECAY_RATE = 0.15;
 
     public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
 
@@ -602,7 +618,7 @@ public class BaseformServer {
                                     new AABB(player.getX()+1.0,player.getY()+0.75,player.getZ()+1.0,
                                             player.getX()-1.0,player.getY()-0.25,player.getZ()-1.0),(enemy)->!enemy.is(player)))
                             {
-                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player),
+                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), player),
                                         HUMMING_TOP_DAMAGE);
                                 enemy.teleportTo(player.getX()+lookAngle.x*2.0,player.getY()+lookAngle.y*2.0,player.getZ()+lookAngle.z*2.0);
                                 player.connection.send(new ClientboundTeleportEntityPacket(enemy));
@@ -999,6 +1015,7 @@ public class BaseformServer {
                                                 spinTargetPos.add(cloudSpawn.scale(0.75)),
                                                 (aoeCloud) -> {
                                                     aoeCloud.setDuration(58);
+                                                    aoeCloud.setOwner(player.getUUID());
                                                 });
 
                                     },7);
@@ -1764,7 +1781,7 @@ public class BaseformServer {
                             if(baseformProperties.grandSlamTime == 40)
                             {
                                 //Damage Target
-                                counterTarget.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),player),
+                                counterTarget.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
                                         GRAND_SLAM_DMG);
 
                                 //Knock Counter Target away
@@ -1803,6 +1820,64 @@ public class BaseformServer {
                         {
                             baseformProperties.grandSlamTime = 0;
                         }
+                    }
+                }
+
+                //Slot 6
+                {
+                    //Meter Decay
+                    baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter - ULT_DECAY_RATE;
+
+                    //Ultimate Ready
+                    if(baseformProperties.ultReady) {
+                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                new DustParticleOptions(new Vector3f(0.4667F, 0F, 0.9961F), 1f),
+                                player.getX() + 0.00, player.getY() + 0.85, player.getZ() + 0.00,
+                                0.0, 0.80f, 1.00f, 0.80f, 1,
+                                true)
+                        );
+                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                new DustParticleOptions(new Vector3f(0.05F, 0.05F, 1.0F), 1f),
+                                player.getX() + 0.00, player.getY() + 0.85, player.getZ() + 0.00,
+                                0.0, 0.80f, 1.00f, 0.80f, 1,
+                                true)
+                        );
+                    }
+
+
+                    if(baseformProperties.ultimateAtkMeter < 0.0)
+                    {
+                        if(baseformProperties.ultReady)
+                            level.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.MASTER, 1.0f, 2.0f);
+
+                        baseformProperties.ultReady = false;
+                        baseformProperties.ultimateAtkMeter = 0.0;
+                    }
+
+                    try
+                    {
+                        //Ultimate
+                        if(baseformProperties.ultimateUse > 0)
+                        {
+                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                    ParticleTypes.ENCHANTED_HIT,
+                                    player.getX()+0.00, player.getY()+0.85, player.getZ()+0.00,
+                                    0.0, 0.80f, 1.00f, 0.80f, 1,
+                                    true)
+                            );
+                            baseformProperties.ultimateUse += 1;
+                        }
+
+                        //Stop Ultimate
+                        if(baseformProperties.ultimateUse > 150)
+                        {
+                            throw new InterruptedException("Move Successfully executed");
+                        }
+                    }
+                    catch(NullPointerException|InterruptedException|ClassCastException e)
+                    {
+                        baseformProperties.ultimateUse = 0;
+                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                     }
                 }
             }
@@ -1856,10 +1931,10 @@ public class BaseformServer {
                 else player.getEffect(MobEffects.DIG_SPEED).update(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false));
 
                 //Immunities: Slowdown
-                if(!player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, -1, 1, false, false));
+                if(player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
 
                 //Immunities: Mining Fatigue
-                if(!player.hasEffect(MobEffects.DIG_SLOWDOWN))      player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false));
+                if(player.hasEffect(MobEffects.DIG_SLOWDOWN))      player.removeEffect(MobEffects.DIG_SPEED);
             }
 
             //Passive Abilities

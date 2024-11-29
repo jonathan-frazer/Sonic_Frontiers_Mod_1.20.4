@@ -50,6 +50,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.grand_slam.GrandSlam;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.Parry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability.UltimateActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
@@ -201,6 +202,12 @@ public class PacketHandler {
 
                 //Grand Slam
                 INSTANCE.messageBuilder(GrandSlam.class,NetworkDirection.PLAY_TO_SERVER).encoder(GrandSlam::encode).decoder(GrandSlam::new).consumerMainThread(GrandSlam::handle).add();
+            }
+
+            //Slot 6
+            {
+                //Ultimate
+                INSTANCE.messageBuilder(UltimateActivate.class,NetworkDirection.PLAY_TO_SERVER).encoder(UltimateActivate::encode).decoder(UltimateActivate::new).consumerMainThread(UltimateActivate::handle).add();
             }
         }
 

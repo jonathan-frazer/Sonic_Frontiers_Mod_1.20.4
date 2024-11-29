@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.entities.all.LinearMovingEntity;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
@@ -28,8 +29,8 @@ public class SonicBoomProjectile extends LinearMovingEntity {
     public static final EntityDataAccessor<Boolean> DESTROY_BLOCKS = SynchedEntityData.defineId(SonicBoomProjectile.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(SonicBoomProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
     private int MAX_DURATION = 50;
-    private static float STRENGTH = 0.5f;
-    private static float SONIC_BOOM_DAMAGE = 6.0f;
+    private static final float STRENGTH = 0.5f;
+
 
     public SonicBoomProjectile(EntityType<? extends PointEntity> type, Level world) {
         super(type, world);
@@ -132,7 +133,7 @@ public class SonicBoomProjectile extends LinearMovingEntity {
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(
                                 ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), this.getOwner()),
-                                SONIC_BOOM_DAMAGE
+                                BaseformServer.SONIC_BOOM_DAMAGE
                         );
                     }
                 }catch(NullPointerException ignored){}

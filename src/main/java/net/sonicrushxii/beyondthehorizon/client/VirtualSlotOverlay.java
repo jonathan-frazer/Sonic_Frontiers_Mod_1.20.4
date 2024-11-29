@@ -15,6 +15,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActi
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -79,8 +80,11 @@ public class VirtualSlotOverlay {
     //Helper Methods and Records
     private record Ability(ResourceLocation texture, @Nullable String sideinfo, byte cooldown, @Nullable Double chargePercent, @Nullable Integer barAlphaColor) {}
 
-    private static final int MAX_BAR_WIDTH = 15;
-    private static final int MAX_BAR_HEIGHT = 1;
+    private static final int SLOT_BAR_WIDTH = 15;
+    private static final int SLOT_BAR_HEIGHT = 1;
+
+    private static final int ULT_BAR_WIDTH = 90;
+    private static final int ULT_BAR_HEIGHT = 5;
 
     private static void renderSlot(Ability SLOT_ABILITY, GuiGraphics guiComponent, int x, int y, int[] textureDimensions)
     {
@@ -108,9 +112,9 @@ public class VirtualSlotOverlay {
         if(SLOT_ABILITY.chargePercent() != null && SLOT_ABILITY.barAlphaColor() != null){
             final int barX = x+3*textureDimensions[0]/10-2;
             final int barY = y+2*textureDimensions[1]/5+10;
-            int barWidth = (int) (0.01*SLOT_ABILITY.chargePercent()*MAX_BAR_WIDTH);
-            guiComponent.fill(barX,barY, barX+MAX_BAR_WIDTH, barY-MAX_BAR_HEIGHT,0xFF000000);
-            guiComponent.fill(barX,barY, barX+barWidth, barY-MAX_BAR_HEIGHT,SLOT_ABILITY.barAlphaColor());
+            int barWidth = (int) (0.01*SLOT_ABILITY.chargePercent()* SLOT_BAR_WIDTH);
+            guiComponent.fill(barX,barY, barX+ SLOT_BAR_WIDTH, barY- SLOT_BAR_HEIGHT,0xFF000000);
+            guiComponent.fill(barX,barY, barX+barWidth, barY- SLOT_BAR_HEIGHT,SLOT_ABILITY.barAlphaColor());
         }
 
 
@@ -126,6 +130,13 @@ public class VirtualSlotOverlay {
     {
         return switch (currName) {
             case "Right Button" -> "RMB";
+            case "Backspace" -> "BkSpc";
+            case "Caps Lock" -> "CAPS";
+            case "Left Shift" -> "LShft";
+            case "Right Shift" -> "RShft";
+            case "Enter" -> "ENT";
+            case "Left Alt" -> "LAlt";
+            case "Right ALt" -> "RAlt";
             default -> currName;
         };
     }
@@ -222,11 +233,8 @@ public class VirtualSlotOverlay {
                 break;
 
             case 5 :
-                slotName = "Ultimate";
-                iconTextures = (Arrays.asList(
-                        new Ability(PHANTOM_RUSH_SLOT,null,cooldownArray[BaseformActiveAbility.PHANTOM_RUSH.ordinal()],null,null))
-                );
-                keyBindings.set(0,KeyBindings.INSTANCE.useSingleAbility.getKey());
+                slotName = "Transform";
+                iconTextures = new ArrayList<Ability>();
                 break;
 
             default:
@@ -260,6 +268,33 @@ public class VirtualSlotOverlay {
                     0xFFFFFF);
         }
 
+        final int imageWidth = 16;
+        final int imageHeight = 16;
+
+        final int barX = (screenWidth - ULT_BAR_WIDTH + imageWidth + shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*5 - 4) / 2; // Center horizontally
+        final int barY = screenHeight - screenHeight / 4;
+
+        int barWidth = (int) (0.01*baseformProperties.ultimateAtkMeter*ULT_BAR_WIDTH);
+        guiComponent.fill(barX+1,barY+1, barX+ULT_BAR_WIDTH+1, barY-ULT_BAR_HEIGHT,0xFF000000);
+        guiComponent.fill(barX,barY, barX+ULT_BAR_WIDTH, barY-ULT_BAR_HEIGHT,0xFF444444);
+        guiComponent.fill(barX,barY, barX+barWidth, barY-ULT_BAR_HEIGHT,(baseformProperties.ultReady)?0xFF0033DD:0xFF00DDDD);
+
+        // Draw the image (Assuming you have a method to draw the image)
+        int imageX = barX - imageWidth - 5; // Image is to the left of the bar
+        int imageY = barY - (ULT_BAR_HEIGHT + imageHeight) / 2; // Center the image vertically with the bar
+        //Draw the Actual Texture
+        guiComponent.blit(PHANTOM_RUSH_SLOT,imageX,imageY,
+                0,0,imageWidth,imageHeight,imageWidth,imageHeight);
+
+        int keyX = imageX - shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*4 - 4;
+        int keyY = imageY + imageHeight/3;
+
+        //Keybinding for Ability
+        guiComponent.drawCenteredString(Minecraft.getInstance().font,
+                shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()),
+                keyX,
+                keyY,
+                0xFFFFFF);
     }
     public static void renderSuperFormSlots(LocalPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {

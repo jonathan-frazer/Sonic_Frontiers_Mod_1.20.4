@@ -15,6 +15,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.entities.all.LinearMovingEntity;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
@@ -30,7 +31,7 @@ public class SonicWind extends LinearMovingEntity {
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(SonicWind.class, EntityDataSerializers.OPTIONAL_UUID);
     private int MAX_DURATION = 160;
     private static float STRENGTH = 3.0f;
-    private static float SONIC_WIND_DAMAGE = 18.0f;
+
 
     public SonicWind(EntityType<? extends PointEntity> type, Level world) {
         super(type, world);
@@ -146,7 +147,7 @@ public class SonicWind extends LinearMovingEntity {
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(
                                 ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), this.getOwner()),
-                                SONIC_WIND_DAMAGE
+                                BaseformServer.SONIC_WIND_DAMAGE
                         );
                     }
                 }catch(NullPointerException ignored){}

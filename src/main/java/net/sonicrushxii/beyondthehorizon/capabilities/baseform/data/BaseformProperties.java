@@ -176,6 +176,12 @@ public class BaseformProperties extends FormProperties {
     public UUID counteredEntity;
     public byte grandSlamTime;
 
+    //Slot 6
+    public double ultimateAtkMeter;
+    public boolean ultReady;
+    public short ultimateUse;
+    public UUID ultTarget;
+
     public BaseformProperties()
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
@@ -243,6 +249,12 @@ public class BaseformProperties extends FormProperties {
         counterReady = false;
         counteredEntity = new UUID(0L,0L);
         grandSlamTime = (byte)0;
+
+        //Slot 6
+        ultimateAtkMeter = 0.0;
+        ultReady = false;
+        ultimateUse = (short)0;
+        ultTarget = new UUID(0L,0L);
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -313,6 +325,12 @@ public class BaseformProperties extends FormProperties {
         counterReady = nbt.getBoolean("CounterReady");
         counteredEntity = nbt.getUUID("CounteredEntity");
         grandSlamTime = nbt.getByte("GrandSlamTime");
+
+        //Slot 6
+        ultimateAtkMeter = nbt.getDouble("UltimateMeter");
+        ultReady = nbt.getBoolean("UltimateReady");
+        ultimateUse = nbt.getShort("UltimateUse");
+        ultTarget = nbt.getUUID("UltimateTargetUUID");
     }
 
     @Override
@@ -387,6 +405,12 @@ public class BaseformProperties extends FormProperties {
         nbt.putUUID("CounteredEntity",counteredEntity);
         nbt.putByte("GrandSlamTime",grandSlamTime);
 
+        //Slot 6
+        nbt.putDouble("UltimateMeter",ultimateAtkMeter);
+        nbt.putBoolean("UltimateReady",ultReady);
+        nbt.putShort("UltimateUse",ultimateUse);
+        nbt.putUUID("UltimateTargetUUID",ultTarget);
+
         return nbt;
     }
 
@@ -416,10 +440,13 @@ public class BaseformProperties extends FormProperties {
 
         boolean homingShot = (this.homingShot > 0);
 
+        boolean ultimate = (this.ultimateUse > 0);
+
         return quickCyloop ||
                 ballForm || homingAttack || speedBlitzDash || melee || hummingTop || stomping ||
                 tornadoJump || mirageTimer || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick ||
-                homingShot;
+                homingShot ||
+                ultimate;
     }
 
     //Checks if Player is in the middle of another attack
@@ -447,11 +474,14 @@ public class BaseformProperties extends FormProperties {
         boolean parry = (this.parryTime > 0 || this.parryTime < -49);
         boolean grandSlam = (this.grandSlamTime > 0);
 
+        boolean ultimate = (this.ultimateUse > 0);
+
         return quickCyloop ||
                 homingAttack || hummingTop || ballform || speedBlitzDash || stomping ||
                 tornadoJump || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick ||
                 crossSlash || homingShot || sonicBoom || sonicWind ||
-                parry || grandSlam;
+                parry || grandSlam ||
+                ultimate;
     }
 
     //Ball form

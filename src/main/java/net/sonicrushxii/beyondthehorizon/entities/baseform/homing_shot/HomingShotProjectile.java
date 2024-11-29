@@ -16,6 +16,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
@@ -32,7 +33,6 @@ public class HomingShotProjectile extends Entity {
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(HomingShotProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
     public static final EntityDataAccessor<Integer> TARGET = SynchedEntityData.defineId(HomingShotProjectile.class, EntityDataSerializers.INT);
     private static final float STRENGTH = 1.0f;
-    private static final float HOMING_SHOT_DAMAGE = 35.0f;
 
     public HomingShotProjectile(EntityType<? extends HomingShotProjectile> type, Level world) {
         super(type, world);
@@ -225,7 +225,7 @@ public class HomingShotProjectile extends Entity {
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(
                                 ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), this.getOwner()),
-                                HOMING_SHOT_DAMAGE
+                                BaseformServer.HOMING_SHOT_DAMAGE
                         );
                     }
 
