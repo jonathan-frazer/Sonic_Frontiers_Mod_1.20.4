@@ -72,6 +72,7 @@ public class BaseformServer {
     private static final float BALLFORM_DAMAGE = 6.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
     public static final float STOMP_DAMAGE = 12.0f;
+    private static final float LIGHT_SPEED_ASSAULT = 20.0f;
 
     //Melee
     public static final float TORNADO_JUMP_DMG = 1.0f;
@@ -919,7 +920,7 @@ public class BaseformServer {
                                                     Collections.emptySet(),
                                                     yawPitch[0], yawPitch[1]);
                                             player.connection.send(new ClientboundTeleportEntityPacket(player));
-                                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), player),
                                                     1.0f);
                                             enemy.setDeltaMovement(player.getLookAngle().scale(1.0));
                                             player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
@@ -954,8 +955,10 @@ public class BaseformServer {
                                     player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                                     //Hurt Enemy
-                                    enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
-                                            20.0f);
+                                    enemy.hurt(
+                                            ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                            LIGHT_SPEED_ASSAULT
+                                    );
                                     enemy.setDeltaMovement(player.getLookAngle().scale(2.0));
                                     player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
 

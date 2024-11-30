@@ -43,8 +43,10 @@ public class PhantomRushRenderer extends EntityRenderer<PhantomRushEntity> {
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull PhantomRushEntity entity)
     {
-        if(entity.getDuration() > 1) {
-            return switch (entity.getPoseType() / 10) {
+        if(entity.getDuration() > 1)
+        {
+            return switch (entity.getPoseType() / 10)
+            {
                 case 0 -> new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/base_skin.png");
                 case 1 ->  new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/powerboost_skin.png");
                 case 2 ->  new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/lightspeed_skin.png");
