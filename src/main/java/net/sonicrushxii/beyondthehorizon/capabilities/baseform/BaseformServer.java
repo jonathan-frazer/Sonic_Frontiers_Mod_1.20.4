@@ -76,7 +76,8 @@ public class BaseformServer {
     public static final float TORNADO_JUMP_DMG = 1.0f;
     private static final float WILDRUSH_DAMAGE = 10.0f;
     private static final float LOOPKICK_DAMAGE = 12.0f;
-    public static final float SPINSLASH_DAMAGE = 6.0f;
+    public static final float SPINSLASH_DAMAGE = 3.0f;
+    public static final float CYCLONE_KICK_DAMAGE = 3.0f;
 
     //Ranged
     public static final float SONIC_BOOM_DAMAGE = 6.0f;
@@ -1146,6 +1147,7 @@ public class BaseformServer {
                                             cycloneTargetPos.add(0,-cycloneTarget.getEyeHeight()/2,0),
                                             (aoeCloud) -> {
                                                 aoeCloud.setDuration(60);
+                                                aoeCloud.setOwner(player.getUUID());
                                             }),12);
                                 }
                             }

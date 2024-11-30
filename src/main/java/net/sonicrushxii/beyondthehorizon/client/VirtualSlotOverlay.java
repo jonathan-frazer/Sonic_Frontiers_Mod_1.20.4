@@ -268,33 +268,40 @@ public class VirtualSlotOverlay {
                     0xFFFFFF);
         }
 
-        final int imageWidth = 16;
-        final int imageHeight = 16;
+        //Render Ultimate Bar
+        {
+            final int imageWidth = 16;
+            final int imageHeight = 16;
 
-        final int barX = (screenWidth - ULT_BAR_WIDTH + imageWidth + shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*5 - 4) / 2; // Center horizontally
-        final int barY = screenHeight - screenHeight / 4;
+            final int barX = (screenWidth - ULT_BAR_WIDTH + imageWidth + shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*5 - 4) / 2; // Center horizontally
+            int noOfHealthBars = (int)Math.ceil(((int)Math.ceil(player.getAbsorptionAmount())+(int)Math.ceil(player.getMaxHealth()))/20.0);
+            final int barY = screenHeight - Math.min(2*screenHeight/5,((5+noOfHealthBars)*screenHeight/24));
 
-        int barWidth = (int) (0.01*baseformProperties.ultimateAtkMeter*ULT_BAR_WIDTH);
-        guiComponent.fill(barX+1,barY+1, barX+ULT_BAR_WIDTH+1, barY-ULT_BAR_HEIGHT,0xFF000000);
-        guiComponent.fill(barX,barY, barX+ULT_BAR_WIDTH, barY-ULT_BAR_HEIGHT,0xFF444444);
-        guiComponent.fill(barX,barY, barX+barWidth, barY-ULT_BAR_HEIGHT,(baseformProperties.ultReady)?0xFF0033DD:0xFF00DDDD);
+            int barWidth = (int) (0.01*baseformProperties.ultimateAtkMeter*ULT_BAR_WIDTH);
+            guiComponent.fill(barX+1,barY+1, barX+ULT_BAR_WIDTH+1, barY-ULT_BAR_HEIGHT,0xFF000000);
+            guiComponent.fill(barX,barY, barX+ULT_BAR_WIDTH, barY-ULT_BAR_HEIGHT,0xFF444444);
+            guiComponent.fill(barX,barY, barX+barWidth, barY-ULT_BAR_HEIGHT,(baseformProperties.ultReady)?0xFF0033DD:0xFF00DDDD);
 
-        // Draw the image (Assuming you have a method to draw the image)
-        int imageX = barX - imageWidth - 5; // Image is to the left of the bar
-        int imageY = barY - (ULT_BAR_HEIGHT + imageHeight) / 2; // Center the image vertically with the bar
-        //Draw the Actual Texture
-        guiComponent.blit(PHANTOM_RUSH_SLOT,imageX,imageY,
-                0,0,imageWidth,imageHeight,imageWidth,imageHeight);
+            // Draw the image (Assuming you have a method to draw the image)
+            int imageX = barX - imageWidth - 5; // Image is to the left of the bar
+            int imageY = barY - (ULT_BAR_HEIGHT + imageHeight) / 2; // Center the image vertically with the bar
+            //Draw the Actual Texture
+            guiComponent.blit(PHANTOM_RUSH_SLOT,imageX,imageY,
+                    0,0,imageWidth,imageHeight,imageWidth,imageHeight);
 
-        int keyX = imageX - shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*4 - 4;
-        int keyY = imageY + imageHeight/3;
+            if(baseformProperties.ultReady)
+            {
+                int keyX = imageX - shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*4 - 4;
+                int keyY = imageY + imageHeight/3;
 
-        //Keybinding for Ability
-        guiComponent.drawCenteredString(Minecraft.getInstance().font,
-                shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()),
-                keyX,
-                keyY,
-                0xFFFFFF);
+                //Keybinding for Ability
+                guiComponent.drawCenteredString(Minecraft.getInstance().font,
+                        shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()),
+                        keyX,
+                        keyY,
+                        0xFFFFFF);
+            }
+        }
     }
     public static void renderSuperFormSlots(LocalPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {
