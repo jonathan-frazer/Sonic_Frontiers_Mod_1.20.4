@@ -13,9 +13,10 @@ import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 public enum ModDamageTypes
 {
     SONIC_BALL("sonic_ball"),
-    SONIC_MELEE("sonic_melee"),
-    SONIC_RANGED("sonic_ranged"),
-    SONIC_CYLOOP("sonic_cyloop");
+    SONIC_MELEE("sonic_melee"),   //Deals More Charge
+    SONIC_RANGED("sonic_ranged"), //Deals less Charge
+    SONIC_CYLOOP("sonic_cyloop"),
+    SONIC_ULTIMATE("sonic_ultimate");//Deals no Charge
 
     private final ResourceKey<DamageType> dmgResourceKey;
 

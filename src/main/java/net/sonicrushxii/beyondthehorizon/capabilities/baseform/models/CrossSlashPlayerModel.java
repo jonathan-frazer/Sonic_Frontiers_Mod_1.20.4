@@ -17,7 +17,7 @@ import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 
 public class CrossSlashPlayerModel<T extends Entity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform_cross_player"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/cross_player"), "main");
 
 	private final ModelPart Head;
 	private final ModelPart Body;

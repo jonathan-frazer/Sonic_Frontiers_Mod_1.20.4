@@ -17,7 +17,7 @@ import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
 
 public class SonicBoomModel<T extends Entity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform_sonic_boom"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/sonic_boom"), "main");
 	public static final ModModelRenderer.Texture[] TEXTURE_LOCATIONS = {
 			new ModModelRenderer.Texture("textures/custom_model/baseform/sonic_boom.png",(byte)0)
 	};

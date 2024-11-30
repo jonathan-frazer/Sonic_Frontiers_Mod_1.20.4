@@ -21,7 +21,7 @@ public class HomingShotRenderer extends EntityRenderer<HomingShotProjectile> {
 
     public HomingShotRenderer(EntityRendererProvider.Context context) {
         super(context);
-        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform_spinslash"), "main"));
+        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/spinslash"), "main"));
         this.model = new Spinslash<>(modelPart);
     }
     @Override

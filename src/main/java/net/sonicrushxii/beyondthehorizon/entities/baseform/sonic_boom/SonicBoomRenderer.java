@@ -21,7 +21,7 @@ public class SonicBoomRenderer extends EntityRenderer<SonicBoomProjectile> {
 
     public SonicBoomRenderer(EntityRendererProvider.Context context) {
         super(context);
-        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform_sonic_boom"), "main"));
+        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/sonic_boom"), "main"));
         this.model = new SonicBoomModel<>(modelPart);
     }
     @Override

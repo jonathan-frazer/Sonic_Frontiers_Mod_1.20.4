@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class SonicFlatPlayerModel<T extends Entity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform_model_base"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/model_base"), "main");
 
 	private final ModelPart Head;
 	private final ModelPart Body;

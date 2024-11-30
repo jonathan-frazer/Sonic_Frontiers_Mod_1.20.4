@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
@@ -19,7 +20,6 @@ import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import org.joml.Vector3f;
 
 public class Stomp {
-    private static final float STOMP_DAMAGE=12.0f;
 
     public Stomp() {}
 
@@ -43,8 +43,8 @@ public class Stomp {
                     (target)->!target.is(player)))
             {
                 //Damage Enemy
-                enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),player),
-                        STOMP_DAMAGE);
+                enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
+                        BaseformServer.STOMP_DAMAGE);
             }
 
             //Particle

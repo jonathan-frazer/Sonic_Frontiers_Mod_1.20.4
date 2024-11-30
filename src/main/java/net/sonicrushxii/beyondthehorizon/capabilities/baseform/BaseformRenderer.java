@@ -26,8 +26,8 @@ public class BaseformRenderer
      */
     public static void onRenderPlayerModelPre(RenderLivingEvent.Pre<?,?> event, Player player, BaseformProperties baseformProperties)
     {
-        PoseStack poseStack = event.getPoseStack();
 
+        PoseStack poseStack = event.getPoseStack();
         //Ballform
         if (baseformProperties.shouldBeInBallform())
         {
@@ -316,7 +316,13 @@ public class BaseformRenderer
                 poseStack.popPose();
                 event.setCanceled(true);
             }
+        }
 
+        //Phantom Rush
+        else if(baseformProperties.ultimateUse > 1 && baseformProperties.ultimateUse < 50)
+        {
+            //Sonic Render stops, Rendering will be done on the targeted mob
+            event.setCanceled(true);
         }
     }
 
@@ -396,7 +402,6 @@ public class BaseformRenderer
 
     public static void onRenderToEveryonePre(RenderLivingEvent.Pre<?,?> event, LivingEntity target)
     {
-
     }
 
     public static void onRenderToEveryonePost(RenderLivingEvent.Post<?,?> event, LivingEntity target)

@@ -22,7 +22,7 @@ public class MirageRenderer extends EntityRenderer<MirageEntity> {
 
     public MirageRenderer(EntityRendererProvider.Context context) {
         super(context);
-        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform_mirage"), "main"));
+        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/mirage"), "main"));
         this.model = new MirageModel<>(modelPart);
     }
 

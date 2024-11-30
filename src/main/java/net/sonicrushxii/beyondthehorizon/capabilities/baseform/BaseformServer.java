@@ -71,6 +71,7 @@ public class BaseformServer {
     private static final float HOMING_ATTACK_DAMAGE = 9.0f;
     private static final float BALLFORM_DAMAGE = 6.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
+    public static final float STOMP_DAMAGE = 12.0f;
 
     //Melee
     public static final float TORNADO_JUMP_DMG = 1.0f;
@@ -90,6 +91,7 @@ public class BaseformServer {
 
     //Ultimate
     private static final double ULT_DECAY_RATE = 0.15;
+    public static final float PHANTOM_RUSH_DAMAGE = 5.0f;
 
     public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
 
@@ -1861,23 +1863,82 @@ public class BaseformServer {
                         //Ultimate
                         if(baseformProperties.ultimateUse > 0)
                         {
-                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                    ParticleTypes.ENCHANTED_HIT,
-                                    player.getX()+0.00, player.getY()+0.85, player.getZ()+0.00,
-                                    0.0, 0.80f, 1.00f, 0.80f, 1,
-                                    true)
-                            );
                             baseformProperties.ultimateUse += 1;
+
+                            //Get Target
+                            assert baseformProperties.meleeTarget != null;
+                            LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.meleeTarget);
+
+                            if(enemy == null)  throw new NullPointerException("Enemy died/doesn't exist anymore");
+
+                            Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+                            Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
+                            double distanceFromEnemy = playerPos.distanceTo(enemyPos);
+
+                            //Light Speed Dash
+                            if(baseformProperties.ultimateUse == 2)
+                            {
+                                //Get Position of in front of enemy
+                                Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);
+                                float[] yawPitch = Utilities.getYawPitchFromVec(tpDir.reverse());
+
+                                //Particle Raycast
+                                PacketHandler.sendToALLPlayers(
+                                        new ParticleRaycastPacketS2C(
+                                                new DustParticleOptions(new Vector3f(0f,0f,1f),1)
+                                                ,playerPos.add(0,1.25,1),enemyPos.add(tpDir).add(0,1.25,0)
+                                        )
+                                );
+
+                                //Teleport to the Position
+                                player.teleportTo(player.serverLevel(),
+                                        enemyPos.x() + tpDir.x(),
+                                        enemyPos.y() + tpDir.y(),
+                                        enemyPos.z() + tpDir.z(),
+                                        Collections.emptySet(),
+                                        yawPitch[0], yawPitch[1]);
+                                player.connection.send(new ClientboundTeleportEntityPacket(player));
+
+                                //Attack the Enemy
+                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                        1.0f);
+                                enemy.setDeltaMovement(player.getLookAngle().scale(0.0));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+
+                                //Make enemy invulnerable for the rest of the attack
+                                enemy.setInvulnerable(true);
+
+                                //Spawn Cloud
+                                Utilities.summonEntity(
+                                        ModEntityTypes.BASEFORM_PHANTOM_RUSH_CLOUD.get(), serverLevel,
+                                        enemyPos,
+                                        (phantomRushCloud) ->{
+                                            phantomRushCloud.setDuration(50);
+                                            if (baseformProperties.lightSpeedState == 2)    phantomRushCloud.setPlayerTextureType((byte)2);
+                                            else if (baseformProperties.powerBoost)         phantomRushCloud.setPlayerTextureType((byte)1);
+                                            else                                            phantomRushCloud.setPlayerTextureType((byte)0);
+                                            phantomRushCloud.setOwner(player.getUUID());
+                                        }
+                                );
+                            }
+
+                            //Phantom Rush
+                            if(baseformProperties.ultimateUse > 2 && baseformProperties.ultimateUse < 50)
+                            {
+                                if(distanceFromEnemy > 4.0) throw new InterruptedException("Moved too Far from enemy");
+                            }
                         }
 
                         //Stop Ultimate
-                        if(baseformProperties.ultimateUse > 150)
+                        if(baseformProperties.ultimateUse > 50)
                         {
                             throw new InterruptedException("Move Successfully executed");
                         }
                     }
                     catch(NullPointerException|InterruptedException|ClassCastException e)
                     {
+                        System.err.println(e.getMessage());
+                        System.err.println(Arrays.toString(e.getStackTrace()));
                         baseformProperties.ultimateUse = 0;
                         player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                     }

@@ -100,6 +100,8 @@ public class BaseformHandler {
             if(baseformProperties.grandSlamTime > 0)
                 event.setCanceled(true);
 
+            if(baseformProperties.ultimateUse > 1 && baseformProperties.ultimateUse < 20)
+                event.setCanceled(true);
 
         }catch(NullPointerException ignored){}
     }
@@ -254,19 +256,23 @@ public class BaseformHandler {
                 },3);
             }
 
-            //Cyloop meter increase
-            baseformProperties.qkCyloopMeter = Math.min(100.0,baseformProperties.qkCyloopMeter+event.getAmount()/5.0);
-            baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter + (
-                    (event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()))?event.getAmount()/3:
-                            (event.getSource().is(ModDamageTypes.SONIC_MELEE.getResourceKey()))?event.getAmount()*2:event.getAmount());
-
-            if(baseformProperties.ultimateAtkMeter > 100.0)
+            //Meter increase
+            if(!event.getSource().is(ModDamageTypes.SONIC_ULTIMATE.getResourceKey()))
             {
-                if(!baseformProperties.ultReady)
-                    damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.MASTER, 1.0f, 2.0f);
-                baseformProperties.ultReady = true;
-                baseformProperties.ultimateAtkMeter = 100.0;
+                baseformProperties.qkCyloopMeter = Math.min(100.0,baseformProperties.qkCyloopMeter+event.getAmount()/5.0);
+                baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter + (
+                        (event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()))?event.getAmount()/5:
+                                (event.getSource().is(ModDamageTypes.SONIC_MELEE.getResourceKey()))?event.getAmount()*3:event.getAmount());
+
+                if(baseformProperties.ultimateAtkMeter > 100.0)
+                {
+                    if(!baseformProperties.ultReady)
+                        damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.MASTER, 1.0f, 2.0f);
+                    baseformProperties.ultReady = true;
+                    baseformProperties.ultimateAtkMeter = 100.0;
+                }
             }
+
 
 
         }catch(NullPointerException|ClassCastException ignored){}

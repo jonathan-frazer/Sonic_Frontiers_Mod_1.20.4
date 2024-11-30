@@ -16,7 +16,7 @@ import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
 
 public class MirageModel<T extends Entity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform_mirage"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/mirage"), "main");
 	public static final ModModelRenderer.Texture[] TEXTURE_LOCATIONS = {
 			new ModModelRenderer.Texture("textures/custom_model/baseform/mirage_skin.png",(byte)0)
 	};

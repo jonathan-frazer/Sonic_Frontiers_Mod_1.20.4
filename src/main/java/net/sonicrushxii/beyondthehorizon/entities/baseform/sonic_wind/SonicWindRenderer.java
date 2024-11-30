@@ -22,7 +22,7 @@ public class SonicWindRenderer extends EntityRenderer<SonicWind> {
 
     public SonicWindRenderer(EntityRendererProvider.Context context) {
         super(context);
-        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform_sonic_wind"), "main"));
+        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/sonic_wind"), "main"));
         this.model = new SonicWindModel<>(modelPart);
     }
     @Override

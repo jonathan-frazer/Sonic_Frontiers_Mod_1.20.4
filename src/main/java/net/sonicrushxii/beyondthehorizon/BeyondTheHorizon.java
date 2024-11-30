@@ -26,6 +26,7 @@ import net.sonicrushxii.beyondthehorizon.entities.all.PointRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.cross_slash.CrossSlashRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.homing_shot.HomingShotRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageRenderer;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.phantom_rush.PhantomRushRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_boom.SonicBoomRenderer;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWindRenderer;
 import net.sonicrushxii.beyondthehorizon.event_handler.*;
@@ -124,6 +125,8 @@ public class BeyondTheHorizon
             EntityRenderers.register(ModEntityTypes.BASEFORM_SONIC_BOOM.get(), SonicBoomRenderer::new);
             EntityRenderers.register(ModEntityTypes.BASEFORM_SONIC_WIND.get(), SonicWindRenderer::new);
             EntityRenderers.register(ModEntityTypes.BASEFORM_HOMING_SHOT.get(), HomingShotRenderer::new);
+            EntityRenderers.register(ModEntityTypes.BASEFORM_PHANTOM_RUSH_CLOUD.get(), PointRenderer::new);
+            EntityRenderers.register(ModEntityTypes.BASEFORM_PHANTOM_RUSH_ENTITY.get(), PhantomRushRenderer::new);
         }
 
         @SubscribeEvent
@@ -193,6 +196,13 @@ public class BeyondTheHorizon
 
             //Grand Slam
             event.registerLayerDefinition(GrandSlamModel.LAYER_LOCATION,GrandSlamModel::createBodyLayer);
+
+            //Phantom Rush
+            event.registerLayerDefinition(PhantomRushModel_1.LAYER_LOCATION,PhantomRushModel_1::createBodyLayer);
+            event.registerLayerDefinition(PhantomRushModel_2.LAYER_LOCATION,PhantomRushModel_2::createBodyLayer);
+            event.registerLayerDefinition(PhantomRushModel_3.LAYER_LOCATION,PhantomRushModel_3::createBodyLayer);
+            event.registerLayerDefinition(PhantomRushModel_4.LAYER_LOCATION,PhantomRushModel_4::createBodyLayer);
+            event.registerLayerDefinition(PhantomRushModel_5.LAYER_LOCATION,PhantomRushModel_5::createBodyLayer);
         }
     }
 }
