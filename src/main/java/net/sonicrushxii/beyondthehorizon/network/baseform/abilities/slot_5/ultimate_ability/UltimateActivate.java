@@ -25,7 +25,8 @@ public class UltimateActivate
     private final UUID enemyID;
 
     public UltimateActivate(UUID enemyID) {
-        this.enemyID = enemyID;
+        if(enemyID.equals(new UUID(0L,0L))) this.enemyID = null;
+        else                                                     this.enemyID = enemyID;
     }
 
     public UltimateActivate(FriendlyByteBuf buffer){

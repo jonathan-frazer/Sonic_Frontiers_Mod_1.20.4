@@ -85,4 +85,10 @@ public class KeyBindings {
             InputConstants.getKey(InputConstants.KEY_U,-1),
             CATEGORY
     );
+    public final KeyMapping helpButton = new KeyMapping(
+            "key."+ BeyondTheHorizon.MOD_ID+".FrontiersHelp",
+            KeyConflictContext.IN_GAME,
+            InputConstants.getKey(InputConstants.KEY_H,-1),
+            CATEGORY
+    );
 }

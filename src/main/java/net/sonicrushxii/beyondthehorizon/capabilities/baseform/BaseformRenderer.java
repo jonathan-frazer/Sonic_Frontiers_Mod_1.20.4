@@ -319,9 +319,29 @@ public class BaseformRenderer
         }
 
         //Phantom Rush
-        else if(baseformProperties.ultimateUse > 1 && baseformProperties.ultimateUse < 50)
+        else if(baseformProperties.ultimateUse > 1 && baseformProperties.ultimateUse < 60)
         {
             //Sonic Render stops, Rendering will be done on the targeted mob
+            event.setCanceled(true);
+        }
+
+        //Coriolis Kick
+        else if(baseformProperties.ultimateUse >= 200)
+        {
+            poseStack.pushPose();
+
+            // Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+            poseStack.translate(0D,-1.5D,0D);
+
+            //Render The Custom Model
+            ModModelRenderer.renderPlayerModel(UltimateKickModel.class, event, poseStack,baseformProperties,null);
+
+            poseStack.popPose();
             event.setCanceled(true);
         }
     }

@@ -9,12 +9,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 import net.sonicrushxii.beyondthehorizon.client.DoubleTapDirection;
+import net.sonicrushxii.beyondthehorizon.client.HelpScreen;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
@@ -539,6 +542,15 @@ public class BaseformClient {
                     PacketHandler.sendToServer(new UltimateActivate(ClientOnlyData.ultTargetReticle));
                     baseformProperties.ultimateUse = 1;
                 }
+            }
+        }
+
+        //Open Help Screen
+        {
+            if(KeyBindings.INSTANCE.helpButton.consumeClick())
+            {
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ()->()-> Minecraft.getInstance().setScreen(new HelpScreen()));
+                while(KeyBindings.INSTANCE.helpButton.consumeClick());
             }
         }
     }

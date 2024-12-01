@@ -100,7 +100,7 @@ public class BaseformHandler {
             if(baseformProperties.grandSlamTime > 0)
                 event.setCanceled(true);
 
-            if(baseformProperties.ultimateUse > 1 && baseformProperties.ultimateUse < 20)
+            if(baseformProperties.ultimateUse > 1)
                 event.setCanceled(true);
 
         }catch(NullPointerException ignored){}

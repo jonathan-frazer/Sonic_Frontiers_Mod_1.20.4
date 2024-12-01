@@ -116,6 +116,7 @@ public class BeyondTheHorizon
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
 
+            //Entities
             EntityRenderers.register(ModEntityTypes.TORNADO_JUMP_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.MIRAGE_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.SONIC_BASEFORM_MIRAGE.get(), MirageRenderer::new);
@@ -127,6 +128,8 @@ public class BeyondTheHorizon
             EntityRenderers.register(ModEntityTypes.BASEFORM_HOMING_SHOT.get(), HomingShotRenderer::new);
             EntityRenderers.register(ModEntityTypes.BASEFORM_PHANTOM_RUSH_CLOUD.get(), PointRenderer::new);
             EntityRenderers.register(ModEntityTypes.BASEFORM_PHANTOM_RUSH_ENTITY.get(), PhantomRushRenderer::new);
+
+            //Menu Screens
         }
 
         @SubscribeEvent
@@ -150,6 +153,7 @@ public class BeyondTheHorizon
             event.register(KeyBindings.INSTANCE.parryKey);
             event.register(KeyBindings.INSTANCE.useSingleAbility);
             event.register(KeyBindings.INSTANCE.useUltimateAbility);
+            event.register(KeyBindings.INSTANCE.helpButton);
         }
 
         @SubscribeEvent
@@ -203,6 +207,9 @@ public class BeyondTheHorizon
             event.registerLayerDefinition(PhantomRushModel_3.LAYER_LOCATION,PhantomRushModel_3::createBodyLayer);
             event.registerLayerDefinition(PhantomRushModel_4.LAYER_LOCATION,PhantomRushModel_4::createBodyLayer);
             event.registerLayerDefinition(PhantomRushModel_5.LAYER_LOCATION,PhantomRushModel_5::createBodyLayer);
+
+            //Coriolis
+            event.registerLayerDefinition(UltimateKickModel.LAYER_LOCATION,UltimateKickModel::createBodyLayer);
         }
     }
 }

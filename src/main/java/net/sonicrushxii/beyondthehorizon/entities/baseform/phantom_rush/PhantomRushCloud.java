@@ -112,9 +112,9 @@ public class PhantomRushCloud extends PointEntity {
         {
             //Set X,Y,Z Positions
             double theta = Utilities.random.nextDouble(0,2*Math.PI);
-            double x = RADIUS*Math.sin(theta);
+            double x = Utilities.random.nextDouble(RADIUS/2,RADIUS)*Math.sin(theta);
             double y = theta/2.0;
-            double z = RADIUS*Math.cos(theta);
+            double z = Utilities.random.nextDouble(RADIUS/2,RADIUS)*Math.cos(theta);
 
             //Spawn AfterImages
             PhantomRushEntity phantomRushEntity = new PhantomRushEntity(ModEntityTypes.BASEFORM_PHANTOM_RUSH_ENTITY.get(),this.level());
@@ -144,6 +144,7 @@ public class PhantomRushCloud extends PointEntity {
             Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
 
             //Damage Enemy
+            if(!enemy.isInvulnerable())
             enemy.hurt(
                         ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_ULTIMATE.getResourceKey(),this.getOwner()),
                         BaseformServer.PHANTOM_RUSH_DAMAGE

@@ -1,6 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -92,7 +93,8 @@ public class BaseformServer {
 
     //Ultimate
     private static final double ULT_DECAY_RATE = 0.15;
-    public static final float PHANTOM_RUSH_DAMAGE = 5.0f;
+    public static final float PHANTOM_RUSH_DAMAGE = 10.0f;
+    public static final float ULTIMATE_DAMAGE = 100.0f;
 
     public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
 
@@ -1780,7 +1782,7 @@ public class BaseformServer {
                                                         player.getZ() + motionDir.z()*2);
                                 player.connection.send(new ClientboundTeleportEntityPacket(counterTarget));
 
-                                //Damage Player
+                                //Damage Enemy
                                 counterTarget.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
                                         1.0F);
                             }
@@ -1869,10 +1871,11 @@ public class BaseformServer {
                             baseformProperties.ultimateUse += 1;
 
                             //Get Target
-                            assert baseformProperties.meleeTarget != null;
-                            LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.meleeTarget);
+                            if(baseformProperties.ultTarget == null) throw new NullPointerException("Null Enemy ID");
+                            LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.ultTarget);
 
-                            if(enemy == null)  throw new NullPointerException("Enemy died/doesn't exist anymore");
+                            if(enemy == null)  throw new NullPointerException("Enemy died/doesn't exist anymore: "+baseformProperties.ultTarget);
+
 
                             Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
                             Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
@@ -1926,22 +1929,195 @@ public class BaseformServer {
                             }
 
                             //Phantom Rush
-                            if(baseformProperties.ultimateUse > 2 && baseformProperties.ultimateUse < 50)
+                            else if(baseformProperties.ultimateUse < 50)
                             {
                                 if(distanceFromEnemy > 4.0) throw new InterruptedException("Moved too Far from enemy");
+                                if(baseformProperties.ultimateUse == 49) baseformProperties.atkRotPhase = player.getYRot();
+                            }
+                            //Uppercut
+                            else if(baseformProperties.ultimateUse < 65)
+                            {
+                                Vec3 motionDir = Utilities.calculateViewVector(-30,baseformProperties.atkRotPhase);
+                                //Teleport the player
+                                player.setDeltaMovement(motionDir.scale(
+                                        Math.max(0.1,
+                                                1.0/(Math.max(1,(baseformProperties.ultimateUse-49)/2))
+                                        )));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                //Teleport the Target in Front of you
+                                enemy.teleportTo(player.getX() + motionDir.x()*2,
+                                        player.getY() + motionDir.y(),
+                                        player.getZ() + motionDir.z()*2);
+                                player.connection.send(new ClientboundTeleportEntityPacket(enemy));
+
+                                //Damage Enemy
+                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
+                                        1.0F);
+                            }
+
+                            //Coriolis Punch
+                            else if(baseformProperties.ultimateUse < 200)
+                            {
+                                //Hold Enemy in Place
+                                enemy.setDeltaMovement(0,0,0);
+                                player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+
+                                Vec3 motionDir = Utilities.calculateViewVector(0,baseformProperties.atkRotPhase);
+                                player.setDeltaMovement(motionDir.scale(3.0));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                //Boost Around the World
+                                if(baseformProperties.ultimateUse == 85 ||
+                                        baseformProperties.ultimateUse == 105 ||
+                                        baseformProperties.ultimateUse == 120 ||
+                                        baseformProperties.ultimateUse == 135 ||
+                                        baseformProperties.ultimateUse == 150 ||
+                                        baseformProperties.ultimateUse == 160 ||
+                                        baseformProperties.ultimateUse == 170 ||
+                                        baseformProperties.ultimateUse == 180)
+                                {
+                                    //Play sound
+                                    level.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.AIR_BOOST.get(), SoundSource.MASTER, 1.0f, 1.0f);
+
+                                    //Particle
+                                    Vec3 playerPosition = player.getPosition(0).add(new Vec3(0,0.75,0));
+                                    PacketHandler.sendToALLPlayers(new ParticleRaycastPacketS2C(
+                                            new DustParticleOptions(new Vector3f(0.000f,0.000f,1.000f), 2.0f),
+                                            playerPosition,
+                                            playerPosition.add(player.getLookAngle().scale(10))
+                                    ));
+                                    PacketHandler.sendToPlayer(player,new ParticleAuraPacketS2C(
+                                            ParticleTypes.SONIC_BOOM,
+                                            player.getX(),player.getY()+1.0,player.getZ(),
+                                            0.0 ,0.0f,0.0f, 0.2f,1,true)
+                                    );
+
+                                    Vec3 destinationVector = enemyPos.add(motionDir.scale(-20));
+                                    player.teleportTo(player.serverLevel(),
+                                            destinationVector.x(),
+                                            destinationVector.y(),
+                                            destinationVector.z(),
+                                            Collections.emptySet(),
+                                            baseformProperties.atkRotPhase,0);
+
+                                    //Boost Around the world
+                                    PacketHandler.sendToALLPlayers(new ParticleRaycastPacketS2C(
+                                            new DustParticleOptions(new Vector3f(0.000f,0.000f,1.000f), 2.0f),
+                                            destinationVector,
+                                            destinationVector.add(motionDir.scale(-10))
+                                    ));
+                                    PacketHandler.sendToPlayer(player,new ParticleAuraPacketS2C(
+                                            ParticleTypes.SONIC_BOOM,
+                                            destinationVector.x(),destinationVector.y()+player.getEyeHeight()/2,destinationVector.z(),
+                                            0.0 ,0.0f,0.0f, 0.2f,1,true)
+                                    );
+                                    player.connection.send(new ClientboundTeleportEntityPacket(player));
+                                }
+
+                                //Normal Strike
+                                if(baseformProperties.ultimateUse < 180 && distanceFromEnemy < 2.0)
+                                {
+                                    //Flash Particle
+                                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                            ParticleTypes.FLASH,
+                                            player.getX(),player.getY()+player.getEyeHeight()/2,player.getZ(),
+                                            0.001,0.01F,player.getEyeHeight()/2,0.01F,
+                                            1,true));
+
+                                    //Play sound
+                                    player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.MASTER, 1.0f, 1.0f);
+                                }
+
+                                //Final Strike
+                                else if(baseformProperties.ultimateUse >= 180 && distanceFromEnemy < 4.0)
+                                {
+                                    //Throw the Entity in our desired direction
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                    //Particle
+                                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                            ParticleTypes.FLASH,
+                                            player.getX(),player.getY()+player.getEyeHeight()/2,player.getZ(),
+                                            0.001,0.01F,player.getEyeHeight()/2,0.01F,
+                                            1,true));
+
+                                    //Teleport to the Position
+                                    Vec3 tpDir = Utilities.calculateViewVector(0,baseformProperties.atkRotPhase);
+                                    player.teleportTo(player.serverLevel(),
+                                            enemyPos.x() - tpDir.x(),
+                                            enemyPos.y() - tpDir.y(),
+                                            enemyPos.z() - tpDir.z(),
+                                            Collections.emptySet(),
+                                            baseformProperties.atkRotPhase, 0);
+                                    player.connection.send(new ClientboundTeleportEntityPacket(player));
+
+                                    //Play sound
+                                    player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SMASH_HIT.get(), SoundSource.MASTER, 1.0f, 1.0f);
+
+                                    baseformProperties.ultimateUse = 200;
+                                }
+                            }
+
+                            //Coriolis Kick
+                            else if(baseformProperties.ultimateUse >= 200)
+                            {
+                                if(baseformProperties.ultimateUse > 207)
+                                {
+                                    enemy.setInvulnerable(false);
+
+                                    //Knock Counter Target away
+                                    enemy.setDeltaMovement(
+                                            Utilities.calculateViewVector(
+                                                    Math.min(90.0F,player.getXRot()+45.0F),
+                                                    player.getYRot()
+                                            ).scale(2.0)
+                                    );
+                                    //Knock yourself back
+                                    player.setDeltaMovement(
+                                            Utilities.calculateViewVector(
+                                                    Math.min(90.0F,player.getXRot()+45.0F),
+                                                    player.getYRot()
+                                            ).scale(-0.75)
+                                    );
+
+                                    //Update Motion
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                    //Final Dmg
+                                    enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_ULTIMATE.getResourceKey(),player),
+                                            ULTIMATE_DAMAGE);
+                                }
+                                else{
+                                    //Freeze them in place
+                                    player.setDeltaMovement(0,0,0);
+                                    enemy.setDeltaMovement(0,0,0);
+
+                                    //Update Motion
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                }
+
+
                             }
                         }
 
                         //Stop Ultimate
-                        if(baseformProperties.ultimateUse > 50)
+                        if(baseformProperties.ultimateUse > 207)
                         {
-                            throw new InterruptedException("Move Successfully executed");
+                            throw new InterruptedException("Move Timed out");
                         }
                     }
                     catch(NullPointerException|InterruptedException|ClassCastException e)
                     {
+                        if(baseformProperties.ultTarget != null) {
+                            LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.ultTarget);
+                            if(enemy != null)  enemy.setInvulnerable(false);
+                        }
                         System.err.println(e.getMessage());
-                        System.err.println(Arrays.toString(e.getStackTrace()));
+                        e.printStackTrace();
                         baseformProperties.ultimateUse = 0;
                         player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                     }

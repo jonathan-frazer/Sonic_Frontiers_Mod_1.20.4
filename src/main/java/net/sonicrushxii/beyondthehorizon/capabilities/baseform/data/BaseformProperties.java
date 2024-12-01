@@ -493,7 +493,8 @@ public class BaseformProperties extends FormProperties {
         boolean lightSpeed = this.lightSpeedState == 1 || this.lightSpeedAssault == -1;
         boolean cycloneKick = (this.cycloneKick < 0);
         boolean homingShot = (this.homingShot > 0 && this.homingShot < 20);
+        boolean ultimate = (this.ultimateUse >= 50 && this.ultimateUse < 60);
 
-        return regular || homingAttack || tornadoJump || lightSpeed || cycloneKick || homingShot;
+        return regular || homingAttack || tornadoJump || lightSpeed || cycloneKick || homingShot || ultimate;
     }
 }
