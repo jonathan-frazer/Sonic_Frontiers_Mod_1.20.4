@@ -78,9 +78,6 @@ public class BaseformClient {
         public static UUID cycloneReticle = null;
         public static UUID spinSlashReticle = null;
 
-        //Ranged Reticles
-        public static UUID crossSlashReticle = null;
-
         //Ultimate Reticle
         public static UUID ultTargetReticle = null;
 
@@ -250,7 +247,6 @@ public class BaseformClient {
                 if (!player.isShiftKeyDown() && baseformProperties.ballFormState == (byte)1)
                 {
                     PacketHandler.sendToServer(new LaunchSpindash());
-
                 }
 
             }
