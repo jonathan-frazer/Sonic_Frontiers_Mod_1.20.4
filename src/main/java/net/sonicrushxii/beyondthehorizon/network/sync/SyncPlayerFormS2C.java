@@ -1,50 +1,57 @@
 package net.sonicrushxii.beyondthehorizon.network.sync;
 
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
-import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
-import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
-import net.sonicrushxii.beyondthehorizon.capabilities.hyperform.HyperformProperties;
-import net.sonicrushxii.beyondthehorizon.capabilities.starfall.StarfallFormProperties;
-import net.sonicrushxii.beyondthehorizon.capabilities.superform.SuperformProperties;
-import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 
 public class SyncPlayerFormS2C {
-    private final SonicForm playerForm;
-    private final FormProperties formData;
+    private final int playerId;
+    private final PlayerSonicForm playerSonicForm;
 
-    public SyncPlayerFormS2C(SonicForm playerForm, FormProperties formData) {
-        this.playerForm = playerForm;
-        this.formData = formData;
+    public SyncPlayerFormS2C(int playerId, PlayerSonicForm playerSonicForm) {
+        this.playerId = playerId;
+        this.playerSonicForm = playerSonicForm;
     }
 
     public SyncPlayerFormS2C(FriendlyByteBuf buffer) {
-        this.playerForm = buffer.readEnum(SonicForm.class);
+        this.playerId = buffer.readInt();
+        this.playerSonicForm = new PlayerSonicForm();
         CompoundTag nbtData = buffer.readNbt();
-        assert nbtData != null;
-        this.formData = switch(this.playerForm){
-            case PLAYER -> new FormProperties(nbtData);
-            case BASEFORM -> new BaseformProperties(nbtData);
-            case SUPERFORM -> new SuperformProperties(nbtData);
-            case STARFALLFORM -> new StarfallFormProperties(nbtData);
-            case HYPERFORM -> new HyperformProperties(nbtData);
-        };
+        if(nbtData != null)
+            playerSonicForm.loadNBTData(nbtData);
     }
 
     public void encode(FriendlyByteBuf buffer){
-        buffer.writeEnum(this.playerForm);
-        buffer.writeNbt(this.formData.serialize());
+        buffer.writeInt(this.playerId);
+        CompoundTag nbtData = new CompoundTag();
+        this.playerSonicForm.saveNBTData(nbtData);
+        buffer.writeNbt(nbtData);
     }
 
     public void handle(CustomPayloadEvent.Context ctx){
         ctx.enqueueWork(()->{
             //On Client Side
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientFormData.setPlayerForm(this.playerForm,this.formData));
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+                // This code is run on the client side
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.level == null) return;
+
+                // Get the player entity by ID
+                Player player = (Player) mc.level.getEntity(this.playerId);
+                if (player == null) return;
+
+                // Update the player's capability data on the client side
+                player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                    playerSonicForm.copyFrom(this.playerSonicForm);
+                });
+            });
         });
         ctx.setPacketHandled(true);
     }

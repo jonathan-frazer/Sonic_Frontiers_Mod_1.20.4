@@ -31,10 +31,10 @@ public class StopSprint {
             //Undo Boost
             player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.50);
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
 

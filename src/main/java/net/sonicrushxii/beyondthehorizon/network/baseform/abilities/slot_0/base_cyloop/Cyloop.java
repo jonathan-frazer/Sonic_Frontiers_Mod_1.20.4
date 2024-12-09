@@ -109,10 +109,10 @@ public class Cyloop {
                         BaseformServer.cyloopCoords.get(player.getUUID()).toArray());
             }
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }

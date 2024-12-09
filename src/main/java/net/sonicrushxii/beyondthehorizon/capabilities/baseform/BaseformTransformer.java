@@ -78,10 +78,10 @@ public class BaseformTransformer {
         //Add Data
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
             playerSonicForm.activateBaseForm();
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            playerSonicForm.getFormProperties()
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
 
@@ -208,10 +208,10 @@ public class BaseformTransformer {
         //Remove Data
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
             playerSonicForm.deactivateBaseForm();
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            playerSonicForm.getFormProperties()
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
 

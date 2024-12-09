@@ -79,10 +79,10 @@ public class Mirage {
                         });
             },7);
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }

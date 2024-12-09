@@ -29,10 +29,10 @@ public class DangerSenseToggle {
 
                     //Modify Tags
                     baseformProperties.dangerSenseActive = !baseformProperties.dangerSenseActive;
-                    PacketHandler.sendToPlayer(player,
+                    PacketHandler.sendToALLPlayers(
                             new SyncPlayerFormS2C(
-                                    playerSonicForm.getCurrentForm(),
-                                    baseformProperties
+                                    player.getId(),
+                                    playerSonicForm
                             ));
                 });
             }

@@ -78,10 +78,10 @@ public class PowerBoostDeactivate {
             //Decay Sound
             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.DEPOWER_BOOST.get(), SoundSource.MASTER, 0.75f, 0.75f);
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }

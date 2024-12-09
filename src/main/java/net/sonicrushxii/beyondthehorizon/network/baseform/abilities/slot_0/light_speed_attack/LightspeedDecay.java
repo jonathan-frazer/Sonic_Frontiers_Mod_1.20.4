@@ -90,10 +90,10 @@ public class LightspeedDecay {
             //Decay Sound
             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.MASTER, 1.0f, 1.0f);
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }

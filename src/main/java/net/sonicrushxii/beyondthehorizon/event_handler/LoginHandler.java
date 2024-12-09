@@ -51,18 +51,13 @@ public class LoginHandler {
 
                 //Revert Cyloop
                 baseformProperties.cylooping = false;
-
-                PacketHandler.sendToPlayer(player,
-                        new SyncPlayerFormS2C(
-                                playerSonicForm.getCurrentForm(),
-                                baseformProperties
-                        ));
             }
 
-            PacketHandler.sendToPlayer(player, new SyncPlayerFormS2C(
-                    playerSonicForm.getCurrentForm(),
-                    playerSonicForm.getFormProperties()
-            ));
+            PacketHandler.sendToALLPlayers(
+                    new SyncPlayerFormS2C(
+                            player.getId(),
+                            playerSonicForm
+                    ));
         });
     }
 }

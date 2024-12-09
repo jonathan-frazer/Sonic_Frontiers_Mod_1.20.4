@@ -98,10 +98,10 @@ public class PowerBoostActivate {
             //Sound
             world.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.POWER_BOOST.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }

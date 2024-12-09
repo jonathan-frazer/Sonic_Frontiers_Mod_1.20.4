@@ -42,10 +42,10 @@ public class Dodge {
             Scheduler.scheduleTask(()->{
                 baseformProperties.dodgeInvul = false;
                 player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
-                PacketHandler.sendToPlayer(player,
+                PacketHandler.sendToALLPlayers(
                         new SyncPlayerFormS2C(
-                                playerSonicForm.getCurrentForm(),
-                                baseformProperties
+                                player.getId(),
+                                playerSonicForm
                         ));
             },5);
 
@@ -57,10 +57,10 @@ public class Dodge {
             player.setDeltaMovement(directionVector.scale(2.0));
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }

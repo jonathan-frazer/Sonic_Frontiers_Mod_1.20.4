@@ -89,10 +89,10 @@ public class LightspeedEffect {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
             baseformProperties.lightSpeedState = (byte)2;
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }

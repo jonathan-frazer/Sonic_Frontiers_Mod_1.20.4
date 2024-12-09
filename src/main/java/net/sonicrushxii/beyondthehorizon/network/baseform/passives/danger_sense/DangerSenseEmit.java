@@ -35,10 +35,10 @@ public class DangerSenseEmit {
                     )
             );
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }
@@ -82,10 +82,10 @@ public class DangerSenseEmit {
 
                             //Change the tag
                             baseformProperties.dangerSensePlaying = true;
-                            PacketHandler.sendToPlayer(player,
+                            PacketHandler.sendToALLPlayers(
                                     new SyncPlayerFormS2C(
-                                            playerSonicForm.getCurrentForm(),
-                                            baseformProperties
+                                            player.getId(),
+                                            playerSonicForm
                                     ));
 
                             //Schedule Sound Stopping

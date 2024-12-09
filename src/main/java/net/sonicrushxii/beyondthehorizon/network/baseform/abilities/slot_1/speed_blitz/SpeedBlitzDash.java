@@ -43,10 +43,10 @@ public class SpeedBlitzDash {
                             //Remove Gravity
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
 
-                            PacketHandler.sendToPlayer(player,
+                            PacketHandler.sendToALLPlayers(
                                     new SyncPlayerFormS2C(
-                                            playerSonicForm.getCurrentForm(),
-                                            baseformProperties
+                                            player.getId(),
+                                            playerSonicForm
                                     ));
                         });
                     }

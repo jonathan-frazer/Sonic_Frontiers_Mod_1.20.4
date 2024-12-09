@@ -56,10 +56,10 @@ public class LaunchSpindash {
                             //Schedule Reversion from Spindash
                             Scheduler.scheduleTask(()-> performRevertSpindash(player,baseformProperties),Math.max(50,Math.min(baseformProperties.spinDashChargeTime, 100)));
 
-                            PacketHandler.sendToPlayer(player,
+                            PacketHandler.sendToALLPlayers(
                                     new SyncPlayerFormS2C(
-                                            playerSonicForm.getCurrentForm(),
-                                            baseformProperties
+                                            player.getId(),
+                                            playerSonicForm
                                     ));
                         });
                     }
