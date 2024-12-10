@@ -1,11 +1,13 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -17,6 +19,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -658,6 +661,21 @@ public class BaseformServer {
                             //Remove Gravity
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                            Vec3 currPos = new Vec3(player.getX(),player.getY(),player.getZ()).add(Utilities.calculateViewVector(0,baseformProperties.atkRotPhase).scale(-4.0));
+                            Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+                            for(LivingEntity enemy : level.getEntitiesOfClass(LivingEntity.class,new AABB(
+                                    currPos.x+4.0, currPos.y+2.0, currPos.z+4.0,
+                                    currPos.x-4.0, currPos.y-2.0, currPos.z-4.0
+                            ),(enemy)->!enemy.is(player)))
+                            {
+                                Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
+                                float[] yawPitch = Utilities.getYawPitchFromVec(enemyPos.subtract(playerPos));
+                                player.teleportTo(player.serverLevel(), player.getX(), player.getY(), player.getZ(),
+                                        EnumSet.of(RelativeMovement.X,RelativeMovement.Y,RelativeMovement.Z), yawPitch[0], yawPitch[1]);
+                                player.connection.send(new ClientboundTeleportEntityPacket(player));
+                                break;
+                            }
                         }
                         if (baseformProperties.speedBlitzDashTimer > 15)
                             baseformProperties.speedBlitzDashTimer = 0;

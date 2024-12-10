@@ -32,6 +32,7 @@ public class SpeedBlitzDash {
 
                             //Speed Dash Timer
                             baseformProperties.speedBlitzDashTimer = 1;
+                            baseformProperties.atkRotPhase = player.getYRot();
 
                             //Sound
                             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.BLITZ.get(), SoundSource.MASTER, 0.1f, 1.0f);

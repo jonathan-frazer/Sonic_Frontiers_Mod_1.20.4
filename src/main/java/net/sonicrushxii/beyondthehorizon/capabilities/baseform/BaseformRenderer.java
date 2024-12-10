@@ -30,7 +30,7 @@ public class BaseformRenderer
         PoseStack poseStack = event.getPoseStack();
 
         //Peelout
-        if(baseformProperties.boostLvl >=2 && player.isSprinting())
+        if(baseformProperties.boostLvl == 2 && player.isSprinting() && player.onGround())
         {
             poseStack.pushPose();
 
