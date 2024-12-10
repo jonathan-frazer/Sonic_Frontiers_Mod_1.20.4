@@ -30,10 +30,10 @@ public class EndCrossSlash
             //Cooldown
             baseformProperties.setCooldown(BaseformActiveAbility.CROSS_SLASH, (byte) 5);
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }

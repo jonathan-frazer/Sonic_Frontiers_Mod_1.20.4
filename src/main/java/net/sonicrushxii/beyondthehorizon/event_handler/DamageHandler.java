@@ -28,10 +28,10 @@ public class DamageHandler {
                 }
 
                 //Sync Player Properties
-                PacketHandler.sendToPlayer(player,
+                PacketHandler.sendToALLPlayers(
                         new SyncPlayerFormS2C(
-                                playerSonicForm.getCurrentForm(),
-                                playerSonicForm.getFormProperties()
+                                player.getId(),
+                                playerSonicForm
                         ));
             });
         }
@@ -50,10 +50,10 @@ public class DamageHandler {
                     }
 
                     //Sync Player Properties
-                    PacketHandler.sendToPlayer(player,
+                    PacketHandler.sendToALLPlayers(
                             new SyncPlayerFormS2C(
-                                    playerSonicForm.getCurrentForm(),
-                                    playerSonicForm.getFormProperties()
+                                    player.getId(),
+                                    playerSonicForm
                             ));
                 });
             }

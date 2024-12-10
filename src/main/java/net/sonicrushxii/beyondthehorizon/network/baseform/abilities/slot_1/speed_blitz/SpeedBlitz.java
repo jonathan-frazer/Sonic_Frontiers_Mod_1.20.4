@@ -80,10 +80,10 @@ public class SpeedBlitz {
             //Add Data
             baseformProperties.speedBlitz = !baseformProperties.speedBlitz;
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }
@@ -117,10 +117,10 @@ public class SpeedBlitz {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
             baseformProperties.speedBlitzDashes -= 1;
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
 
@@ -163,10 +163,10 @@ public class SpeedBlitz {
                             else if(baseformProperties.speedBlitzDashes > 0)
                                 performSpeedDash(player,enemyPos);
 
-                            PacketHandler.sendToPlayer(player,
+                            PacketHandler.sendToALLPlayers(
                                     new SyncPlayerFormS2C(
-                                            playerSonicForm.getCurrentForm(),
-                                            baseformProperties
+                                            player.getId(),
+                                            playerSonicForm
                                     ));
                         });
                     }

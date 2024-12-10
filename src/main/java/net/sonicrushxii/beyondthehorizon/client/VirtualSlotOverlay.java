@@ -11,6 +11,7 @@ import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 
@@ -146,13 +147,16 @@ public class VirtualSlotOverlay {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
 
-        switch(ClientFormData.getPlayerForm())
-        {
-            case BASEFORM -> renderBaseFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
-            case SUPERFORM -> renderSuperFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
-            case STARFALLFORM -> renderStarfallFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
-            case HYPERFORM -> renderHyperFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
-        }
+        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+            switch(playerSonicForm.getCurrentForm())
+            {
+                case BASEFORM -> renderBaseFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
+                case SUPERFORM -> renderSuperFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
+                case STARFALLFORM -> renderStarfallFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
+                case HYPERFORM -> renderHyperFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
+            }
+        });
+
     });
 
     public static void renderBaseFormSlots(LocalPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
@@ -161,147 +165,151 @@ public class VirtualSlotOverlay {
         int x = textureDimensions[0]; //screenWidth  - (int)(textureDimensions[0]*1.5);
         int y = 0;
 
-        BaseformProperties baseformProperties = (BaseformProperties) ClientFormData.getPlayerFormDetails();
-        byte[] cooldownArray = baseformProperties.getAllCooldowns();
+        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-        String slotName;
-        List<Ability> iconTextures;
-        List<InputConstants.Key> keyBindings = Arrays.asList(
-                KeyBindings.INSTANCE.useAbility1.getKey(),
-                KeyBindings.INSTANCE.useAbility2.getKey(),
-                KeyBindings.INSTANCE.useAbility3.getKey(),
-                KeyBindings.INSTANCE.useAbility4.getKey(),
-                KeyBindings.INSTANCE.useAbility5.getKey(),
-                KeyBindings.INSTANCE.useAbility6.getKey()
-        );
+            byte[] cooldownArray = baseformProperties.getAllCooldowns();
 
-        //Creates a List of all the Ability
-        switch(VirtualSlotHandler.getCurrAbility())
-        {
-            case 0 :
-                slotName = "Boost";
-                iconTextures = (Arrays.asList(
-                        new Ability(BOOST_SLOT,"Lv. "+baseformProperties.boostLvl,cooldownArray[BaseformActiveAbility.BOOST.ordinal()],null,null),
-                        new Ability((baseformProperties.lightSpeedState==2)?LIGHT_SPEED_ATTACK_ACTIVE:LIGHT_SPEED_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.LIGHT_SPEED_ATTACK.ordinal()],null,null),
-                        new Ability((baseformProperties.powerBoost)?POWER_BOOST_ACTIVE:POWER_BOOST_SLOT,null,cooldownArray[BaseformActiveAbility.POWER_BOOST.ordinal()],null,null),
-                        new Ability(CYLOOP_SLOT,null,cooldownArray[BaseformActiveAbility.CYLOOP.ordinal()],baseformProperties.qkCyloopMeter,0xFF00DDDD))
-                );
-                keyBindings.set(3,KeyBindings.INSTANCE.useSingleAbility.getKey());
-                break;
+            String slotName;
+            List<Ability> iconTextures;
+            List<InputConstants.Key> keyBindings = Arrays.asList(
+                    KeyBindings.INSTANCE.useAbility1.getKey(),
+                    KeyBindings.INSTANCE.useAbility2.getKey(),
+                    KeyBindings.INSTANCE.useAbility3.getKey(),
+                    KeyBindings.INSTANCE.useAbility4.getKey(),
+                    KeyBindings.INSTANCE.useAbility5.getKey(),
+                    KeyBindings.INSTANCE.useAbility6.getKey()
+            );
 
-            case 1 :
-                slotName = "Combo";
-                iconTextures = (Arrays.asList(
-                        new Ability(HOMING_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_ATTACK.ordinal()],null,null),
-                        new Ability(HUMMING_TOP_SLOT,null,cooldownArray[BaseformActiveAbility.HUMMING_TOP.ordinal()],null,null),
-                        new Ability((baseformProperties.speedBlitz)?SPEED_BLITZ_ACTIVE:SPEED_BLITZ_SLOT,null,cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()],null,null),
-                        new Ability((baseformProperties.smashHit == 0)?SMASH_HIT_SLOT:SMASH_HIT_ACTIVE,null,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()],null,null),
-                        new Ability(STOMP_SLOT,null,cooldownArray[BaseformActiveAbility.STOMP.ordinal()],null,null)
-                ));
-                break;
-
-            case 2 :
-                slotName = "Melee";
-                iconTextures = (Arrays.asList(
-                        new Ability(TORNADO_JUMP_SLOT,null,cooldownArray[BaseformActiveAbility.TORNADO_JUMP.ordinal()],null,null),
-                        new Ability(SPINSLASH_SLOT,null,cooldownArray[BaseformActiveAbility.SPINSLASH.ordinal()],null,null),
-                        new Ability(WILDRUSH_SLOT,null,cooldownArray[BaseformActiveAbility.WILDRUSH.ordinal()],null,null),
-                        new Ability(LOOPKICK_SLOT,null,cooldownArray[BaseformActiveAbility.LOOPKICK.ordinal()],null,null)
-                ));
-                if(player.isShiftKeyDown()){
-                    iconTextures.set(0,new Ability(MIRAGE_SLOT,null,cooldownArray[BaseformActiveAbility.MIRAGE.ordinal()],null,null));
-                    iconTextures.set(1,new Ability(CYCLONE_KICK_SLOT,null,cooldownArray[BaseformActiveAbility.CYCLONE_KICK.ordinal()],null,null));
-                }
-                break;
-
-            case 3 :
-                slotName = "Ranged";
-                iconTextures = (Arrays.asList(
-                        new Ability(SONIC_BOOM_SLOT,null,cooldownArray[BaseformActiveAbility.SONIC_BOOM.ordinal()],null,null),
-                        new Ability(CROSS_SLASH_SLOT,null,cooldownArray[BaseformActiveAbility.CROSS_SLASH.ordinal()],null,null),
-                        new Ability(SONIC_WIND_SLOT,null,cooldownArray[BaseformActiveAbility.SONIC_WIND.ordinal()],null,null),
-                        new Ability(HOMING_SHOT_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_SHOT.ordinal()],null,null))
-                );
-                break;
-
-            case 4 :
-                slotName = "Counter";
-                iconTextures = (Arrays.asList(
-                        new Ability(GRAND_SLAM_SLOT,null,cooldownArray[BaseformActiveAbility.GRAND_SLAM.ordinal()],null,null))
-                );
-                keyBindings.set(0,KeyBindings.INSTANCE.useSingleAbility.getKey());
-                break;
-
-            case 5 :
-                slotName = "Transform";
-                iconTextures = new ArrayList<Ability>();
-                break;
-
-            default:
-                slotName = "NULL";
-                iconTextures = (Arrays.asList(
-                        new Ability(EMPTY_SLOT,null,(byte)0,null,null),
-                        new Ability(EMPTY_SLOT,null,(byte)0,null,null),
-                        new Ability(EMPTY_SLOT,null,(byte)0,null,null),
-                        new Ability(EMPTY_SLOT,null,(byte)0,null,null),
-                        new Ability(EMPTY_SLOT,null,(byte)0,null,null),
-                        new Ability(EMPTY_SLOT,null,(byte)0,null,null))
-                );
-        }
-
-        //Render Slot Name
-        guiComponent.drawCenteredString(Minecraft.getInstance().font, slotName,
-                x+textureDimensions[0]/3,
-                y+textureDimensions[1]/3,
-                0xFFFFFF);
-
-        for(int i=1;i<=iconTextures.size();++i)
-        {
-            //Slot Icon
-            renderSlot(iconTextures.get(i-1),guiComponent,
-                    x,y+i*textureDimensions[1],textureDimensions);
-
-            //Keybinding for Ability
-            guiComponent.drawCenteredString(Minecraft.getInstance().font, shortenName(keyBindings.get(i-1).getDisplayName().getString()),
-                    x - textureDimensions[0]/2,
-                    y + textureDimensions[1]/2 + i*textureDimensions[1],
-                    0xFFFFFF);
-        }
-
-        //Render Ultimate Bar
-        {
-            final int imageWidth = 16;
-            final int imageHeight = 16;
-
-            final int barX = (screenWidth - ULT_BAR_WIDTH + imageWidth + shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*5 - 4) / 2; // Center horizontally
-            int noOfHealthBars = (int)Math.ceil(((int)Math.ceil(player.getAbsorptionAmount())+(int)Math.ceil(player.getMaxHealth()))/20.0);
-            final int barY = screenHeight - Math.min(2*screenHeight/5,((5+noOfHealthBars)*screenHeight/24));
-
-            int barWidth = (int) (0.01*baseformProperties.ultimateAtkMeter*ULT_BAR_WIDTH);
-            guiComponent.fill(barX+1,barY+1, barX+ULT_BAR_WIDTH+1, barY-ULT_BAR_HEIGHT,0xFF000000);
-            guiComponent.fill(barX,barY, barX+ULT_BAR_WIDTH, barY-ULT_BAR_HEIGHT,0xFF444444);
-            guiComponent.fill(barX,barY, barX+barWidth, barY-ULT_BAR_HEIGHT,(baseformProperties.ultReady)?0xFF0033DD:0xFF00DDDD);
-
-            // Draw the image (Assuming you have a method to draw the image)
-            int imageX = barX - imageWidth - 5; // Image is to the left of the bar
-            int imageY = barY - (ULT_BAR_HEIGHT + imageHeight) / 2; // Center the image vertically with the bar
-            //Draw the Actual Texture
-            guiComponent.blit(PHANTOM_RUSH_SLOT,imageX,imageY,
-                    0,0,imageWidth,imageHeight,imageWidth,imageHeight);
-
-            if(baseformProperties.ultReady)
+            //Creates a List of all the Ability
+            switch(VirtualSlotHandler.getCurrAbility())
             {
-                int keyX = imageX - shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*4 - 4;
-                int keyY = imageY + imageHeight/3;
+                case 0 :
+                    slotName = "Boost";
+                    iconTextures = (Arrays.asList(
+                            new Ability(BOOST_SLOT,"Lv. "+baseformProperties.boostLvl,cooldownArray[BaseformActiveAbility.BOOST.ordinal()],null,null),
+                            new Ability((baseformProperties.lightSpeedState==2)?LIGHT_SPEED_ATTACK_ACTIVE:LIGHT_SPEED_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.LIGHT_SPEED_ATTACK.ordinal()],null,null),
+                            new Ability((baseformProperties.powerBoost)?POWER_BOOST_ACTIVE:POWER_BOOST_SLOT,null,cooldownArray[BaseformActiveAbility.POWER_BOOST.ordinal()],null,null),
+                            new Ability(CYLOOP_SLOT,null,cooldownArray[BaseformActiveAbility.CYLOOP.ordinal()],baseformProperties.qkCyloopMeter,0xFF00DDDD))
+                    );
+                    keyBindings.set(3,KeyBindings.INSTANCE.useSingleAbility.getKey());
+                    break;
+
+                case 1 :
+                    slotName = "Combo";
+                    iconTextures = (Arrays.asList(
+                            new Ability(HOMING_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_ATTACK.ordinal()],null,null),
+                            new Ability(HUMMING_TOP_SLOT,null,cooldownArray[BaseformActiveAbility.HUMMING_TOP.ordinal()],null,null),
+                            new Ability((baseformProperties.speedBlitz)?SPEED_BLITZ_ACTIVE:SPEED_BLITZ_SLOT,null,cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()],null,null),
+                            new Ability((baseformProperties.smashHit == 0)?SMASH_HIT_SLOT:SMASH_HIT_ACTIVE,null,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()],null,null),
+                            new Ability(STOMP_SLOT,null,cooldownArray[BaseformActiveAbility.STOMP.ordinal()],null,null)
+                    ));
+                    break;
+
+                case 2 :
+                    slotName = "Melee";
+                    iconTextures = (Arrays.asList(
+                            new Ability(TORNADO_JUMP_SLOT,null,cooldownArray[BaseformActiveAbility.TORNADO_JUMP.ordinal()],null,null),
+                            new Ability(SPINSLASH_SLOT,null,cooldownArray[BaseformActiveAbility.SPINSLASH.ordinal()],null,null),
+                            new Ability(WILDRUSH_SLOT,null,cooldownArray[BaseformActiveAbility.WILDRUSH.ordinal()],null,null),
+                            new Ability(LOOPKICK_SLOT,null,cooldownArray[BaseformActiveAbility.LOOPKICK.ordinal()],null,null)
+                    ));
+                    if(player.isShiftKeyDown()){
+                        iconTextures.set(0,new Ability(MIRAGE_SLOT,null,cooldownArray[BaseformActiveAbility.MIRAGE.ordinal()],null,null));
+                        iconTextures.set(1,new Ability(CYCLONE_KICK_SLOT,null,cooldownArray[BaseformActiveAbility.CYCLONE_KICK.ordinal()],null,null));
+                    }
+                    break;
+
+                case 3 :
+                    slotName = "Ranged";
+                    iconTextures = (Arrays.asList(
+                            new Ability(SONIC_BOOM_SLOT,null,cooldownArray[BaseformActiveAbility.SONIC_BOOM.ordinal()],null,null),
+                            new Ability(CROSS_SLASH_SLOT,null,cooldownArray[BaseformActiveAbility.CROSS_SLASH.ordinal()],null,null),
+                            new Ability(SONIC_WIND_SLOT,null,cooldownArray[BaseformActiveAbility.SONIC_WIND.ordinal()],null,null),
+                            new Ability(HOMING_SHOT_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_SHOT.ordinal()],null,null))
+                    );
+                    break;
+
+                case 4 :
+                    slotName = "Counter";
+                    iconTextures = (Arrays.asList(
+                            new Ability(GRAND_SLAM_SLOT,null,cooldownArray[BaseformActiveAbility.GRAND_SLAM.ordinal()],null,null))
+                    );
+                    keyBindings.set(0,KeyBindings.INSTANCE.useSingleAbility.getKey());
+                    break;
+
+                case 5 :
+                    slotName = "Transform";
+                    iconTextures = new ArrayList<Ability>();
+                    break;
+
+                default:
+                    slotName = "NULL";
+                    iconTextures = (Arrays.asList(
+                            new Ability(EMPTY_SLOT,null,(byte)0,null,null),
+                            new Ability(EMPTY_SLOT,null,(byte)0,null,null),
+                            new Ability(EMPTY_SLOT,null,(byte)0,null,null),
+                            new Ability(EMPTY_SLOT,null,(byte)0,null,null),
+                            new Ability(EMPTY_SLOT,null,(byte)0,null,null),
+                            new Ability(EMPTY_SLOT,null,(byte)0,null,null))
+                    );
+            }
+
+            //Render Slot Name
+            guiComponent.drawCenteredString(Minecraft.getInstance().font, slotName,
+                    x+textureDimensions[0]/3,
+                    y+textureDimensions[1]/3,
+                    0xFFFFFF);
+
+            for(int i=1;i<=iconTextures.size();++i)
+            {
+                //Slot Icon
+                renderSlot(iconTextures.get(i-1),guiComponent,
+                        x,y+i*textureDimensions[1],textureDimensions);
 
                 //Keybinding for Ability
-                guiComponent.drawCenteredString(Minecraft.getInstance().font,
-                        shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()),
-                        keyX,
-                        keyY,
+                guiComponent.drawCenteredString(Minecraft.getInstance().font, shortenName(keyBindings.get(i-1).getDisplayName().getString()),
+                        x - textureDimensions[0]/2,
+                        y + textureDimensions[1]/2 + i*textureDimensions[1],
                         0xFFFFFF);
             }
-        }
+
+            //Render Ultimate Bar
+            {
+                final int imageWidth = 16;
+                final int imageHeight = 16;
+
+                final int barX = (screenWidth - ULT_BAR_WIDTH + imageWidth + shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*5 - 4) / 2; // Center horizontally
+                int noOfHealthBars = (int)Math.ceil(((int)Math.ceil(player.getAbsorptionAmount())+(int)Math.ceil(player.getMaxHealth()))/20.0);
+                final int barY = screenHeight - Math.min(2*screenHeight/5,((5+noOfHealthBars)*screenHeight/24));
+
+                int barWidth = (int) (0.01*baseformProperties.ultimateAtkMeter*ULT_BAR_WIDTH);
+                guiComponent.fill(barX+1,barY+1, barX+ULT_BAR_WIDTH+1, barY-ULT_BAR_HEIGHT,0xFF000000);
+                guiComponent.fill(barX,barY, barX+ULT_BAR_WIDTH, barY-ULT_BAR_HEIGHT,0xFF444444);
+                guiComponent.fill(barX,barY, barX+barWidth, barY-ULT_BAR_HEIGHT,(baseformProperties.ultReady)?0xFF0033DD:0xFF00DDDD);
+
+                // Draw the image (Assuming you have a method to draw the image)
+                int imageX = barX - imageWidth - 5; // Image is to the left of the bar
+                int imageY = barY - (ULT_BAR_HEIGHT + imageHeight) / 2; // Center the image vertically with the bar
+                //Draw the Actual Texture
+                guiComponent.blit(PHANTOM_RUSH_SLOT,imageX,imageY,
+                        0,0,imageWidth,imageHeight,imageWidth,imageHeight);
+
+                if(baseformProperties.ultReady)
+                {
+                    int keyX = imageX - shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*4 - 4;
+                    int keyY = imageY + imageHeight/3;
+
+                    //Keybinding for Ability
+                    guiComponent.drawCenteredString(Minecraft.getInstance().font,
+                            shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()),
+                            keyX,
+                            keyY,
+                            0xFFFFFF);
+                }
+            }
+        });
+
     }
     public static void renderSuperFormSlots(LocalPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {

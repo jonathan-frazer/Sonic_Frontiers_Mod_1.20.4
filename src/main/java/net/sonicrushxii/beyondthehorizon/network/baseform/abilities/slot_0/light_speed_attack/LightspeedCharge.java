@@ -33,10 +33,10 @@ public class LightspeedCharge {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
             baseformProperties.lightSpeedState = (byte)1;
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
 

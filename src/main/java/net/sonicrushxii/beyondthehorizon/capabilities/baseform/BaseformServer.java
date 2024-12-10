@@ -1,7 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -2116,18 +2115,16 @@ public class BaseformServer {
                             LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.ultTarget);
                             if(enemy != null)  enemy.setInvulnerable(false);
                         }
-                        System.err.println(e.getMessage());
-                        e.printStackTrace();
                         baseformProperties.ultimateUse = 0;
                         player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                     }
                 }
             }
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
 
@@ -2204,10 +2201,10 @@ public class BaseformServer {
             }
 
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }

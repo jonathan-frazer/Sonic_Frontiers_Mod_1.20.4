@@ -28,10 +28,10 @@ public class SpeedBlitzOff {
 
                             baseformProperties.speedBlitz = false;
 
-                            PacketHandler.sendToPlayer(player,
+                            PacketHandler.sendToALLPlayers(
                                     new SyncPlayerFormS2C(
-                                            playerSonicForm.getCurrentForm(),
-                                            baseformProperties
+                                            player.getId(),
+                                            playerSonicForm
                                     ));
                         });
                     }

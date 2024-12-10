@@ -12,7 +12,6 @@ import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformRenderer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
-import net.sonicrushxii.beyondthehorizon.client.ClientFormData;
 
 @Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
 public class RenderHandler {
@@ -36,22 +35,25 @@ public class RenderHandler {
                 });
             } catch (NullPointerException | NoSuchMethodError | ClassCastException ignored) {}
 
+            /*
             try {
                 LivingEntity entity = event.getEntity();
                 LocalPlayer player = Minecraft.getInstance().player;
 
                 if (player != null && entity.is(player))
-                    switch(ClientFormData.getPlayerForm())
-                    {
-                        case BASEFORM -> BaseformRenderer.onRenderPlayerModelPre(event, player, (BaseformProperties)ClientFormData.getPlayerFormDetails());
-                                /*
-                                case SUPERFORM
-                                case STARFALLFORM
-                                case HYPERFORM
-                                 */
-                    }
+                    player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                        switch(playerSonicForm.getCurrentForm())
+                        {
+                            case BASEFORM -> BaseformRenderer.onRenderPlayerModelPre(event, player, (BaseformProperties)playerSonicForm.getFormProperties());
+                                //case SUPERFORM
+                                //case STARFALLFORM
+                                //case HYPERFORM
+
+                        }
+                    });
 
             } catch (NullPointerException | NoSuchMethodError | ClassCastException ignored) {}
+            */
         }
 
         //Manage Render to Everyone
@@ -61,14 +63,18 @@ public class RenderHandler {
 
         //Manage Render to Self
         {
-            switch(ClientFormData.getPlayerForm())
-            {
-                case BASEFORM:      BaseformRenderer.onRenderToSelfPre(event, event.getEntity(), (BaseformProperties) ClientFormData.getPlayerFormDetails());
-                case SUPERFORM:
-                case STARFALLFORM:
-                case HYPERFORM:
-                case PLAYER:
-            }
+            LocalPlayer player = Minecraft.getInstance().player;
+            player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                switch(playerSonicForm.getCurrentForm())
+                {
+                    case BASEFORM:      BaseformRenderer.onRenderToSelfPre(event, event.getEntity(), (BaseformProperties) playerSonicForm.getFormProperties());
+                    case SUPERFORM:
+                    case STARFALLFORM:
+                    case HYPERFORM:
+                    case PLAYER:
+                }
+            });
+
         }
 
 
@@ -94,6 +100,7 @@ public class RenderHandler {
                 });
             } catch (NullPointerException | NoSuchMethodError | ClassCastException ignored) {}
 
+            /*
             try {
                 LivingEntity entity = event.getEntity();
                 LocalPlayer player = Minecraft.getInstance().player;
@@ -102,14 +109,13 @@ public class RenderHandler {
                     switch(ClientFormData.getPlayerForm())
                     {
                         case BASEFORM -> BaseformRenderer.onRenderPlayerModelPost(event, player, (BaseformProperties)ClientFormData.getPlayerFormDetails());
-                                /*
-                                case SUPERFORM
-                                case STARFALLFORM
-                                case HYPERFORM
-                                 */
+                                //case SUPERFORM
+                                //case STARFALLFORM
+                                //case HYPERFORM
+
                     }
 
-            } catch (NullPointerException | NoSuchMethodError | ClassCastException ignored) {}
+            } catch (NullPointerException | NoSuchMethodError | ClassCastException ignored) {}*/
         }
 
         //Manage Render to Everyone
@@ -119,14 +125,17 @@ public class RenderHandler {
 
         //Manage Render to Self
         {
-            switch(ClientFormData.getPlayerForm())
-            {
-                case BASEFORM: BaseformRenderer.onRenderToSelfPost(event, event.getEntity(), (BaseformProperties) ClientFormData.getPlayerFormDetails());
-                case SUPERFORM:
-                case STARFALLFORM:
-                case HYPERFORM:
-                case PLAYER:
-            }
+            LocalPlayer player = Minecraft.getInstance().player;
+            player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                switch(playerSonicForm.getCurrentForm())
+                {
+                    case BASEFORM: BaseformRenderer.onRenderToSelfPost(event, event.getEntity(), (BaseformProperties) playerSonicForm.getFormProperties());
+                    case SUPERFORM:
+                    case STARFALLFORM:
+                    case HYPERFORM:
+                    case PLAYER:
+                }
+            });
         }
     }
 }

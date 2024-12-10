@@ -37,10 +37,10 @@ public class DoubleJump {
 
                             //Modify Tags
                             baseformProperties.hasDoubleJump = false;
-                            PacketHandler.sendToPlayer(player,
+                            PacketHandler.sendToALLPlayers(
                                     new SyncPlayerFormS2C(
-                                            playerSonicForm.getCurrentForm(),
-                                            baseformProperties
+                                            player.getId(),
+                                            playerSonicForm
                                     ));
 
                             //Thrust

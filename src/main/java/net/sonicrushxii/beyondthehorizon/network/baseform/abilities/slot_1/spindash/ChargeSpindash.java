@@ -42,10 +42,10 @@ public class ChargeSpindash {
                             Level world = player.level();
                             world.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SPINDASH_CHARGE.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
-                            PacketHandler.sendToPlayer(player,
+                            PacketHandler.sendToALLPlayers(
                                     new SyncPlayerFormS2C(
-                                            playerSonicForm.getCurrentForm(),
-                                            baseformProperties
+                                            player.getId(),
+                                            playerSonicForm
                                     ));
                         });
                     }

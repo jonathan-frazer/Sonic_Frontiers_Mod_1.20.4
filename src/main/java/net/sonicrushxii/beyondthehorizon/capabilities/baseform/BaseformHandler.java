@@ -28,7 +28,6 @@ import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleDirPacketS2C;
-import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
@@ -50,11 +49,6 @@ public class BaseformHandler {
                 if (baseformProperties.mirageTimer > 1)
                     baseformProperties.mirageTimer = 141;
 
-                PacketHandler.sendToPlayer(receiver,
-                        new SyncPlayerFormS2C(
-                                playerSonicForm.getCurrentForm(),
-                                baseformProperties
-                        ));
             });
 
             boolean isFireworkDmg = "fireworks".equals(event.getSource().getMsgId());
@@ -228,13 +222,6 @@ public class BaseformHandler {
                     //Get Data From the Player
                     BaseformProperties updatedBaseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
                     updatedBaseformProperties.smashHit = 0;
-
-                    //Sync Data
-                    PacketHandler.sendToPlayer(damageGiver,
-                            new SyncPlayerFormS2C(
-                                    playerSonicForm.getCurrentForm(),
-                                    baseformProperties
-                            ));
                 });
             }//Speed Blitz
             else if(baseformProperties.speedBlitz && event.getSource().is(DamageTypes.PLAYER_ATTACK))

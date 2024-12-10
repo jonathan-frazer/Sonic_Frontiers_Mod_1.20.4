@@ -36,10 +36,10 @@ public class EndSonicBoom
             //Cooldown
             baseformProperties.setCooldown(BaseformActiveAbility.SONIC_BOOM, (byte) 5);
 
-            PacketHandler.sendToPlayer(player,
+            PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
-                            playerSonicForm.getCurrentForm(),
-                            baseformProperties
+                            player.getId(),
+                            playerSonicForm
                     ));
         });
     }
