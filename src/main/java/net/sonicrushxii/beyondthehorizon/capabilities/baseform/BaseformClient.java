@@ -320,7 +320,7 @@ public class BaseformClient {
                         && KeyBindings.INSTANCE.useAbility4.isDown())
                 {
                     //Add Number
-                    baseformProperties.smashHit = (byte) Math.min(baseformProperties.smashHit+1,65);
+                    baseformProperties.smashHit = (byte) Math.min(baseformProperties.smashHit+ (byte)((baseformProperties.powerBoost)?2:1),65);
                     PacketHandler.sendToServer(new SetSmashHitChargeC2S(baseformProperties.smashHit));
                 }
 

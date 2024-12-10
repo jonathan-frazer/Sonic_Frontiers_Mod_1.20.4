@@ -138,4 +138,66 @@ public class ModModelRenderer {
                  InvocationTargetException ignored) {
         }
     }
+
+    public static void renderSonicPeelout(Class<? extends EntityModel> modelClass, RenderLivingEvent<?, ?> event, PoseStack poseStack, FormProperties formProperties, Consumer<ModelPart> customTransform) {
+        MultiBufferSource buffer = event.getMultiBufferSource();
+        LocalPlayer player = (LocalPlayer) event.getEntity();
+        int packedLight = event.getPackedLight();
+
+        // Render the custom model
+        try {
+            //Get Layer Location
+            Field layerField = modelClass.getDeclaredField("LAYER_LOCATION");
+            ModelLayerLocation layerLocation = (ModelLayerLocation) layerField.get(null);
+
+            //Find Model
+            EntityModelSet entityModelSet = Minecraft.getInstance().getEntityModels();
+            ModelPart modelPart = entityModelSet.bakeLayer(layerLocation);
+
+            //Perform Custom Transform
+            if (customTransform != null) customTransform.accept(modelPart);
+
+            //Texture Path
+            StringBuilder texturePath = new StringBuilder();
+
+            //Handle Baseform Rendering
+            if (formProperties instanceof BaseformProperties baseformProperties)
+            {
+                texturePath.append("baseform/");
+
+                //Find Texture based on Condition
+                if (baseformProperties.lightSpeedState == 2) texturePath.append("lightspeed_skin_peelout");
+                else if (baseformProperties.powerBoost) texturePath.append("powerboost_skin_peelout");
+                else texturePath.append("base_skin_peelout");
+            }
+
+            //Handle Superform Rendering
+
+            //Handle Starfall Rendering
+
+            //Handle HyperForm Rendering
+
+
+            VertexConsumer vertexConsumer;
+            //Handle Default Player Rendering
+            if (texturePath.isEmpty()) {
+                vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(
+                        player.getSkin().texture()
+                ));
+            }
+            //Handle Custom Rendering
+            else {
+                vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(
+                        new ResourceLocation(BeyondTheHorizon.MOD_ID, String.format("textures/custom_model/%s.png", texturePath))
+                ));
+
+            }
+
+            EntityModel model = modelClass.getConstructor(ModelPart.class).newInstance(modelPart);
+            model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(player, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
+        } catch (NullPointerException | ClassCastException | NoSuchMethodError | NoSuchFieldException |
+                 NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException ignored) {
+        }
+    }
 }

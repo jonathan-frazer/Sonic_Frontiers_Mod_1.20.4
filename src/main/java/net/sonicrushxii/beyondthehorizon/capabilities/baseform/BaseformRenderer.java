@@ -28,8 +28,31 @@ public class BaseformRenderer
     {
 
         PoseStack poseStack = event.getPoseStack();
+
+        //Peelout
+        if(baseformProperties.boostLvl >=2 && player.isSprinting())
+        {
+            poseStack.pushPose();
+
+            //Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+
+            poseStack.translate(0D,-1.5D,0D);
+
+            //Render The Custom Model
+            ModModelRenderer.renderSonicPeelout(SonicPeeloutModel.class,event,poseStack,baseformProperties,(modelPart)->{
+                modelPart.getChild("Head").xRot = (float)(player.getXRot()*Math.PI/180);
+            });
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
+
         //Ballform
-        if (baseformProperties.shouldBeInBallform())
+        else if(baseformProperties.shouldBeInBallform())
         {
             poseStack.pushPose();
 
