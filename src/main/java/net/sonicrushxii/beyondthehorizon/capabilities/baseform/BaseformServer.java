@@ -79,6 +79,7 @@ public class BaseformServer {
 
     //Melee
     public static final float TORNADO_JUMP_DMG = 1.0f;
+    public static final float DASH_DAMAGE = 1.0f;
     private static final float WILDRUSH_DAMAGE = 10.0f;
     private static final float LOOPKICK_DAMAGE = 12.0f;
     public static final float SPINSLASH_DAMAGE = 3.0f;
@@ -653,6 +654,15 @@ public class BaseformServer {
                                     player.getX()+0.00, player.getY()+1.05, player.getZ()+0.00,
                                     0.001, 0.15f, 1.05f, 0.15f, 9,
                                     true));
+
+                            for(LivingEntity enemy : level.getEntitiesOfClass(LivingEntity.class,new AABB(
+                                    player.getX()+1.5, player.getY()+2.0, player.getZ()+1.5,
+                                    player.getX()-1.5, player.getY()-1, player.getZ()-1.5
+                            ),(enemy)->!enemy.is(player)))
+                            {
+                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player),
+                                        DASH_DAMAGE);
+                            }
                         }
                         if(baseformProperties.speedBlitzDashTimer == 5)
                         {
