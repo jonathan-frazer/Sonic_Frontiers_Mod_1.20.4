@@ -1,13 +1,11 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -2108,6 +2106,13 @@ public class BaseformServer {
                                                     player.getYRot()
                                             ).scale(-0.75)
                                     );
+
+                                    //Flash Particle
+                                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                            ParticleTypes.FLASH,
+                                            player.getX(),player.getY()+player.getEyeHeight()/2,player.getZ(),
+                                            0.001,0.01F,player.getEyeHeight()/2,0.01F,
+                                            1,true));
 
                                     //Update Motion
                                     player.connection.send(new ClientboundSetEntityMotionPacket(enemy));

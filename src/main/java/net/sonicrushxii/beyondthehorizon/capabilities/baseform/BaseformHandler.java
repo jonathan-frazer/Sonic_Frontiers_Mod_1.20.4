@@ -212,7 +212,7 @@ public class BaseformHandler {
                 //Knockback
                 damageTaker.setDeltaMovement(damageGiver.getLookAngle().scale(baseformProperties.smashHit/20.0f));
                 //Damage Enemy
-                damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),damageGiver),
+                damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),damageGiver),
                         baseformProperties.smashHit*0.5f);
 
                 //Sound
@@ -248,8 +248,8 @@ public class BaseformHandler {
             {
                 baseformProperties.qkCyloopMeter = Math.min(100.0,baseformProperties.qkCyloopMeter+event.getAmount()/5.0);
                 baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter + (
-                        (event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()))?event.getAmount()/5:
-                                (event.getSource().is(ModDamageTypes.SONIC_MELEE.getResourceKey()))?event.getAmount()*3:event.getAmount());
+                        (event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()))?event.getAmount()/6:
+                                (event.getSource().is(ModDamageTypes.SONIC_MELEE.getResourceKey()))?event.getAmount()*3:event.getAmount()/1.3);
 
                 if(baseformProperties.ultimateAtkMeter > 100.0)
                 {
