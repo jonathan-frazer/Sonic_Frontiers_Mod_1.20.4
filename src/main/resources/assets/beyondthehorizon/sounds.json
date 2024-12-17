@@ -1,8 +1,38 @@
 {
-  "double_jump": {
-    "subtitles": "sounds.sonic.baseform.double_jump",
+  "air_boost": {
+    "subtitles": "sounds.sonic.baseform.air_boost",
     "sounds": [
-      "beyondthehorizon:baseform/double_jump_sfx"
+      "beyondthehorizon:baseform/air_boost_sfx"
+    ]
+  },
+  "blitz": {
+    "subtitles": "sounds.sonic.baseform.blitz",
+    "sounds": [
+      "beyondthehorizon:baseform/blitz_sfx"
+    ]
+  },
+  "cross_slash": {
+    "subtitles": "sounds.sonic.baseform.cross_slash",
+    "sounds": [
+      "beyondthehorizon:baseform/cross_slash_sfx"
+    ]
+  },
+  "cyloop_rings": {
+    "subtitles": "sounds.sonic.baseform.cyloop_rings",
+    "sounds": [
+      "beyondthehorizon:baseform/cyloop_rings_sfx"
+    ]
+  },
+  "cyloop": {
+    "subtitles": "sounds.sonic.baseform.cyloop",
+    "sounds": [
+      "beyondthehorizon:baseform/cyloop_sfx"
+    ]
+  },
+  "cyloop_success": {
+    "subtitles": "sounds.sonic.baseform.cyloop_success",
+    "sounds": [
+      "beyondthehorizon:baseform/cyloop_success_sfx"
     ]
   },
   "danger_sense": {
@@ -11,34 +41,22 @@
       "beyondthehorizon:baseform/danger_sense_sfx"
     ]
   },
-  "air_boost": {
-    "subtitles": "sounds.sonic.baseform.air_boost",
-    "sounds": [
-      "beyondthehorizon:baseform/air_boost_sfx"
-    ]
-  },
-  "max_boost": {
-    "subtitles": "sounds.sonic.baseform.max_boost",
-    "sounds": [
-      "beyondthehorizon:baseform/max_boost_sfx"
-    ]
-  },
-  "light_speed_charge": {
-    "subtitles": "sounds.sonic.baseform.light_speed_charge",
-    "sounds": [
-       "beyondthehorizon:baseform/light_speed_charge_sfx"
-    ]
-  },
-  "power_boost": {
-    "subtitles": "sounds.sonic.baseform.power_boost",
-    "sounds": [
-      "beyondthehorizon:baseform/power_boost_sfx"
-    ]
-  },
   "depower_boost": {
     "subtitles": "sounds.sonic.baseform.depower_boost",
     "sounds": [
       "beyondthehorizon:baseform/depower_boost_sfx"
+    ]
+  },
+  "double_jump": {
+    "subtitles": "sounds.sonic.baseform.double_jump",
+    "sounds": [
+      "beyondthehorizon:baseform/double_jump_sfx"
+    ]
+  },
+  "grand_slam": {
+    "subtitles": "sounds.sonic.baseform.grand_slam",
+    "sounds": [
+      "beyondthehorizon:baseform/grand_slam_sfx"
     ]
   },
   "homing_attack": {
@@ -47,22 +65,58 @@
       "beyondthehorizon:baseform/homing_attack_sfx"
     ]
   },
-  "spindash_charge": {
-    "subtitles": "sounds.sonic.baseform.spindash_charge",
+  "homing_shot": {
+    "subtitles": "sounds.sonic.baseform.homing_shot",
     "sounds": [
-      "beyondthehorizon:baseform/spindash_charge_sfx"
+      "beyondthehorizon:baseform/homing_shot_sfx"
     ]
   },
-  "spindash_release": {
-    "subtitles": "sounds.sonic.baseform.spindash_release",
+  "light_speed_charge": {
+    "subtitles": "sounds.sonic.baseform.light_speed_charge",
     "sounds": [
-      "beyondthehorizon:baseform/spindash_release_sfx"
+      "beyondthehorizon:baseform/light_speed_charge_sfx"
     ]
   },
-  "blitz": {
-    "subtitles": "sounds.sonic.baseform.blitz",
+  "light_speed_idle": {
+    "subtitles": "sounds.sonic.baseform.light_speed_idle",
     "sounds": [
-      "beyondthehorizon:baseform/blitz_sfx"
+      "beyondthehorizon:baseform/light_speed_idle_sfx"
+    ]
+  },
+  "loop_kick": {
+    "subtitles": "sounds.sonic.baseform.loop_kick",
+    "sounds": [
+      "beyondthehorizon:baseform/loop_kick_sfx"
+    ]
+  },
+  "max_boost": {
+    "subtitles": "sounds.sonic.baseform.max_boost",
+    "sounds": [
+      "beyondthehorizon:baseform/max_boost_sfx"
+    ]
+  },
+  "mirage": {
+    "subtitles": "sounds.sonic.baseform.mirage",
+    "sounds": [
+      "beyondthehorizon:baseform/mirage_sfx"
+    ]
+  },
+  "parry": {
+    "subtitles": "sounds.sonic.baseform.parry",
+    "sounds": [
+      "beyondthehorizon:baseform/parry_sfx"
+    ]
+  },
+  "power_boost_idle": {
+    "subtitles": "sounds.sonic.baseform.power_boost_idle",
+    "sounds": [
+      "beyondthehorizon:baseform/power_boost_idle_sfx"
+    ]
+  },
+  "power_boost": {
+    "subtitles": "sounds.sonic.baseform.power_boost",
+    "sounds": [
+      "beyondthehorizon:baseform/power_boost_sfx"
     ]
   },
   "smash_charge": {
@@ -77,10 +131,58 @@
       "beyondthehorizon:baseform/smash_hit_sfx"
     ]
   },
+  "sonic_boom": {
+    "subtitles": "sounds.sonic.baseform.sonic_boom",
+    "sounds": [
+      "beyondthehorizon:baseform/sonic_boom_sfx"
+    ]
+  },
+  "sonic_wind_shoot": {
+    "subtitles": "sounds.sonic.baseform.sonic_wind_shoot",
+    "sounds": [
+      "beyondthehorizon:baseform/sonic_wind_shoot_sfx"
+    ]
+  },
+  "sonic_wind_stun": {
+    "subtitles": "sounds.sonic.baseform.sonic_wind_stun",
+    "sounds": [
+      "beyondthehorizon:baseform/sonic_wind_stun_sfx"
+    ]
+  },
+  "spin_slash": {
+    "subtitles": "sounds.sonic.baseform.spin_slash",
+    "sounds": [
+      "beyondthehorizon:baseform/spin_slash_sfx"
+    ]
+  },
+  "spindash_charge": {
+    "subtitles": "sounds.sonic.baseform.spindash_charge",
+    "sounds": [
+      "beyondthehorizon:baseform/spindash_charge_sfx"
+    ]
+  },
+  "spindash_release": {
+    "subtitles": "sounds.sonic.baseform.spindash_release",
+    "sounds": [
+      "beyondthehorizon:baseform/spindash_release_sfx"
+    ]
+  },
   "stomp": {
     "subtitles": "sounds.sonic.baseform.stomp",
     "sounds": [
       "beyondthehorizon:baseform/stomp_sfx"
+    ]
+  },
+  "tornado": {
+    "subtitles": "sounds.sonic.baseform.tornado",
+    "sounds": [
+      "beyondthehorizon:baseform/tornado_sfx"
+    ]
+  },
+  "ultimate_music": {
+    "subtitles": "sounds.sonic.baseform.ultimate_music",
+    "sounds": [
+      "beyondthehorizon:baseform/ultimate_music_sfx"
     ]
   }
 }
