@@ -134,7 +134,7 @@ public class TornadoJumpCloud extends PointEntity {
 
             Vec3 motionDir = currentPos.subtract(enemyPos)
                             .normalize()
-                            .scale(Math.min(0.8,5/CyloopMath.xzDistSqr(currentPos,enemyPos)));
+                            .scale(Math.min(0.6,4/CyloopMath.xzDistSqr(currentPos,enemyPos)));
 
             if(CyloopMath.xzDistSqr(currentPos,enemyPos) < 3.0) {
                 //Damage Enemy

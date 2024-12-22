@@ -2,6 +2,7 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -14,6 +15,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
@@ -115,6 +117,9 @@ public class CycloneKick {
 
             //Remove Gravity
             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+
+            //Play Sound
+            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.DOUBLE_JUMP.get(), SoundSource.MASTER, 0.75f, 1.0f);
 
             PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(

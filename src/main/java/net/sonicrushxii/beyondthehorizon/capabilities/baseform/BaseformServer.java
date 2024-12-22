@@ -1081,6 +1081,9 @@ public class BaseformServer {
                         }
 
                         try {
+                            if(baseformProperties.spinSlash == 1)
+                                player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SPIN_SLASH.get(), SoundSource.MASTER, 0.65f, 1.0f);
+
                             if (baseformProperties.spinSlash > 0)
                             {
                                 baseformProperties.spinSlash += 1;
@@ -1262,8 +1265,11 @@ public class BaseformServer {
                                                 baseformProperties.wildRushPZ[baseformProperties.wildRushPtr]
                                         );
                                     //Update Lightning Bolt to move to next Position
-                                    if(lightningPos != null && lightningPos.distanceToSqr(playerPos) < 4)
+                                    if(lightningPos != null && lightningPos.distanceToSqr(playerPos) < 4) {
                                         baseformProperties.wildRushPtr += 1;
+                                        //Play Sound
+                                        player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 0.75f, 1.0f);
+                                    }
 
 
                                     //Find Motion Direction
@@ -1304,12 +1310,16 @@ public class BaseformServer {
                                                 getCommands().
                                                 performPrefixedCommand(commandSourceStack,command);
 
+                                        //Play Sound
+                                        player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, SoundSource.MASTER, 0.75f, 1.0f);
+
                                         //Hurt Enemy
                                         wildRushTarget.setDeltaMovement(motionDirection.scale(1.75f));
                                         wildRushTarget.hurt(
                                                 ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
                                                 WILDRUSH_DAMAGE
                                         );
+
                                         player.connection.send(new ClientboundSetEntityMotionPacket(wildRushTarget));
                                         throw new NullPointerException("Move Successful");
                                     }
@@ -1468,6 +1478,9 @@ public class BaseformServer {
                                     sonicBoomProjectile.setDestroyBlocks(player.isShiftKeyDown());
                                     sonicBoomProjectile.setOwner(player.getUUID());
 
+                                    //Play Sound
+                                    player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SONIC_BOOM.get(), SoundSource.MASTER, 0.75f, 1.0f);
+
                                     // Add the entity to the world
                                     level.addFreshEntity(sonicBoomProjectile);
                                 }
@@ -1513,6 +1526,9 @@ public class BaseformServer {
                                     crossSlashProjectile.setMovementDirection(player.getLookAngle());
                                     crossSlashProjectile.setDestroyBlocks(player.isShiftKeyDown());
                                     crossSlashProjectile.setOwner(player.getUUID());
+
+                                    //Play Sound
+                                    level.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.CROSS_SLASH.get(), SoundSource.MASTER, 0.75f, 1.0f);
 
                                     // Add the entity to the world
                                     level.addFreshEntity(crossSlashProjectile);
@@ -1561,6 +1577,9 @@ public class BaseformServer {
                                 sonicWind.setMovementDirection(player.getLookAngle());
                                 sonicWind.setDestroyBlocks(player.isShiftKeyDown());
                                 sonicWind.setOwner(player.getUUID());
+
+                                //Play Sound
+                                level.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SONIC_WIND_SHOOT.get(), SoundSource.MASTER, 0.75f, 1.0f);
 
                                 // Add the entity to the world
                                 level.addFreshEntity(sonicWind);
@@ -1619,8 +1638,7 @@ public class BaseformServer {
                                 ));
 
                                 //Sound
-                                level.playSound(null,player.getX(),player.getY(),player.getZ(),
-                                        SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.MASTER, 1.0f, 1.0f);
+                                level.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SONIC_WIND_STUN.get(), SoundSource.MASTER, 0.75f, 1.0f);
 
                                 //Blast
                                 for(LivingEntity enemy : serverLevel.getEntitiesOfClass(LivingEntity.class,

@@ -126,7 +126,7 @@ public class BaseformHandler {
                         damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
                     }
 
-                    if (baseformProperties.hitCount == 3)
+                    if (baseformProperties.hitCount == 2)
                     {
                         Level world = damageGiver.level();
                         world.playSound(null, damageGiver.getX(), damageGiver.getY(), damageGiver.getZ(), SoundEvents.SPLASH_POTION_BREAK, SoundSource.MASTER, 1.0f, 1.0f);
@@ -138,7 +138,7 @@ public class BaseformHandler {
                                 true)
                             );
                     }
-                    if (baseformProperties.hitCount == 4)
+                    if (baseformProperties.hitCount == 3)
                     {
                         if (damageGiver.isShiftKeyDown()||damageGiver.getXRot() < 0) {
                             damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 10, false, false));

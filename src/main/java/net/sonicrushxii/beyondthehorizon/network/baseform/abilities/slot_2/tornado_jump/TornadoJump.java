@@ -3,6 +3,7 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.torn
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
@@ -10,6 +11,7 @@ import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
@@ -49,7 +51,7 @@ public class TornadoJump {
                         playerPos.add
                                 (Utilities.calculateViewVector(0,-baseformProperties.atkRotPhase+180).scale(1.4)),
                         (aoeCloud) -> {
-                            aoeCloud.setDuration(100);
+                            aoeCloud.setDuration(195);
                             aoeCloud.setOwner(player.getUUID());
                         });
             },5);
@@ -57,6 +59,8 @@ public class TornadoJump {
             //Remove Gravity
             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
 
+            //Play Sound
+            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.TORNADO.get(), SoundSource.MASTER, 0.75f, 1.0f);
 
             PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(

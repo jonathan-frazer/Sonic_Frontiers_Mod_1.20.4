@@ -3,6 +3,7 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.torn
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,6 +16,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
@@ -78,6 +80,9 @@ public class Mirage {
                             mirageCloud.setDuration(140);
                         });
             },7);
+
+            //Play Sound
+            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.MIRAGE.get(), SoundSource.MASTER, 0.75f, 1.0f);
 
             PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(

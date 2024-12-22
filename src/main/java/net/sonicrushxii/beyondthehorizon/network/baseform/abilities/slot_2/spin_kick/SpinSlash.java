@@ -3,6 +3,8 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -93,6 +95,10 @@ public class SpinSlash {
             //Reset Momentum
             player.setDeltaMovement(0,0,0);
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+            //Play Sound
+            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.MASTER, 2.0f, 2.0f);
+
 
             //Remove Gravity
             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);

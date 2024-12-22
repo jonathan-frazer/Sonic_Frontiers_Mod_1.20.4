@@ -2,10 +2,12 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.gran
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -39,6 +41,9 @@ public class GrandSlam
                                 baseformProperties.counterReady = false;
 
                                 //baseformProperties.counteredEntity = new UUID(0L,0L); We still wanna store the counteredEntity
+
+                                //Play Sound
+                                player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.GRAND_SLAM.get(), SoundSource.MASTER, 0.85f, 1.0f);
 
                                 //Remove Attributes
                                 if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED))

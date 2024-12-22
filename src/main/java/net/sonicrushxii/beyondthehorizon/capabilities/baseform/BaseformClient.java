@@ -7,10 +7,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
@@ -19,6 +21,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProp
 import net.sonicrushxii.beyondthehorizon.client.DoubleTapDirection;
 import net.sonicrushxii.beyondthehorizon.client.HelpScreen;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
@@ -64,6 +67,7 @@ import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class BaseformClient {
@@ -176,7 +180,12 @@ public class BaseformClient {
 
                         ClientOnlyData.lightSpeedCanceller = Scheduler.scheduleTask(() -> {
                             PacketHandler.sendToServer(new LightspeedEffect());
+                            level.playLocalSound(player.getX(),player.getY(),player.getZ(),
+                                    Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(ModSounds.LIGHT_SPEED_IDLE.get().getLocation())),
+                                    SoundSource.MASTER, 0.75f, 1.0f, true);
+
                             Scheduler.scheduleTask(()->{
+                                minecraft.getSoundManager().stop(ModSounds.LIGHT_SPEED_IDLE.get().getLocation(), SoundSource.MASTER);
                                 PacketHandler.sendToServer(new LightspeedDecay());
                             },300);
                         }, 66);

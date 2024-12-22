@@ -5,6 +5,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -152,6 +154,10 @@ public class CycloneKickCloud extends PointEntity {
                         ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(),this.getOwner()),
                         BaseformServer.CYCLONE_KICK_DAMAGE
                 );
+                //Play Sound
+                if(!this.level().isClientSide)
+                    this.level().playSound(null,enemy.getX(),enemy.getY(),enemy.getZ(), SoundEvents.PLAYER_ATTACK_STRONG, SoundSource.MASTER, 0.75f, 1.0f);
+
             }
 
             enemy.setDeltaMovement(new Vec3(motionDir.x(),0,motionDir.z()));
