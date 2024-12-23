@@ -13,9 +13,11 @@ import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.PlayerPlaySoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import org.joml.Vector3f;
 
@@ -87,6 +89,11 @@ public class QuickCyloop {
 
             //Target Enemy
             baseformProperties.qkCyloopTarget = enemy.getUUID();
+
+            //PlaySound in Minecraft
+            PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(
+                    ModSounds.CYLOOP.get().getLocation())
+            );
 
             //Get Right in Front of the enemy
             Vec3 lookAngle = Utilities.calculateViewVector(0f, player.getYRot());

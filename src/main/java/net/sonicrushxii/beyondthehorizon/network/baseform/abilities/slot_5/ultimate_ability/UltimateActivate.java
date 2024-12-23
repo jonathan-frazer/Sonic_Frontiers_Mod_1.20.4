@@ -3,9 +3,11 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ulti
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
@@ -13,11 +15,13 @@ import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -96,8 +100,28 @@ public class UltimateActivate
                                 player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
                                 player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 
+                                //Deactivate PowerBoost
+                                {
+                                    //Dequip Head
+                                    if(baseformProperties.lightSpeedState != (byte)2)
+                                    {
+                                        Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
+                                        armorItems.next(); armorItems.next(); armorItems.next();
+                                        try{
+                                            if(armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 2){
+                                                EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
+                                                player.setItemSlot(EquipmentSlot.HEAD, BaseformProperties.baseformSonicHead);
+                                            }
+                                        }
+                                        catch(NullPointerException ignored){}
+                                    }
+
+                                    //Power Boost
+                                    baseformProperties.powerBoost = false;
+                                }
+
                                 //Play Sound
-                                player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
+                                player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.ULTIMATE_MUSIC.get(), SoundSource.MASTER, 1.0f, 1.0f);
                             }
 
                             PacketHandler.sendToALLPlayers(

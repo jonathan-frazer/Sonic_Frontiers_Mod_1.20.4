@@ -27,6 +27,7 @@ public class CyloopParticleS2C {
     public void encode(FriendlyByteBuf buffer){
         buffer.writeVec3(this.position);
     }
+
     public void handle(CustomPayloadEvent.Context ctx){
         ctx.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
                             LocalPlayer player = Minecraft.getInstance().player;

@@ -7,7 +7,9 @@ import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 public class EndSonicBoom
@@ -35,6 +37,8 @@ public class EndSonicBoom
             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
             //Cooldown
             baseformProperties.setCooldown(BaseformActiveAbility.SONIC_BOOM, (byte) 5);
+            //Play Sound
+            PacketHandler.sendToALLPlayers(new PlayerStopSoundPacketS2C(ModSounds.SONIC_BOOM.get().getLocation()));
 
             PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(

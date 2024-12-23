@@ -8,8 +8,11 @@ import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.PlayerPlaySoundPacketS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import org.joml.Vector3f;
 
@@ -96,6 +99,9 @@ public class Cyloop {
             //If Activating, Initialize our list
             if(activate)
             {
+                PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(
+                        ModSounds.CYLOOP.get().getLocation())
+                );
                 BaseformServer.cyloopCoords.put(
                         player.getUUID(),
                         new ArrayDeque<Vec3>(50)
@@ -105,6 +111,10 @@ public class Cyloop {
             //If Deactivating, print List of Traversal. Discard the old list
             if(!activate)
             {
+                //StopSound in Minecraft
+                PacketHandler.sendToALLPlayers(new PlayerStopSoundPacketS2C(
+                        ModSounds.CYLOOP.get().getLocation())
+                );
                 CyloopMath.cyloopEffect(player,
                         BaseformServer.cyloopCoords.get(player.getUUID()).toArray());
             }

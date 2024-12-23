@@ -2,13 +2,13 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.soni
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.sync.PlayerPlaySoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 public class SonicBoom
@@ -81,7 +81,7 @@ public class SonicBoom
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
 
                             //Play Sound
-                            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
+                            PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(ModSounds.SONIC_BOOM.get().getLocation()));
 
                             PacketHandler.sendToALLPlayers(
                                     new SyncPlayerFormS2C(

@@ -3,7 +3,6 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -13,6 +12,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
@@ -121,8 +121,6 @@ public class CyloopMath
                             })) {
                         Vec3 enemyPos = new Vec3(enemy.getX(), enemy.getY(), enemy.getZ());
 
-
-
                         //Play Particle
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 ParticleTypes.FLASH,
@@ -136,7 +134,7 @@ public class CyloopMath
                         );
 
                         //Sound
-                        world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.MASTER, 1.0f, 2.0f);
+                        world.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.CYLOOP_SUCCESS.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
                         //Mark Enemy to be Hit
                         enemyHit = true;
@@ -152,7 +150,7 @@ public class CyloopMath
                                     CYLOOP_DAMAGE * 1.5F);
 
                             //Give the Cylooped Effect
-                            enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 20, 0, false, false));
+                            enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 80, 0, false, false));
                         }
                         //Single Cyloop
                         else {
@@ -172,10 +170,9 @@ public class CyloopMath
 
                                 //Give the Cylooped Effect
                                 if (enemy.hasEffect(ModEffects.CYLOOPED.get()))
-                                    enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
+                                    enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 80, 0, false, false));
                                 else
-                                    enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED.get(), 40, 0, false, false));
-
+                                    enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED.get(), 80, 0, false, false));
                             }, 10);
                         }
 
@@ -195,6 +192,9 @@ public class CyloopMath
                 if(player.hasEffect(MobEffects.ABSORPTION))     player.removeEffect(MobEffects.ABSORPTION);
                 player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, -1, amplifier, false, false));
             }
+
+            //Cyloop Rings
+            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.CYLOOP_RINGS.get(), SoundSource.MASTER, 1.0f, 1.0f);
         }
 
     }

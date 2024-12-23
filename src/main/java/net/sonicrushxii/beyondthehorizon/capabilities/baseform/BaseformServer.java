@@ -59,9 +59,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
-import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
-import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
-import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.*;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
 
@@ -178,7 +176,8 @@ public class BaseformServer {
                                     Vec3 lookAngle = player.getLookAngle();
                                     Vec3 playerDirection = new Vec3(lookAngle.x(), 0, lookAngle.z());
 
-                                    if (baseformProperties.isWaterBoosting == false) {
+                                    if (baseformProperties.isWaterBoosting == false)
+                                    {
                                         player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
                                         baseformProperties.isWaterBoosting = true;
 
@@ -204,7 +203,8 @@ public class BaseformServer {
                                         ||
                                         (player.getDeltaMovement().x < 0.5 && player.getDeltaMovement().y < 0.5 && player.getDeltaMovement().z < 0.5)
                                         ||
-                                        player.isInWater()) {
+                                        player.isInWater())
+                                {
                                     player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                                     baseformProperties.isWaterBoosting = false;
                                 }
@@ -328,6 +328,8 @@ public class BaseformServer {
                                 0.0, 0.80f, 1.00f, 0.80f, 1,
                                 true)
                         );
+
+
                     }
 
                     //Base Cyloop
@@ -418,8 +420,13 @@ public class BaseformServer {
                                         0.0, 0.2f, 0.2f, 0.2f, 1, true)
                                 );
 
+                                //Stopsound in Minecraft
+                                PacketHandler.sendToALLPlayers(new PlayerStopSoundPacketS2C(
+                                        ModSounds.CYLOOP.get().getLocation())
+                                );
+
                                 //Sound
-                                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.MASTER, 1.0f, 2.0f);
+                                level.playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.CYLOOP_SUCCESS.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
                                 //Damage
                                 //Double Cyloop - Launch Down
@@ -1471,8 +1478,6 @@ public class BaseformServer {
                                     Vec3 spawnPos = new Vec3(player.getX() + motionDir.x,
                                             player.getY() + motionDir.y + player.getEyeHeight()/3,
                                             player.getZ() + motionDir.z);
-                                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                                            SoundEvents.EGG_THROW, SoundSource.MASTER, 1.0f, 1.0f);
 
                                     SonicBoomProjectile sonicBoomProjectile = new SonicBoomProjectile(ModEntityTypes.BASEFORM_SONIC_BOOM.get(), level);
 
@@ -1483,9 +1488,6 @@ public class BaseformServer {
                                     sonicBoomProjectile.setMovementDirection(player.getLookAngle());
                                     sonicBoomProjectile.setDestroyBlocks(player.isShiftKeyDown());
                                     sonicBoomProjectile.setOwner(player.getUUID());
-
-                                    //Play Sound
-                                    player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SONIC_BOOM.get(), SoundSource.MASTER, 0.75f, 1.0f);
 
                                     // Add the entity to the world
                                     level.addFreshEntity(sonicBoomProjectile);
@@ -1786,7 +1788,7 @@ public class BaseformServer {
                         if(baseformProperties.parryTimeSlow > 30)   StopParry.returnFromParryTime(player);
                     }
 
-                    //Grandslam
+                    //Grand Slam
                     {
                         try
                         {
