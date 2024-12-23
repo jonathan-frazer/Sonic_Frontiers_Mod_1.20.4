@@ -284,9 +284,9 @@ public class BaseformServer {
                                         break;
                                     case 3:
                                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                                new DustParticleOptions(new Vector3f(0.0f, 0.89f, 1.00f), 1),
+                                                new DustParticleOptions(new Vector3f(0.0f, 0.89f, 1.00f), 1.2F),
                                                 player.getX()+0.00, player.getY()+1.0, player.getZ()+0.00,
-                                                0.001, 0.35f, 1f, 0.35f, 12,
+                                                0.001, 0.35f, 1f, 0.35f, 21,
                                                 true)
                                         );
                                         break;
@@ -318,6 +318,12 @@ public class BaseformServer {
                     if (baseformProperties.powerBoost) {
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 ParticleTypes.ENCHANTED_HIT,
+                                player.getX()+0.00, player.getY()+0.85, player.getZ()+0.00,
+                                0.0, 0.80f, 1.00f, 0.80f, 1,
+                                false)
+                        );
+                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                new DustParticleOptions(new Vector3f(0.000f,0.969f,1.000f), 1.5f),
                                 player.getX()+0.00, player.getY()+0.85, player.getZ()+0.00,
                                 0.0, 0.80f, 1.00f, 0.80f, 1,
                                 true)
@@ -949,7 +955,7 @@ public class BaseformServer {
                                             player.connection.send(new ClientboundTeleportEntityPacket(player));
                                             enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), player),
                                                     1.0f);
-                                            enemy.setDeltaMovement(player.getLookAngle().scale(1.0));
+                                            enemy.setDeltaMovement(player.getLookAngle().scale(2.4));
                                             player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
                                         }
                                     }
@@ -1886,13 +1892,13 @@ public class BaseformServer {
                                 new DustParticleOptions(new Vector3f(0.4667F, 0F, 0.9961F), 1f),
                                 player.getX() + 0.00, player.getY() + 0.85, player.getZ() + 0.00,
                                 0.0, 0.80f, 1.00f, 0.80f, 1,
-                                true)
+                                false)
                         );
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 new DustParticleOptions(new Vector3f(0.05F, 0.05F, 1.0F), 1f),
                                 player.getX() + 0.00, player.getY() + 0.85, player.getZ() + 0.00,
                                 0.0, 0.80f, 1.00f, 0.80f, 1,
-                                true)
+                                false)
                         );
                     }
 
@@ -2115,7 +2121,7 @@ public class BaseformServer {
                                             Utilities.calculateViewVector(
                                                     Math.min(90.0F,player.getXRot()+45.0F),
                                                     player.getYRot()
-                                            ).scale(2.0)
+                                            ).scale(4.0)
                                     );
                                     //Knock yourself back
                                     player.setDeltaMovement(
@@ -2167,6 +2173,7 @@ public class BaseformServer {
                             if(enemy != null)  enemy.setInvulnerable(false);
                         }
                         baseformProperties.ultimateUse = 0;
+                        player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.0);
                         player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                     }
                 }

@@ -4,6 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -91,8 +92,9 @@ public class UltimateActivate
                                 baseformProperties.ultimateAtkMeter = 0.0;
                                 baseformProperties.ultTarget = enemyID;
 
-                                //Remove Gravity
+                                //Attributes
                                 player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                                player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 
                                 //Play Sound
                                 player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
