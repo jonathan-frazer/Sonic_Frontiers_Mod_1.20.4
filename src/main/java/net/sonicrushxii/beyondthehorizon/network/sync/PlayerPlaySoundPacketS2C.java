@@ -3,6 +3,7 @@ package net.sonicrushxii.beyondthehorizon.network.sync;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
@@ -13,19 +14,46 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
 
-public class PlayerPlaySoundPacketS2C {
+public class PlayerPlaySoundPacketS2C
+{
     private final ResourceLocation soundLocation;
+    private final BlockPos emitterPosition;
+    private final float volume;
+    private final float pitch;
 
-    public PlayerPlaySoundPacketS2C(ResourceLocation soundLocation) {
+    public PlayerPlaySoundPacketS2C(BlockPos emitterPosition, ResourceLocation soundLocation) {
         this.soundLocation = soundLocation;
+        this.emitterPosition = emitterPosition;
+        this.volume = 1.0f;
+        this.pitch = 1.0f;
+    }
+
+    public PlayerPlaySoundPacketS2C(BlockPos emitterPosition, ResourceLocation soundLocation, float volume) {
+        this.soundLocation = soundLocation;
+        this.emitterPosition = emitterPosition;
+        this.volume = volume;
+        this.pitch = 1.0f;
+    }
+
+    public PlayerPlaySoundPacketS2C(BlockPos emitterPosition, ResourceLocation soundLocation, float volume, float pitch) {
+        this.soundLocation = soundLocation;
+        this.emitterPosition = emitterPosition;
+        this.volume = volume;
+        this.pitch = pitch;
     }
 
     public PlayerPlaySoundPacketS2C(FriendlyByteBuf buf) {
         this.soundLocation = buf.readResourceLocation();
+        this.emitterPosition = buf.readBlockPos();
+        this.volume = buf.readFloat();
+        this.pitch = buf.readFloat();
     }
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeResourceLocation(this.soundLocation);
+        buf.writeBlockPos(this.emitterPosition);
+        buf.writeFloat(this.volume);
+        buf.writeFloat(this.pitch);
     }
 
     public void handle(CustomPayloadEvent.Context ctx) {
@@ -36,9 +64,10 @@ public class PlayerPlaySoundPacketS2C {
             LocalPlayer player = mc.player;
 
             if(player != null && world != null) {
-                world.playLocalSound(player.getX(),player.getY(),player.getZ(),
+                if(player.blockPosition().distSqr(emitterPosition) < 576)
+                    world.playLocalSound(emitterPosition.getX(),emitterPosition.getY(),emitterPosition.getZ(),
                         Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(this.soundLocation)),
-                        SoundSource.MASTER, 1.0f, 1.0f, true);
+                        SoundSource.MASTER, volume, pitch, true);
             }
         }));
         ctx.setPacketHandled(true);

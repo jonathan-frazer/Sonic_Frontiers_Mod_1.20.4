@@ -77,6 +77,7 @@ public class DangerSenseEmit {
                         {
                             //Play Sound
                             PacketHandler.sendToPlayer(player, new PlayerPlaySoundPacketS2C(
+                                    player.blockPosition(),
                                     ModSounds.DANGER_SENSE.get().getLocation())
                             );
 

@@ -60,12 +60,14 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
 import net.sonicrushxii.beyondthehorizon.network.sync.*;
+import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
 
 import java.util.*;
 
 public class BaseformServer {
+
     //Combo
     private static final float HOMING_ATTACK_DAMAGE = 9.0f;
     private static final float BALLFORM_DAMAGE = 6.0f;
@@ -96,6 +98,7 @@ public class BaseformServer {
     public static final float ULTIMATE_DAMAGE = 100.0f;
 
     public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
+    public static final HashMap<UUID,ScheduledTask> cyloopSoundEmitter = new HashMap<>();
 
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {

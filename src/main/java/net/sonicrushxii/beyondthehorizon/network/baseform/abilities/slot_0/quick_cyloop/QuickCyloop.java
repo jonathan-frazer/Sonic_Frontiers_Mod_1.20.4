@@ -92,6 +92,7 @@ public class QuickCyloop {
 
             //PlaySound in Minecraft
             PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(
+                    player.blockPosition(),
                     ModSounds.CYLOOP.get().getLocation())
             );
 

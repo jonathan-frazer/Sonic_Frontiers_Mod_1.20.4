@@ -14,6 +14,7 @@ import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerPlaySoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
+import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
 
 import java.util.ArrayDeque;
@@ -88,6 +89,16 @@ public class Cyloop {
         }
     }
 
+    public static void playCyloopSound(ServerPlayer player)
+    {
+        PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(player.blockPosition(),
+                ModSounds.CYLOOP.get().getLocation())
+        );
+        BaseformServer.cyloopSoundEmitter.put(player.getUUID(),Scheduler.scheduleTask(()->{
+            playCyloopSound(player);
+        },187));
+    }
+
     public static void toggleCyloop(ServerPlayer player, boolean activate)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
@@ -99,9 +110,8 @@ public class Cyloop {
             //If Activating, Initialize our list
             if(activate)
             {
-                PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(
-                        ModSounds.CYLOOP.get().getLocation())
-                );
+                playCyloopSound(player);
+
                 BaseformServer.cyloopCoords.put(
                         player.getUUID(),
                         new ArrayDeque<Vec3>(50)
@@ -111,6 +121,8 @@ public class Cyloop {
             //If Deactivating, print List of Traversal. Discard the old list
             if(!activate)
             {
+                //Stop the Scheduler
+                BaseformServer.cyloopSoundEmitter.get(player.getUUID()).cancel();
                 //StopSound in Minecraft
                 PacketHandler.sendToALLPlayers(new PlayerStopSoundPacketS2C(
                         ModSounds.CYLOOP.get().getLocation())

@@ -81,7 +81,10 @@ public class SonicBoom
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
 
                             //Play Sound
-                            PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(ModSounds.SONIC_BOOM.get().getLocation()));
+                            PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(
+                                    player.blockPosition(),
+                                    ModSounds.SONIC_BOOM.get().getLocation())
+                            );
 
                             PacketHandler.sendToALLPlayers(
                                     new SyncPlayerFormS2C(
