@@ -78,6 +78,27 @@ public class VirtualSlotOverlay {
     private static final ResourceLocation WILDRUSH_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/wildrush_slot.png");
 
+    private static final ResourceLocation GOOD_100  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/combo_system/100_good.png");
+    private static final ResourceLocation NICE_200  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/combo_system/200_nice.png");
+    private static final ResourceLocation GREAT_300  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/combo_system/300_great.png");
+    private static final ResourceLocation JAMMIN_400  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/combo_system/400_jammin.png");
+    private static final ResourceLocation COOL_500  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/combo_system/500_cool.png");
+    private static final ResourceLocation RADICAL_600  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/combo_system/600_radical.png");
+    private static final ResourceLocation TIGHT_800  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/combo_system/800_tight.png");
+    private static final ResourceLocation AWESOME_1000  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/combo_system/1000_awesome.png");
+    private static final ResourceLocation EXTREME_1500  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/combo_system/1500_extreme.png");
+    private static final ResourceLocation PERFECT_2000  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/combo_system/2000_perfect.png");
+
     //Helper Methods and Records
     private record Ability(ResourceLocation texture, @Nullable String sideinfo, byte cooldown, @Nullable Double chargePercent, @Nullable Integer barAlphaColor) {}
 
@@ -170,108 +191,109 @@ public class VirtualSlotOverlay {
 
             byte[] cooldownArray = baseformProperties.getAllCooldowns();
 
-            String slotName;
-            List<Ability> iconTextures;
-            List<InputConstants.Key> keyBindings = Arrays.asList(
-                    KeyBindings.INSTANCE.useAbility1.getKey(),
-                    KeyBindings.INSTANCE.useAbility2.getKey(),
-                    KeyBindings.INSTANCE.useAbility3.getKey(),
-                    KeyBindings.INSTANCE.useAbility4.getKey(),
-                    KeyBindings.INSTANCE.useAbility5.getKey(),
-                    KeyBindings.INSTANCE.useAbility6.getKey()
-            );
-
-            //Creates a List of all the Ability
-            switch(VirtualSlotHandler.getCurrAbility())
+            //Render Slot Ability
             {
-                case 0 :
-                    slotName = "Boost";
-                    iconTextures = (Arrays.asList(
-                            new Ability(BOOST_SLOT,"Lv. "+baseformProperties.boostLvl,cooldownArray[BaseformActiveAbility.BOOST.ordinal()],null,null),
-                            new Ability((baseformProperties.lightSpeedState==2)?LIGHT_SPEED_ATTACK_ACTIVE:LIGHT_SPEED_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.LIGHT_SPEED_ATTACK.ordinal()],null,null),
-                            new Ability((baseformProperties.powerBoost)?POWER_BOOST_ACTIVE:POWER_BOOST_SLOT,null,cooldownArray[BaseformActiveAbility.POWER_BOOST.ordinal()],null,null),
-                            new Ability(CYLOOP_SLOT,null,cooldownArray[BaseformActiveAbility.CYLOOP.ordinal()],baseformProperties.qkCyloopMeter,0xFF00DDDD))
-                    );
-                    keyBindings.set(3,KeyBindings.INSTANCE.useSingleAbility.getKey());
-                    break;
+                String slotName;
+                List<Ability> iconTextures;
+                List<InputConstants.Key> keyBindings = Arrays.asList(
+                        KeyBindings.INSTANCE.useAbility1.getKey(),
+                        KeyBindings.INSTANCE.useAbility2.getKey(),
+                        KeyBindings.INSTANCE.useAbility3.getKey(),
+                        KeyBindings.INSTANCE.useAbility4.getKey(),
+                        KeyBindings.INSTANCE.useAbility5.getKey(),
+                        KeyBindings.INSTANCE.useAbility6.getKey()
+                );
 
-                case 1 :
-                    slotName = "Combo";
-                    iconTextures = (Arrays.asList(
-                            new Ability(HOMING_ATTACK_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_ATTACK.ordinal()],null,null),
-                            new Ability(HUMMING_TOP_SLOT,null,cooldownArray[BaseformActiveAbility.HUMMING_TOP.ordinal()],null,null),
-                            new Ability((baseformProperties.speedBlitz)?SPEED_BLITZ_ACTIVE:SPEED_BLITZ_SLOT,null,cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()],null,null),
-                            new Ability((baseformProperties.smashHit == 0)?SMASH_HIT_SLOT:SMASH_HIT_ACTIVE,null,cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()],null,null),
-                            new Ability(STOMP_SLOT,null,cooldownArray[BaseformActiveAbility.STOMP.ordinal()],null,null)
-                    ));
-                    break;
+                //Creates a List of all the Ability
+                switch (VirtualSlotHandler.getCurrAbility()) {
+                    case 0:
+                        slotName = "Boost";
+                        iconTextures = (Arrays.asList(
+                                new Ability(BOOST_SLOT, "Lv. " + baseformProperties.boostLvl, cooldownArray[BaseformActiveAbility.BOOST.ordinal()], null, null),
+                                new Ability((baseformProperties.lightSpeedState == 2) ? LIGHT_SPEED_ATTACK_ACTIVE : LIGHT_SPEED_ATTACK_SLOT, null, cooldownArray[BaseformActiveAbility.LIGHT_SPEED_ATTACK.ordinal()], null, null),
+                                new Ability((baseformProperties.powerBoost) ? POWER_BOOST_ACTIVE : POWER_BOOST_SLOT, null, cooldownArray[BaseformActiveAbility.POWER_BOOST.ordinal()], null, null),
+                                new Ability(CYLOOP_SLOT, null, cooldownArray[BaseformActiveAbility.CYLOOP.ordinal()], baseformProperties.qkCyloopMeter, 0xFF00DDDD))
+                        );
+                        keyBindings.set(3, KeyBindings.INSTANCE.useSingleAbility.getKey());
+                        break;
 
-                case 2 :
-                    slotName = "Melee";
-                    iconTextures = (Arrays.asList(
-                            new Ability(TORNADO_JUMP_SLOT,null,cooldownArray[BaseformActiveAbility.TORNADO_JUMP.ordinal()],null,null),
-                            new Ability(SPINSLASH_SLOT,null,cooldownArray[BaseformActiveAbility.SPINSLASH.ordinal()],null,null),
-                            new Ability(WILDRUSH_SLOT,null,cooldownArray[BaseformActiveAbility.WILDRUSH.ordinal()],null,null),
-                            new Ability(LOOPKICK_SLOT,null,cooldownArray[BaseformActiveAbility.LOOPKICK.ordinal()],null,null)
-                    ));
-                    if(player.isShiftKeyDown()){
-                        iconTextures.set(0,new Ability(MIRAGE_SLOT,null,cooldownArray[BaseformActiveAbility.MIRAGE.ordinal()],null,null));
-                        iconTextures.set(1,new Ability(CYCLONE_KICK_SLOT,null,cooldownArray[BaseformActiveAbility.CYCLONE_KICK.ordinal()],null,null));
-                    }
-                    break;
+                    case 1:
+                        slotName = "Combo";
+                        iconTextures = (Arrays.asList(
+                                new Ability(HOMING_ATTACK_SLOT, null, cooldownArray[BaseformActiveAbility.HOMING_ATTACK.ordinal()], null, null),
+                                new Ability(HUMMING_TOP_SLOT, null, cooldownArray[BaseformActiveAbility.HUMMING_TOP.ordinal()], null, null),
+                                new Ability((baseformProperties.speedBlitz) ? SPEED_BLITZ_ACTIVE : SPEED_BLITZ_SLOT, null, cooldownArray[BaseformActiveAbility.SPEED_BLITZ.ordinal()], null, null),
+                                new Ability((baseformProperties.smashHit == 0) ? SMASH_HIT_SLOT : SMASH_HIT_ACTIVE, null, cooldownArray[BaseformActiveAbility.SMASH_HIT.ordinal()], null, null),
+                                new Ability(STOMP_SLOT, null, cooldownArray[BaseformActiveAbility.STOMP.ordinal()], null, null)
+                        ));
+                        break;
 
-                case 3 :
-                    slotName = "Ranged";
-                    iconTextures = (Arrays.asList(
-                            new Ability(SONIC_BOOM_SLOT,null,cooldownArray[BaseformActiveAbility.SONIC_BOOM.ordinal()],null,null),
-                            new Ability(CROSS_SLASH_SLOT,null,cooldownArray[BaseformActiveAbility.CROSS_SLASH.ordinal()],null,null),
-                            new Ability(SONIC_WIND_SLOT,null,cooldownArray[BaseformActiveAbility.SONIC_WIND.ordinal()],null,null),
-                            new Ability(HOMING_SHOT_SLOT,null,cooldownArray[BaseformActiveAbility.HOMING_SHOT.ordinal()],null,null))
-                    );
-                    break;
+                    case 2:
+                        slotName = "Melee";
+                        iconTextures = (Arrays.asList(
+                                new Ability(TORNADO_JUMP_SLOT, null, cooldownArray[BaseformActiveAbility.TORNADO_JUMP.ordinal()], null, null),
+                                new Ability(SPINSLASH_SLOT, null, cooldownArray[BaseformActiveAbility.SPINSLASH.ordinal()], null, null),
+                                new Ability(WILDRUSH_SLOT, null, cooldownArray[BaseformActiveAbility.WILDRUSH.ordinal()], null, null),
+                                new Ability(LOOPKICK_SLOT, null, cooldownArray[BaseformActiveAbility.LOOPKICK.ordinal()], null, null)
+                        ));
+                        if (player.isShiftKeyDown()) {
+                            iconTextures.set(0, new Ability(MIRAGE_SLOT, null, cooldownArray[BaseformActiveAbility.MIRAGE.ordinal()], null, null));
+                            iconTextures.set(1, new Ability(CYCLONE_KICK_SLOT, null, cooldownArray[BaseformActiveAbility.CYCLONE_KICK.ordinal()], null, null));
+                        }
+                        break;
 
-                case 4 :
-                    slotName = "Counter";
-                    iconTextures = (Arrays.asList(
-                            new Ability(GRAND_SLAM_SLOT,null,cooldownArray[BaseformActiveAbility.GRAND_SLAM.ordinal()],null,null))
-                    );
-                    keyBindings.set(0,KeyBindings.INSTANCE.useSingleAbility.getKey());
-                    break;
+                    case 3:
+                        slotName = "Ranged";
+                        iconTextures = (Arrays.asList(
+                                new Ability(SONIC_BOOM_SLOT, null, cooldownArray[BaseformActiveAbility.SONIC_BOOM.ordinal()], null, null),
+                                new Ability(CROSS_SLASH_SLOT, null, cooldownArray[BaseformActiveAbility.CROSS_SLASH.ordinal()], null, null),
+                                new Ability(SONIC_WIND_SLOT, null, cooldownArray[BaseformActiveAbility.SONIC_WIND.ordinal()], null, null),
+                                new Ability(HOMING_SHOT_SLOT, null, cooldownArray[BaseformActiveAbility.HOMING_SHOT.ordinal()], null, null))
+                        );
+                        break;
 
-                case 5 :
-                    slotName = "Transform";
-                    iconTextures = new ArrayList<Ability>();
-                    break;
+                    case 4:
+                        slotName = "Counter";
+                        iconTextures = (Arrays.asList(
+                                new Ability(GRAND_SLAM_SLOT, null, cooldownArray[BaseformActiveAbility.GRAND_SLAM.ordinal()], null, null))
+                        );
+                        keyBindings.set(0, KeyBindings.INSTANCE.useSingleAbility.getKey());
+                        break;
 
-                default:
-                    slotName = "NULL";
-                    iconTextures = (Arrays.asList(
-                            new Ability(EMPTY_SLOT,null,(byte)0,null,null),
-                            new Ability(EMPTY_SLOT,null,(byte)0,null,null),
-                            new Ability(EMPTY_SLOT,null,(byte)0,null,null),
-                            new Ability(EMPTY_SLOT,null,(byte)0,null,null),
-                            new Ability(EMPTY_SLOT,null,(byte)0,null,null),
-                            new Ability(EMPTY_SLOT,null,(byte)0,null,null))
-                    );
-            }
+                    case 5:
+                        slotName = "Transform";
+                        iconTextures = new ArrayList<Ability>();
+                        break;
 
-            //Render Slot Name
-            guiComponent.drawCenteredString(Minecraft.getInstance().font, slotName,
-                    x+textureDimensions[0]/3,
-                    y+textureDimensions[1]/3,
-                    0xFFFFFF);
+                    default:
+                        slotName = "NULL";
+                        iconTextures = (Arrays.asList(
+                                new Ability(EMPTY_SLOT, null, (byte) 0, null, null),
+                                new Ability(EMPTY_SLOT, null, (byte) 0, null, null),
+                                new Ability(EMPTY_SLOT, null, (byte) 0, null, null),
+                                new Ability(EMPTY_SLOT, null, (byte) 0, null, null),
+                                new Ability(EMPTY_SLOT, null, (byte) 0, null, null),
+                                new Ability(EMPTY_SLOT, null, (byte) 0, null, null))
+                        );
+                }
 
-            for(int i=1;i<=iconTextures.size();++i)
-            {
-                //Slot Icon
-                renderSlot(iconTextures.get(i-1),guiComponent,
-                        x,y+i*textureDimensions[1],textureDimensions);
-
-                //Keybinding for Ability
-                guiComponent.drawCenteredString(Minecraft.getInstance().font, shortenName(keyBindings.get(i-1).getDisplayName().getString()),
-                        x - textureDimensions[0]/2,
-                        y + textureDimensions[1]/2 + i*textureDimensions[1],
+                //Render Slot Name
+                guiComponent.drawCenteredString(Minecraft.getInstance().font, slotName,
+                        x + textureDimensions[0] / 3,
+                        y + textureDimensions[1] / 3,
                         0xFFFFFF);
+
+                for (int i = 1; i <= iconTextures.size(); ++i) {
+                    //Slot Icon
+                    renderSlot(iconTextures.get(i - 1), guiComponent,
+                            x, y + i * textureDimensions[1], textureDimensions);
+
+                    //Keybinding for Ability
+                    guiComponent.drawCenteredString(Minecraft.getInstance().font, shortenName(keyBindings.get(i - 1).getDisplayName().getString()),
+                            x - textureDimensions[0] / 2,
+                            y + textureDimensions[1] / 2 + i * textureDimensions[1],
+                            0xFFFFFF);
+                }
             }
 
             //Render Ultimate Bar
@@ -307,6 +329,19 @@ public class VirtualSlotOverlay {
                             keyY,
                             0xFFFFFF);
                 }
+            }
+
+            //Render Combo System
+            {
+                // Render the texture
+                int imageWidth = 100;  // Desired width of the rendered combo points
+                int imageHeight = 60; // Desired height of the rendered combo points
+
+                int comboX = screenWidth / 2 - imageWidth/2; // Adjust as needed
+                int comboY = screenHeight / 2 - (imageHeight + imageWidth/3); // Slightly above the cursor
+
+                // Render your texture
+                guiComponent.blit(GOOD_100, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
             }
         });
 
