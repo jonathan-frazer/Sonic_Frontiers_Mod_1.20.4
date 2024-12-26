@@ -2136,12 +2136,13 @@ public class BaseformServer {
                                             ).scale(-0.75)
                                     );
 
-                                    //Flash Particle
+                                    //Impact Frame
                                     PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                             ParticleTypes.FLASH,
                                             player.getX(),player.getY()+player.getEyeHeight()/2,player.getZ(),
                                             0.001,0.01F,player.getEyeHeight()/2,0.01F,
                                             1,true));
+                                    player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 20, 0, false, false));
 
                                     //Update Motion
                                     player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
