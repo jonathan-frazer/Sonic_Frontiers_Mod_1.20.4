@@ -16,6 +16,11 @@ public enum ModDamageTypes
     SONIC_MELEE("sonic_melee"),   //Deals More Charge
     SONIC_RANGED("sonic_ranged"), //Deals less Charge
     SONIC_CYLOOP("sonic_cyloop"),
+
+    SONIC_BALL_COMBO_IMMUNE("sonic_ball_combo_immune"), //Does not Range Combo Meter
+    SONIC_MELEE_COMBO_IMMUNE("sonic_melee_combo_immune"), //Deals less Charge, Does not raise the combo meter
+    SONIC_RANGED_COMBO_IMMUNE("sonic_ranged_combo_immune"), //Deals less Charge, Does not raise the combo meter
+
     SONIC_ULTIMATE("sonic_ultimate");//Deals no Charge
 
     private final ResourceKey<DamageType> dmgResourceKey;

@@ -111,6 +111,7 @@ public class BaseformProperties extends FormProperties {
     }
 
     private final byte[] abilityCooldowns;
+    public short comboPointDisplay;
     public float atkRotPhase;
 
     //Passives
@@ -186,6 +187,7 @@ public class BaseformProperties extends FormProperties {
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
         hitCount = 0;
+        comboPointDisplay = 0;
         atkRotPhase = 0.0f;
 
         //Passives
@@ -262,6 +264,7 @@ public class BaseformProperties extends FormProperties {
         //Common
         abilityCooldowns = nbt.getByteArray("AbilityCooldowns");
         hitCount = nbt.getByte("hitsPerformed");
+        comboPointDisplay = nbt.getShort("comboPointDisplay");
         atkRotPhase = nbt.getFloat("atkRotPhase");
 
         //Passives
@@ -341,6 +344,7 @@ public class BaseformProperties extends FormProperties {
         //Common
         nbt.putByteArray("AbilityCooldowns",abilityCooldowns);
         nbt.putByte("hitsPerformed",hitCount);
+        nbt.putShort("comboPointDisplay",comboPointDisplay);
         nbt.putFloat("atkRotPhase", atkRotPhase);
 
         //Passives

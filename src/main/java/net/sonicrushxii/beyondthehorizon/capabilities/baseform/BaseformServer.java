@@ -99,6 +99,7 @@ public class BaseformServer {
 
     public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
     public static final HashMap<UUID,ScheduledTask> cyloopSoundEmitter = new HashMap<>();
+    public static final Map<UUID,ScheduledTask> comboDisplayReset = new HashMap<>();
 
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
@@ -908,7 +909,7 @@ public class BaseformServer {
                                             player.connection.send(new ClientboundTeleportEntityPacket(player));
 
                                             //Attack the Enemy
-                                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE_COMBO_IMMUNE.getResourceKey(), player),
                                                     1.0f);
                                             enemy.setDeltaMovement(player.getLookAngle().scale(0.3));
                                             player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
@@ -1844,7 +1845,7 @@ public class BaseformServer {
                             if(baseformProperties.grandSlamTime == 40)
                             {
                                 //Damage Target
-                                counterTarget.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
+                                counterTarget.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL_COMBO_IMMUNE.getResourceKey(),player),
                                         GRAND_SLAM_DMG);
 
                                 //Knock Counter Target away

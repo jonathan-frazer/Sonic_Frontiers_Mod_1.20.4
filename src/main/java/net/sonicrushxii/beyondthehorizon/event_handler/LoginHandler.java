@@ -48,6 +48,7 @@ public class LoginHandler {
 
                 //Reset Combo Meter
                 baseformProperties.hitCount = 0;
+                baseformProperties.comboPointDisplay = 0;
 
                 //Revert Cyloop
                 baseformProperties.cylooping = false;

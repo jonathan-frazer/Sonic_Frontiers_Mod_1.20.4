@@ -243,13 +243,17 @@ public class BaseformHandler {
                 },3);
             }
 
+            //Prevent Spam punching
+            if(damageTaker.hurtTime != 0)
+                throw new NullPointerException("Mob is already being hurt");
+
             //Meter increase
             if(!event.getSource().is(ModDamageTypes.SONIC_ULTIMATE.getResourceKey()))
             {
                 baseformProperties.qkCyloopMeter = Math.min(100.0,baseformProperties.qkCyloopMeter+event.getAmount()/5.0);
                 baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter + (
-                        (event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()))?event.getAmount()/6:
-                                (event.getSource().is(ModDamageTypes.SONIC_MELEE.getResourceKey()))?event.getAmount()*3:event.getAmount()/1.3);
+                        ((event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey())||event.getSource().is(ModDamageTypes.SONIC_RANGED_COMBO_IMMUNE.getResourceKey())))?event.getAmount()/6:
+                                ((event.getSource().is(ModDamageTypes.SONIC_MELEE.getResourceKey()))||event.getSource().is(ModDamageTypes.SONIC_MELEE_COMBO_IMMUNE.getResourceKey()))?event.getAmount()*3:event.getAmount()/1.3);
 
                 if(baseformProperties.ultimateAtkMeter > 100.0)
                 {
@@ -258,6 +262,25 @@ public class BaseformHandler {
                     baseformProperties.ultReady = true;
                     baseformProperties.ultimateAtkMeter = 100.0;
                 }
+            }
+
+            //Combo Display Increase
+            if(!event.getSource().is(ModDamageTypes.SONIC_CYLOOP.getResourceKey()) &&
+                    !event.getSource().is(ModDamageTypes.SONIC_RANGED_COMBO_IMMUNE.getResourceKey()) &&
+                    !event.getSource().is(ModDamageTypes.SONIC_MELEE_COMBO_IMMUNE.getResourceKey()) &&
+                    !event.getSource().is(ModDamageTypes.SONIC_BALL_COMBO_IMMUNE.getResourceKey()) &&
+                    !event.getSource().is(ModDamageTypes.SONIC_ULTIMATE.getResourceKey()))
+            {
+                baseformProperties.comboPointDisplay += 1;
+                assert damageGiver != null;
+
+                //Cancel the canceller if another attack is played
+                if(BaseformServer.comboDisplayReset.get(damageGiver.getUUID()) != null)
+                    BaseformServer.comboDisplayReset.get(damageGiver.getUUID()).cancel();
+                //Reset the Timer
+                BaseformServer.comboDisplayReset.put(damageGiver.getUUID(),Scheduler.scheduleTask(()->{
+                    baseformProperties.comboPointDisplay = 0;
+                },100));
             }
 
 

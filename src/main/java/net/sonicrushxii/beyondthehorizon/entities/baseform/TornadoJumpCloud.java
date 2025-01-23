@@ -139,7 +139,7 @@ public class TornadoJumpCloud extends PointEntity {
             if(CyloopMath.xzDistSqr(currentPos,enemyPos) < 3.0) {
                 //Damage Enemy
                 enemy.hurt(
-                        ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(),this.getOwner()),
+                        ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED_COMBO_IMMUNE.getResourceKey(),this.getOwner()),
                         BaseformServer.TORNADO_JUMP_DMG
                 );
 
