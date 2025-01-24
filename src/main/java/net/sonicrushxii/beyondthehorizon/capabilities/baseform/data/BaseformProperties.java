@@ -119,7 +119,7 @@ public class BaseformProperties extends FormProperties {
     public boolean sprintFlag;
     public boolean dangerSenseActive;
     public boolean dangerSensePlaying;
-    public byte hitCount;
+    public byte meleeHitCount;
 
     //Slot 1
     public byte airBoosts;
@@ -186,7 +186,7 @@ public class BaseformProperties extends FormProperties {
     public BaseformProperties()
     {
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
-        hitCount = 0;
+        meleeHitCount = 0;
         comboPointDisplay = 0;
         atkRotPhase = 0.0f;
 
@@ -263,7 +263,7 @@ public class BaseformProperties extends FormProperties {
     {
         //Common
         abilityCooldowns = nbt.getByteArray("AbilityCooldowns");
-        hitCount = nbt.getByte("hitsPerformed");
+        meleeHitCount = nbt.getByte("hitsPerformed");
         comboPointDisplay = nbt.getShort("comboPointDisplay");
         atkRotPhase = nbt.getFloat("atkRotPhase");
 
@@ -343,7 +343,7 @@ public class BaseformProperties extends FormProperties {
 
         //Common
         nbt.putByteArray("AbilityCooldowns",abilityCooldowns);
-        nbt.putByte("hitsPerformed",hitCount);
+        nbt.putByte("hitsPerformed", meleeHitCount);
         nbt.putShort("comboPointDisplay",comboPointDisplay);
         nbt.putFloat("atkRotPhase", atkRotPhase);
 
@@ -430,7 +430,7 @@ public class BaseformProperties extends FormProperties {
         boolean ballForm = ballFormState > 0;
         boolean speedBlitzDash = (this.speedBlitzDashTimer > 0);
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 50);
-        boolean melee = hitCount > 3;
+        boolean melee = meleeHitCount > 3;
         boolean hummingTop = this.hummingTop > 0;
         boolean stomping = (this.stomp > 0);
 

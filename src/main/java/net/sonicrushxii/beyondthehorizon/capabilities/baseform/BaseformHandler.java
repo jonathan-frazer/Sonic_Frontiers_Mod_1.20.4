@@ -126,7 +126,7 @@ public class BaseformHandler {
                         damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
                     }
 
-                    if (baseformProperties.hitCount == 2)
+                    if (baseformProperties.meleeHitCount == 2)
                     {
                         Level world = damageGiver.level();
                         world.playSound(null, damageGiver.getX(), damageGiver.getY(), damageGiver.getZ(), SoundEvents.SPLASH_POTION_BREAK, SoundSource.MASTER, 1.0f, 1.0f);
@@ -138,7 +138,7 @@ public class BaseformHandler {
                                 true)
                             );
                     }
-                    if (baseformProperties.hitCount == 3)
+                    if (baseformProperties.meleeHitCount == 3)
                     {
                         if (damageGiver.isShiftKeyDown()||damageGiver.getXRot() < 0) {
                             damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 10, false, false));
@@ -168,7 +168,7 @@ public class BaseformHandler {
                     }
 
                     //Increase Count
-                    baseformProperties.hitCount = (byte) ((baseformProperties.hitCount + 1) % 6);
+                    baseformProperties.meleeHitCount = (byte) ((baseformProperties.meleeHitCount + 1) % 6);
 
                     //Cancel the Current Combo schedule
                     ScheduledTask currentSchedule = hitSchedule.get(damageGiver.getUUID());
@@ -176,7 +176,7 @@ public class BaseformHandler {
 
                     //Add another Schedule to reset counter After 2 seconds
                     hitSchedule.put(damageGiver.getUUID(), Scheduler.scheduleTask(() -> {
-                                baseformProperties.hitCount = 0;
+                                baseformProperties.meleeHitCount = 0;
                                 damageGiver.removeEffect(MobEffects.SLOW_FALLING);
                             }, COMBO_TIME)
                     );
@@ -187,7 +187,7 @@ public class BaseformHandler {
                     if (currentSchedule != null && !currentSchedule.isCancelled()) {
                         currentSchedule.cancel();
                         damageGiver.removeEffect(MobEffects.SLOW_FALLING);
-                        baseformProperties.hitCount = 0;
+                        baseformProperties.meleeHitCount = 0;
                     }
                 }
             }
@@ -271,7 +271,13 @@ public class BaseformHandler {
                     !event.getSource().is(ModDamageTypes.SONIC_BALL_COMBO_IMMUNE.getResourceKey()) &&
                     !event.getSource().is(ModDamageTypes.SONIC_ULTIMATE.getResourceKey()))
             {
-                baseformProperties.comboPointDisplay += 1;
+                //Increase Combo count, If negative set to 1, pretty much like ReLU
+                baseformProperties.comboPointDisplay =
+                        (short) (
+                                        (baseformProperties.comboPointDisplay <= 0)?
+                                        1 :
+                                        baseformProperties.comboPointDisplay+1
+                        );
                 assert damageGiver != null;
 
                 //Cancel the canceller if another attack is played

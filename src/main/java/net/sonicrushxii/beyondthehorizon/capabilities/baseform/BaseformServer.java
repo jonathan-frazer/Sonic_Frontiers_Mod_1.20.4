@@ -155,6 +155,10 @@ public class BaseformServer {
                 }
                 //Danger Sense
 
+                //Combo Meter
+                if(player.onGround() && baseformProperties.comboPointDisplay > 0 && !baseformProperties.isAttacking())
+                    baseformProperties.comboPointDisplay  = (short) -baseformProperties.comboPointDisplay;
+
                 //Subdue Hunger
                 if (player.getFoodData().getFoodLevel() <= 7)
                     player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
@@ -1961,7 +1965,7 @@ public class BaseformServer {
                                 player.connection.send(new ClientboundTeleportEntityPacket(player));
 
                                 //Attack the Enemy
-                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_ULTIMATE.getResourceKey(), player),
                                         1.0f);
                                 enemy.setDeltaMovement(player.getLookAngle().scale(0.0));
                                 player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
@@ -2007,7 +2011,7 @@ public class BaseformServer {
                                 player.connection.send(new ClientboundTeleportEntityPacket(enemy));
 
                                 //Damage Enemy
-                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
+                                enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_ULTIMATE.getResourceKey(),player),
                                         1.0F);
                             }
 

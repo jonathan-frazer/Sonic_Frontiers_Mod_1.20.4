@@ -337,11 +337,11 @@ public class VirtualSlotOverlay {
                 int imageWidth = 100;  // Desired width of the rendered combo points
                 int imageHeight = 60; // Desired height of the rendered combo points
 
-                int comboX = screenWidth / 2 - imageWidth/2; // Adjust as needed
-                int comboY = screenHeight / 2 - (imageHeight + imageWidth/3); // Slightly above the cursor
+                int comboX = screenWidth - imageWidth; // Adjust as needed
+                int comboY = screenHeight / 2 - (imageHeight); // Slightly above the cursor
 
                 // Render your texture
-                switch(baseformProperties.comboPointDisplay)
+                switch(Math.abs(baseformProperties.comboPointDisplay))
                 {
                     case 0: break;
                     case 1: guiComponent.blit(GOOD_100, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
