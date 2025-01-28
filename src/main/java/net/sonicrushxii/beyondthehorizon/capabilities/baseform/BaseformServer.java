@@ -57,9 +57,11 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
-import net.sonicrushxii.beyondthehorizon.network.baseform.passives.auto_step.AutoStep;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
-import net.sonicrushxii.beyondthehorizon.network.sync.*;
+import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
@@ -130,34 +132,32 @@ public class BaseformServer {
                 if (!baseformProperties.hasDoubleJump && player.onGround()) {
                     baseformProperties.hasDoubleJump = true;
                 }
-
-                //Auto Step
-                if (player.isSprinting() && !baseformProperties.isAttacking())
+                //Sprinting
+                if(!player.onGround() && player.isSprinting() && baseformProperties.groundTraction)
                 {
-                    List<String> blocksinFront = new ArrayList<>();
-                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -3, 0)).getBlock()) + "");
-                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -2, 0)).getBlock()) + "");
-                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, -1, 0)).getBlock()) + "");
-                    blocksinFront.add(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos).getBlock()) + "");
-
-                    if (Utilities.passableBlocks.contains(blocksinFront.get(3))
-                            && Utilities.passableBlocks.contains(blocksinFront.get(2))
-                            && !Utilities.passableBlocks.contains(blocksinFront.get(1))
-                            && player.onGround())
-                        AutoStep.performStepDown(player,0.95);
-
-                    if (Utilities.passableBlocks.contains(blocksinFront.get(3))
-                            && Utilities.passableBlocks.contains(blocksinFront.get(2))
-                            && Utilities.passableBlocks.contains(blocksinFront.get(1))
-                            && !Utilities.passableBlocks.contains(blocksinFront.get(0))
-                            && player.onGround())
-                        AutoStep.performStepDown(player,1.95);
+                    baseformProperties.groundTraction = false;
+                    System.out.println(player.getDeltaMovement().y);
+                    if (player.getDeltaMovement().y < 0.1 && !player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).hasModifier(AttributeMultipliers.SPRINT_GRAVITY))
+                    {
+                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).addTransientModifier(AttributeMultipliers.SPRINT_GRAVITY);
+                        Scheduler.scheduleTask(()->{
+                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).removeModifier(AttributeMultipliers.SPRINT_GRAVITY.getId());
+                        },5);
+                    }
                 }
-                //Danger Sense
+                if(player.onGround())
+                    baseformProperties.groundTraction = true;
 
                 //Combo Meter
-                if(player.onGround() && baseformProperties.comboPointDisplay > 0 && !baseformProperties.isAttacking())
-                    baseformProperties.comboPointDisplay  = (short) -baseformProperties.comboPointDisplay;
+                if(player.onGround() && baseformProperties.comboPointDisplay > 0 && !baseformProperties.isAttacking() &&
+                        !(baseformProperties.homingAttackAirTime > 0))
+                {
+                    System.out.println(baseformProperties.comboPointDisplay);
+                    baseformProperties.comboPointDisplay = (short) -baseformProperties.comboPointDisplay;
+                    Scheduler.scheduleTask(()->{
+                        baseformProperties.comboPointDisplay = 0;
+                    },100);
+                }
 
                 //Subdue Hunger
                 if (player.getFoodData().getFoodLevel() <= 7)

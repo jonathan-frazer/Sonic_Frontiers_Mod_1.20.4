@@ -269,8 +269,11 @@ public class BaseformHandler {
                     !event.getSource().is(ModDamageTypes.SONIC_RANGED_COMBO_IMMUNE.getResourceKey()) &&
                     !event.getSource().is(ModDamageTypes.SONIC_MELEE_COMBO_IMMUNE.getResourceKey()) &&
                     !event.getSource().is(ModDamageTypes.SONIC_BALL_COMBO_IMMUNE.getResourceKey()) &&
-                    !event.getSource().is(ModDamageTypes.SONIC_ULTIMATE.getResourceKey()))
+                    !event.getSource().is(ModDamageTypes.SONIC_ULTIMATE.getResourceKey())
+            //&&     (damageTaker.getHealth() < 3.0f || damageTaker.getMaxHealth() > 30.0f)
+            )
             {
+                System.out.println(damageTaker.getHealth()+"    ,   "+damageTaker.getMaxHealth());
                 //Increase Combo count, If negative set to 1, pretty much like ReLU
                 baseformProperties.comboPointDisplay =
                         (short) (
@@ -279,14 +282,6 @@ public class BaseformHandler {
                                         baseformProperties.comboPointDisplay+1
                         );
                 assert damageGiver != null;
-
-                //Cancel the canceller if another attack is played
-                if(BaseformServer.comboDisplayReset.get(damageGiver.getUUID()) != null)
-                    BaseformServer.comboDisplayReset.get(damageGiver.getUUID()).cancel();
-                //Reset the Timer
-                BaseformServer.comboDisplayReset.put(damageGiver.getUUID(),Scheduler.scheduleTask(()->{
-                    baseformProperties.comboPointDisplay = 0;
-                },100));
             }
 
 

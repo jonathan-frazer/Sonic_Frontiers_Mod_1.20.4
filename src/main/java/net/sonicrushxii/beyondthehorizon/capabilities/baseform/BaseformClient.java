@@ -126,7 +126,9 @@ public class BaseformClient {
                         while(KeyBindings.INSTANCE.doubleJump.consumeClick());
                     }
                 }
+
                 //Auto Step
+                {}
 
                 //Danger Sense
                 {
