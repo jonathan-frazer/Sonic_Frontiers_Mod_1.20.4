@@ -149,11 +149,11 @@ public class BaseformServer {
                     baseformProperties.groundTraction = true;
 
                 //Combo Meter
-                if(player.onGround() && baseformProperties.comboPointDisplay > 0 && !baseformProperties.isAttacking() &&
+                if(player.onGround() && baseformProperties.comboPointCount > 0 && !baseformProperties.isAttacking() &&
                         !(baseformProperties.homingAttackAirTime > 0))
                 {
-                    System.out.println(baseformProperties.comboPointDisplay);
-                    baseformProperties.comboPointDisplay = (short) -baseformProperties.comboPointDisplay;
+                    baseformProperties.comboPointDisplay = baseformProperties.comboPointCount;
+                    baseformProperties.comboPointCount = 0;
                     Scheduler.scheduleTask(()->{
                         baseformProperties.comboPointDisplay = 0;
                     },100);

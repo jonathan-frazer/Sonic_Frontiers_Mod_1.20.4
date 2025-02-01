@@ -341,21 +341,20 @@ public class VirtualSlotOverlay {
                 int comboY = screenHeight / 2 - (imageHeight); // Slightly above the cursor
 
                 // Render your texture
-                if(baseformProperties.comboPointDisplay < 0)
-                    switch(Math.abs(baseformProperties.comboPointDisplay))
-                    {
-                        case 0: break;
-                        case 1: guiComponent.blit(GOOD_100, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
-                        case 2: guiComponent.blit(NICE_200, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
-                        case 3: guiComponent.blit(GREAT_300, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
-                        case 4: guiComponent.blit(JAMMIN_400, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
-                        case 5: guiComponent.blit(COOL_500, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
-                        case 6: guiComponent.blit(RADICAL_600, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
-                        case 7: guiComponent.blit(TIGHT_800, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
-                        case 8: guiComponent.blit(AWESOME_1000, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
-                        case 9: guiComponent.blit(EXTREME_1500, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight); break;
-                        default: guiComponent.blit(PERFECT_2000, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
-                    }
+                switch(Math.abs(baseformProperties.comboPointDisplay))
+                {
+                    case 0: break;
+                    case 1: guiComponent.blit(GOOD_100, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
+                    case 2: guiComponent.blit(NICE_200, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
+                    case 3: guiComponent.blit(GREAT_300, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
+                    case 4: guiComponent.blit(JAMMIN_400, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
+                    case 5: guiComponent.blit(COOL_500, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
+                    case 6: guiComponent.blit(RADICAL_600, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
+                    case 7: guiComponent.blit(TIGHT_800, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
+                    case 8: guiComponent.blit(AWESOME_1000, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);break;
+                    case 9: guiComponent.blit(EXTREME_1500, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight); break;
+                    default: guiComponent.blit(PERFECT_2000, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+                }
             }
         });
 

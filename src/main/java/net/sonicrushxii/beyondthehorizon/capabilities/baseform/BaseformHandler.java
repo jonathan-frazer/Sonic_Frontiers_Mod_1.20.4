@@ -273,14 +273,7 @@ public class BaseformHandler {
             //&&     (damageTaker.getHealth() < 3.0f || damageTaker.getMaxHealth() > 30.0f)
             )
             {
-                System.out.println(damageTaker.getHealth()+"    ,   "+damageTaker.getMaxHealth());
-                //Increase Combo count, If negative set to 1, pretty much like ReLU
-                baseformProperties.comboPointDisplay =
-                        (short) (
-                                        (baseformProperties.comboPointDisplay <= 0)?
-                                        1 :
-                                        baseformProperties.comboPointDisplay+1
-                        );
+                baseformProperties.comboPointCount += 1;
                 assert damageGiver != null;
             }
 
