@@ -1,7 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
@@ -38,7 +38,7 @@ public class RenderHandler {
             /*
             try {
                 LivingEntity entity = event.getEntity();
-                LocalPlayer player = Minecraft.getInstance().player;
+                AbstractClientPlayer player = Minecraft.getInstance().player;
 
                 if (player != null && entity.is(player))
                     player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
@@ -63,7 +63,7 @@ public class RenderHandler {
 
         //Manage Render to Self
         {
-            LocalPlayer player = Minecraft.getInstance().player;
+            AbstractClientPlayer player = Minecraft.getInstance().player;
             player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
                 switch(playerSonicForm.getCurrentForm())
                 {
@@ -103,7 +103,7 @@ public class RenderHandler {
             /*
             try {
                 LivingEntity entity = event.getEntity();
-                LocalPlayer player = Minecraft.getInstance().player;
+                AbstractClientPlayer player = Minecraft.getInstance().player;
 
                 if (player != null && entity.is(player))
                     switch(ClientFormData.getPlayerForm())
@@ -125,7 +125,7 @@ public class RenderHandler {
 
         //Manage Render to Self
         {
-            LocalPlayer player = Minecraft.getInstance().player;
+            AbstractClientPlayer player = Minecraft.getInstance().player;
             player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
                 switch(playerSonicForm.getCurrentForm())
                 {

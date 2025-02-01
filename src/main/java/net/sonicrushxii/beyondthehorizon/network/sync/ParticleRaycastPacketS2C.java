@@ -14,6 +14,7 @@ import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.event_handler.client_handlers.ClientPacketHandler;
 import org.joml.Vector3f;
 
 public class ParticleRaycastPacketS2C {
@@ -60,23 +61,7 @@ public class ParticleRaycastPacketS2C {
 
     public void handle(CustomPayloadEvent.Context ctx) {
         ctx.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            ClientLevel world = Minecraft.getInstance().level;
-            if (world != null) {
-                ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(new ResourceLocation(this.particleType));
-                ParticleOptions particleOptions;
-
-                if (particleType == ParticleTypes.DUST) {
-                    particleOptions = new DustParticleOptions(new Vector3f(this.red, this.green, this.blue), this.scale);
-                } else {
-                    particleOptions = (ParticleOptions) particleType;
-                }
-
-                Utilities.particleRaycast(
-                        world, particleOptions,
-                        new Vec3(pos1.x(), pos1.y(), pos1.z()),
-                        new Vec3(pos2.x(), pos2.y(), pos2.z())
-                );
-            }
+            ClientPacketHandler.clientParticleRaycast(pos1,pos2,particleType,red,green,blue,scale);
         }));
         ctx.setPacketHandled(true);
     }

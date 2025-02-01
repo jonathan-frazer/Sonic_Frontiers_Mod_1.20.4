@@ -2,7 +2,7 @@ package net.sonicrushxii.beyondthehorizon.event_handler;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,7 +26,7 @@ public class InputSlotHandler {
 
         // Get the Minecraft instance and the player
         Minecraft mc = Minecraft.getInstance();
-        LocalPlayer player = mc.player;
+        AbstractClientPlayer player = mc.player;
 
         if(player == null || !player.level().isClientSide())
             return;
@@ -71,7 +71,7 @@ public class InputSlotHandler {
     public static void onKeyPress(InputEvent.Key event) {
         // Get the Minecraft instance and the player
         Minecraft mc = Minecraft.getInstance();
-        LocalPlayer player = mc.player;
+        AbstractClientPlayer player = mc.player;
 
         if(player == null || !player.level().isClientSide())
             return;

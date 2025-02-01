@@ -3,7 +3,7 @@ package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -411,7 +411,7 @@ public class BaseformRenderer
 
     public static void onRenderToSelfPost(RenderLivingEvent.Post<?, ?> event, LivingEntity target, BaseformProperties baseformProperties)
     {
-        LocalPlayer player = Minecraft.getInstance().player;
+        AbstractClientPlayer player = Minecraft.getInstance().player;
 
         assert player != null;
         PoseStack poseStack = event.getPoseStack();

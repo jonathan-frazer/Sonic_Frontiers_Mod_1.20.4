@@ -2,7 +2,7 @@ package net.sonicrushxii.beyondthehorizon.network.sync;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -14,6 +14,7 @@ import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.event_handler.client_handlers.ClientPacketHandler;
 import org.joml.Vector3f;
 
 public class ParticleDirPacketS2C {
@@ -119,26 +120,12 @@ public class ParticleDirPacketS2C {
         ctx.enqueueWork(() -> {
             // This code is run on the client side
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                Minecraft mc = Minecraft.getInstance();
-                ClientLevel world = mc.level;
-                LocalPlayer player = mc.player;
-
-                if (player != null && world != null) {
-                    ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(new ResourceLocation(this.particleType));
-                    ParticleOptions particleOptions;
-
-                    if (particleType == ParticleTypes.DUST) {
-                        particleOptions = new DustParticleOptions(new Vector3f(this.red, this.green, this.blue), this.scale);
-                    } else {
-                        particleOptions = (ParticleOptions) particleType;
-                    }
-
-                    assert particleOptions != null;
-                    Utilities.displayParticle(player, particleOptions, this.absX, this.absY, this.absZ,
-                            this.radiusX, this.radiusY, this.radiusZ,
-                            this.speedX, this.speedY, this.speedZ,
-                            this.count, this.force);
-                }
+                ClientPacketHandler.clientParticleDir(this.particleType,
+                        this.absX,this.absY,this.absZ,
+                        this.speedX,this.speedY,this.speedZ,
+                        this.radiusX,this.radiusY,this.radiusZ,
+                        this.count,this.force,
+                        this.red,this.green,this.blue,this.scale);
             });
         });
 

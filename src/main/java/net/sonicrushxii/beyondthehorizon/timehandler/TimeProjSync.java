@@ -8,6 +8,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.sonicrushxii.beyondthehorizon.event_handler.client_handlers.ClientPacketHandler;
 
 public class TimeProjSync {
     private final int entityId;
@@ -34,13 +35,7 @@ public class TimeProjSync {
 
     public void handle(CustomPayloadEvent.Context ctx){
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            Minecraft mc = Minecraft.getInstance();
-            ClientLevel world = mc.level;
-            try {
-                Projectile projectile = (Projectile) world.getEntity(entityId);
-                projectile.setNoGravity(noGravity);
-                projectile.setDeltaMovement(deltaMovement);
-            } catch(NullPointerException|ClassCastException ignored) {}
+            ClientPacketHandler.clientProjSync(entityId, noGravity, deltaMovement);
         });
         ctx.setPacketHandled(true);
     }

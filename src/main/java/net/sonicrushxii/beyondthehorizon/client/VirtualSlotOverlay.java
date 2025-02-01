@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
@@ -165,7 +165,7 @@ public class VirtualSlotOverlay {
 
     //Register the Main Overlay
     public static final IGuiOverlay ABILITY_HUD = ((ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)-> {
-        LocalPlayer player = Minecraft.getInstance().player;
+        AbstractClientPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
 
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
@@ -180,7 +180,7 @@ public class VirtualSlotOverlay {
 
     });
 
-    public static void renderBaseFormSlots(LocalPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
+    public static void renderBaseFormSlots(AbstractClientPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {
         final int[] textureDimensions = {22,22};
         int x = textureDimensions[0]; //screenWidth  - (int)(textureDimensions[0]*1.5);
@@ -360,21 +360,21 @@ public class VirtualSlotOverlay {
         });
 
     }
-    public static void renderSuperFormSlots(LocalPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
+    public static void renderSuperFormSlots(AbstractClientPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {
         final int[] textureDimensions = {22,22};
         int x = textureDimensions[0]; //screenWidth  - (int)(textureDimensions[0]*1.5);
         int y = 0;
 
     }
-    public static void renderStarfallFormSlots(LocalPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
+    public static void renderStarfallFormSlots(AbstractClientPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {
         final int[] textureDimensions = {22,22};
         int x = textureDimensions[0]; //screenWidth  - (int)(textureDimensions[0]*1.5);
         int y = 0;
 
     }
-    public static void renderHyperFormSlots(LocalPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
+    public static void renderHyperFormSlots(AbstractClientPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {
         final int[] textureDimensions = {22,22};
         int x = textureDimensions[0]; //screenWidth  - (int)(textureDimensions[0]*1.5);

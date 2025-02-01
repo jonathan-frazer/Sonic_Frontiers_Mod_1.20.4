@@ -2,7 +2,7 @@ package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -89,7 +89,7 @@ public class BaseformClient {
         private static boolean airBoostLock = false;
     }
 
-    public static void performClientTick(LocalPlayer player, CompoundTag playerNBT) {
+    public static void performClientTick(AbstractClientPlayer player, CompoundTag playerNBT) {
         Minecraft minecraft = Minecraft.getInstance();
         Level level = player.level();
 
@@ -565,12 +565,12 @@ public class BaseformClient {
         });
     }
 
-    public static void performClientSecond(LocalPlayer player, CompoundTag playerNBT)
+    public static void performClientSecond(AbstractClientPlayer player, CompoundTag playerNBT)
     {
 
     }
 
-    public static void performDoublePress(LocalPlayer player, BaseformProperties baseformProperties, DoubleTapDirection doubleTapDirection)
+    public static void performDoublePress(AbstractClientPlayer player, BaseformProperties baseformProperties, DoubleTapDirection doubleTapDirection)
     {
         if(baseformProperties.isAttacking())
             return;

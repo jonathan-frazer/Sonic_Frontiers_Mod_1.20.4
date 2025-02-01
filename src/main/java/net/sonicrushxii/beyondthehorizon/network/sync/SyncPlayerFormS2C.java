@@ -1,15 +1,13 @@
 package net.sonicrushxii.beyondthehorizon.network.sync;
 
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.event_handler.client_handlers.ClientPacketHandler;
 
 public class SyncPlayerFormS2C {
     private final int playerId;
@@ -39,18 +37,7 @@ public class SyncPlayerFormS2C {
         ctx.enqueueWork(()->{
             //On Client Side
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                // This code is run on the client side
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.level == null) return;
-
-                // Get the player entity by ID
-                Player player = (Player) mc.level.getEntity(this.playerId);
-                if (player == null) return;
-
-                // Update the player's capability data on the client side
-                player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
-                    playerSonicForm.copyFrom(this.playerSonicForm);
-                });
+                ClientPacketHandler.playerFormSync(playerId,playerSonicForm);
             });
         });
         ctx.setPacketHandled(true);
