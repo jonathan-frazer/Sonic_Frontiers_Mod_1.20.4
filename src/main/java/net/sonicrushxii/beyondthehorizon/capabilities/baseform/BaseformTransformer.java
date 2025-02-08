@@ -58,8 +58,8 @@ public class BaseformTransformer {
             player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
 
             //Step Height
-            if (!player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).hasModifier(AttributeMultipliers.STEP_UP_BASE))
-                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).addTransientModifier(AttributeMultipliers.STEP_UP_BASE);
+            if (!player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).hasModifier(AttributeMultipliers.STEP_UP_BASE))
+                player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).addTransientModifier(AttributeMultipliers.STEP_UP_BASE);
 
             //Jump
             if(!player.hasEffect(MobEffects.JUMP)) player.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));
@@ -223,7 +223,7 @@ public class BaseformTransformer {
         PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)0));
 
         //Remove Effects
-        if (player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).hasModifier(AttributeMultipliers.STEP_UP_BASE)) player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).removeModifier(AttributeMultipliers.STEP_UP_BASE.getId());
+        if (player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).hasModifier(AttributeMultipliers.STEP_UP_BASE)) player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).removeModifier(AttributeMultipliers.STEP_UP_BASE.getId());
         player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.10000000149011612);
         player.removeEffect(MobEffects.JUMP);
         player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
