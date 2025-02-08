@@ -179,7 +179,8 @@ public class BaseformServer {
                                 baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3) {
                             try {
                                 if (ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
-                                        .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER))) {
+                                        .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)) && (player.getY()-player.blockPosition().getY()) < 0.5)
+                                {
                                     //Get Motion
                                     Vec3 lookAngle = player.getLookAngle();
                                     Vec3 playerDirection = new Vec3(lookAngle.x(), 0, lookAngle.z());
@@ -209,7 +210,7 @@ public class BaseformServer {
                                         ||
                                         !(baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3)
                                         ||
-                                        (player.getDeltaMovement().x < 0.5 && player.getDeltaMovement().y < 0.5 && player.getDeltaMovement().z < 0.5)
+                                        (player.getDeltaMovement().x < 0.2 && player.getDeltaMovement().y < 0.2 && player.getDeltaMovement().z < 0.2)
                                         ||
                                         player.isInWater())
                                 {
@@ -255,18 +256,6 @@ public class BaseformServer {
                                         0.001, 0.35f, 1f, 0.35f, 12,
                                         true)
                                 );
-
-                            //Wall Boost
-                            if (!Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
-                                    && player.getXRot() < -80.0
-                                    && baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3) {
-                                //Move Upward
-                                player.setSprinting(false);
-                                baseformProperties.wallBoosting = true;
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
-                                player.setDeltaMovement(new Vec3(0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 2.5, 0));
-                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
-                            }
                         }
                         //Wall Boost
                         if(baseformProperties.wallBoosting)

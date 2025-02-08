@@ -63,6 +63,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability.UltimateActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.wall_boost.WallBoost;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.lwjgl.glfw.GLFW;
@@ -168,6 +169,14 @@ public class BaseformClient {
 
                     //Quickstep
                     //Double Press
+
+                    //WallBoost
+                    if (!Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(player.level().getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
+                            && baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3
+                            && player.isSprinting() && !baseformProperties.wallBoosting && KeyBindings.INSTANCE.doubleJump.isDown())
+                    {
+                        PacketHandler.sendToServer(new WallBoost());
+                    }
 
                 }
                 //Light Speed Attack

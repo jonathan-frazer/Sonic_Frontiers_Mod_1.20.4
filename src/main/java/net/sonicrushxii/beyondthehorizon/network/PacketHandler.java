@@ -55,6 +55,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.wall_boost.WallBoost;
 import net.sonicrushxii.beyondthehorizon.network.sync.*;
 import net.sonicrushxii.beyondthehorizon.timehandler.TimeProjSync;
 
@@ -105,6 +106,8 @@ public class PacketHandler {
                 INSTANCE.messageBuilder(AirBoost.class, NetworkDirection.PLAY_TO_SERVER).encoder(AirBoost::encode).decoder(AirBoost::new).consumerMainThread(AirBoost::handle).add();
                 //Boost
                 INSTANCE.messageBuilder(Boost.class, NetworkDirection.PLAY_TO_SERVER).encoder(Boost::encode).decoder(Boost::new).consumerMainThread(Boost::handle).add();
+                INSTANCE.messageBuilder(WallBoost.class, NetworkDirection.PLAY_TO_SERVER).encoder(WallBoost::encode).decoder(WallBoost::new).consumerMainThread(WallBoost::handle).add();
+
                 //Quick Step
                 INSTANCE.messageBuilder(Sidestep.class, NetworkDirection.PLAY_TO_SERVER).encoder(Sidestep::encode).decoder(Sidestep::new).consumerMainThread(Sidestep::handle).add();
 
