@@ -178,7 +178,7 @@ public class BaseformServer {
                                 baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3) {
                             try {
                                 if (ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
-                                        .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)) && (player.getY()-player.blockPosition().getY()) < 0.5)
+                                        .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)) && (player.getY()-player.blockPosition().getY()) < 0.75)
                                 {
                                     //Get Motion
                                     Vec3 lookAngle = player.getLookAngle();
@@ -190,7 +190,7 @@ public class BaseformServer {
                                         baseformProperties.isWaterBoosting = true;
 
                                         //Slight upward
-                                        playerDirection = new Vec3(lookAngle.x(), 0.01, lookAngle.z());
+                                        playerDirection = new Vec3(lookAngle.x(), 0.001, lookAngle.z());
                                     }
 
                                     //Move Forward
