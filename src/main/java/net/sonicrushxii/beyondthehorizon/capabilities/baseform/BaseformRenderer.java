@@ -50,6 +50,14 @@ public class BaseformRenderer
             poseStack.popPose();
             event.setCanceled(true);
         }
+        //Humming Top
+        else if(baseformProperties.hummingTop > 0)
+        {
+            //Rotate Player
+            poseStack.pushPose();
+            poseStack.mulPose(Axis.XP.rotationDegrees(-2F));
+            poseStack.mulPose(Axis.YP.rotationDegrees((baseformProperties.hummingTop%7)*51.42F));
+        }
 
         //Ballform
         else if(baseformProperties.shouldBeInBallform())
@@ -71,15 +79,6 @@ public class BaseformRenderer
             poseStack.popPose();
 
             event.setCanceled(true);
-        }
-
-        //Humming Top
-        else if(baseformProperties.hummingTop > 0)
-        {
-            //Rotate Player
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.XP.rotationDegrees(-2F));
-            poseStack.mulPose(Axis.YP.rotationDegrees((baseformProperties.hummingTop%7)*51.42F));
         }
 
         //Mirage

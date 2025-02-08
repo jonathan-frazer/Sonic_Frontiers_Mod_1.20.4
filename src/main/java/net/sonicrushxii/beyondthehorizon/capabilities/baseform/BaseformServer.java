@@ -71,8 +71,8 @@ import java.util.*;
 public class BaseformServer {
 
     //Combo
-    private static final float HOMING_ATTACK_DAMAGE = 9.0f;
-    private static final float BALLFORM_DAMAGE = 6.0f;
+    private static final float HOMING_ATTACK_DAMAGE = 15.0f;
+    private static final float BALLFORM_DAMAGE = 10.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
     public static final float STOMP_DAMAGE = 12.0f;
     private static final float LIGHT_SPEED_ASSAULT = 20.0f;
@@ -101,7 +101,6 @@ public class BaseformServer {
 
     public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
     public static final HashMap<UUID,ScheduledTask> cyloopSoundEmitter = new HashMap<>();
-    public static final Map<UUID,ScheduledTask> comboDisplayReset = new HashMap<>();
 
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
