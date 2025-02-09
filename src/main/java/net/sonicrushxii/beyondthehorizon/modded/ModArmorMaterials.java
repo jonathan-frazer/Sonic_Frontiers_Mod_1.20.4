@@ -44,7 +44,6 @@ public enum ModArmorMaterials implements ArmorMaterial {
         this.repairIngredient = repairIngredient;
     }
 
-
     @Override
     public int getDurabilityForType(ArmorItem.Type type) {
         return BASE_DURABILITY[type.ordinal()]*this.durabilityMultiplier;

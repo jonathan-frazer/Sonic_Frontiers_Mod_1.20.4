@@ -71,6 +71,12 @@
       "beyondthehorizon:baseform/homing_shot_sfx"
     ]
   },
+  "humming_top": {
+    "subtitles": "sounds.sonic.baseform.humming_top",
+    "sounds": [
+      "beyondthehorizon:baseform/humming_top_sfx"
+    ]
+  },
   "light_speed_charge": {
     "subtitles": "sounds.sonic.baseform.light_speed_charge",
     "sounds": [

@@ -6,7 +6,9 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.sync.PlayerPlaySoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 
@@ -36,6 +38,11 @@ public class HummingTop {
             //Modify Data
             baseformProperties.hummingTop = 1;
 
+            //Play Sound
+            PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(player.blockPosition(),
+                    ModSounds.HUMMING_TOP.get().getLocation())
+            );
+
             PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
                             player.getId(),
@@ -51,6 +58,7 @@ public class HummingTop {
 
             //Gravity
             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+
             //Modify Data
             baseformProperties.hummingTop = 0;
             baseformProperties.ballFormState = 0;

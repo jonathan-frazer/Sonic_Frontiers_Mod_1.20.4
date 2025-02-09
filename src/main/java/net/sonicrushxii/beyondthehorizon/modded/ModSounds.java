@@ -37,6 +37,8 @@ public class ModSounds {
             registerSoundEvents("homing_attack");
     public static final RegistryObject<SoundEvent> HOMING_SHOT =
             registerSoundEvents("homing_shot");
+    public static final RegistryObject<SoundEvent> HUMMING_TOP =
+            registerSoundEvents("humming_top");
     public static final RegistryObject<SoundEvent> LIGHT_SPEED_CHARGE =
             registerSoundEvents("light_speed_charge");
     public static final RegistryObject<SoundEvent> LIGHT_SPEED_IDLE =
