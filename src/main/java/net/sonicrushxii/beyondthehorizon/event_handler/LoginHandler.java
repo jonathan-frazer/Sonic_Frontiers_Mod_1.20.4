@@ -25,7 +25,6 @@ public class LoginHandler {
 
     private void onServerLogin(ServerPlayer player)
     {
-        System.out.println("Logged In");
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
             if(playerSonicForm.getCurrentForm() == SonicForm.BASEFORM)
             {
@@ -51,7 +50,7 @@ public class LoginHandler {
                 baseformProperties.comboPointDisplay = 0;
 
                 //Revert Cyloop
-                baseformProperties.cylooping = false;
+                baseformProperties.cylooping = 0;
             }
 
             PacketHandler.sendToALLPlayers(

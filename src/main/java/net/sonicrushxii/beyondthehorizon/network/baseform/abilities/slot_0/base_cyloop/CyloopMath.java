@@ -10,6 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
@@ -19,8 +20,6 @@ import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 
 public class CyloopMath
 {
-    private static final float CYLOOP_DAMAGE = 15.0f;
-
     enum Direction{
         RIGHT(1.0,0),LEFT(-1.0,0),DOWN(0,-1.0),UP(0,1.0);
         private final double x;
@@ -147,7 +146,7 @@ public class CyloopMath
 
                             //Deal Damage
                             enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_CYLOOP.getResourceKey(), player),
-                                    CYLOOP_DAMAGE * 1.5F);
+                                    BaseformServer.CYLOOP_DAMAGE * 1.5F);
 
                             //Give the Cylooped Effect
                             enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 80, 0, false, false));
@@ -156,7 +155,7 @@ public class CyloopMath
                         else {
                             //Damage
                             enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_CYLOOP.getResourceKey(), player),
-                                    CYLOOP_DAMAGE);
+                                    BaseformServer.CYLOOP_DAMAGE);
 
                             //Launch Up
                             enemy.setDeltaMovement(0.0, 1.1, 0.0);

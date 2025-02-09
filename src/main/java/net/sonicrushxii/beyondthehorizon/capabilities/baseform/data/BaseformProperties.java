@@ -131,7 +131,7 @@ public class BaseformProperties extends FormProperties {
     public boolean isWaterBoosting;
     public byte lightSpeedState;
     public boolean powerBoost;
-    public boolean cylooping;
+    public short cylooping;
     public byte quickCyloop;
     public UUID qkCyloopTarget;
     public double qkCyloopMeter;
@@ -164,6 +164,7 @@ public class BaseformProperties extends FormProperties {
     public byte loopKick;
 
     //Slot 4
+    public byte rangedComboTrip;
     public UUID rangedTarget;
     public byte crossSlash;
     public byte homingShot;
@@ -208,7 +209,7 @@ public class BaseformProperties extends FormProperties {
         isWaterBoosting = false;
         lightSpeedState = 0;
         powerBoost = false;
-        cylooping = false;
+        cylooping = 0;
         quickCyloop = 0;
         qkCyloopTarget = new UUID(0L,0L);
         qkCyloopMeter = 0.0;
@@ -241,6 +242,7 @@ public class BaseformProperties extends FormProperties {
         loopKick = 0;
 
         //Slot 4
+        rangedComboTrip = 0;
         rangedTarget = new UUID(0L,0L);
         crossSlash = (byte)0;
         homingShot = (byte)0;
@@ -287,7 +289,7 @@ public class BaseformProperties extends FormProperties {
         isWaterBoosting = nbt.getBoolean("IsWaterBoosting");
         lightSpeedState = nbt.getByte("LightSpeedState");
         powerBoost = nbt.getBoolean("PowerBoost");
-        cylooping = nbt.getBoolean("isCylooping");
+        cylooping = nbt.getShort("cyloopTime");
         quickCyloop = nbt.getByte("quickCyloop");
         qkCyloopTarget = nbt.getUUID("QkCyloopTarget");
         qkCyloopMeter = nbt.getDouble("QkCyloopMeter");
@@ -320,6 +322,7 @@ public class BaseformProperties extends FormProperties {
         loopKick = nbt.getByte("LoopKick");
 
         //Slot 4
+        rangedComboTrip = nbt.getByte("RangedSemaphore");
         rangedTarget = nbt.getUUID("RangedTarget");
         crossSlash = nbt.getByte("CrossSlash");
         homingShot = nbt.getByte("HomingShot");
@@ -369,7 +372,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putBoolean("IsWaterBoosting",isWaterBoosting);
         nbt.putByte("LightSpeedState",lightSpeedState);
         nbt.putBoolean("PowerBoost",powerBoost);
-        nbt.putBoolean("isCylooping",cylooping);
+        nbt.putShort("cyloopTime",cylooping);
         nbt.putByte("QuickCyloop",quickCyloop);
         nbt.putUUID("QkCyloopTarget",qkCyloopTarget);
         nbt.putDouble("QkCyloopMeter",qkCyloopMeter);
@@ -402,6 +405,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("LoopKick",loopKick);
 
         //Slot 4
+        nbt.putByte("RangedSemaphore",rangedComboTrip);
         nbt.putUUID("RangedTarget",rangedTarget);
         nbt.putByte("CrossSlash",crossSlash);
         nbt.putByte("HomingShot",homingShot);

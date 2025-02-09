@@ -225,14 +225,14 @@ public class BaseformClient {
 
                 //Base Cyloop
                 if(VirtualSlotHandler.getCurrAbility() == 0 && isMoving && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useSingleAbility.isDown() && !player.isShiftKeyDown()) {
-                    if(!baseformProperties.cylooping){
+                    if(baseformProperties.cylooping <= 0){
                         PacketHandler.sendToServer(new Cyloop(true));
-                        baseformProperties.cylooping = true;
+                        baseformProperties.cylooping = 1;
                     }
                 }
-                else if(baseformProperties.cylooping) {
+                else if(baseformProperties.cylooping > 0) {
                     PacketHandler.sendToServer(new Cyloop(false));
-                    baseformProperties.cylooping = false;
+                    baseformProperties.cylooping = 0;
                 }
 
                 //Quick Cyloop

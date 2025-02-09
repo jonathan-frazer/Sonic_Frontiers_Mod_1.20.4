@@ -45,6 +45,7 @@ import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushParticleS2C;
@@ -58,17 +59,18 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMult
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
-import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
-import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
-import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
-import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
-import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
+import net.sonicrushxii.beyondthehorizon.network.sync.*;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
 
 import java.util.*;
 
-public class BaseformServer {
+public class BaseformServer
+{
+    //Cyloop
+    public static final float CYLOOP_DAMAGE = 15.0f;
+    public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
+    private static final float QK_CYLOOP_DAMAGE = 15.0f;
 
     //Combo
     private static final float HOMING_ATTACK_DAMAGE = 15.0f;
@@ -99,9 +101,6 @@ public class BaseformServer {
     public static final float PHANTOM_RUSH_DAMAGE = 10.0f;
     public static final float ULTIMATE_DAMAGE = 100.0f;
 
-    public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
-    public static final HashMap<UUID,ScheduledTask> cyloopSoundEmitter = new HashMap<>();
-
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
         Minecraft mc = Minecraft.getInstance();
@@ -131,17 +130,14 @@ public class BaseformServer {
                 if (!baseformProperties.hasDoubleJump && player.onGround()) {
                     baseformProperties.hasDoubleJump = true;
                 }
-                //Sprinting
-                if(!player.onGround() && player.isSprinting() && baseformProperties.groundTraction)
+                //Step Down
+                if(!player.onGround() && player.isSprinting() && baseformProperties.groundTraction && !baseformProperties.isWaterBoosting)
                 {
                     baseformProperties.groundTraction = false;
-                    System.out.println(player.getDeltaMovement().y);
-                    if (player.getDeltaMovement().y < 0.1 && !player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).hasModifier(AttributeMultipliers.SPRINT_GRAVITY))
+                    if (player.getDeltaMovement().y > -0.38 && player.getDeltaMovement().y < -0.078)
                     {
-                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).addTransientModifier(AttributeMultipliers.SPRINT_GRAVITY);
-                        Scheduler.scheduleTask(()->{
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).removeModifier(AttributeMultipliers.SPRINT_GRAVITY.getId());
-                        },5);
+                        player.addDeltaMovement(new Vec3(0,-0.85,0));
+                        player.connection.send(new ClientboundSetEntityMotionPacket(player));
                     }
                 }
                 if(player.onGround())
@@ -171,6 +167,10 @@ public class BaseformServer {
                     if (baseformProperties.airBoosts < 3 && player.onGround())
                         baseformProperties.airBoosts = 3;
 
+                    //Exit Ball form While swimming
+                    if(player.isInWater())
+                        baseformProperties.ballFormState = 0;
+
                     //Boost
                     {
                         //Water Boost
@@ -178,7 +178,7 @@ public class BaseformServer {
                                 baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3) {
                             try {
                                 if (ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
-                                        .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)) && (player.getY()-player.blockPosition().getY()) < 0.75)
+                                        .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)) && (player.getY()-player.blockPosition().getY()) < 0.45)
                                 {
                                     //Get Motion
                                     Vec3 lookAngle = player.getLookAngle();
@@ -190,7 +190,7 @@ public class BaseformServer {
                                         baseformProperties.isWaterBoosting = true;
 
                                         //Slight upward
-                                        playerDirection = new Vec3(lookAngle.x(), 0.001, lookAngle.z());
+                                        playerDirection = new Vec3(lookAngle.x(), 0.05, lookAngle.z());
                                     }
 
                                     //Move Forward
@@ -202,22 +202,23 @@ public class BaseformServer {
                         }
 
                         //Undo Water Boost
-                        try {
-                            if (baseformProperties.isWaterBoosting)
-                                if (!ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
+                        try
+                        {
+                            if (baseformProperties.isWaterBoosting &&
+                                    (!ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
                                         .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER))
                                         ||
                                         !(baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3)
                                         ||
-                                        (player.getDeltaMovement().x < 0.2 && player.getDeltaMovement().y < 0.2 && player.getDeltaMovement().z < 0.2)
+                                        !Utilities.isMoving(player.getDeltaMovement(),0.2)
                                         ||
                                         player.isInWater())
-                                {
-                                    player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
-                                    baseformProperties.isWaterBoosting = false;
-                                }
-                        } catch (NullPointerException ignored) {
-                        }
+                            )
+                            {
+                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                baseformProperties.isWaterBoosting = false;
+                            }
+                        } catch (NullPointerException ignored) {}
 
                         //Sprint Effects
                         if (player.isSprinting()) {
@@ -329,7 +330,7 @@ public class BaseformServer {
                     }
 
                     //Base Cyloop
-                    if(baseformProperties.cylooping)
+                    if(baseformProperties.cylooping != 0)
                     {
                         //Get a Deque of current Coordinates
                         Deque<Vec3> currCoords = cyloopCoords.get(player.getUUID());
@@ -340,15 +341,21 @@ public class BaseformServer {
                         Cyloop.addToList(currCoords,currPoint);
 
                         //Display all points in the list
-                        for(Vec3 coord: currCoords) {
-                            PacketHandler.sendToALLPlayers(new CyloopParticleS2C(coord));
+                        for(Vec3 coord: currCoords)    PacketHandler.sendToALLPlayers(new CyloopParticleS2C(coord));
+
+                        //Play Cyloop sound, if the player keeps holding it down
+                        if(baseformProperties.cylooping > 187)
+                        {
+                            baseformProperties.cylooping = 0;
+                            PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(player.blockPosition(),
+                                    ModSounds.CYLOOP.get().getLocation())
+                            );
                         }
+                        baseformProperties.cylooping += 1;
                     }
 
                     //Quick Cyloop
                     {
-                        final float QK_CYLOOP_DAMAGE = 15.0f;
-
                         //Duration
                         try {
                             if (baseformProperties.quickCyloop > 0) {
@@ -641,12 +648,10 @@ public class BaseformServer {
                             }
 
                         }
+
                         //Ability End
                         if(baseformProperties.hummingTop > 0 && player.onGround())
-                        {
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
-                            baseformProperties.hummingTop = 0;
-                        }
+                            HummingTop.hummingTopEnd(player);
                     }
 
                     //Speed Blitz
@@ -1458,6 +1463,10 @@ public class BaseformServer {
 
                 //Slot 4
                 {
+                    //If this is positive then drop until it becomes 1
+                    if(baseformProperties.rangedComboTrip > 0)
+                        baseformProperties.rangedComboTrip -= 1;
+
                     //Sonic Boom
                     {
                         try {

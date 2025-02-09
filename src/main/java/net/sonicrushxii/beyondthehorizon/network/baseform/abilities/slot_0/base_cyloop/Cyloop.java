@@ -14,7 +14,6 @@ import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerPlaySoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.PlayerStopSoundPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
-import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
 
 import java.util.ArrayDeque;
@@ -89,44 +88,41 @@ public class Cyloop {
         }
     }
 
-    public static void playCyloopSound(ServerPlayer player)
-    {
-        PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(player.blockPosition(),
-                ModSounds.CYLOOP.get().getLocation())
-        );
-        BaseformServer.cyloopSoundEmitter.put(player.getUUID(),Scheduler.scheduleTask(()->{
-            playCyloopSound(player);
-        },187));
-    }
-
     public static void toggleCyloop(ServerPlayer player, boolean activate)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            //Activate Cyloop
-            baseformProperties.cylooping = activate;
-
-            //If Activating, Initialize our list
+            //If Activating
             if(activate)
             {
-                playCyloopSound(player);
+                //Set Timer
+                baseformProperties.cylooping = 1;
 
+                //Play Sound
+                PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(player.blockPosition(),
+                        ModSounds.CYLOOP.get().getLocation())
+                );
+
+                //Initialize list
                 BaseformServer.cyloopCoords.put(
                         player.getUUID(),
                         new ArrayDeque<Vec3>(50)
                 );
             }
 
-            //If Deactivating, print List of Traversal. Discard the old list
+            //If Deactivating
             if(!activate)
             {
-                //Stop the Scheduler
-                BaseformServer.cyloopSoundEmitter.get(player.getUUID()).cancel();
+                //Set Timer
+                baseformProperties.cylooping = 0;
+
                 //StopSound in Minecraft
                 PacketHandler.sendToALLPlayers(new PlayerStopSoundPacketS2C(
                         ModSounds.CYLOOP.get().getLocation())
                 );
+
+                //Ready the Coordinates
                 CyloopMath.cyloopEffect(player,
                         BaseformServer.cyloopCoords.get(player.getUUID()).toArray());
             }

@@ -430,4 +430,13 @@ public class Utilities {
                     0, 0, 0);
         }
     }
+
+    public static boolean isMoving(Vec3 playerDeltaMovement, double threshold)
+    {
+        boolean x = Math.abs(playerDeltaMovement.x()) < threshold;
+        boolean y = Math.abs(playerDeltaMovement.y()) < threshold;
+        boolean z = Math.abs(playerDeltaMovement.z()) < threshold;
+
+        return !(x && y && z);
+    }
 }

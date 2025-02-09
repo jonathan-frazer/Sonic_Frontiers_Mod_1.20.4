@@ -121,7 +121,6 @@ public class BaseformHandler {
 
                     if (!damageGiver.onGround())
                     {
-
                         damageTaker.setDeltaMovement(Vec3.ZERO);
                         damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
                     }
@@ -273,7 +272,14 @@ public class BaseformHandler {
             //&&     (damageTaker.getHealth() < 3.0f || damageTaker.getMaxHealth() > 30.0f)
             )
             {
-                baseformProperties.comboPointCount += 1;
+                //Increase Counter
+                if(!event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()) || baseformProperties.rangedComboTrip <= 0)
+                    baseformProperties.comboPointCount += 1;
+
+                //Gives Ranged attack is a ~1 sec Delay
+                if(event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()) && baseformProperties.rangedComboTrip <= 0)
+                    baseformProperties.rangedComboTrip = 15;
+
                 assert damageGiver != null;
             }
 

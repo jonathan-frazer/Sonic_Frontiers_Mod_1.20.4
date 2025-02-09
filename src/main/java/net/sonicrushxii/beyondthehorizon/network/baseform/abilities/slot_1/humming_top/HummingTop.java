@@ -26,27 +26,34 @@ public class HummingTop {
         buffer.writeBoolean(this.activate);
     }
 
-    public static void performHummingTop(ServerPlayer player, boolean activate)
+    public static void hummingTopActivate(ServerPlayer player)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            if(activate)
-            {
-                //Gravity
-                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
-                //Modify Data
-                baseformProperties.hummingTop = 1;
+            //Gravity
+            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+            //Modify Data
+            baseformProperties.hummingTop = 1;
 
-            }
-            else
-            {
-                //Gravity
-                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
-                //Modify Data
-                baseformProperties.hummingTop = 0;
-            }
+            PacketHandler.sendToALLPlayers(
+                    new SyncPlayerFormS2C(
+                            player.getId(),
+                            playerSonicForm
+                    ));
+        });
+    }
 
+    public static void hummingTopEnd(ServerPlayer player)
+    {
+        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+
+            //Gravity
+            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+            //Modify Data
+            baseformProperties.hummingTop = 0;
+            baseformProperties.ballFormState = 0;
 
             PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
@@ -62,7 +69,8 @@ public class HummingTop {
                     ServerPlayer player = ctx.getSender();
                     if(player != null)
                     {
-                        performHummingTop(player,this.activate);
+                        if(this.activate)   hummingTopActivate(player);
+                        else                hummingTopEnd(player);
                     }
                 });
         ctx.setPacketHandled(true);
