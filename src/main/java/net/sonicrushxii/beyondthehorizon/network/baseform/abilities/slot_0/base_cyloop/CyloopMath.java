@@ -182,15 +182,20 @@ public class CyloopMath
                 }
         }
 
-        //If Cyloop is closed and no enemies were hit, Give Absorption
+        //If Cyloop is closed and no enemies were hit, Give Absorption & Regen
         if(cyloopClosed && !enemyHit)
         {
+            //Absorption
             int absorptionAmt = (int) Math.ceil(player.getAbsorptionAmount());
             int amplifier = -1 + (1+absorptionAmt/8)*2;
             if(amplifier != -1 && amplifier < 10) {
                 if(player.hasEffect(MobEffects.ABSORPTION))     player.removeEffect(MobEffects.ABSORPTION);
                 player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, -1, amplifier, false, false));
             }
+
+            //Regeneration
+            if(player.hasEffect(MobEffects.REGENERATION))     player.removeEffect(MobEffects.REGENERATION);
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 20, 3, false, false));
 
             //Cyloop Rings
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.CYLOOP_RINGS.get(), SoundSource.MASTER, 1.0f, 1.0f);

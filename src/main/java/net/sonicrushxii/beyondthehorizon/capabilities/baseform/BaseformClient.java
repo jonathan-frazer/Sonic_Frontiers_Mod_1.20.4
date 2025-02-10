@@ -193,7 +193,7 @@ public class BaseformClient {
                             PacketHandler.sendToServer(new LightspeedEffect());
                             level.playLocalSound(player.getX(),player.getY(),player.getZ(),
                                     Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(ModSounds.LIGHT_SPEED_IDLE.get().getLocation())),
-                                    SoundSource.MASTER, 0.75f, 1.0f, true);
+                                    SoundSource.MASTER, 0.33f, 1.0f, true);
 
                             Scheduler.scheduleTask(()->{
                                 minecraft.getSoundManager().stop(ModSounds.LIGHT_SPEED_IDLE.get().getLocation(), SoundSource.MASTER);
