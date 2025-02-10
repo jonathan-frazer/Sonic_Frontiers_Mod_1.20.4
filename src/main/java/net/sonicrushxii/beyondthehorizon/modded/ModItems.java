@@ -15,6 +15,8 @@ public class ModItems {
 
     public static final RegistryObject<Item> BASEFORM_CHESTPLATE = ITEMS.register("sonic_baseform_armor_chestplate",
             ()-> new SonicChestplateItem(ModArmorMaterials.BASEFORM_SONIC, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
+    public static final RegistryObject<Item> BASEFORM_POWERBOOST_CHESTPLATE = ITEMS.register("sonic_baseform_powerboost_chestplate",
+            ()-> new SonicChestplateItem(ModArmorMaterials.BASEFORM_SONIC, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
     public static final RegistryObject<Item> BASEFORM_LEGGINGS = ITEMS.register("sonic_baseform_armor_leggings",
             ()-> new ArmorItem(ModArmorMaterials.BASEFORM_SONIC, ArmorItem.Type.LEGGINGS, new Item.Properties()));
     public static final RegistryObject<Item> BASEFORM_BOOTS = ITEMS.register("sonic_baseform_armor_boots",

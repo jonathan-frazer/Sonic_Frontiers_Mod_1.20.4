@@ -134,7 +134,9 @@ public class BaseformServer
                 if(!player.onGround() && player.isSprinting() && baseformProperties.groundTraction && !baseformProperties.isWaterBoosting)
                 {
                     baseformProperties.groundTraction = false;
-                    if (player.getDeltaMovement().y > -0.38 && player.getDeltaMovement().y < -0.078)
+                    if (player.getDeltaMovement().y > -0.38 && player.getDeltaMovement().y < -0.078 &&
+                            Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+"")
+                    )
                     {
                         player.addDeltaMovement(new Vec3(0,-0.85,0));
                         player.connection.send(new ClientboundSetEntityMotionPacket(player));

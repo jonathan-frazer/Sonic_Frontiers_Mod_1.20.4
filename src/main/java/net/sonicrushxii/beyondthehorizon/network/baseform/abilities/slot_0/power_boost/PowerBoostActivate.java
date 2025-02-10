@@ -17,6 +17,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
+import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
@@ -47,7 +48,16 @@ public class PowerBoostActivate {
             if(baseformProperties.lightSpeedState != (byte)2)
             {
                 Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
-                armorItems.next(); armorItems.next(); armorItems.next();
+                armorItems.next(); armorItems.next();
+                try {
+                    if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
+                        ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_POWERBOOST_CHESTPLATE.get());
+                        itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
+                        player.setItemSlot(EquipmentSlot.CHEST, itemToPlace);
+                    }
+                }
+                catch(NullPointerException ignored){}
+
                 try{
                     if(armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 2){
                         EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
@@ -55,6 +65,8 @@ public class PowerBoostActivate {
                     }
                 }
                 catch(NullPointerException ignored){}
+
+                player.setItemSlot(EquipmentSlot.HEAD, BaseformProperties.baseformPBSonicHead);
             }
 
             //Power Boost Data

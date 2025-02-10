@@ -28,8 +28,10 @@ public class SonicChestplateItem extends ModArmorItem{
 
     @Override
     public @Nullable String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-        if(stack.is(ModItems.BASEFORM_CHESTPLATE.get())) return makeCustomTextureLocation(BeyondTheHorizon.MOD_ID,"baseform_sonic_armor");
-        else if(stack.is(ModItems.BASEFORM_LIGHTSPEED_CHESTPLATE.get())) return makeCustomTextureLocation(BeyondTheHorizon.MOD_ID,"baseform_ls_sonic_armor");
-        else return null;
+
+        if(stack.is(ModItems.BASEFORM_CHESTPLATE.get()))                    return makeCustomTextureLocation(BeyondTheHorizon.MOD_ID,"baseform_sonic_armor");
+        else if(stack.is(ModItems.BASEFORM_POWERBOOST_CHESTPLATE.get()))    return makeCustomTextureLocation(BeyondTheHorizon.MOD_ID,"baseform_pb_sonic_armor");
+        else if(stack.is(ModItems.BASEFORM_LIGHTSPEED_CHESTPLATE.get()))    return makeCustomTextureLocation(BeyondTheHorizon.MOD_ID,"baseform_ls_sonic_armor");
+        else                                                                return null;
     }
 }

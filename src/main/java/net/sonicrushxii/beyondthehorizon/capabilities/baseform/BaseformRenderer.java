@@ -50,7 +50,6 @@ public class BaseformRenderer
                 float rotation = (float) (90.0F * Math.sin((Math.PI / 2) * PlayerTickHandler.tickCounter%4) * (Math.PI / 180));
                 modelPart.getChild("RightLeg").xRot = rotation;
                 modelPart.getChild("LeftLeg").xRot = -rotation;
-                System.err.println((PlayerTickHandler.tickCounter%4)+":"+Math.toDegrees(rotation)+","+Math.toDegrees(-rotation));
             });
             poseStack.popPose();
             event.setCanceled(true);
