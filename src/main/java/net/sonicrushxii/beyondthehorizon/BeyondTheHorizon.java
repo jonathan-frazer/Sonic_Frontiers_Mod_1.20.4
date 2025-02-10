@@ -160,6 +160,8 @@ public class BeyondTheHorizon
             event.registerLayerDefinition(SonicFlatPlayerModel.LAYER_LOCATION, SonicFlatPlayerModel::createBodyLayer);
             //Peelout Model
             event.registerLayerDefinition(SonicPeeloutModel.LAYER_LOCATION, SonicPeeloutModel::createBodyLayer);
+            //Boost Model
+            event.registerLayerDefinition(SonicBoostModel.LAYER_LOCATION, SonicBoostModel::createBodyLayer);
 
             //Parry Model
             event.registerLayerDefinition(ParryModelPre.LAYER_LOCATION, ParryModelPre::createBodyLayer);

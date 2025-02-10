@@ -15,6 +15,7 @@ import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.*;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
+import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
 
 @Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
@@ -29,8 +30,33 @@ public class BaseformRenderer
 
         PoseStack poseStack = event.getPoseStack();
 
+        //Boost
+        if(baseformProperties.boostLvl == 3 && player.isSprinting() && (player.onGround() || baseformProperties.isWaterBoosting))
+        {
+            poseStack.pushPose();
+
+            //Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+
+            poseStack.translate(0D,-1.5D,0D);
+
+            //Render The Custom Model
+            ModModelRenderer.renderPlayerModel(SonicBoostModel.class,event,poseStack,baseformProperties,(modelPart)->{
+                modelPart.getChild("Head").xRot = (float)(player.getXRot()*Math.PI/180);
+                float rotation = (float) (90.0F * Math.sin((Math.PI / 2) * PlayerTickHandler.tickCounter%4) * (Math.PI / 180));
+                modelPart.getChild("RightLeg").xRot = rotation;
+                modelPart.getChild("LeftLeg").xRot = -rotation;
+                System.err.println((PlayerTickHandler.tickCounter%4)+":"+Math.toDegrees(rotation)+","+Math.toDegrees(-rotation));
+            });
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
         //Peelout
-        if(baseformProperties.boostLvl == 2 && player.isSprinting() && (player.onGround() || baseformProperties.isWaterBoosting))
+        else if(baseformProperties.boostLvl == 2 && player.isSprinting() && (player.onGround() || baseformProperties.isWaterBoosting))
         {
             poseStack.pushPose();
 
