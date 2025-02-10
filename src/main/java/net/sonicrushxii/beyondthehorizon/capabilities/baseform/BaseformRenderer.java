@@ -31,7 +31,7 @@ public class BaseformRenderer
         PoseStack poseStack = event.getPoseStack();
 
         //Boost
-        if(baseformProperties.boostLvl == 3 && player.isSprinting() && (player.onGround() || baseformProperties.isWaterBoosting))
+        if(baseformProperties.boostLvl == 3 && player.isSprinting())
         {
             poseStack.pushPose();
 
@@ -55,7 +55,7 @@ public class BaseformRenderer
             event.setCanceled(true);
         }
         //Peelout
-        else if(baseformProperties.boostLvl == 2 && player.isSprinting() && (player.onGround() || baseformProperties.isWaterBoosting))
+        else if(baseformProperties.boostLvl == 2 && player.isSprinting())
         {
             poseStack.pushPose();
 
