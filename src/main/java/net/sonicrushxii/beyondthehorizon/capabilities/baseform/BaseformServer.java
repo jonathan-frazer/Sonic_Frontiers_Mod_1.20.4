@@ -2178,10 +2178,14 @@ public class BaseformServer
                     }
                     catch(NullPointerException|InterruptedException|ClassCastException e)
                     {
-                        if(baseformProperties.ultTarget != null) {
+                        if(baseformProperties.ultTarget != null)
+                        {
+                            //If you can find enemy make sure it goes back
                             LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.ultTarget);
                             if(enemy != null)  enemy.setInvulnerable(false);
                         }
+
+                        //Return Attributes to normal
                         baseformProperties.ultimateUse = 0;
                         player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.0);
                         player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);

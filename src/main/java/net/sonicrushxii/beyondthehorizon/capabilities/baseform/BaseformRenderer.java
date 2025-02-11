@@ -30,8 +30,38 @@ public class BaseformRenderer
 
         PoseStack poseStack = event.getPoseStack();
 
+        //Humming Top
+        if(baseformProperties.hummingTop > 0)
+        {
+            //Rotate Player
+            poseStack.pushPose();
+            poseStack.mulPose(Axis.XP.rotationDegrees(-2F));
+            poseStack.mulPose(Axis.YP.rotationDegrees((baseformProperties.hummingTop%7)*51.42F));
+        }
+
+        //Ballform
+        else if(baseformProperties.shouldBeInBallform())
+        {
+            poseStack.pushPose();
+
+            //Translate
+            poseStack.translate(0.0D, -0.65D, 0.0D);
+
+            // Scale
+            poseStack.scale(1.15f, 1.15f, 1.15f);
+
+            //Apply Rotation
+            float playerYaw = (player.getYRot() > 180.0) ? player.getYRot() - 180.0f : player.getYRot() + 180.0f;
+            poseStack.mulPose(Axis.YP.rotationDegrees(-playerYaw));
+
+            //Render The Custom Model
+            ModModelRenderer.renderModel(Spindash.class, event, poseStack,null);
+            poseStack.popPose();
+
+            event.setCanceled(true);
+        }
         //Boost
-        if(baseformProperties.boostLvl == 3 && player.isSprinting())
+        else if(baseformProperties.boostLvl == 3 && player.isSprinting())
         {
             poseStack.pushPose();
 
@@ -73,36 +103,6 @@ public class BaseformRenderer
                 modelPart.getChild("Head").xRot = (float)(player.getXRot()*Math.PI/180);
             });
             poseStack.popPose();
-            event.setCanceled(true);
-        }
-        //Humming Top
-        else if(baseformProperties.hummingTop > 0)
-        {
-            //Rotate Player
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.XP.rotationDegrees(-2F));
-            poseStack.mulPose(Axis.YP.rotationDegrees((baseformProperties.hummingTop%7)*51.42F));
-        }
-
-        //Ballform
-        else if(baseformProperties.shouldBeInBallform())
-        {
-            poseStack.pushPose();
-
-            //Translate
-            poseStack.translate(0.0D, -0.65D, 0.0D);
-
-            // Scale
-            poseStack.scale(1.15f, 1.15f, 1.15f);
-
-            //Apply Rotation
-            float playerYaw = (player.getYRot() > 180.0) ? player.getYRot() - 180.0f : player.getYRot() + 180.0f;
-            poseStack.mulPose(Axis.YP.rotationDegrees(-playerYaw));
-
-            //Render The Custom Model
-            ModModelRenderer.renderModel(Spindash.class, event, poseStack,null);
-            poseStack.popPose();
-
             event.setCanceled(true);
         }
 

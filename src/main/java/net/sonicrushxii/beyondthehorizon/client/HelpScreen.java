@@ -8,9 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 
 public class HelpScreen extends Screen {
-    private static final Component TITLE = Component.translatable("gui."+ BeyondTheHorizon.MOD_ID+".example_block_screen");
-    private static final Component EXAMPLE_BUTTON = Component.translatable("gui."+BeyondTheHorizon.MOD_ID+".example_block_screen.button.example_button");
-    private static final ResourceLocation TEXTURE = new ResourceLocation(BeyondTheHorizon.MOD_ID,"textures/gui/example_block_screen.png");
+    private static final Component TITLE = Component.translatable("gui."+BeyondTheHorizon.MOD_ID+".sonic_help_screen.title");
     private static final int OFFSET = 5;
     private static final int MAX_SLOT = 10;
 
@@ -53,9 +51,21 @@ public class HelpScreen extends Screen {
                         .build());
     }
 
+    public static String padNumber(int num)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        //Pad 0's based on your max slot
+        for(int i=0;i<((byte)Math.log10(MAX_SLOT)-(byte)Math.log10(num));++i)
+            sb.append('0');
+        sb.append(num);
+
+        return sb.toString();
+    }
+
     private ResourceLocation getTexture()
     {
-        return TEXTURE;
+        return new ResourceLocation(BeyondTheHorizon.MOD_ID,"textures/help_screen_gui/sonic_block_screen_"+this.scrollIdx+".png");
     }
 
     private void handlePageTurn(Button button)
@@ -72,7 +82,7 @@ public class HelpScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
         guiGraphics.blit(getTexture(), this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
-        guiGraphics.drawString(this.font, TITLE, this.leftPos + 8, this.topPos + 8, 0x404040, false);
+        guiGraphics.drawString(this.font, padNumber(this.scrollIdx)+"/"+MAX_SLOT, this.leftPos + 17*this.imageWidth/40, this.topPos - 16, 0xFFFFFF, false);
     }
 
     @Override
