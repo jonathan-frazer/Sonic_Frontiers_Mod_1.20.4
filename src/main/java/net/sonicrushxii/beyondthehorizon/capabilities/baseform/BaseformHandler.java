@@ -167,7 +167,7 @@ public class BaseformHandler {
                     }
 
                     //Increase Count
-                    baseformProperties.meleeHitCount = (byte) ((baseformProperties.meleeHitCount + 1) % 6);
+                    baseformProperties.meleeHitCount = (byte) ((baseformProperties.meleeHitCount + 1) % 5);
 
                     //Cancel the Current Combo schedule
                     ScheduledTask currentSchedule = hitSchedule.get(damageGiver.getUUID());
