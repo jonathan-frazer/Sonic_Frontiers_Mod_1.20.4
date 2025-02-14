@@ -138,7 +138,7 @@ public class BaseformServer
                             Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+"")
                     )
                     {
-                        player.addDeltaMovement(new Vec3(0,-0.85,0));
+                        player.setDeltaMovement(player.getDeltaMovement().x,-0.65,player.getDeltaMovement().z);
                         player.connection.send(new ClientboundSetEntityMotionPacket(player));
                     }
                 }
