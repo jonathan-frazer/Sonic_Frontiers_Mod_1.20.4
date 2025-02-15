@@ -62,51 +62,6 @@ public class BaseformRenderer
 
             event.setCanceled(true);
         }
-        //Boost
-        else if(baseformProperties.boostLvl == 3 && player.isSprinting())
-        {
-            poseStack.pushPose();
-
-            //Scale
-            poseStack.scale(1.0f, 1.0f, 1.0f);
-
-            //Apply Rotation & Translation
-            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
-            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
-
-            poseStack.translate(0D,-1.5D,0D);
-
-            //Render The Custom Model
-            ModModelRenderer.renderPlayerModel(SonicBoostModel.class,event,poseStack,baseformProperties,(modelPart)->{
-                modelPart.getChild("Head").xRot = (float)(player.getXRot()*Math.PI/180);
-                float rotation = (float) (90.0F * Math.sin((Math.PI / 2) * PlayerTickHandler.tickCounter%4) * (Math.PI / 180));
-                modelPart.getChild("RightLeg").xRot = rotation;
-                modelPart.getChild("LeftLeg").xRot = -rotation;
-            });
-            poseStack.popPose();
-            event.setCanceled(true);
-        }
-        //Peelout
-        else if(baseformProperties.boostLvl == 2 && player.isSprinting())
-        {
-            poseStack.pushPose();
-
-            //Scale
-            poseStack.scale(1.0f, 1.0f, 1.0f);
-
-            //Apply Rotation & Translation
-            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
-            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
-
-            poseStack.translate(0D,-1.5D,0D);
-
-            //Render The Custom Model
-            ModModelRenderer.renderSonicPeelout(SonicPeeloutModel.class,event,poseStack,baseformProperties,(modelPart)->{
-                modelPart.getChild("Head").xRot = (float)(player.getXRot()*Math.PI/180);
-            });
-            poseStack.popPose();
-            event.setCanceled(true);
-        }
 
         //Mirage
         else if(baseformProperties.mirageTimer > 0)
@@ -390,6 +345,51 @@ public class BaseformRenderer
             //Render The Custom Model
             ModModelRenderer.renderPlayerModel(UltimateKickModel.class, event, poseStack,baseformProperties,null);
 
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
+        //Peelout
+        else if(baseformProperties.boostLvl == 2 && player.isSprinting())
+        {
+            poseStack.pushPose();
+
+            //Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+
+            poseStack.translate(0D,-1.5D,0D);
+
+            //Render The Custom Model
+            ModModelRenderer.renderSonicPeelout(SonicPeeloutModel.class,event,poseStack,baseformProperties,(modelPart)->{
+                modelPart.getChild("Head").xRot = (float)(player.getXRot()*Math.PI/180);
+            });
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
+        //Boost
+        else if(baseformProperties.boostLvl == 3 && player.isSprinting())
+        {
+            poseStack.pushPose();
+
+            //Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+
+            poseStack.translate(0D,-1.5D,0D);
+
+            //Render The Custom Model
+            ModModelRenderer.renderPlayerModel(SonicBoostModel.class,event,poseStack,baseformProperties,(modelPart)->{
+                modelPart.getChild("Head").xRot = (float)(player.getXRot()*Math.PI/180);
+                float rotation = (float) (90.0F * Math.sin((Math.PI / 2) * PlayerTickHandler.tickCounter%4) * (Math.PI / 180));
+                modelPart.getChild("RightLeg").xRot = rotation;
+                modelPart.getChild("LeftLeg").xRot = -rotation;
+            });
             poseStack.popPose();
             event.setCanceled(true);
         }
