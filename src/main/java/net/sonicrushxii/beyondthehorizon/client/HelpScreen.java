@@ -10,7 +10,7 @@ import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 public class HelpScreen extends Screen {
     private static final Component TITLE = Component.translatable("gui."+BeyondTheHorizon.MOD_ID+".sonic_help_screen.title");
     private static final int OFFSET = 5;
-    private static final int MAX_SLOT = 10;
+    private static final int MAX_SLOT = 25;
 
     private Button button;
     private Button leftArrow;
