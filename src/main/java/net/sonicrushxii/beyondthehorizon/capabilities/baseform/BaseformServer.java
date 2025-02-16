@@ -22,6 +22,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -225,47 +226,9 @@ public class BaseformServer
                         //Sprint Effects
                         if (player.isSprinting()) {
                             //Particles
-                            switch (baseformProperties.boostLvl) {
-                                case 1:
-                                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                            ParticleTypes.CAMPFIRE_COSY_SMOKE,
-                                            player.getX()+0.00, player.getY()+0.05, player.getZ()+0.00,
-                                            0.001, 0.00f, 0.00f, 0.00f, 1,
-                                            true));
-                                    break;
-                                case 2:
-                                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                            new DustParticleOptions((baseformProperties.ballFormState==0)?(new Vector3f(1.000f, 0.000f, 0.000f)):(new Vector3f(0.000f, 0.000f, 0.800f)), 2f),
-                                            player.getX()+0.00, player.getY()+0.35, player.getZ()+0.00,
-                                            0.001, 0.25f, 0.25f, 0.25f, 4,
-                                            true)
-                                    );
-                                    break;
-                                case 3:
-                                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                            new DustParticleOptions(new Vector3f(0.0f, 0.89f, 1.00f), 1),
-                                            player.getX()+0.00, player.getY()+1.0, player.getZ()+0.00,
-                                            0.001, 0.35f, 1f, 0.35f, 12,
-                                            true)
-                                    );
-                                    break;
-                                default:
-                            }
-                            if (ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock()).equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)))
-                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                        ParticleTypes.FALLING_WATER,
-                                        player.getX()+0.00, player.getY()+1.0, player.getZ()+0.00,
-                                        0.001, 0.35f, 1f, 0.35f, 12,
-                                        true)
-                                );
-                        }
-                        //Wall Boost
-                        if(baseformProperties.wallBoosting)
-                        {
-                            if (!Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + ""))
-                            {
-                                //Particle
-                                switch (baseformProperties.boostLvl) {
+                            if(player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR)
+                                switch (baseformProperties.boostLvl)
+                                {
                                     case 1:
                                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                                 ParticleTypes.CAMPFIRE_COSY_SMOKE,
@@ -283,14 +246,57 @@ public class BaseformServer
                                         break;
                                     case 3:
                                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                                new DustParticleOptions(new Vector3f(0.0f, 0.89f, 1.00f), 1.2F),
+                                                new DustParticleOptions(new Vector3f(0.0f, 0.89f, 1.00f), 1),
                                                 player.getX()+0.00, player.getY()+1.0, player.getZ()+0.00,
-                                                0.001, 0.35f, 1f, 0.35f, 21,
+                                                0.001, 0.35f, 1f, 0.35f, 12,
                                                 true)
                                         );
                                         break;
                                     default:
                                 }
+
+                            if (ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock()).equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)))
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        ParticleTypes.FALLING_WATER,
+                                        player.getX()+0.00, player.getY()+1.0, player.getZ()+0.00,
+                                        0.001, 0.35f, 1f, 0.35f, 12,
+                                        true)
+                                );
+                        }
+                        //Wall Boost
+                        if(baseformProperties.wallBoosting)
+                        {
+                            if (!Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + ""))
+                            {
+                                //Particle
+                                if(player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR)
+                                    switch (baseformProperties.boostLvl)
+                                    {
+                                        case 1:
+                                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                                    ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                                                    player.getX()+0.00, player.getY()+0.05, player.getZ()+0.00,
+                                                    0.001, 0.00f, 0.00f, 0.00f, 1,
+                                                    true));
+                                            break;
+                                        case 2:
+                                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                                    new DustParticleOptions((baseformProperties.ballFormState==0)?(new Vector3f(1.000f, 0.000f, 0.000f)):(new Vector3f(0.000f, 0.000f, 0.800f)), 2f),
+                                                    player.getX()+0.00, player.getY()+0.35, player.getZ()+0.00,
+                                                    0.001, 0.25f, 0.25f, 0.25f, 4,
+                                                    true)
+                                            );
+                                            break;
+                                        case 3:
+                                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                                    new DustParticleOptions(new Vector3f(0.0f, 0.89f, 1.00f), 1.2F),
+                                                    player.getX()+0.00, player.getY()+1.0, player.getZ()+0.00,
+                                                    0.001, 0.35f, 1f, 0.35f, 21,
+                                                    true)
+                                            );
+                                            break;
+                                        default:
+                                    }
 
                                 //Motion
                                 player.setDeltaMovement(new Vec3(0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 2.5, 0));
@@ -305,7 +311,7 @@ public class BaseformServer
 
                     //Light Speed Attack
                     //Particles
-                    if (baseformProperties.lightSpeedState == (byte) 1)
+                    if (baseformProperties.lightSpeedState == (byte) 1 && player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR)
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 new DustParticleOptions(new Vector3f(0.0f, 1.2f, 1.0f), 1),
                                 player.getX()+0.00, player.getY()+0.35, player.getZ()+0.00,
@@ -314,7 +320,8 @@ public class BaseformServer
                         );
 
                     //Power Boost
-                    if (baseformProperties.powerBoost) {
+                    if (baseformProperties.powerBoost && player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR)
+                    {
                         PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                 ParticleTypes.ENCHANTED_HIT,
                                 player.getX()+0.00, player.getY()+0.85, player.getZ()+0.00,
@@ -327,8 +334,6 @@ public class BaseformServer
                                 0.0, 0.80f, 1.00f, 0.80f, 1,
                                 true)
                         );
-
-
                     }
 
                     //Base Cyloop
@@ -360,7 +365,7 @@ public class BaseformServer
                     {
                         //Duration
                         try {
-                            if (baseformProperties.quickCyloop > 0) {
+                            if (baseformProperties.quickCyloop > 0 && player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) {
                                 //Increment Counter
                                 baseformProperties.quickCyloop += 1;
 
@@ -501,7 +506,8 @@ public class BaseformServer
                                     true)
                             );
                         }
-                        if (baseformProperties.ballFormState == (byte) 2) {
+                        if (baseformProperties.ballFormState == (byte) 2)
+                        {
                             player.setDeltaMovement((Utilities.calculateViewVector(0,player.getYRot())).scale(Math.min(10.0,baseformProperties.spinDashChargeTime/10f)));
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 

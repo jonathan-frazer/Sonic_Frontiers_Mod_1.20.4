@@ -29,6 +29,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitzOff;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.SpindashBreak;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.CycloneKick;
@@ -51,6 +52,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.grand
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.Parry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability.UltimateActivate;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.HelpScreenSync;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
@@ -84,6 +86,9 @@ public class PacketHandler {
 
         //Base form
         {
+            //HelpScreen
+            INSTANCE.messageBuilder(HelpScreenSync.class, NetworkDirection.PLAY_TO_SERVER).encoder(HelpScreenSync::encode).decoder(HelpScreenSync::new).consumerMainThread(HelpScreenSync::handle).add();
+
             //Passives
             {
                 INSTANCE.messageBuilder(StartSprint.class, NetworkDirection.PLAY_TO_SERVER).encoder(StartSprint::encode).decoder(StartSprint::new).consumerMainThread(StartSprint::handle).add();
@@ -133,6 +138,7 @@ public class PacketHandler {
             {
                 //Spin Dash
                 INSTANCE.messageBuilder(ChargeSpindash.class, NetworkDirection.PLAY_TO_SERVER).encoder(ChargeSpindash::encode).decoder(ChargeSpindash::new).consumerMainThread(ChargeSpindash::handle).add();
+                INSTANCE.messageBuilder(SpindashBreak.class, NetworkDirection.PLAY_TO_SERVER).encoder(SpindashBreak::encode).decoder(SpindashBreak::new).consumerMainThread(SpindashBreak::handle).add();
                 INSTANCE.messageBuilder(LaunchSpindash.class, NetworkDirection.PLAY_TO_SERVER).encoder(LaunchSpindash::encode).decoder(LaunchSpindash::new).consumerMainThread(LaunchSpindash::handle).add();
 
                 //Homing Attack

@@ -42,6 +42,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitzDash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.SpindashBreak;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.CycloneKick;
@@ -105,6 +106,7 @@ public class BaseformClient {
                 || InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_LCONTROL));
         final boolean isShiftDown = (InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_RSHIFT)
                 || InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_LSHIFT));
+        final boolean holdingLeftClick = minecraft.options.keyAttack.isDown();
 
         final boolean isMoving = player.getDeltaMovement().lengthSqr() > 0.01;
 
@@ -250,7 +252,7 @@ public class BaseformClient {
                 //Spin Dash
                 {
                     //Charge Spindash
-                    if (VirtualSlotHandler.getCurrAbility() == 1 && player.isShiftKeyDown() &&
+                    if(VirtualSlotHandler.getCurrAbility() == 1 && player.isShiftKeyDown() &&
                             player.getXRot() > 80.0 && baseformProperties.ballFormState == (byte) 0 &&
                             KeyBindings.INSTANCE.useAbility1.isDown() && !baseformProperties.isAttacking()) {
                         //Set Camera
@@ -265,10 +267,15 @@ public class BaseformClient {
                     }
 
                     //Launch Spindash
-                    if (!player.isShiftKeyDown() && baseformProperties.ballFormState == (byte)1)
+                    if(!player.isShiftKeyDown() && baseformProperties.ballFormState == (byte)1)
                     {
                         PacketHandler.sendToServer(new LaunchSpindash());
+                    }
 
+                    //Break blocks with Spindash
+                    if(holdingLeftClick && baseformProperties.ballFormState == (byte)2)
+                    {
+                        PacketHandler.sendToServer(new SpindashBreak());
                     }
 
                 }
@@ -567,7 +574,9 @@ public class BaseformClient {
             {
                 if(KeyBindings.INSTANCE.helpButton.consumeClick())
                 {
-                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ()->()-> Minecraft.getInstance().setScreen(new HelpScreen()));
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ()->()-> {
+                        Minecraft.getInstance().setScreen(new HelpScreen(baseformProperties.helpScreenPageNo));
+                    });
                     while(KeyBindings.INSTANCE.helpButton.consumeClick());
                 }
             }

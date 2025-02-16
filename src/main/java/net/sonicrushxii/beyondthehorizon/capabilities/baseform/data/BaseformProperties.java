@@ -110,6 +110,7 @@ public class BaseformProperties extends FormProperties {
         baseformPBSonicHead.setTag(nbt);
     }
 
+    public int helpScreenPageNo;
     private final byte[] abilityCooldowns;
     public short comboPointCount;
     public short comboPointDisplay;
@@ -188,6 +189,7 @@ public class BaseformProperties extends FormProperties {
 
     public BaseformProperties()
     {
+        helpScreenPageNo = 0;
         abilityCooldowns = new byte[BaseformActiveAbility.values().length];
         meleeHitCount = 0;
         comboPointCount = 0;
@@ -268,6 +270,7 @@ public class BaseformProperties extends FormProperties {
     public BaseformProperties(CompoundTag nbt)
     {
         //Common
+        helpScreenPageNo = nbt.getInt("HelpScreenPage");
         abilityCooldowns = nbt.getByteArray("AbilityCooldowns");
         meleeHitCount = nbt.getByte("hitsPerformed");
         comboPointCount = nbt.getShort("comboPointCount");
@@ -351,6 +354,7 @@ public class BaseformProperties extends FormProperties {
         CompoundTag nbt = new CompoundTag();
 
         //Common
+        nbt.putInt("HelpScreenPage",helpScreenPageNo);
         nbt.putByteArray("AbilityCooldowns",abilityCooldowns);
         nbt.putByte("hitsPerformed", meleeHitCount);
         nbt.putShort("comboPointCount",comboPointCount);

@@ -1,11 +1,16 @@
 package net.sonicrushxii.beyondthehorizon.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
+import net.sonicrushxii.beyondthehorizon.KeyBindings;
+import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.HelpScreenSync;
+import org.lwjgl.glfw.GLFW;
 
 public class HelpScreen extends Screen {
     private static final Component TITLE = Component.translatable("gui."+BeyondTheHorizon.MOD_ID+".sonic_help_screen.title");
@@ -23,6 +28,14 @@ public class HelpScreen extends Screen {
         super(TITLE);
 
         this.scrollIdx = 0;
+        this.imageWidth = 176;
+        this.imageHeight = 166;
+    }
+
+    public HelpScreen(int scrollIdx) {
+        super(TITLE);
+
+        this.scrollIdx = scrollIdx;
         this.imageWidth = 176;
         this.imageHeight = 166;
     }
@@ -56,8 +69,7 @@ public class HelpScreen extends Screen {
         StringBuilder sb = new StringBuilder();
 
         //Pad 0's based on your max slot
-        for(int i=0;i<((byte)Math.log10(MAX_SLOT)-(byte)Math.log10(num));++i)
-            sb.append('0');
+        sb.append("0".repeat(Math.max(0, ((byte) Math.log10(MAX_SLOT) - (byte) Math.log10(num)))));
         sb.append(num);
 
         return sb.toString();
@@ -72,10 +84,9 @@ public class HelpScreen extends Screen {
     {
         switch(button.getMessage().getString())
         {
-            case "<": this.scrollIdx =(this.scrollIdx ==0)  ?   MAX_SLOT    :   this.scrollIdx -1;   break;
-            case ">": this.scrollIdx =(this.scrollIdx % MAX_SLOT)   +   1;                           break;
+            case "<": this.scrollIdx =(this.scrollIdx == 0)  ?   MAX_SLOT    :   this.scrollIdx-1;   break;
+            case ">": this.scrollIdx = (this.scrollIdx == MAX_SLOT)  ?   0   :   this.scrollIdx+1;   break;
         }
-        System.out.println("Scroll Pos" + this.scrollIdx);
     }
 
     @Override
@@ -93,5 +104,23 @@ public class HelpScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        // Close screen when <HelpButton> is pressed
+        if (keyCode == KeyBindings.INSTANCE.helpButton.getKey().getValue()) {
+            PacketHandler.sendToServer(new HelpScreenSync(this.scrollIdx));
+            Minecraft.getInstance().setScreen(null);
+            return true;
+        }
+
+        //Scroll Left and Right
+        else if(keyCode == GLFW.GLFW_KEY_LEFT  || keyCode == GLFW.GLFW_KEY_A)
+            this.scrollIdx = (this.scrollIdx == 0)  ?   MAX_SLOT   :   this.scrollIdx-1;
+        else if(keyCode == GLFW.GLFW_KEY_RIGHT || keyCode == GLFW.GLFW_KEY_D)
+            this.scrollIdx = (this.scrollIdx == MAX_SLOT)  ?   0   :   this.scrollIdx+1;
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }
