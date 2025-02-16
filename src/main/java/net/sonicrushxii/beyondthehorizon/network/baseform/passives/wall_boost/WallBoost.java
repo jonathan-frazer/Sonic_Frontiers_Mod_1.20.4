@@ -9,11 +9,13 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
+
+import java.util.Objects;
 
 public class WallBoost {
     public WallBoost() {}
@@ -31,8 +33,8 @@ public class WallBoost {
         //Move Upward
         player.setSprinting(false);
         baseformProperties.wallBoosting = true;
-        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
-        player.setDeltaMovement(new Vec3(0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 2.5, 0));
+        Objects.requireNonNull(player.getAttribute(ForgeMod.ENTITY_GRAVITY.get())).setBaseValue(0.0);
+        player.setDeltaMovement(new Vec3(0, Objects.requireNonNull(player.getAttribute(Attributes.MOVEMENT_SPEED)).getValue() * 2.5, 0));
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }
 
@@ -42,7 +44,7 @@ public class WallBoost {
                     ServerPlayer player = ctx.getSender();
                     if(player != null)
                     {
-                        Vec3 playerDirCentre = Utilities.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
+                        Vec3 playerDirCentre = ModUtils.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
                         BlockPos centrePos = player.blockPosition().offset(
                                 (int) Math.round(playerDirCentre.x),
                                 (Math.round(player.getY()) > player.getY()) ? 1 : 0,
@@ -52,7 +54,7 @@ public class WallBoost {
                         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
                             BaseformProperties baseformProperties =  (BaseformProperties) playerSonicForm.getFormProperties();
                             //Wall Boost
-                            if (!Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(player.level().getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
+                            if (!ModUtils.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(player.level().getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
                                     && baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3
                                     && player.isSprinting())
                             {

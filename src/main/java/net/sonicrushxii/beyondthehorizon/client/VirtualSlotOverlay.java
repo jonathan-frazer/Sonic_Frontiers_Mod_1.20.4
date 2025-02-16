@@ -14,6 +14,7 @@ import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ import java.util.List;
 public class VirtualSlotOverlay {
     private static final ResourceLocation BASEFORM_SONIC_ICON  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/baseform_sonic_icon.png");
+    private static final ResourceLocation SUPER_SONIC_ICON  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+            "textures/custom_gui/superform/super_sonic_icon.png");
     private static final ResourceLocation EMPTY_SLOT = new ResourceLocation(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/empty_slot.png");
     private static final ResourceLocation MIRAGE_SLOT = new ResourceLocation(BeyondTheHorizon.MOD_ID,
@@ -254,7 +257,7 @@ public class VirtualSlotOverlay {
 
                     case 4:
                         slotName = "Counter";
-                        iconTextures = (Arrays.asList(
+                        iconTextures = (List.of(
                                 new Ability(GRAND_SLAM_SLOT, null, cooldownArray[BaseformActiveAbility.GRAND_SLAM.ordinal()], null, null))
                         );
                         keyBindings.set(0, KeyBindings.INSTANCE.useSingleAbility.getKey());
@@ -263,6 +266,8 @@ public class VirtualSlotOverlay {
                     case 5:
                         slotName = "Transform";
                         iconTextures = new ArrayList<Ability>();
+                        if(PlayerTickHandler.hasAllChaosEmeralds(player))
+                            iconTextures.add(new Ability(SUPER_SONIC_ICON, null, (byte)0, null, null));
                         break;
 
                     default:

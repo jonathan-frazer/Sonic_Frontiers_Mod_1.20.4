@@ -10,7 +10,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -22,6 +22,7 @@ import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class CycloneKick {
@@ -101,22 +102,18 @@ public class CycloneKick {
                 //Set Data
                 baseformProperties.cycloneKick = 1;
                 Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
-                Scheduler.scheduleTask(()->{
-                    Utilities.summonEntity(ModEntityTypes.BASEFORM_CYCLONE_KICK_CLOUD.get(),
-                        player.serverLevel(),
-                        playerPos.add
-                                (Utilities.calculateViewVector(0,player.getYRot()).scale(1.4)),
-                        (aoeCloud) -> {
-                            aoeCloud.setDuration(60);
-                        });
-                },5);
+                Scheduler.scheduleTask(()-> ModUtils.summonEntity(ModEntityTypes.BASEFORM_CYCLONE_KICK_CLOUD.get(),
+                    player.serverLevel(),
+                    playerPos.add
+                            (ModUtils.calculateViewVector(0,player.getYRot()).scale(1.4)),
+                    (aoeCloud) -> aoeCloud.setDuration(60)),5);
                 baseformProperties.meleeTarget = new UUID(0L,0L);
             }
 
             baseformProperties.atkRotPhase = -player.getYRot()-135f;
 
             //Remove Gravity
-            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+            Objects.requireNonNull(player.getAttribute(ForgeMod.ENTITY_GRAVITY.get())).setBaseValue(0.0);
 
             //Play Sound
             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.DOUBLE_JUMP.get(), SoundSource.MASTER, 0.75f, 1.0f);

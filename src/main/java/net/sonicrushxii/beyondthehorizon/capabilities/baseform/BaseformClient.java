@@ -14,7 +14,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -95,7 +95,7 @@ public class BaseformClient {
         Minecraft minecraft = Minecraft.getInstance();
         Level level = player.level();
 
-        Vec3 playerDirCentre = Utilities.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
+        Vec3 playerDirCentre = ModUtils.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
         BlockPos centrePos = player.blockPosition().offset(
                 (int) Math.round(playerDirCentre.x),
                 (Math.round(player.getY()) > player.getY()) ? 1 : 0,
@@ -173,7 +173,7 @@ public class BaseformClient {
                     //Double Press
 
                     //WallBoost
-                    if (!Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(player.level().getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
+                    if (!ModUtils.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(player.level().getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
                             && baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3
                             && player.isSprinting() && !baseformProperties.wallBoosting && KeyBindings.INSTANCE.doubleJump.isDown())
                     {
@@ -299,7 +299,7 @@ public class BaseformClient {
                         if(ClientOnlyData.homingAttackReticle == null && !ClientOnlyData.airBoostLock) {
                             PacketHandler.sendToServer(new AirBoost());
                             ClientOnlyData.airBoostLock = true;
-                            Scheduler.scheduleTask(()->{ClientOnlyData.airBoostLock = false;},5);
+                            Scheduler.scheduleTask(()-> ClientOnlyData.airBoostLock = false,5);
                         }
                         else
                             PacketHandler.sendToServer(new HomingAttack(ClientOnlyData.homingAttackReticle));
@@ -574,9 +574,7 @@ public class BaseformClient {
             {
                 if(KeyBindings.INSTANCE.helpButton.consumeClick())
                 {
-                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ()->()-> {
-                        Minecraft.getInstance().setScreen(new HelpScreen(baseformProperties.helpScreenPageNo));
-                    });
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ()->()-> Minecraft.getInstance().setScreen(new HelpScreen(baseformProperties.helpScreenPageNo)));
                     while(KeyBindings.INSTANCE.helpButton.consumeClick());
                 }
             }

@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
@@ -20,6 +20,8 @@ import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
+
+import java.util.Objects;
 
 public class Mirage {
     public Mirage() {
@@ -52,7 +54,7 @@ public class Mirage {
 
             //Add Invisibility
             if(player.hasEffect(MobEffects.INVISIBILITY))
-                player.getEffect(MobEffects.INVISIBILITY).update(new MobEffectInstance(MobEffects.INVISIBILITY, 140, 2, false, false));
+                Objects.requireNonNull(player.getEffect(MobEffects.INVISIBILITY)).update(new MobEffectInstance(MobEffects.INVISIBILITY, 140, 2, false, false));
             else
                 player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 140, 2, false, false));
 
@@ -63,7 +65,7 @@ public class Mirage {
                     (entity)->!(entity instanceof Player)))
             {
                 if(mob.hasEffect(ModEffects.MIRAGE_CONFUSE.get()))
-                    mob.getEffect(ModEffects.MIRAGE_CONFUSE.get()).update(new MobEffectInstance(ModEffects.MIRAGE_CONFUSE.get(),140,2,false,false));
+                    Objects.requireNonNull(mob.getEffect(ModEffects.MIRAGE_CONFUSE.get())).update(new MobEffectInstance(ModEffects.MIRAGE_CONFUSE.get(),140,2,false,false));
                 else
                     mob.addEffect(new MobEffectInstance(ModEffects.MIRAGE_CONFUSE.get(),140,2,false,false));
             }
@@ -71,15 +73,11 @@ public class Mirage {
             //Set Phase
             baseformProperties.atkRotPhase = -player.getYRot()-135f;
             final Vec3 playerPos = new Vec3(player.getX(),player.getY()+1,player.getZ());
-            Scheduler.scheduleTask(()->{
-                Utilities.summonEntity(ModEntityTypes.MIRAGE_CLOUD.get(),
-                        player.serverLevel(),
-                        playerPos.add
-                                (Utilities.calculateViewVector(0,-baseformProperties.atkRotPhase+240).scale(2.75)),
-                        (mirageCloud) -> {
-                            mirageCloud.setDuration(140);
-                        });
-            },7);
+            Scheduler.scheduleTask(()-> ModUtils.summonEntity(ModEntityTypes.MIRAGE_CLOUD.get(),
+                    player.serverLevel(),
+                    playerPos.add
+                            (ModUtils.calculateViewVector(0,-baseformProperties.atkRotPhase+240).scale(2.75)),
+                    (mirageCloud) -> mirageCloud.setDuration(140)),7);
 
             //Play Sound
             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.MIRAGE.get(), SoundSource.MASTER, 0.75f, 1.0f);

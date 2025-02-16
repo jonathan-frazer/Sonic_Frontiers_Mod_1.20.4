@@ -29,7 +29,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -104,11 +104,10 @@ public class BaseformServer
 
     public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
     {
-        Minecraft mc = Minecraft.getInstance();
         Level level = player.level();
         ServerLevel serverLevel = player.serverLevel();
 
-        Vec3 playerDirCentre = Utilities.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
+        Vec3 playerDirCentre = ModUtils.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
         BlockPos centrePos = player.blockPosition().offset(
                 (int) Math.round(playerDirCentre.x),
                 (Math.round(player.getY()) > player.getY()) ? 1 : 0,
@@ -122,9 +121,9 @@ public class BaseformServer
             //Passive Abilities
             {
                 //General Sprinting, it also handles autostep
-                if (player.isSprinting() && baseformProperties.sprintFlag == false)
+                if (player.isSprinting() && !baseformProperties.sprintFlag)
                     StartSprint.performStartSprint(player);
-                if (!player.isSprinting() && baseformProperties.sprintFlag == true)
+                if (!player.isSprinting() && baseformProperties.sprintFlag)
                     StopSprint.performStopSprint(player);
 
                 //Double Jump
@@ -136,7 +135,7 @@ public class BaseformServer
                 {
                     baseformProperties.groundTraction = false;
                     if (player.getDeltaMovement().y > -0.38 && player.getDeltaMovement().y < -0.078 &&
-                            Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+"")
+                            ModUtils.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+"")
                     )
                     {
                         player.setDeltaMovement(player.getDeltaMovement().x,-0.65,player.getDeltaMovement().z);
@@ -152,9 +151,7 @@ public class BaseformServer
                 {
                     baseformProperties.comboPointDisplay = baseformProperties.comboPointCount;
                     baseformProperties.comboPointCount = 0;
-                    Scheduler.scheduleTask(()->{
-                        baseformProperties.comboPointDisplay = 0;
-                    },100);
+                    Scheduler.scheduleTask(()-> baseformProperties.comboPointDisplay = 0,100);
                 }
 
                 //Subdue Hunger
@@ -187,7 +184,7 @@ public class BaseformServer
                                     Vec3 lookAngle = player.getLookAngle();
                                     Vec3 playerDirection = new Vec3(lookAngle.x(), 0, lookAngle.z());
 
-                                    if (baseformProperties.isWaterBoosting == false)
+                                    if (!baseformProperties.isWaterBoosting)
                                     {
                                         player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
                                         baseformProperties.isWaterBoosting = true;
@@ -213,7 +210,7 @@ public class BaseformServer
                                         ||
                                         !(baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3)
                                         ||
-                                        !Utilities.isMoving(player.getDeltaMovement(),0.2)
+                                        !ModUtils.isMoving(player.getDeltaMovement(),0.2)
                                         ||
                                         player.isInWater())
                             )
@@ -266,7 +263,7 @@ public class BaseformServer
                         //Wall Boost
                         if(baseformProperties.wallBoosting)
                         {
-                            if (!Utilities.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + ""))
+                            if (!ModUtils.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + ""))
                             {
                                 //Particle
                                 if(player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR)
@@ -508,7 +505,11 @@ public class BaseformServer
                         }
                         if (baseformProperties.ballFormState == (byte) 2)
                         {
-                            player.setDeltaMovement((Utilities.calculateViewVector(0,player.getYRot())).scale(Math.min(10.0,baseformProperties.spinDashChargeTime/10f)));
+                            player.setDeltaMovement((ModUtils.calculateViewVector(0,player.getYRot())).scale(Math.min(10.0,baseformProperties.spinDashChargeTime/10f)));
+                            if (ModUtils.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+""))
+                            {
+                                player.addDeltaMovement(new Vec3(0,-1.26,0));
+                            }
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                             for(LivingEntity nearbyEntity : level.getEntitiesOfClass(LivingEntity.class,
@@ -692,7 +693,7 @@ public class BaseformServer
                             player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
-                            Vec3 currPos = new Vec3(player.getX(),player.getY(),player.getZ()).add(Utilities.calculateViewVector(0,baseformProperties.atkRotPhase).scale(-4.0));
+                            Vec3 currPos = new Vec3(player.getX(),player.getY(),player.getZ()).add(ModUtils.calculateViewVector(0,baseformProperties.atkRotPhase).scale(-4.0));
                             Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
                             for(LivingEntity enemy : level.getEntitiesOfClass(LivingEntity.class,new AABB(
                                     currPos.x+4.0, currPos.y+2.0, currPos.z+4.0,
@@ -700,7 +701,7 @@ public class BaseformServer
                             ),(enemy)->!enemy.is(player)))
                             {
                                 Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
-                                float[] yawPitch = Utilities.getYawPitchFromVec(enemyPos.subtract(playerPos));
+                                float[] yawPitch = ModUtils.getYawPitchFromVec(enemyPos.subtract(playerPos));
                                 player.teleportTo(player.serverLevel(), player.getX(), player.getY(), player.getZ(),
                                         EnumSet.of(RelativeMovement.X,RelativeMovement.Y,RelativeMovement.Z), yawPitch[0], yawPitch[1]);
                                 player.connection.send(new ClientboundTeleportEntityPacket(player));
@@ -819,14 +820,14 @@ public class BaseformServer
                                         player.getX() - 6, player.getY() - 6, player.getZ() - 6));
                                 if (mirageClouds.isEmpty()) throw new NullPointerException("No Cloud");
                                 MirageCloud mirageCloud = mirageClouds.get(0);
-                                double newX = mirageCloud.getX()+Utilities.random.nextDouble(-5,5);
-                                double newY = mirageCloud.getY()+Utilities.random.nextDouble(0,1.5);
-                                double newZ = mirageCloud.getZ()+Utilities.random.nextDouble(-5,5);
+                                double newX = mirageCloud.getX()+ ModUtils.random.nextDouble(-5,5);
+                                double newY = mirageCloud.getY()+ ModUtils.random.nextDouble(0,1.5);
+                                double newZ = mirageCloud.getZ()+ ModUtils.random.nextDouble(-5,5);
 
                                 if(baseformProperties.mirageTimer == 9) {
                                     Vec3 lookDir = (new Vec3(mirageCloud.getX(), mirageCloud.getY(), mirageCloud.getZ()))
                                             .subtract(new Vec3(newX, newY, newZ));
-                                    float[] yawPitch = Utilities.getYawPitchFromVec(lookDir);
+                                    float[] yawPitch = ModUtils.getYawPitchFromVec(lookDir);
 
                                     player.teleportTo(player.serverLevel(), newX, newY, newZ,
                                             Collections.emptySet(), yawPitch[0], yawPitch[1]);
@@ -894,7 +895,7 @@ public class BaseformServer
                                         if (baseformProperties.lightSpeedAssault % 4 == 0) {
                                             //Get Position of in front of enemy
                                             Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);
-                                            float[] yawPitch = Utilities.getYawPitchFromVec(tpDir.reverse());
+                                            float[] yawPitch = ModUtils.getYawPitchFromVec(tpDir.reverse());
 
                                             //Particle Raycast
                                             PacketHandler.sendToALLPlayers(
@@ -922,13 +923,13 @@ public class BaseformServer
                                         else if(baseformProperties.lightSpeedAssault % 4 == 2)
                                         {
                                             //Find Random Position around Enemy
-                                            double theta = Utilities.random.nextDouble(0,2*Math.PI);
+                                            double theta = ModUtils.random.nextDouble(0,2*Math.PI);
                                             Vec3 tpLocation = new Vec3(
                                                     6*Math.cos(theta)+enemyPos.x(),
-                                                    enemyPos.y()+Utilities.random.nextDouble(-1,1),
+                                                    enemyPos.y()+ ModUtils.random.nextDouble(-1,1),
                                                     6*Math.sin(theta)+enemyPos.z()
                                             );
-                                            float[] yawPitch = Utilities.getYawPitchFromVec(enemyPos.subtract(tpLocation));
+                                            float[] yawPitch = ModUtils.getYawPitchFromVec(enemyPos.subtract(tpLocation));
 
                                             //Particle Raycast
                                             PacketHandler.sendToALLPlayers(
@@ -953,7 +954,7 @@ public class BaseformServer
                                         if (baseformProperties.lightSpeedAssault % 3 == 0) {
                                             //Damage Enemy
                                             Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);
-                                            float[] yawPitch = Utilities.getYawPitchFromVec(tpDir.reverse());
+                                            float[] yawPitch = ModUtils.getYawPitchFromVec(tpDir.reverse());
 
                                             //Particle Raycast
                                             PacketHandler.sendToALLPlayers(
@@ -980,7 +981,7 @@ public class BaseformServer
                                 {
                                     //Damage Enemy
                                     Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);
-                                    float[] yawPitch = Utilities.getYawPitchFromVec(tpDir.reverse());
+                                    float[] yawPitch = ModUtils.getYawPitchFromVec(tpDir.reverse());
 
                                     //Particle Raycast
                                     PacketHandler.sendToALLPlayers(
@@ -1065,7 +1066,7 @@ public class BaseformServer
                                     Scheduler.scheduleTask(()->{
                                         Vec3 cloudSpawn = new Vec3(-motionDirection.x(),0,-motionDirection.z());
 
-                                        Utilities.summonEntity(ModEntityTypes.BASEFORM_SPIN_SLASH_CLOUD.get(),
+                                        ModUtils.summonEntity(ModEntityTypes.BASEFORM_SPIN_SLASH_CLOUD.get(),
                                                 player.serverLevel(),
                                                 spinTargetPos.add(cloudSpawn.scale(0.75)),
                                                 (aoeCloud) -> {
@@ -1199,7 +1200,7 @@ public class BaseformServer
                                     },3);
 
                                     //Spawn Cyclone Kick Cloud
-                                    Scheduler.scheduleTask(()-> Utilities.summonEntity(ModEntityTypes.BASEFORM_CYCLONE_KICK_CLOUD.get(),
+                                    Scheduler.scheduleTask(()-> ModUtils.summonEntity(ModEntityTypes.BASEFORM_CYCLONE_KICK_CLOUD.get(),
                                             player.serverLevel(),
                                             cycloneTargetPos.add(0,-cycloneTarget.getEyeHeight()/2,0),
                                             (aoeCloud) -> {
@@ -1303,7 +1304,7 @@ public class BaseformServer
                                     player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                                     //Update Player model in the direction of the vector
-                                    float[] yawPitch = Utilities.getYawPitchFromVec(motionDirection);
+                                    float[] yawPitch = ModUtils.getYawPitchFromVec(motionDirection);
                                     PacketHandler.sendToALLPlayers(new WildRushRotationSyncS2C(yawPitch[0],yawPitch[1]));
                                     //Particle
                                     PacketHandler.sendToALLPlayers(
@@ -1718,7 +1719,7 @@ public class BaseformServer
                                         double zComponent = Math.cos((baseformProperties.atkRotPhase+90) * (Math.PI / 180)) * 0.707;
 
                                         //Motion
-                                        Utilities.summonEntity(ModEntityTypes.BASEFORM_HOMING_SHOT.get(),
+                                        ModUtils.summonEntity(ModEntityTypes.BASEFORM_HOMING_SHOT.get(),
                                                 player.serverLevel(),
                                                 new Vec3(
                                                         // sin(wt + T)
@@ -1820,7 +1821,7 @@ public class BaseformServer
 
                             if(baseformProperties.grandSlamTime == 2)
                             {
-                                float[] yawPitch = Utilities.getYawPitchFromVec(tpDir.reverse());
+                                float[] yawPitch = ModUtils.getYawPitchFromVec(tpDir.reverse());
                                 baseformProperties.atkRotPhase = yawPitch[0];
                                 player.teleportTo(player.serverLevel(),
                                         counterTargetPos.x() + tpDir.x(),
@@ -1832,7 +1833,7 @@ public class BaseformServer
 
                             if(baseformProperties.grandSlamTime > 1 && baseformProperties.grandSlamTime <= 40)
                             {
-                                Vec3 motionDir = Utilities.calculateViewVector(-30,baseformProperties.atkRotPhase);
+                                Vec3 motionDir = ModUtils.calculateViewVector(-30,baseformProperties.atkRotPhase);
                                 //Teleport the player
                                 player.setDeltaMovement(motionDir.scale(
                                         Math.max(0.1,
@@ -1859,14 +1860,14 @@ public class BaseformServer
 
                                 //Knock Counter Target away
                                 counterTarget.setDeltaMovement(
-                                        Utilities.calculateViewVector(
+                                        ModUtils.calculateViewVector(
                                                 Math.min(90.0F,player.getXRot()+45.0F),
                                                 player.getYRot()
                                         ).scale(2.0)
                                 );
                                 //Knock yourself back
                                 player.setDeltaMovement(
-                                        Utilities.calculateViewVector(
+                                        ModUtils.calculateViewVector(
                                                 Math.min(90.0F,player.getXRot()+45.0F),
                                                 player.getYRot()
                                         ).scale(-0.75)
@@ -1950,7 +1951,7 @@ public class BaseformServer
                             {
                                 //Get Position of in front of enemy
                                 Vec3 tpDir = playerPos.subtract(enemyPos).normalize().scale(2);
-                                float[] yawPitch = Utilities.getYawPitchFromVec(tpDir.reverse());
+                                float[] yawPitch = ModUtils.getYawPitchFromVec(tpDir.reverse());
 
                                 //Particle Raycast
                                 PacketHandler.sendToALLPlayers(
@@ -1979,7 +1980,7 @@ public class BaseformServer
                                 enemy.setInvulnerable(true);
 
                                 //Spawn Cloud
-                                Utilities.summonEntity(
+                                ModUtils.summonEntity(
                                         ModEntityTypes.BASEFORM_PHANTOM_RUSH_CLOUD.get(), serverLevel,
                                         enemyPos,
                                         (phantomRushCloud) ->{
@@ -2001,7 +2002,7 @@ public class BaseformServer
                             //Uppercut
                             else if(baseformProperties.ultimateUse < 65)
                             {
-                                Vec3 motionDir = Utilities.calculateViewVector(-30,baseformProperties.atkRotPhase);
+                                Vec3 motionDir = ModUtils.calculateViewVector(-30,baseformProperties.atkRotPhase);
                                 //Teleport the player
                                 player.setDeltaMovement(motionDir.scale(
                                         Math.max(0.1,
@@ -2027,7 +2028,7 @@ public class BaseformServer
                                 enemy.setDeltaMovement(0,0,0);
                                 player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
 
-                                Vec3 motionDir = Utilities.calculateViewVector(0,baseformProperties.atkRotPhase);
+                                Vec3 motionDir = ModUtils.calculateViewVector(0,baseformProperties.atkRotPhase);
                                 player.setDeltaMovement(motionDir.scale(3.0));
                                 player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
@@ -2108,7 +2109,7 @@ public class BaseformServer
                                             1,true));
 
                                     //Teleport to the Position
-                                    Vec3 tpDir = Utilities.calculateViewVector(0,baseformProperties.atkRotPhase);
+                                    Vec3 tpDir = ModUtils.calculateViewVector(0,baseformProperties.atkRotPhase);
                                     player.teleportTo(player.serverLevel(),
                                             enemyPos.x() - tpDir.x(),
                                             enemyPos.y() - tpDir.y(),
@@ -2133,14 +2134,14 @@ public class BaseformServer
 
                                     //Knock Counter Target away
                                     enemy.setDeltaMovement(
-                                            Utilities.calculateViewVector(
+                                            ModUtils.calculateViewVector(
                                                     Math.min(90.0F,player.getXRot()+45.0F),
                                                     player.getYRot()
                                             ).scale(4.0)
                                     );
                                     //Knock yourself back
                                     player.setDeltaMovement(
-                                            Utilities.calculateViewVector(
+                                            ModUtils.calculateViewVector(
                                                     Math.min(90.0F,player.getXRot()+45.0F),
                                                     player.getYRot()
                                             ).scale(-0.75)
@@ -2229,23 +2230,23 @@ public class BaseformServer
             {
                 //Speed
                 if(baseformProperties.boostLvl == 0)
-                    player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
+                    Objects.requireNonNull(player.getAttribute(Attributes.MOVEMENT_SPEED)).setBaseValue(0.5);
 
                 //Jump
                 if(!player.hasEffect(MobEffects.JUMP)) player.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));
-                else player.getEffect(MobEffects.JUMP).update(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));
+                else Objects.requireNonNull(player.getEffect(MobEffects.JUMP)).update(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));
 
                 //Resistance
                 if(!player.hasEffect(MobEffects.DAMAGE_RESISTANCE)) player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, -1, 3, false, false));
-                else player.getEffect(MobEffects.DAMAGE_RESISTANCE).update(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, -1, 3, false, false));
+                else Objects.requireNonNull(player.getEffect(MobEffects.DAMAGE_RESISTANCE)).update(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, -1, 3, false, false));
 
                 //Strength
                 if(!player.hasEffect(MobEffects.DAMAGE_BOOST)) player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 1, false, false));
-                else player.getEffect(MobEffects.DAMAGE_BOOST).update(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 1, false, false));
+                else Objects.requireNonNull(player.getEffect(MobEffects.DAMAGE_BOOST)).update(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 1, false, false));
 
                 //Haste
                 if(!player.hasEffect(MobEffects.DIG_SPEED)) player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false));
-                else player.getEffect(MobEffects.DIG_SPEED).update(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false));
+                else Objects.requireNonNull(player.getEffect(MobEffects.DIG_SPEED)).update(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false));
 
                 //Immunities: Slowdown
                 if(player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
@@ -2274,8 +2275,8 @@ public class BaseformServer
             //Slot 5
             {
                 //Movement Speed Removal, In the case that it trips
-                if(baseformProperties.parryTime <= 0 && player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_HOLD))
-                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_HOLD.getId());
+                if(baseformProperties.parryTime <= 0 && Objects.requireNonNull(player.getAttribute(Attributes.MOVEMENT_SPEED)).hasModifier(AttributeMultipliers.PARRY_HOLD))
+                    Objects.requireNonNull(player.getAttribute(Attributes.MOVEMENT_SPEED)).removeModifier(AttributeMultipliers.PARRY_HOLD.getId());
             }
 
 

@@ -1,21 +1,17 @@
 package net.sonicrushxii.beyondthehorizon.network.sync;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.event_handler.client_handlers.ClientPacketHandler;
 import org.joml.Vector3f;
+
+import java.util.Objects;
 
 public class ParticleRaycastPacketS2C {
     private final Vector3f pos1;
@@ -24,7 +20,7 @@ public class ParticleRaycastPacketS2C {
     private final float red, green, blue, scale; // For DustParticleOptions
 
     public ParticleRaycastPacketS2C(ParticleOptions particleType, Vec3 pos1, Vec3 pos2) {
-        this.particleType = ForgeRegistries.PARTICLE_TYPES.getKey(particleType.getType()).toString();
+        this.particleType = Objects.requireNonNull(ForgeRegistries.PARTICLE_TYPES.getKey(particleType.getType())).toString();
         this.pos1 = pos1.toVector3f();
         this.pos2 = pos2.toVector3f();
 
@@ -60,9 +56,7 @@ public class ParticleRaycastPacketS2C {
     }
 
     public void handle(CustomPayloadEvent.Context ctx) {
-        ctx.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            ClientPacketHandler.clientParticleRaycast(pos1,pos2,particleType,red,green,blue,scale);
-        }));
+        ctx.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandler.clientParticleRaycast(pos1,pos2,particleType,red,green,blue,scale)));
         ctx.setPacketHandled(true);
     }
 }

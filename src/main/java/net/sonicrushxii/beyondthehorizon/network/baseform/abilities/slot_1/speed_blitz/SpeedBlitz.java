@@ -15,7 +15,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
@@ -95,7 +95,7 @@ public class SpeedBlitz {
         Vec3 tpDirection = enemyPos.subtract(playerPos).normalize();
 
         Vec3 newPlayerPos = enemyPos.add(tpDirection.scale(3));
-        float[] yawPitch = Utilities.calculateFacing(newPlayerPos,enemyPos);
+        float[] yawPitch = ModUtils.calculateFacing(newPlayerPos,enemyPos);
 
         //Display Raycast Particle
         PacketHandler.sendToPlayer(player, new ParticleRaycastPacketS2C(
@@ -135,7 +135,7 @@ public class SpeedBlitz {
                         )
                 ).getBlock())+"";
         //Set New Position
-        if(Utilities.passableBlocks.contains(destinationBlockName))
+        if(ModUtils.passableBlocks.contains(destinationBlockName))
         {
             player.teleportTo(player.serverLevel(), newPlayerPos.x, newPlayerPos.y, newPlayerPos.z,
                     Collections.emptySet(), yawPitch[0], yawPitch[1]);

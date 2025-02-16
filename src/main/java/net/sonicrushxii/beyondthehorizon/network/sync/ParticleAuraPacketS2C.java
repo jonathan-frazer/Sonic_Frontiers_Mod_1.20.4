@@ -1,21 +1,16 @@
 package net.sonicrushxii.beyondthehorizon.network.sync;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sonicrushxii.beyondthehorizon.Utilities;
 import net.sonicrushxii.beyondthehorizon.event_handler.client_handlers.ClientPacketHandler;
 import org.joml.Vector3f;
+
+import java.util.Objects;
 
 public class ParticleAuraPacketS2C {
     private final String particleType;
@@ -31,7 +26,7 @@ public class ParticleAuraPacketS2C {
                                  double speed,
                                  float radiusX, float radiusY, float radiusZ,
                                  int count, boolean force) {
-        this.particleType = ForgeRegistries.PARTICLE_TYPES.getKey(particleType.getType()).toString();
+        this.particleType = Objects.requireNonNull(ForgeRegistries.PARTICLE_TYPES.getKey(particleType.getType())).toString();
         this.absX = absX;   this.absY = absY;   this.absZ = absZ;
         this.speed = speed;
         this.radiusX = radiusX; this.radiusY = radiusY; this.radiusZ = radiusZ;
@@ -54,7 +49,7 @@ public class ParticleAuraPacketS2C {
                                  double speed,
                                  float radius,
                                  int count, boolean force) {
-        this.particleType = ForgeRegistries.PARTICLE_TYPES.getKey(particleType.getType()).toString();
+        this.particleType = Objects.requireNonNull(ForgeRegistries.PARTICLE_TYPES.getKey(particleType.getType())).toString();
         this.absX = absX;
         this.absY = absY;
         this.absZ = absZ;
@@ -113,13 +108,11 @@ public class ParticleAuraPacketS2C {
     public void handle(CustomPayloadEvent.Context ctx) {
         ctx.enqueueWork(() -> {
             // This code is run on the client side
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                ClientPacketHandler.clientParticleAura(this.particleType,
-                        this.absX,this.absY,this.absZ,this.speed,
-                        this.radiusX,this.radiusY,this.radiusZ,
-                        this.count,this.force,
-                        this.red,this.green,this.blue,this.scale);
-            });
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandler.clientParticleAura(this.particleType,
+                    this.absX,this.absY,this.absZ,this.speed,
+                    this.radiusX,this.radiusY,this.radiusZ,
+                    this.count,this.force,
+                    this.red,this.green,this.blue,this.scale));
         });
 
         ctx.setPacketHandled(true);

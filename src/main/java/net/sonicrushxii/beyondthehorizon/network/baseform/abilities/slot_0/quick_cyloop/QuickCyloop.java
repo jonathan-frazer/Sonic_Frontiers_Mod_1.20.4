@@ -10,7 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
@@ -23,6 +23,7 @@ import org.joml.Vector3f;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class QuickCyloop {
 
@@ -80,7 +81,7 @@ public class QuickCyloop {
             baseformProperties.qkCyloopMeter -= 50.0;
 
             //Cyloop Regeneration
-            if(player.hasEffect(MobEffects.SATURATION)) player.getEffect(MobEffects.SATURATION).update(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
+            if(player.hasEffect(MobEffects.SATURATION)) Objects.requireNonNull(player.getEffect(MobEffects.SATURATION)).update(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
             else                                        player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
 
             //Activate Cyloop
@@ -97,7 +98,7 @@ public class QuickCyloop {
             );
 
             //Get Right in Front of the enemy
-            Vec3 lookAngle = Utilities.calculateViewVector(0f, player.getYRot());
+            Vec3 lookAngle = ModUtils.calculateViewVector(0f, player.getYRot());
 
             double destX, destY, destZ;
             destX = enemy.getX() - lookAngle.x * 1.1;

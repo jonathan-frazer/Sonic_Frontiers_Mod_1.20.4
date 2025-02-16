@@ -12,7 +12,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.*;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
@@ -30,6 +30,7 @@ public class BaseformRenderer
     {
         PoseStack poseStack = event.getPoseStack();
 
+        assert Minecraft.getInstance().gameMode != null;
         if(Minecraft.getInstance().gameMode.getPlayerMode() == GameType.SPECTATOR) return;
 
         //Humming Top
@@ -363,9 +364,7 @@ public class BaseformRenderer
             poseStack.translate(0D,-1.5D,0D);
 
             //Render The Custom Model
-            ModModelRenderer.renderSonicPeelout(SonicPeeloutModel.class,event,poseStack,baseformProperties,(modelPart)->{
-                modelPart.getChild("Head").xRot = (float)(player.getXRot()*Math.PI/180);
-            });
+            ModModelRenderer.renderSonicPeelout(SonicPeeloutModel.class,event,poseStack,baseformProperties,(modelPart)-> modelPart.getChild("Head").xRot = (float)(player.getXRot()*Math.PI/180));
             poseStack.popPose();
             event.setCanceled(true);
         }
@@ -457,7 +456,7 @@ public class BaseformRenderer
                 poseStack.translate(dir.x, dir.y, dir.z);
 
                 //Apply Rotation
-                float[] yawPitch = Utilities.getYawPitchFromVec(dir);
+                float[] yawPitch = ModUtils.getYawPitchFromVec(dir);
                 poseStack.mulPose(Axis.YP.rotationDegrees(-yawPitch[0]));
                 poseStack.mulPose(Axis.XP.rotationDegrees(yawPitch[1]));
 

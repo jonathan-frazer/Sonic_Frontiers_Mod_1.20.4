@@ -14,7 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.entities.all.LinearMovingEntity;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
@@ -29,8 +29,6 @@ public class SonicBoomProjectile extends LinearMovingEntity {
     public static final EntityDataAccessor<Boolean> DESTROY_BLOCKS = SynchedEntityData.defineId(SonicBoomProjectile.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(SonicBoomProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
     private int MAX_DURATION = 50;
-    private static final float STRENGTH = 0.5f;
-
 
     public SonicBoomProjectile(EntityType<? extends PointEntity> type, Level world) {
         super(type, world);
@@ -99,8 +97,8 @@ public class SonicBoomProjectile extends LinearMovingEntity {
         super.tick();
 
         if(this.level().isClientSide) {
-            Vec3 lookDir = Utilities.calculateViewVector(this.getXRot(),this.getYRot());
-            Utilities.displayParticle(this.level(),
+            Vec3 lookDir = ModUtils.calculateViewVector(this.getXRot(),this.getYRot());
+            ModUtils.displayParticle(this.level(),
                     ParticleTypes.FIREWORK,
                     this.getX()+lookDir.x(),this.getY()+lookDir.y(),this.getZ()+lookDir.z(),
                     0.1f,0.1f,0.1f,
@@ -120,9 +118,10 @@ public class SonicBoomProjectile extends LinearMovingEntity {
                         try {
                             Player playerEntity = (Player)enemy;
                             ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
-                            if (headItem.getItem() == Items.PLAYER_HEAD &&
-                                    headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
-                                return false;
+                            if (headItem.getItem() == Items.PLAYER_HEAD) {
+                                assert headItem.getTag() != null;
+                                if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
+                            }
                         }
                         catch (NullPointerException|ClassCastException ignored){}
                         return true;

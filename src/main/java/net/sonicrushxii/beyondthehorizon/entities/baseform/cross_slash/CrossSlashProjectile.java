@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.entities.all.LinearMovingEntity;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
@@ -32,7 +32,6 @@ public class CrossSlashProjectile extends LinearMovingEntity {
     public static final EntityDataAccessor<Boolean> DESTROY_BLOCKS = SynchedEntityData.defineId(CrossSlashProjectile.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(CrossSlashProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
     private int MAX_DURATION = 50;
-    private static final float STRENGTH = 0.5f;
 
     public CrossSlashProjectile(EntityType<? extends PointEntity> type, Level world) {
         super(type, world);
@@ -101,8 +100,8 @@ public class CrossSlashProjectile extends LinearMovingEntity {
         super.tick();
 
         if(this.level().isClientSide) {
-            Vec3 lookDir = Utilities.calculateViewVector(this.getXRot(),this.getYRot());
-            Utilities.displayParticle(this.level(),
+            Vec3 lookDir = ModUtils.calculateViewVector(this.getXRot(),this.getYRot());
+            ModUtils.displayParticle(this.level(),
                     ParticleTypes.FIREWORK,
                     this.getX()+lookDir.x(),this.getY()+lookDir.y(),this.getZ()+lookDir.z(),
                     0.1f,0.1f,0.1f,
@@ -122,9 +121,10 @@ public class CrossSlashProjectile extends LinearMovingEntity {
                         try {
                             Player playerEntity = (Player)enemy;
                             ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
-                            if (headItem.getItem() == Items.PLAYER_HEAD &&
-                                    headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
-                                return false;
+                            if (headItem.getItem() == Items.PLAYER_HEAD) {
+                                assert headItem.getTag() != null;
+                                if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
+                            }
                         }
                         catch (NullPointerException|ClassCastException ignored){}
                         return true;
@@ -161,7 +161,7 @@ public class CrossSlashProjectile extends LinearMovingEntity {
         // Use BlockPos.betweenClosed to iterate over all positions in the cube
         for (BlockPos pos : BlockPos.betweenClosed(start, end)) {
             BlockState blockState = this.level().getBlockState(pos);
-            if(!Utilities.unbreakableBlocks.contains(ForgeRegistries.BLOCKS.getKey(blockState.getBlock())+""))
+            if(!ModUtils.unbreakableBlocks.contains(ForgeRegistries.BLOCKS.getKey(blockState.getBlock())+""))
                 this.level().destroyBlock(pos,true);
         }
 

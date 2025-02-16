@@ -14,10 +14,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
-import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_boom.SonicBoomProjectile;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import org.joml.Vector3f;
 
@@ -31,7 +30,7 @@ public class SpinSlashCloud extends PointEntity {
         super(entityType, world);
     }
 
-    public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(SonicBoomProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
+    public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(SpinSlashCloud.class, EntityDataSerializers.OPTIONAL_UUID);
 
     @Override
     protected void defineSynchedData() {
@@ -84,13 +83,13 @@ public class SpinSlashCloud extends PointEntity {
                 double particleY = this.getY() + 1.0;
                 double particleZ = this.getZ() + Math.cos(theta)*3.0;
 
-                Utilities.displayParticle(this.level(),
+                ModUtils.displayParticle(this.level(),
                         ParticleTypes.SWEEP_ATTACK,
                         particleX,particleY,particleZ,
                         1.0f,0.1f,1.0f,
                         0.001, 1, false
                 );
-                Utilities.displayParticle(this.level(),
+                ModUtils.displayParticle(this.level(),
                         new DustParticleOptions(new Vector3f(0.259f,0.387f,1.00f),2f),
                         particleX,particleY,particleZ,
                         1.0f,0.1f,1.0f,
@@ -107,9 +106,10 @@ public class SpinSlashCloud extends PointEntity {
                 (playerEntity)->{
                     try {
                         ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
-                        if (headItem.getItem() == Items.PLAYER_HEAD &&
-                                headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
-                            return true;
+                        if (headItem.getItem() == Items.PLAYER_HEAD) {
+                            assert headItem.getTag() != null;
+                            if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return true;
+                        }
                     }
                     catch (NullPointerException|ClassCastException ignored){}
                     return false;
@@ -124,9 +124,10 @@ public class SpinSlashCloud extends PointEntity {
                     try {
                         Player playerEntity = (Player)entity;
                         ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
-                        if (headItem.getItem() == Items.PLAYER_HEAD &&
-                                headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
-                            return false;
+                        if (headItem.getItem() == Items.PLAYER_HEAD) {
+                            assert headItem.getTag() != null;
+                            if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
+                        }
                     }
                     catch (NullPointerException|ClassCastException ignored){}
                     return true;

@@ -15,7 +15,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
@@ -96,7 +96,7 @@ public class HomingShotProjectile extends Entity {
         final int timeElapsed = 150-getDuration();
 
         this.move(MoverType.SELF, this.getDeltaMovement());
-        final float[] yawPitch = Utilities.getYawPitchFromVec(this.getDeltaMovement());
+        final float[] yawPitch = ModUtils.getYawPitchFromVec(this.getDeltaMovement());
         this.setYRot(yawPitch[0]);
         this.setXRot(yawPitch[1]);
 
@@ -140,9 +140,10 @@ public class HomingShotProjectile extends Entity {
                     (playerEntity)->{
                         try {
                             ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
-                            if (headItem.getItem() == Items.PLAYER_HEAD &&
-                                    headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
-                                return true;
+                            if (headItem.getItem() == Items.PLAYER_HEAD) {
+                                assert headItem.getTag() != null;
+                                if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return true;
+                            }
                         }
                         catch (NullPointerException|ClassCastException ignored){}
                         return false;
@@ -170,7 +171,7 @@ public class HomingShotProjectile extends Entity {
         //Particles
         if(this.level().isClientSide)
         {
-            Utilities.displayParticle(this.level(),
+            ModUtils.displayParticle(this.level(),
                     new DustParticleOptions(new Vector3f(0.2f,0.2f,1f),1f),
                     this.getX(),this.getY()+1,this.getZ(),
                     0.2F,0.2F,0.2F,
@@ -182,6 +183,7 @@ public class HomingShotProjectile extends Entity {
             //Traverse
             try {
                 LivingEntity homingShotTarget = (LivingEntity) this.level().getEntity(getTarget());
+                assert homingShotTarget != null;
                 this.setDeltaMovement(
                         (new Vec3(homingShotTarget.getX(), homingShotTarget.getY() + homingShotTarget.getEyeHeight() / 2, homingShotTarget.getZ()))
                                 .subtract(new Vec3(this.getX(), this.getY(), this.getZ()))
@@ -193,10 +195,11 @@ public class HomingShotProjectile extends Entity {
             {
                 try {
                     Player owner = (Player) this.getOwner();
+                    assert owner != null;
                     this.setDeltaMovement(owner.getLookAngle().scale(0.75));
                 }
                 catch (NullPointerException f) {
-                    this.setDeltaMovement(Utilities.calculateViewVector(this.getXRot(),this.getYRot()).scale(0.75));
+                    this.setDeltaMovement(ModUtils.calculateViewVector(this.getXRot(),this.getYRot()).scale(0.75));
                 }
             }
 
@@ -212,9 +215,10 @@ public class HomingShotProjectile extends Entity {
                         try {
                             Player playerEntity = (Player)enemy;
                             ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
-                            if (headItem.getItem() == Items.PLAYER_HEAD &&
-                                    headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
-                                return false;
+                            if (headItem.getItem() == Items.PLAYER_HEAD) {
+                                assert headItem.getTag() != null;
+                                if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
+                            }
                         }
                         catch (NullPointerException|ClassCastException ignored){}
                         return true;

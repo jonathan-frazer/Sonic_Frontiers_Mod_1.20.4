@@ -12,7 +12,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -24,6 +24,7 @@ import org.joml.Vector3f;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class WildRush
@@ -108,7 +109,7 @@ public class WildRush
                                 Vec3 newDir = tpDir.reverse().normalize();
                                 Vec3 newPlayerPosition = enemyPos.add(tpDir.add(0,2,0));
 
-                                float[] yawPitch = Utilities.getYawPitchFromVec(newDir);
+                                float[] yawPitch = ModUtils.getYawPitchFromVec(newDir);
 
                                 player.teleportTo(player.serverLevel(),
                                         newPlayerPosition.x(),
@@ -140,7 +141,7 @@ public class WildRush
                                 baseformProperties.wildRushPX[4] = (int)pos4.x();   baseformProperties.wildRushPY[4] = (int)pos4.y();   baseformProperties.wildRushPZ[4] = (int)pos4.z();
 
                                 //Remove Gravity
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                                Objects.requireNonNull(player.getAttribute(ForgeMod.ENTITY_GRAVITY.get())).setBaseValue(0.0);
 
                                 //Play Sound
                                 player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);

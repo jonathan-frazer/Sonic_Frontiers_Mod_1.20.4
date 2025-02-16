@@ -4,23 +4,27 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
-public class Utilities {
+public class ModUtils {
 
     public static Random random = new Random();
 
@@ -438,5 +442,117 @@ public class Utilities {
         boolean z = Math.abs(playerDeltaMovement.z()) < threshold;
 
         return !(x && y && z);
+    }
+
+    public static boolean playerHoldingItem(Player player, String modid, String itemName) {
+        // Get the item from the registry
+        ResourceLocation itemID = new ResourceLocation(modid, itemName);
+        var item = ForgeRegistries.ITEMS.getValue(itemID);
+
+        if (item == null) {
+            return false; // The item doesn't exist
+        }
+
+        // Check main hand
+        ItemStack mainHandStack = player.getMainHandItem();
+        if (mainHandStack.getItem() == item) {
+            return true;
+        }
+
+        // Check offhand
+        ItemStack offHandStack = player.getOffhandItem();
+        return offHandStack.getItem() == item;
+    }
+
+    public static boolean playerHasItem(Player player, String modid, String itemName)
+    {
+        // Get the item from the registry
+        ResourceLocation itemID = new ResourceLocation(modid, itemName);
+        var item = ForgeRegistries.ITEMS.getValue(itemID);
+
+        if (item == null) {
+            return false; // The item doesn't exist or isn't registered
+        }
+
+        // Iterate through the player's inventory
+        for (ItemStack stack : player.getInventory().items) { // `.items` is the main inventory list
+            if (!stack.isEmpty() && stack.getItem() == item) {
+                return true; // Found the item in inventory
+            }
+        }
+
+        return false; // Item not found
+    }
+
+    //Assumes Small Lists
+    public static boolean playerHasAnyItem(Player player, List<String> itemStrings, String modid)
+    {
+        // Convert item names into an array
+        Item[] requiredItems = new Item[itemStrings.size()];
+        for (int i = 0; i < itemStrings.size(); i++) {
+            requiredItems[i] = ForgeRegistries.ITEMS.getValue(new ResourceLocation(modid, itemStrings.get(i)));
+        }
+
+        // Check main inventory for any match (early exit)
+        for (ItemStack stack : player.getInventory().items) {
+            if (!stack.isEmpty()) {
+                for (Item item : requiredItems) {
+                    if (item != null && stack.getItem() == item) {
+                        return true; // Found at least one item
+                    }
+                }
+            }
+        }
+
+        // Check offhand slot separately (optional)
+        ItemStack offhandStack = player.getOffhandItem();
+        if (!offhandStack.isEmpty()) {
+            for (Item item : requiredItems) {
+                if (item != null && offhandStack.getItem() == item) {
+                    return true; // Found at least one item
+                }
+            }
+        }
+
+        return false; // No matching items found
+    }
+
+    //Assumes Small Lists
+    public static boolean playerHasAllItems(Player player, List<String> itemStrings, String modid)
+    {
+        int itemsNeeded = itemStrings.size();
+        int itemsFound = 0;
+
+        // Convert item names into an array for fast lookup
+        Item[] requiredItems = new Item[itemsNeeded];
+
+        for (int i = 0; i < itemsNeeded; i++) {
+            requiredItems[i] = ForgeRegistries.ITEMS.getValue(new ResourceLocation(modid, itemStrings.get(i)));
+        }
+
+        // Iterate through inventory and count matches
+        for (ItemStack stack : player.getInventory().items) {
+            if (!stack.isEmpty()) {
+                for (Item item : requiredItems) {
+                    if (item != null && stack.getItem() == item) {
+                        itemsFound++;
+                        if (itemsFound == itemsNeeded) return true; // Early exit
+                    }
+                }
+            }
+        }
+
+        // Check offhand separately (optional)
+        ItemStack offhandStack = player.getOffhandItem();
+        if (!offhandStack.isEmpty()) {
+            for (Item item : requiredItems) {
+                if (item != null && offhandStack.getItem() == item) {
+                    itemsFound++;
+                    if (itemsFound == itemsNeeded) return true; // Early exit
+                }
+            }
+        }
+
+        return false; // Not all items were found
     }
 }

@@ -15,7 +15,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
@@ -92,17 +92,17 @@ public class PhantomRushCloud extends PointEntity {
         Vec3 currentPos = new Vec3(this.getX(),this.getY(),this.getZ());
 
         if(this.level().isClientSide) {
-            Utilities.displayParticle(this.level(),new DustParticleOptions(new Vector3f(0.4667F, 0.0F, 0.9961F), 2f),
+            ModUtils.displayParticle(this.level(),new DustParticleOptions(new Vector3f(0.4667F, 0.0F, 0.9961F), 2f),
                     this.getX(), this.getY()+1.80, this.getZ(),
                     RADIUS+2, 2.40f, RADIUS+2,
                     0,10,false
                     );
-            Utilities.displayParticle(this.level(),new DustParticleOptions(new Vector3f(0.05F, 0.05F, 1.0F), 2f),
+            ModUtils.displayParticle(this.level(),new DustParticleOptions(new Vector3f(0.05F, 0.05F, 1.0F), 2f),
                     this.getX(), this.getY()+1.80, this.getZ(),
                     RADIUS+2, 2.40f, RADIUS+2,
                     0,10,false
             );
-            Utilities.displayParticle(this.level(), ParticleTypes.CRIT,
+            ModUtils.displayParticle(this.level(), ParticleTypes.CRIT,
                     this.getX(), this.getY()+1.80, this.getZ(),
                     RADIUS+2, 2.40f, RADIUS+2,
                     0,10,false
@@ -111,17 +111,17 @@ public class PhantomRushCloud extends PointEntity {
         else
         {
             //Set X,Y,Z Positions
-            double theta = Utilities.random.nextDouble(0,2*Math.PI);
-            double x = Utilities.random.nextDouble(RADIUS/2,RADIUS)*Math.sin(theta);
+            double theta = ModUtils.random.nextDouble(0,2*Math.PI);
+            double x = ModUtils.random.nextDouble(RADIUS/2,RADIUS)*Math.sin(theta);
             double y = theta/2.0;
-            double z = Utilities.random.nextDouble(RADIUS/2,RADIUS)*Math.cos(theta);
+            double z = ModUtils.random.nextDouble(RADIUS/2,RADIUS)*Math.cos(theta);
 
             //Spawn AfterImages
             PhantomRushEntity phantomRushEntity = new PhantomRushEntity(ModEntityTypes.BASEFORM_PHANTOM_RUSH_ENTITY.get(),this.level());
             phantomRushEntity.setPos(this.getX()+x, this.getY()+y, this.getZ()+z);
             phantomRushEntity.setDuration(3);
             phantomRushEntity.setPoseType((byte)(getPlayerTextureType()*10+this.getDuration()%5));
-            phantomRushEntity.setYRot(Utilities.getYawPitchFromVec( (new Vec3(x,y,z)).reverse() )[0]);
+            phantomRushEntity.setYRot(ModUtils.getYawPitchFromVec( (new Vec3(x,y,z)).reverse() )[0]);
             this.level().addFreshEntity(phantomRushEntity);
         }
 
@@ -132,9 +132,10 @@ public class PhantomRushCloud extends PointEntity {
             try {
                 Player playerEntity = (Player)entity;
                 ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
-                if (headItem.getItem() == Items.PLAYER_HEAD &&
-                        headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
-                    return false;
+                if (headItem.getItem() == Items.PLAYER_HEAD) {
+                    assert headItem.getTag() != null;
+                    if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
+                }
             }
             catch (NullPointerException|ClassCastException ignored){}
             return true;
@@ -145,10 +146,10 @@ public class PhantomRushCloud extends PointEntity {
 
             //Damage Enemy
             if(!enemy.isInvulnerable())
-            enemy.hurt(
-                        ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_ULTIMATE.getResourceKey(),this.getOwner()),
-                        BaseformServer.PHANTOM_RUSH_DAMAGE
-                );
+                enemy.hurt(
+                            ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_ULTIMATE.getResourceKey(),this.getOwner()),
+                            BaseformServer.PHANTOM_RUSH_DAMAGE
+                    );
 
             //Suck Enemies inward
             Vec3 motionDir = currentPos.subtract(enemyPos)

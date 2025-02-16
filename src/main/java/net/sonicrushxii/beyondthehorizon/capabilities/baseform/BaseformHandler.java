@@ -17,7 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.DamageHandler;
@@ -75,6 +75,7 @@ public class BaseformHandler {
             //Parry
             if(baseformProperties.parryTime > 0)
             {
+                assert damageGiver != null;
                 Vec3 motionDir =  (new Vec3(damageGiver.getX(),damageGiver.getY(),damageGiver.getZ()))
                         .subtract(new Vec3(receiver.getX(),receiver.getY(),receiver.getZ())).normalize();
 
@@ -182,6 +183,7 @@ public class BaseformHandler {
                 }
                 else if (DamageHandler.isDamageSourceModded(event.getSource())) {
                     //Cancel Combo, if you do any other modded Attack
+                    assert damageGiver != null;
                     ScheduledTask currentSchedule = hitSchedule.get(damageGiver.getUUID());
                     if (currentSchedule != null && !currentSchedule.isCancelled()) {
                         currentSchedule.cancel();
@@ -200,6 +202,7 @@ public class BaseformHandler {
             //Reduce Vertical Movement to 0 if In Player attack
             if(event.getSource().is(DamageTypes.PLAYER_ATTACK))
             {
+                assert damageGiver != null;
                 Vec3 currentPlayerMovement = damageGiver.getDeltaMovement();
                 damageGiver.setDeltaMovement(currentPlayerMovement.x(), 0.0, currentPlayerMovement.z());
                 damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageGiver));
@@ -209,6 +212,7 @@ public class BaseformHandler {
             if(baseformProperties.smashHit > 0 && event.getSource().is(DamageTypes.PLAYER_ATTACK))
             {
                 //Knockback
+                assert damageGiver != null;
                 damageTaker.setDeltaMovement(damageGiver.getLookAngle().scale(baseformProperties.smashHit/20.0f));
                 //Damage Enemy
                 damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),damageGiver),
@@ -226,6 +230,7 @@ public class BaseformHandler {
             else if(baseformProperties.speedBlitz && event.getSource().is(DamageTypes.PLAYER_ATTACK))
             {
                 //Recover Speed Blitz Dashes
+                assert damageGiver != null;
                 if(!damageGiver.hasEffect(ModEffects.SPEED_BLITZING.get()) && damageGiver.onGround())
                     baseformProperties.speedBlitzDashes = 4;
 
@@ -237,7 +242,7 @@ public class BaseformHandler {
                     currComboEffect.update(new MobEffectInstance(ModEffects.SPEED_BLITZED.get(), 20, 0, false, false));
 
                 Scheduler.scheduleTask(()->{
-                    damageTaker.setDeltaMovement(Utilities.calculateViewVector(damageGiver.getXRot(),damageGiver.getYRot()).scale(0.85));
+                    damageTaker.setDeltaMovement(ModUtils.calculateViewVector(damageGiver.getXRot(),damageGiver.getYRot()).scale(0.85));
                     damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
                 },3);
             }
@@ -256,8 +261,10 @@ public class BaseformHandler {
 
                 if(baseformProperties.ultimateAtkMeter > 100.0)
                 {
-                    if(!baseformProperties.ultReady)
+                    if(!baseformProperties.ultReady) {
+                        assert damageGiver != null;
                         damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.MASTER, 1.0f, 2.0f);
+                    }
                     baseformProperties.ultReady = true;
                     baseformProperties.ultimateAtkMeter = 100.0;
                 }

@@ -7,7 +7,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
@@ -15,6 +15,8 @@ import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
+
+import java.util.Objects;
 
 public class TornadoJump {
 
@@ -45,19 +47,17 @@ public class TornadoJump {
             //Set Phase
             baseformProperties.atkRotPhase = -player.getYRot()-135f;
             final Vec3 playerPos = new Vec3(player.getX(),player.getY()+1,player.getZ());
-            Scheduler.scheduleTask(()->{
-                Utilities.summonEntity(ModEntityTypes.TORNADO_JUMP_CLOUD.get(),
-                        player.serverLevel(),
-                        playerPos.add
-                                (Utilities.calculateViewVector(0,-baseformProperties.atkRotPhase+180).scale(1.4)),
-                        (aoeCloud) -> {
-                            aoeCloud.setDuration(195);
-                            aoeCloud.setOwner(player.getUUID());
-                        });
-            },5);
+            Scheduler.scheduleTask(()-> ModUtils.summonEntity(ModEntityTypes.TORNADO_JUMP_CLOUD.get(),
+                    player.serverLevel(),
+                    playerPos.add
+                            (ModUtils.calculateViewVector(0,-baseformProperties.atkRotPhase+180).scale(1.4)),
+                    (aoeCloud) -> {
+                        aoeCloud.setDuration(195);
+                        aoeCloud.setOwner(player.getUUID());
+                    }),5);
 
             //Remove Gravity
-            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+            Objects.requireNonNull(player.getAttribute(ForgeMod.ENTITY_GRAVITY.get())).setBaseValue(0.0);
 
             //Play Sound
             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.TORNADO.get(), SoundSource.MASTER, 0.75f, 1.0f);

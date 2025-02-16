@@ -14,7 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.entities.all.LinearMovingEntity;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
@@ -30,8 +30,6 @@ public class SonicWind extends LinearMovingEntity {
     public static final EntityDataAccessor<Boolean> DESTROY_BLOCKS = SynchedEntityData.defineId(SonicWind.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(SonicWind.class, EntityDataSerializers.OPTIONAL_UUID);
     private int MAX_DURATION = 160;
-    private static float STRENGTH = 3.0f;
-
 
     public SonicWind(EntityType<? extends PointEntity> type, Level world) {
         super(type, world);
@@ -106,13 +104,13 @@ public class SonicWind extends LinearMovingEntity {
                    double particleX = (0.2)*p*Math.sin(this.getDuration()/2.0F+offset+p/10);
                    double particleZ = (0.2)*p*Math.cos(this.getDuration()/2.0F+offset+p/10);
 
-                   Utilities.displayParticle(this.level(),
+                   ModUtils.displayParticle(this.level(),
                            new DustParticleOptions(new Vector3f(0.00f,0.0f,1f),1f),
                            this.getX()+particleX,this.getY(),this.getZ()+particleZ,
                            0.25f-(0.025f)*p,0.25f-(0.025f)*p,0.25f-(0.025f)*p,
                            0.001, 2, false
                    );
-                   Utilities.displayParticle(this.level(),
+                   ModUtils.displayParticle(this.level(),
                            new DustParticleOptions(new Vector3f(0.00f,1f,1f),1f),
                            this.getX()+particleX,this.getY(),this.getZ()+particleZ,
                            0.25f-(0.025f)*p,0.25f-(0.025f)*p,0.25f-(0.025f)*p,
@@ -134,9 +132,10 @@ public class SonicWind extends LinearMovingEntity {
                         try {
                             Player playerEntity = (Player)enemy;
                             ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
-                            if (headItem.getItem() == Items.PLAYER_HEAD &&
-                                    headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
-                                return false;
+                            if (headItem.getItem() == Items.PLAYER_HEAD) {
+                                assert headItem.getTag() != null;
+                                if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
+                            }
                         }
                         catch (NullPointerException|ClassCastException ignored){}
                         return true;
@@ -159,6 +158,7 @@ public class SonicWind extends LinearMovingEntity {
     private void explode()
     {
         this.kill();
+        float STRENGTH = 3.0f;
         if(this.isDestroyBlocks() && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))
         {
             this.level().explode(

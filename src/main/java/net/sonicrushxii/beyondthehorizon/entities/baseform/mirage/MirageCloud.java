@@ -5,7 +5,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.sonicrushxii.beyondthehorizon.Utilities;
+import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
 import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
 import org.joml.Vector3f;
@@ -35,7 +35,6 @@ public class MirageCloud extends PointEntity
 
         if(this.level().isClientSide)
         {
-            int color = 0;
             Vec3[] positions = {new Vec3(-3,0,8),
                                 new Vec3(4,5,9),
                                 new Vec3(11,1,3),
@@ -54,7 +53,7 @@ public class MirageCloud extends PointEntity
                 {
                     if(i!=j) {
                         //Display Particle
-                        Utilities.particleRaycast(this.level(),
+                        ModUtils.particleRaycast(this.level(),
                                 new DustParticleOptions(colorSelect(i),1.15f),
                                 currentPos.add(positions[i]),currentPos.add(positions[j]));
                     }
@@ -64,7 +63,7 @@ public class MirageCloud extends PointEntity
         else if(this.getDuration()%3 == 0)
         {
             //Set X,Y,Z Positions
-            double theta = Utilities.random.nextDouble(0,2*Math.PI);
+            double theta = ModUtils.random.nextDouble(0,2*Math.PI);
             double x = RADIUS*Math.sin(theta);
             double y = theta/2.0;
             double z = RADIUS*Math.cos(theta);
@@ -73,7 +72,7 @@ public class MirageCloud extends PointEntity
             MirageEntity sonicMirage = new MirageEntity(ModEntityTypes.SONIC_BASEFORM_MIRAGE.get(),this.level());
             sonicMirage.setPos(this.getX()+x, this.getY()+y, this.getZ()+z);
             sonicMirage.setDuration(10);
-            sonicMirage.setYRot(Utilities.getYawPitchFromVec( (new Vec3(x,y,z)).reverse() )[0]);
+            sonicMirage.setYRot(ModUtils.getYawPitchFromVec( (new Vec3(x,y,z)).reverse() )[0]);
             this.level().addFreshEntity(sonicMirage);
         }
     }
