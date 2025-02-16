@@ -1,11 +1,9 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -82,7 +80,7 @@ public class BaseformServer
 
     //Melee
     public static final float TORNADO_JUMP_DMG = 1.0f;
-    public static final float DASH_DAMAGE = 1.0f;
+    public static final float SPEED_BLITZ_DASH_DAMAGE = 5.0f;
     private static final float WILDRUSH_DAMAGE = 10.0f;
     private static final float LOOPKICK_DAMAGE = 12.0f;
     public static final float SPINSLASH_DAMAGE = 3.0f;
@@ -102,7 +100,7 @@ public class BaseformServer
     public static final float PHANTOM_RUSH_DAMAGE = 10.0f;
     public static final float ULTIMATE_DAMAGE = 100.0f;
 
-    public static void performServerTick(ServerPlayer player, CompoundTag playerNBT)
+    public static void performServerTick(ServerPlayer player)
     {
         Level level = player.level();
         ServerLevel serverLevel = player.serverLevel();
@@ -682,7 +680,7 @@ public class BaseformServer
                             ),(enemy)->!enemy.is(player)))
                             {
                                 enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player),
-                                        DASH_DAMAGE);
+                                        SPEED_BLITZ_DASH_DAMAGE);
                             }
                         }
                         if(baseformProperties.speedBlitzDashTimer == 5)
@@ -2210,7 +2208,7 @@ public class BaseformServer
 
     }
 
-    public static void performServerSecond(ServerPlayer player, CompoundTag playerNBT)
+    public static void performServerSecond(ServerPlayer player)
     {
         //Get Data From the Player
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
