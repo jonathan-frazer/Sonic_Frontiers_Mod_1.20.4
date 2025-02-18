@@ -304,6 +304,12 @@ public class BaseformClient {
                         else
                             PacketHandler.sendToServer(new HomingAttack(ClientOnlyData.homingAttackReticle));
                     }
+
+                    //Break Blocks with Air Boost
+                    if(holdingLeftClick && baseformProperties.ballFormState == (byte)3)
+                    {
+                        PacketHandler.sendToServer(new SpindashBreak());
+                    }
                 }
 
                 //Humming Top
