@@ -45,16 +45,15 @@ public class BeyondTheHorizon
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
-
-    public BeyondTheHorizon(FMLJavaModLoadingContext context)
+    public static void initializeMod(BeyondTheHorizon thisMod, FMLJavaModLoadingContext context)
     {
         IEventBus modEventBus = context.getModEventBus();
 
         // Register the commonSetup method for modloading
-        modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(thisMod::commonSetup);
 
         // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(thisMod);
         MinecraftForge.EVENT_BUS.register(new LoginHandler());
         MinecraftForge.EVENT_BUS.register(new FallDamageHandler());
         MinecraftForge.EVENT_BUS.register(new ServerTickHandler());
@@ -65,7 +64,7 @@ public class BeyondTheHorizon
         MinecraftForge.EVENT_BUS.register(new EquipmentChangeHandler());
 
         // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
+        modEventBus.addListener(thisMod::addCreative);
 
         // Register Stuff
         ModCreativeModeTabs.register(modEventBus);
@@ -76,6 +75,15 @@ public class BeyondTheHorizon
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+    }
+
+    public BeyondTheHorizon(FMLJavaModLoadingContext context)
+    {
+        initializeMod(this,context);
+    }
+
+    public BeyondTheHorizon() {
+        initializeMod(this,FMLJavaModLoadingContext.get());
     }
 
     @SubscribeEvent
