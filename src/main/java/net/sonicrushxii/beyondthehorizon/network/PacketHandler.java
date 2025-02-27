@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.network;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -60,6 +61,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.Do
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.wall_boost.WallBoost;
 import net.sonicrushxii.beyondthehorizon.network.sync.*;
 import net.sonicrushxii.beyondthehorizon.timehandler.TimeProjSync;
+import org.slf4j.Logger;
 
 public class PacketHandler {
     private static final int PROTOCOL_VERSION = 1;
@@ -67,9 +69,10 @@ public class PacketHandler {
             .named(new ResourceLocation(BeyondTheHorizon.MOD_ID, "main"))
             .networkProtocolVersion(PROTOCOL_VERSION)
             .simpleChannel();
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public static void register() {
-        System.out.println("REGISTERED PACKET HANDLER");
+        LOGGER.info("HELLO FROM CLIENT SETUP");
 
         //Sync Packets
         {
