@@ -1,6 +1,5 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
@@ -50,12 +49,11 @@ public class PlayerTickHandler {
     {
         if (!player.isAlive())
             return;
-        CompoundTag playerNBT = player.serializeNBT();
 
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             switch(playerSonicForm.getCurrentForm())
             {
-                case BASEFORM -> BaseformServer.performServerTick(player,playerNBT);
+                case BASEFORM -> BaseformServer.performServerTick(player);
                 case SUPERFORM -> SuperformHandler.performSuperformServerTick(player);
                 case STARFALLFORM -> StarfallFormHandler.performStarfallformServerTick(player);
                 case HYPERFORM -> HyperformHandler.performHyperformServerTick(player);
@@ -65,16 +63,16 @@ public class PlayerTickHandler {
         ++tickCounter;
         if (tickCounter >= TICKS_PER_SECOND) {
             tickCounter = 0;
-            serverPlayerSecond(player,playerNBT);
+            serverPlayerSecond(player);
         }
     }
 
-    private void serverPlayerSecond(ServerPlayer player, CompoundTag playerNBT)
+    private void serverPlayerSecond(ServerPlayer player)
     {
         player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
             switch(playerSonicForm.getCurrentForm())
             {
-                case BASEFORM -> BaseformServer.performServerSecond(player,playerNBT);
+                case BASEFORM -> BaseformServer.performServerSecond(player);
                 case SUPERFORM -> SuperformHandler.performSuperformServerSecond(player);
                 case STARFALLFORM -> StarfallFormHandler.performStarfallformServerSecond(player);
                 case HYPERFORM -> HyperformHandler.performHyperformServerSecond(player);
