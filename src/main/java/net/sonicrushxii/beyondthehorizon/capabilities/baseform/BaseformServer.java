@@ -72,7 +72,7 @@ public class BaseformServer
     private static final float QK_CYLOOP_DAMAGE = 15.0f;
 
     //Combo
-    private static final float HOMING_ATTACK_DAMAGE = 15.0f;
+    private static final float HOMING_ATTACK_DAMAGE = 11.0f;
     private static final float BALLFORM_DAMAGE = 10.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
     public static final float STOMP_DAMAGE = 8.0f;
@@ -81,15 +81,15 @@ public class BaseformServer
     //Melee
     public static final float TORNADO_JUMP_DMG = 1.0f;
     public static final float SPEED_BLITZ_DASH_DAMAGE = 5.0f;
-    private static final float WILDRUSH_DAMAGE = 14.0f;
-    private static final float LOOPKICK_DAMAGE = 14.0f;
+    private static final float WILDRUSH_DAMAGE = 24.0f;
+    private static final float LOOPKICK_DAMAGE = 24.0f;
     public static final float SPINSLASH_DAMAGE = 3.5f;
     public static final float CYCLONE_KICK_DAMAGE = 3.5f;
 
     //Ranged
     public static final float SONIC_BOOM_DAMAGE = 6.0f;
-    public static final float SONIC_WIND_DAMAGE = 12.0f;
-    public static final float HOMING_SHOT_DAMAGE = 20.0f;
+    public static final float SONIC_WIND_DAMAGE = 24.0f;
+    public static final float HOMING_SHOT_DAMAGE = 27.0f;
     public static final float CROSS_SLASH_DAMAGE = 12.0f;
 
     //Counter
@@ -98,7 +98,7 @@ public class BaseformServer
     //Ultimate
     private static final double ULT_DECAY_RATE = 0.15;
     public static final float PHANTOM_RUSH_DAMAGE = 10.0f;
-    public static final float ULTIMATE_DAMAGE = 100.0f;
+    public static final float ULTIMATE_DAMAGE = 120.0f;
 
     public static void performServerTick(ServerPlayer player)
     {
