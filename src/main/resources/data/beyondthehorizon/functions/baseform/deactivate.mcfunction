@@ -1,1 +1,1 @@
-clear @s player_head{BeyondTheHorizon:2b}
+clear @s player_head{BeyondTheHorizon:2b} 1
