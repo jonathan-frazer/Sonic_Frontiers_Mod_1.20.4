@@ -56,9 +56,7 @@ public class ServerTickHandler
                             if(itemInfo.getItem() == Items.PLAYER_HEAD && itemInfo.getTag().getByte("BeyondTheHorizon") == (byte)2)
                                 itemEntity.setItem(BaseformProperties.baseformSonicHead);
 
-                        }catch(NullPointerException ignored) {
-                            continue;
-                        }
+                        }catch(NullPointerException ignored) {  }
 
                         //Floor Crafting
                         if (itemInfo.getItem() == Items.BEACON && itemInfo.getCount() == 1) {
