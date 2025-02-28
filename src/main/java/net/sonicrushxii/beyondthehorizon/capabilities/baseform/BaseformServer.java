@@ -75,25 +75,25 @@ public class BaseformServer
     private static final float HOMING_ATTACK_DAMAGE = 15.0f;
     private static final float BALLFORM_DAMAGE = 10.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
-    public static final float STOMP_DAMAGE = 12.0f;
-    private static final float LIGHT_SPEED_ASSAULT = 20.0f;
+    public static final float STOMP_DAMAGE = 8.0f;
+    private static final float LIGHT_SPEED_ASSAULT = 55.0f;
 
     //Melee
     public static final float TORNADO_JUMP_DMG = 1.0f;
     public static final float SPEED_BLITZ_DASH_DAMAGE = 5.0f;
-    private static final float WILDRUSH_DAMAGE = 10.0f;
-    private static final float LOOPKICK_DAMAGE = 12.0f;
-    public static final float SPINSLASH_DAMAGE = 3.0f;
-    public static final float CYCLONE_KICK_DAMAGE = 3.0f;
+    private static final float WILDRUSH_DAMAGE = 14.0f;
+    private static final float LOOPKICK_DAMAGE = 14.0f;
+    public static final float SPINSLASH_DAMAGE = 3.5f;
+    public static final float CYCLONE_KICK_DAMAGE = 3.5f;
 
     //Ranged
     public static final float SONIC_BOOM_DAMAGE = 6.0f;
-    public static final float SONIC_WIND_DAMAGE = 18.0f;
-    public static final float HOMING_SHOT_DAMAGE = 35.0f;
+    public static final float SONIC_WIND_DAMAGE = 12.0f;
+    public static final float HOMING_SHOT_DAMAGE = 20.0f;
     public static final float CROSS_SLASH_DAMAGE = 12.0f;
 
     //Counter
-    private static final float GRAND_SLAM_DMG = 17.0f;
+    private static final float GRAND_SLAM_DMG = 21.0f;
 
     //Ultimate
     private static final double ULT_DECAY_RATE = 0.15;
