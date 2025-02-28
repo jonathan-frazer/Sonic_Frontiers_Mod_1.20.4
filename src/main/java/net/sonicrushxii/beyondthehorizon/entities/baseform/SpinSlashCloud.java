@@ -135,7 +135,7 @@ public class SpinSlashCloud extends PointEntity {
         {
             //Damage Enemy
             enemy.hurt(
-                    ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(),this.getOwner()),
+                    ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_BALL.getResourceKey(),this.getOwner()),
                     BaseformServer.SPINSLASH_DAMAGE
             );
         }

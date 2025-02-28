@@ -145,7 +145,7 @@ public class SonicWind extends LinearMovingEntity {
                 try {// Synchronize on server only
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(
-                                ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), this.getOwner()),
+                                ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), this.getOwner()),
                                 BaseformServer.SONIC_WIND_DAMAGE
                         );
                     }

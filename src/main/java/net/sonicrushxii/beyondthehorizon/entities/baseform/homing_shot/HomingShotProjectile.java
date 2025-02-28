@@ -228,7 +228,7 @@ public class HomingShotProjectile extends Entity {
                 try {// Synchronize on server only
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(
-                                ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), this.getOwner()),
+                                ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), this.getOwner()),
                                 BaseformServer.HOMING_SHOT_DAMAGE
                         );
                     }

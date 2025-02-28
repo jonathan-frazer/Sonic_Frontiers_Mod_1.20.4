@@ -257,7 +257,8 @@ public class BaseformHandler {
                 baseformProperties.qkCyloopMeter = Math.min(100.0,baseformProperties.qkCyloopMeter+event.getAmount()/5.0);
                 baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter + (
                         ((event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey())||event.getSource().is(ModDamageTypes.SONIC_RANGED_COMBO_IMMUNE.getResourceKey())))?event.getAmount()/6:
-                                ((event.getSource().is(ModDamageTypes.SONIC_MELEE.getResourceKey()))||event.getSource().is(ModDamageTypes.SONIC_MELEE_COMBO_IMMUNE.getResourceKey()))?event.getAmount()*1.5:event.getAmount()/1.3);
+                                ((event.getSource().is(ModDamageTypes.SONIC_MELEE.getResourceKey()))||event.getSource().is(ModDamageTypes.SONIC_MELEE_COMBO_IMMUNE.getResourceKey()))?event.getAmount()*1.5:
+                                        (event.getSource().is(ModDamageTypes.SONIC_CYLOOP.getResourceKey()))?event.getAmount()*1.5:event.getAmount()/1.3);
 
                 if(baseformProperties.ultimateAtkMeter > 100.0)
                 {

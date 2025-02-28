@@ -43,7 +43,7 @@ public class Stomp {
                     (target)->!target.is(player)))
             {
                 //Damage Enemy
-                enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
+                enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),player),
                         BaseformServer.STOMP_DAMAGE);
             }
 
