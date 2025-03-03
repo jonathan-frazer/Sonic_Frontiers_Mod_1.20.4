@@ -87,16 +87,16 @@ public class BaseformServer
     public static final float CYCLONE_KICK_DAMAGE = 3.5f;
 
     //Ranged
-    public static final float SONIC_BOOM_DAMAGE = 6.0f;
+    public static final float SONIC_BOOM_DAMAGE = 7.0f;
     public static final float SONIC_WIND_DAMAGE = 24.0f;
     public static final float HOMING_SHOT_DAMAGE = 27.0f;
-    public static final float CROSS_SLASH_DAMAGE = 12.0f;
+    public static final float CROSS_SLASH_DAMAGE = 7.0f;
 
     //Counter
     private static final float GRAND_SLAM_DMG = 21.0f;
 
     //Ultimate
-    private static final double ULT_DECAY_RATE = 0.15;
+    private static final double ULT_DECAY_RATE = 0.075;
     public static final float PHANTOM_RUSH_DAMAGE = 10.0f;
     public static final float ULTIMATE_DAMAGE = 120.0f;
 
@@ -1007,6 +1007,10 @@ public class BaseformServer
                                             ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
                                             LIGHT_SPEED_ASSAULT
                                     );
+
+                                    //Increment Meter
+                                    baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter + LIGHT_SPEED_ASSAULT;
+
                                     enemy.setDeltaMovement(player.getLookAngle().scale(2.0));
                                     player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
 
