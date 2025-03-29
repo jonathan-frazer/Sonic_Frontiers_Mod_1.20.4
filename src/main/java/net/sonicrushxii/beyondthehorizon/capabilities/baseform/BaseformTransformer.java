@@ -34,18 +34,17 @@ public class BaseformTransformer {
         //Equip Armor
         //SET ARMOR NBT DATA(COMMON)
         {
-            Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
-            if (armorItems.next().isEmpty()) {
+            if (player.getItemBySlot(EquipmentSlot.FEET).isEmpty()) {
                 ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_BOOTS.get());
                 itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
                 player.setItemSlot(EquipmentSlot.FEET, itemToPlace);
             }
-            if (armorItems.next().isEmpty()) {
+            if (player.getItemBySlot(EquipmentSlot.LEGS).isEmpty()) {
                 ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_LEGGINGS.get());
                 itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
                 player.setItemSlot(EquipmentSlot.LEGS, itemToPlace);
             }
-            if (armorItems.next().isEmpty()) {
+            if (player.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) {
                 ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_CHESTPLATE.get());
                 itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
                 player.setItemSlot(EquipmentSlot.CHEST, itemToPlace);
