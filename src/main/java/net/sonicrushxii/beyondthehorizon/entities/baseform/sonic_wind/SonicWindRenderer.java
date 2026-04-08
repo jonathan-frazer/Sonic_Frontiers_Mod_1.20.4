@@ -41,7 +41,7 @@ public class SonicWindRenderer extends EntityRenderer<SonicWind> {
         poseStack.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
         poseStack.translate(0D,-1.0D,0D);
 
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
 
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);

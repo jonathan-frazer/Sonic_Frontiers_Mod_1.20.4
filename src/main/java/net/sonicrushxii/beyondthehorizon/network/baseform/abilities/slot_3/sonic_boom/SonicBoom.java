@@ -5,7 +5,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -90,7 +90,7 @@ public class SonicBoom implements CustomPacketPayload
                         baseformProperties.sonicBoom = 1;
 
                         //Remove Gravity
-                        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.0);
+                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
 
                         //Play Sound
                         PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(

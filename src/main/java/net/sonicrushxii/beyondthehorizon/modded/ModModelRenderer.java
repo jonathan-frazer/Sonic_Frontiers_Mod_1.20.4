@@ -70,7 +70,7 @@ public class ModModelRenderer {
 
             VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, getTextureLocation(textures, animationLength))));
             EntityModel model = modelClass.getConstructor(ModelPart.class).newInstance(modelPart);
-            model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
+            model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), -1);
         } catch (NullPointerException | ClassCastException | NoSuchMethodError | NoSuchFieldException |
                  NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException ignored) {
@@ -132,7 +132,7 @@ public class ModModelRenderer {
             }
 
             EntityModel model = modelClass.getConstructor(ModelPart.class).newInstance(modelPart);
-            model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(player, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
+            model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(player, 0.0F), -1);
         } catch (NullPointerException | ClassCastException | NoSuchMethodError | NoSuchFieldException |
                  NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException ignored) {
@@ -194,7 +194,7 @@ public class ModModelRenderer {
             }
 
             EntityModel model = modelClass.getConstructor(ModelPart.class).newInstance(modelPart);
-            model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(player, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
+            model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(player, 0.0F), -1);
         } catch (NullPointerException | ClassCastException | NoSuchMethodError | NoSuchFieldException |
                  NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException ignored) {

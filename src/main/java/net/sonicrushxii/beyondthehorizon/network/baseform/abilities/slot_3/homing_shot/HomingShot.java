@@ -11,7 +11,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -118,7 +118,7 @@ public class HomingShot implements CustomPacketPayload {
         baseformProperties.atkRotPhase = player.getYRot();
 
         //Remove Gravity
-        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.0);
+        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
 
         //Play Sound
         player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_SHOT.get(), SoundSource.MASTER, 0.75f, 1.0f);

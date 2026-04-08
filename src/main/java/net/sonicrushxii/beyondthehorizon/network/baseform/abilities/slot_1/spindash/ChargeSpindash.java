@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -51,7 +50,7 @@ public class ChargeSpindash implements CustomPacketPayload {
 
                         //Lock Player in Position
                         player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.0);
-                        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.80);
+                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.80);
 
                         //PlaySound
                         Level world = player.level();

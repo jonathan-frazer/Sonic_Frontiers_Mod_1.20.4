@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -67,7 +69,7 @@ public class ModUtils {
         display.putString("Name", "{\"text\":\"Sonic Head\",\"color\": \"blue\",\"italic\": false}");
         nbt.put("display", display);
 
-        baseformSonicHead.setTag(nbt);
+        baseformSonicHead.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
     }
 
     public static final HashSet<String> passableBlocks =

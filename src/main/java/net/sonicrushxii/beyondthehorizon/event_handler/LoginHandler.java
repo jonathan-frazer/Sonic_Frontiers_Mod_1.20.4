@@ -3,7 +3,7 @@ package net.sonicrushxii.beyondthehorizon.event_handler;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
@@ -44,7 +44,7 @@ public class LoginHandler {
                 //Revert Dodge
                 if(baseformProperties.dodgeInvul) {
                     baseformProperties.dodgeInvul = false;
-                    player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.08);
+                    player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
                 }
 
                 //Reset Combo Meter

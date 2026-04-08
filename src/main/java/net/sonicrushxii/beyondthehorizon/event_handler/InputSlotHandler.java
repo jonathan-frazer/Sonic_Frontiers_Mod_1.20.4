@@ -23,7 +23,7 @@ public class InputSlotHandler {
 
     @SubscribeEvent
     public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
-        boolean isScrollingUp = (event.getDeltaY() >= 0);
+        boolean isScrollingUp = (event.getScrollDeltaY() >= 0);
 
         // Get the Minecraft instance and the player
         Minecraft mc = Minecraft.getInstance();

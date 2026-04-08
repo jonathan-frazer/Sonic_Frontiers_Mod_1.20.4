@@ -71,6 +71,7 @@ public class BeyondTheHorizon
         modEventBus.addListener(PacketHandler::onRegisterPayloadHandlers);
 
         // Register Stuff
+        ModArmorMaterials.register(modEventBus);
         ModCreativeModeTabs.register(modEventBus);
         ModItems.register(modEventBus);
         ModSounds.register(modEventBus);

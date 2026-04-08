@@ -11,7 +11,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -117,7 +117,7 @@ public class LoopKick implements CustomPacketPayload {
         player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.LOOP_KICK.get(), SoundSource.MASTER, 0.75f, 1.0f);
 
         //Remove Gravity
-        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.0);
+        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
 
 
         PacketHandler.sendToALLPlayers(

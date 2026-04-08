@@ -1,6 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.entities.baseform.homing_shot;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -39,10 +41,10 @@ public class HomingShotProjectile extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DURATION, 150);
-        this.entityData.define(OWNER,Optional.empty());
-        this.entityData.define(TARGET,-1);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DURATION, 150);
+        builder.define(OWNER,Optional.empty());
+        builder.define(TARGET,-1);
     }
 
     @Override
@@ -141,8 +143,8 @@ public class HomingShotProjectile extends Entity {
                         try {
                             ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
                             if (headItem.getItem() == Items.PLAYER_HEAD) {
-                                assert headItem.getTag() != null;
-                                if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return true;
+                                assert headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag() != null;
+                                if (headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon") == (byte) 2) return true;
                             }
                         }
                         catch (NullPointerException|ClassCastException ignored){}
@@ -216,8 +218,8 @@ public class HomingShotProjectile extends Entity {
                             Player playerEntity = (Player)enemy;
                             ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
                             if (headItem.getItem() == Items.PLAYER_HEAD) {
-                                assert headItem.getTag() != null;
-                                if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
+                                assert headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag() != null;
+                                if (headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
                             }
                         }
                         catch (NullPointerException|ClassCastException ignored){}

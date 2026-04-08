@@ -1,87 +1,105 @@
 package net.sonicrushxii.beyondthehorizon.modded;
 
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.Util;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 
-import java.util.function.Supplier;
+import java.util.EnumMap;
+import java.util.List;
 
-public enum ModArmorMaterials implements ArmorMaterial {
+public class ModArmorMaterials {
+    public static final DeferredRegister<ArmorMaterial> ARMOR_MATERIALS =
+            DeferredRegister.create(Registries.ARMOR_MATERIAL, BeyondTheHorizon.MOD_ID);
 
-    BASEFORM_SONIC("baseform",134217727,new int[]{1,1,1,1}, 26,
-            SoundEvents.ARMOR_EQUIP_LEATHER,1f,0f, null),
-    BASEFORM_LIGHTSPEED_SONIC("baseform_lightspeed",134217727,new int[]{1,1,1,1}, 26,
-            SoundEvents.ARMOR_EQUIP_LEATHER,1f,0f, null),
-    SUPERFORM_SONIC("superform",134217727,new int[]{5,7,5,4}, 26,
-            SoundEvents.ARMOR_EQUIP_LEATHER,1f,0f, null),
-    STARFALL_SONIC("starfall",134217727,new int[]{5,7,5,4}, 26,
-            SoundEvents.ARMOR_EQUIP_LEATHER,1f,0f, null),
-    HYPERFORM_SONIC("hyperform",134217727,new int[]{5,7,5,4}, 26,
-            SoundEvents.ARMOR_EQUIP_LEATHER,1f,0f, null);
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> BASEFORM_SONIC = ARMOR_MATERIALS.register("baseform",
+            () -> new ArmorMaterial(
+                    Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                        map.put(ArmorItem.Type.BOOTS, 1);
+                        map.put(ArmorItem.Type.LEGGINGS, 1);
+                        map.put(ArmorItem.Type.CHESTPLATE, 1);
+                        map.put(ArmorItem.Type.HELMET, 1);
+                    }),
+                    26,
+                    SoundEvents.ARMOR_EQUIP_LEATHER,
+                    () -> Ingredient.EMPTY,
+                    List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "baseform"))),
+                    1.0f,
+                    0.0f
+            ));
 
-    private final String name;
-    private final int durabilityMultiplier;
-    private final int[] protectionAmounts;
-    private final int enchantmentValue;
-    private final SoundEvent equipSound;
-    private final float toughness;
-    private final float knockbackResistance;
-    private final Supplier<Ingredient> repairIngredient;
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> BASEFORM_LIGHTSPEED_SONIC = ARMOR_MATERIALS.register("baseform_lightspeed",
+            () -> new ArmorMaterial(
+                    Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                        map.put(ArmorItem.Type.BOOTS, 1);
+                        map.put(ArmorItem.Type.LEGGINGS, 1);
+                        map.put(ArmorItem.Type.CHESTPLATE, 1);
+                        map.put(ArmorItem.Type.HELMET, 1);
+                    }),
+                    26,
+                    SoundEvents.ARMOR_EQUIP_LEATHER,
+                    () -> Ingredient.EMPTY,
+                    List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "baseform_lightspeed"))),
+                    1.0f,
+                    0.0f
+            ));
 
-    private static final int[] BASE_DURABILITY = {11,16,16,13};
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> SUPERFORM_SONIC = ARMOR_MATERIALS.register("superform",
+            () -> new ArmorMaterial(
+                    Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                        map.put(ArmorItem.Type.BOOTS, 4);
+                        map.put(ArmorItem.Type.LEGGINGS, 5);
+                        map.put(ArmorItem.Type.CHESTPLATE, 7);
+                        map.put(ArmorItem.Type.HELMET, 5);
+                    }),
+                    26,
+                    SoundEvents.ARMOR_EQUIP_LEATHER,
+                    () -> Ingredient.EMPTY,
+                    List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "superform"))),
+                    1.0f,
+                    0.0f
+            ));
 
-    ModArmorMaterials(String name, int durabilityMultiplier, int[] protectionAmounts, int enchantmentValue, SoundEvent equipSound, float toughness, float knockbackResistance, Supplier<Ingredient> repairIngredient) {
-        this.name = name;
-        this.durabilityMultiplier = durabilityMultiplier;
-        this.protectionAmounts = protectionAmounts;
-        this.enchantmentValue = enchantmentValue;
-        this.equipSound = equipSound;
-        this.toughness = toughness;
-        this.knockbackResistance = knockbackResistance;
-        this.repairIngredient = repairIngredient;
-    }
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> STARFALL_SONIC = ARMOR_MATERIALS.register("starfall",
+            () -> new ArmorMaterial(
+                    Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                        map.put(ArmorItem.Type.BOOTS, 4);
+                        map.put(ArmorItem.Type.LEGGINGS, 5);
+                        map.put(ArmorItem.Type.CHESTPLATE, 7);
+                        map.put(ArmorItem.Type.HELMET, 5);
+                    }),
+                    26,
+                    SoundEvents.ARMOR_EQUIP_LEATHER,
+                    () -> Ingredient.EMPTY,
+                    List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "starfall"))),
+                    1.0f,
+                    0.0f
+            ));
 
-    @Override
-    public int getDurabilityForType(ArmorItem.Type type) {
-        return BASE_DURABILITY[type.ordinal()]*this.durabilityMultiplier;
-    }
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> HYPERFORM_SONIC = ARMOR_MATERIALS.register("hyperform",
+            () -> new ArmorMaterial(
+                    Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                        map.put(ArmorItem.Type.BOOTS, 4);
+                        map.put(ArmorItem.Type.LEGGINGS, 5);
+                        map.put(ArmorItem.Type.CHESTPLATE, 7);
+                        map.put(ArmorItem.Type.HELMET, 5);
+                    }),
+                    26,
+                    SoundEvents.ARMOR_EQUIP_LEATHER,
+                    () -> Ingredient.EMPTY,
+                    List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "hyperform"))),
+                    1.0f,
+                    0.0f
+            ));
 
-    @Override
-    public int getDefenseForType(ArmorItem.Type type) {
-        return this.protectionAmounts[type.ordinal()];
-    }
-
-    @Override
-    public int getEnchantmentValue() {
-        return enchantmentValue;
-    }
-
-    @Override
-    public SoundEvent getEquipSound() {
-        return this.equipSound;
-    }
-
-    @Override
-    public Ingredient getRepairIngredient() {
-        return (this.repairIngredient==null)?null:this.repairIngredient.get();
-    }
-
-    @Override
-    public String getName() {
-        return BeyondTheHorizon.MOD_ID+":"+this.name;
-    }
-
-    @Override
-    public float getToughness() {
-        return this.toughness;
-    }
-
-    @Override
-    public float getKnockbackResistance() {
-        return this.knockbackResistance;
+    public static void register(IEventBus eventBus) {
+        ARMOR_MATERIALS.register(eventBus);
     }
 }
-

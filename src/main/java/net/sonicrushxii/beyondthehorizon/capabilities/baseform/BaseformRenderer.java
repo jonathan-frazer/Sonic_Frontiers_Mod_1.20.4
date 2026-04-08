@@ -10,7 +10,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.client.event.RenderLivingEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -19,7 +19,7 @@ import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
 
-@Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
+@EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
 public class BaseformRenderer
 {
     /**

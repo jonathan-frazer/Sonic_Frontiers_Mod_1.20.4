@@ -15,7 +15,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
@@ -114,7 +114,7 @@ public class SpinSlash implements CustomPacketPayload {
 
 
         //Remove Gravity
-        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.0);
+        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
 
         PacketHandler.sendToALLPlayers(
                 new SyncPlayerFormS2C(

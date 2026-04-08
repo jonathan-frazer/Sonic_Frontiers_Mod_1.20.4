@@ -59,8 +59,8 @@ public class GrandSlam implements CustomPacketPayload
                             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.GRAND_SLAM.get(), SoundSource.MASTER, 0.85f, 1.0f);
 
                             //Remove Attributes
-                            if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED))
-                                player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_SPEED.getId());
+                            if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED.id()))
+                                player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_SPEED.id());
 
                             baseformProperties.grandSlamTime = 1;
                         }

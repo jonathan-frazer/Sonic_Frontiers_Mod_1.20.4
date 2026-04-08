@@ -78,10 +78,10 @@ public class Mirage implements CustomPacketPayload {
                         player.getX()-6.5,player.getY()-6.5,player.getZ()-6.5),
                 (entity)->!(entity instanceof Player)))
         {
-            if(mob.hasEffect(ModEffects.MIRAGE_CONFUSE.get()))
-                Objects.requireNonNull(mob.getEffect(ModEffects.MIRAGE_CONFUSE.get())).update(new MobEffectInstance(ModEffects.MIRAGE_CONFUSE.get(),140,2,false,false));
+            if(mob.hasEffect(ModEffects.MIRAGE_CONFUSE))
+                Objects.requireNonNull(mob.getEffect(ModEffects.MIRAGE_CONFUSE)).update(new MobEffectInstance(ModEffects.MIRAGE_CONFUSE,140,2,false,false));
             else
-                mob.addEffect(new MobEffectInstance(ModEffects.MIRAGE_CONFUSE.get(),140,2,false,false));
+                mob.addEffect(new MobEffectInstance(ModEffects.MIRAGE_CONFUSE,140,2,false,false));
         }
 
         //Set Phase

@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
@@ -70,7 +70,7 @@ public class TornadoJump implements CustomPacketPayload {
                 }),5);
 
         //Remove Gravity
-        Objects.requireNonNull(player.getAttribute(NeoForgeMod.ENTITY_GRAVITY)).setBaseValue(0.0);
+        Objects.requireNonNull(player.getAttribute(Attributes.GRAVITY)).setBaseValue(0.0);
 
         //Play Sound
         player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.TORNADO.get(), SoundSource.MASTER, 0.75f, 1.0f);

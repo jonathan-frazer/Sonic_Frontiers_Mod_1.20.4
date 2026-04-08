@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -11,9 +12,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
@@ -110,7 +111,7 @@ public class UltimateActivate implements CustomPacketPayload
                             baseformProperties.ultTarget = msg.enemyID;
 
                             //Attributes
-                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.0);
+                            player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
                             player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 
                             //Deactivate PowerBoost
@@ -121,7 +122,7 @@ public class UltimateActivate implements CustomPacketPayload
                                     Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
                                     armorItems.next(); armorItems.next(); armorItems.next();
                                     try{
-                                        if(armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 2){
+                                        if(armorItems.next().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon") == (byte) 2){
                                             EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
                                             player.setItemSlot(EquipmentSlot.HEAD, BaseformProperties.baseformSonicHead);
                                         }

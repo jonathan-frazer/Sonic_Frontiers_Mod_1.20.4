@@ -9,7 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -51,11 +51,11 @@ public class Dodge implements CustomPacketPayload {
 
         //Get Invul Frames
         baseformProperties.dodgeInvul = true;
-        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
 
         Scheduler.scheduleTask(()->{
             baseformProperties.dodgeInvul = false;
-            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+            player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
             PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
                             player.getId(),

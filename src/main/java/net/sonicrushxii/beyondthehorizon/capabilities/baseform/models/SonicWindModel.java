@@ -279,17 +279,17 @@ public class SonicWindModel<T extends Entity> extends EntityModel<T> {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		sphere3.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		sphere2.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		sphere1.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		sphere0.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		sphere4.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		sphere_center.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		sphere5.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		sphere6.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		sphere7.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		sphere8.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		sphere9.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+		sphere3.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		sphere2.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		sphere1.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		sphere0.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		sphere4.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		sphere_center.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		sphere5.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		sphere6.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		sphere7.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		sphere8.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		sphere9.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
 	}
 }

@@ -27,7 +27,7 @@ public class ClientTickHandler {
             if (!player.isAlive())
                 return;
 
-            CompoundTag playerNBT = player.serializeNBT();
+            CompoundTag playerNBT = player.serializeNBT(player.registryAccess());
 
             {
                 PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);

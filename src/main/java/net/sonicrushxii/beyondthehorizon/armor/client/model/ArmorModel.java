@@ -52,15 +52,15 @@ public class ArmorModel extends EntityModel<LivingEntity> {
     }
 
     @Override
-    public void renderToBuffer(@NotNull PoseStack stack, @NotNull VertexConsumer consumer, int packedLight, int packedOverlay, float r, float g, float b, float a) {
-        armorHead.render(stack, consumer, packedLight, packedOverlay, r, g, b, a);
-        armorChest.render(stack, consumer, packedLight, packedOverlay, r, g, b, a);
-        armorRightArm.render(stack, consumer, packedLight, packedOverlay, r, g, b, a);
-        armorLeftArm.render(stack, consumer, packedLight, packedOverlay, r, g, b, a);
-        armorRightLeg.render(stack, consumer, packedLight, packedOverlay, r, g, b, a);
-        armorLeftLeg.render(stack, consumer, packedLight, packedOverlay, r, g, b, a);
-        armorRightBoot.render(stack, consumer, packedLight, packedOverlay, r, g, b, a);
-        armorLeftBoot.render(stack, consumer, packedLight, packedOverlay, r, g, b, a);
+    public void renderToBuffer(@NotNull PoseStack stack, @NotNull VertexConsumer consumer, int packedLight, int packedOverlay, int color) {
+        if (armorHead != null) armorHead.render(stack, consumer, packedLight, packedOverlay, color);
+        if (armorChest != null) armorChest.render(stack, consumer, packedLight, packedOverlay, color);
+        if (armorRightArm != null) armorRightArm.render(stack, consumer, packedLight, packedOverlay, color);
+        if (armorLeftArm != null) armorLeftArm.render(stack, consumer, packedLight, packedOverlay, color);
+        if (armorRightLeg != null) armorRightLeg.render(stack, consumer, packedLight, packedOverlay, color);
+        if (armorLeftLeg != null) armorLeftLeg.render(stack, consumer, packedLight, packedOverlay, color);
+        if (armorRightBoot != null) armorRightBoot.render(stack, consumer, packedLight, packedOverlay, color);
+        if (armorLeftBoot != null) armorLeftBoot.render(stack, consumer, packedLight, packedOverlay, color);
     }
 
     public void makeInvisible(boolean invisible) {

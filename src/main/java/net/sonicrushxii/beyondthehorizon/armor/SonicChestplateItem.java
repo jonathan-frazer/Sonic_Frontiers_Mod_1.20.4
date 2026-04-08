@@ -1,18 +1,15 @@
 package net.sonicrushxii.beyondthehorizon.armor;
 
-import net.minecraft.world.entity.Entity;
+import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.armor.client.renderer.ArmorRenderer;
-import net.sonicrushxii.beyondthehorizon.modded.ModItems;
-import org.jetbrains.annotations.Nullable;
 
 public class SonicChestplateItem extends ModArmorItem{
 
-    public SonicChestplateItem(ArmorMaterial pMaterial, Type pType, Properties pProperties) {
+    public SonicChestplateItem(Holder<ArmorMaterial> pMaterial, Type pType, Properties pProperties) {
         super(pMaterial, pType, pProperties);
     }
 
@@ -26,12 +23,7 @@ public class SonicChestplateItem extends ModArmorItem{
         return new ArmorRenderer<>(net.sonicrushxii.beyondthehorizon.armor.client.model.SonicArmorModel::createBodyLayer, net.sonicrushxii.beyondthehorizon.armor.client.model.SonicArmorModel::new);
     }
 
-    @Override
-    public @Nullable String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-
-        if(stack.is(ModItems.BASEFORM_CHESTPLATE.get()))                    return makeCustomTextureLocation(BeyondTheHorizon.MOD_ID,"baseform_sonic_armor");
-        else if(stack.is(ModItems.BASEFORM_POWERBOOST_CHESTPLATE.get()))    return makeCustomTextureLocation(BeyondTheHorizon.MOD_ID,"baseform_pb_sonic_armor");
-        else if(stack.is(ModItems.BASEFORM_LIGHTSPEED_CHESTPLATE.get()))    return makeCustomTextureLocation(BeyondTheHorizon.MOD_ID,"baseform_ls_sonic_armor");
-        else                                                                return null;
-    }
+    // TODO: In NeoForge 1.21.1, armor textures are resolved via ArmorMaterial.Layer instead of getArmorTexture().
+    // Custom per-item textures (baseform vs powerboost vs lightspeed) need to use separate ArmorMaterial registrations
+    // or a custom armor rendering layer. The texture paths are defined in ModArmorMaterials via Layer.
 }

@@ -7,7 +7,7 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -56,7 +56,7 @@ public class SpeedBlitzDash implements CustomPacketPayload {
                         player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                         //Remove Gravity
-                        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
 
                         PacketHandler.sendToALLPlayers(
                                 new SyncPlayerFormS2C(

@@ -1,6 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.entities.baseform.cross_slash;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -44,10 +46,10 @@ public class CrossSlashProjectile extends LinearMovingEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DESTROY_BLOCKS, true);
-        this.entityData.define(OWNER,Optional.empty());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DESTROY_BLOCKS, true);
+        builder.define(OWNER,Optional.empty());
     }
 
     @Override
@@ -122,8 +124,8 @@ public class CrossSlashProjectile extends LinearMovingEntity {
                             Player playerEntity = (Player)enemy;
                             ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
                             if (headItem.getItem() == Items.PLAYER_HEAD) {
-                                assert headItem.getTag() != null;
-                                if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
+                                assert headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag() != null;
+                                if (headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
                             }
                         }
                         catch (NullPointerException|ClassCastException ignored){}

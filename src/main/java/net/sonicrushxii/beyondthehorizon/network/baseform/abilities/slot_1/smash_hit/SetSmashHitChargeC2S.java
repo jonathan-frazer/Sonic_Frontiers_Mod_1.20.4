@@ -50,9 +50,9 @@ public class SetSmashHitChargeC2S implements CustomPacketPayload {
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
                         BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                        if(msg.newChargeAmt == 0 && player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT))
-                            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.SMASH_HIT.getId());
-                        if(msg.newChargeAmt > 0 && !player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT))
+                        if(msg.newChargeAmt == 0 && player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT.id()))
+                            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.SMASH_HIT.id());
+                        if(msg.newChargeAmt > 0 && !player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT.id()))
                             player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.SMASH_HIT);
 
                         baseformProperties.smashHit = msg.newChargeAmt;

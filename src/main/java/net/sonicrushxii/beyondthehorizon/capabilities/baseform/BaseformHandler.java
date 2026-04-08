@@ -16,7 +16,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
@@ -39,7 +39,7 @@ import java.util.UUID;
 public class BaseformHandler {
     private static final HashMap<UUID,ScheduledTask> hitSchedule = new HashMap<>();
 
-    public static void takeDamage(LivingAttackEvent event, BaseformProperties baseformProperties)
+    public static void takeDamage(LivingIncomingDamageEvent event, BaseformProperties baseformProperties)
     {
         try {
             ServerPlayer receiver = (ServerPlayer) event.getEntity();
@@ -69,8 +69,8 @@ public class BaseformHandler {
             // Makes you only invulnerable to Direct mob attacks when using this ability. Like weakness but better
             if (baseformProperties.dodgeInvul)
                 event.setCanceled(true);
-            if ((baseformProperties.selectiveInvul() || receiver.hasEffect(ModEffects.SPEED_BLITZING.get())) &&
-                    !(damageGiver instanceof Player) && !event.getSource().isIndirect())
+            if ((baseformProperties.selectiveInvul() || receiver.hasEffect(ModEffects.SPEED_BLITZING)) &&
+                    !(damageGiver instanceof Player) && (event.getSource().getDirectEntity() == event.getSource().getEntity()))
                 event.setCanceled(true);
 
             //Parry
@@ -102,7 +102,7 @@ public class BaseformHandler {
         }catch(NullPointerException ignored){}
     }
 
-    public static void dealDamage(LivingAttackEvent event, BaseformProperties baseformProperties)
+    public static void dealDamage(LivingIncomingDamageEvent event, BaseformProperties baseformProperties)
     {
         //Living Entity, Rapid Damage (Hurt Time 0 only)
         try {
@@ -143,7 +143,7 @@ public class BaseformHandler {
                     {
                         if (damageGiver.isShiftKeyDown()||damageGiver.getXRot() < 0) {
                             damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 10, false, false));
-                            damageTaker.addEffect(new MobEffectInstance(ModEffects.COMBO_EFFECT.get(), 40, 0, false, false));
+                            damageTaker.addEffect(new MobEffectInstance(ModEffects.COMBO_EFFECT, 40, 0, false, false));
                             damageTaker.moveTo(damageTaker.getX(), damageTaker.getY() + 5.0, damageTaker.getZ());
                         }
                         else if(damageGiver.getXRot() > 0)
@@ -161,7 +161,7 @@ public class BaseformHandler {
                             damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.MASTER, 1.0f, 1.0f);
 
                             damageGiver.removeEffect(MobEffects.SLOW_FALLING);
-                            damageTaker.removeEffect(ModEffects.COMBO_EFFECT.get());
+                            damageTaker.removeEffect(ModEffects.COMBO_EFFECT);
                             damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),damageGiver), 6.0f);
                             damageTaker.addDeltaMovement(new Vec3(0.0, -0.85, 0.0));
                             damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
@@ -233,15 +233,15 @@ public class BaseformHandler {
             {
                 //Recover Speed Blitz Dashes
                 assert damageGiver != null;
-                if(!damageGiver.hasEffect(ModEffects.SPEED_BLITZING.get()) && damageGiver.onGround())
+                if(!damageGiver.hasEffect(ModEffects.SPEED_BLITZING) && damageGiver.onGround())
                     baseformProperties.speedBlitzDashes = 4;
 
                 //Current Combo Duration
-                MobEffectInstance currComboEffect = damageTaker.getEffect(ModEffects.SPEED_BLITZED.get());
+                MobEffectInstance currComboEffect = damageTaker.getEffect(ModEffects.SPEED_BLITZED);
                 if(currComboEffect == null)
-                    damageTaker.addEffect(new MobEffectInstance(ModEffects.SPEED_BLITZED.get(), 20, 0, false, false));
+                    damageTaker.addEffect(new MobEffectInstance(ModEffects.SPEED_BLITZED, 20, 0, false, false));
                 else
-                    currComboEffect.update(new MobEffectInstance(ModEffects.SPEED_BLITZED.get(), 20, 0, false, false));
+                    currComboEffect.update(new MobEffectInstance(ModEffects.SPEED_BLITZED, 20, 0, false, false));
 
                 //Increment Meter
                 baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter + event.getAmount();

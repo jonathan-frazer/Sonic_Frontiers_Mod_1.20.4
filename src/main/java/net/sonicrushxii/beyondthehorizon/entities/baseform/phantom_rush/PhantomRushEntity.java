@@ -12,9 +12,9 @@ public class PhantomRushEntity extends PointEntity {
     public static final EntityDataAccessor<Byte> POSE_TYPE = SynchedEntityData.defineId(PhantomRushEntity.class, EntityDataSerializers.BYTE);
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(POSE_TYPE, (byte)0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(POSE_TYPE, (byte)0);
     }
 
     @Override

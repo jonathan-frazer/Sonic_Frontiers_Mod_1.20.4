@@ -9,11 +9,12 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -37,17 +38,17 @@ public class BaseformTransformer {
         {
             if (player.getItemBySlot(EquipmentSlot.FEET).isEmpty()) {
                 ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_BOOTS.get());
-                itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
+                itemToPlace.set(DataComponents.CUSTOM_DATA, CustomData.of(BaseformProperties.baseformArmorNBTTag));
                 player.setItemSlot(EquipmentSlot.FEET, itemToPlace);
             }
             if (player.getItemBySlot(EquipmentSlot.LEGS).isEmpty()) {
                 ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_LEGGINGS.get());
-                itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
+                itemToPlace.set(DataComponents.CUSTOM_DATA, CustomData.of(BaseformProperties.baseformArmorNBTTag));
                 player.setItemSlot(EquipmentSlot.LEGS, itemToPlace);
             }
             if (player.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) {
                 ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_CHESTPLATE.get());
-                itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
+                itemToPlace.set(DataComponents.CUSTOM_DATA, CustomData.of(BaseformProperties.baseformArmorNBTTag));
                 player.setItemSlot(EquipmentSlot.CHEST, itemToPlace);
             }
         }
@@ -58,8 +59,8 @@ public class BaseformTransformer {
             player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
 
             //Step Height
-            if (!player.getAttribute(NeoForgeMod.STEP_HEIGHT_ADDITION.get()).hasModifier(AttributeMultipliers.STEP_UP_BASE))
-                player.getAttribute(NeoForgeMod.STEP_HEIGHT_ADDITION.get()).addTransientModifier(AttributeMultipliers.STEP_UP_BASE);
+            if (!player.getAttribute(Attributes.STEP_HEIGHT).hasModifier(AttributeMultipliers.STEP_UP_BASE.id()))
+                player.getAttribute(Attributes.STEP_HEIGHT).addTransientModifier(AttributeMultipliers.STEP_UP_BASE);
 
             //Jump
             if(!player.hasEffect(MobEffects.JUMP)) player.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));
@@ -114,7 +115,7 @@ public class BaseformTransformer {
                             player.getX() - 2, player.getY() - 2, player.getZ() - 2),
                     (itemEntity) -> {
                         try {
-                            byte bthTagVal = itemEntity.getItem().getTag().getByte("BeyondTheHorizon");
+                            byte bthTagVal = itemEntity.getItem().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon");
                             return (bthTagVal == (byte)1 || bthTagVal == (byte)2);
                         }catch(NullPointerException ignored){
                             return false;
@@ -136,20 +137,20 @@ public class BaseformTransformer {
 
             //Delete Boots
             ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_BOOTS.get());
-            itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
-            if(ItemStack.isSameItemSameTags(armorItems.next(),itemToPlace))
+            itemToPlace.set(DataComponents.CUSTOM_DATA, CustomData.of(BaseformProperties.baseformArmorNBTTag));
+            if(ItemStack.isSameItemSameComponents(armorItems.next(),itemToPlace))
                 player.setItemSlot(EquipmentSlot.FEET,ItemStack.EMPTY);
 
             //Delete Leggings
             itemToPlace = new ItemStack(ModItems.BASEFORM_LEGGINGS.get());
-            itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
-            if(ItemStack.isSameItemSameTags(armorItems.next(),itemToPlace))
+            itemToPlace.set(DataComponents.CUSTOM_DATA, CustomData.of(BaseformProperties.baseformArmorNBTTag));
+            if(ItemStack.isSameItemSameComponents(armorItems.next(),itemToPlace))
                 player.setItemSlot(EquipmentSlot.LEGS,ItemStack.EMPTY);
 
             //Delete Chestplate
             itemToPlace = new ItemStack(ModItems.BASEFORM_CHESTPLATE.get());
-            itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
-            if(ItemStack.isSameItemSameTags(armorItems.next(),itemToPlace))
+            itemToPlace.set(DataComponents.CUSTOM_DATA, CustomData.of(BaseformProperties.baseformArmorNBTTag));
+            if(ItemStack.isSameItemSameComponents(armorItems.next(),itemToPlace))
                 player.setItemSlot(EquipmentSlot.CHEST,ItemStack.EMPTY);
         }
 
@@ -160,7 +161,7 @@ public class BaseformTransformer {
                 //Double Jump
 
                 //Auto Step
-                player.getAttribute(NeoForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(0.0);
+                player.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.0);
 
                 //Danger Sense
                 PacketHandler.sendToPlayer(player, new PlayerStopSoundPacketS2C(
@@ -174,17 +175,17 @@ public class BaseformTransformer {
             //Slot 1
             {
                 //Reset Water Boost
-                player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
 
                 //Reset Light Speed Attack
-                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.LIGHTSPEED_MODE))
-                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.LIGHTSPEED_MODE.getId());
+                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.LIGHTSPEED_MODE.id()))
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.LIGHTSPEED_MODE.id());
 
                 //Reset Power Boost
-                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.POWERBOOST_SPEED))
-                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.POWERBOOST_SPEED.getId());
-                if(player.getAttribute(Attributes.ARMOR).hasModifier(AttributeMultipliers.POWERBOOST_ARMOR))
-                    player.getAttribute(Attributes.ARMOR).removeModifier(AttributeMultipliers.POWERBOOST_ARMOR.getId());
+                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.POWERBOOST_SPEED.id()))
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.POWERBOOST_SPEED.id());
+                if(player.getAttribute(Attributes.ARMOR).hasModifier(AttributeMultipliers.POWERBOOST_ARMOR.id()))
+                    player.getAttribute(Attributes.ARMOR).removeModifier(AttributeMultipliers.POWERBOOST_ARMOR.id());
 
             }
 
@@ -197,11 +198,11 @@ public class BaseformTransformer {
                 //Gravity Removal
 
                 //Speed Blitz
-                player.removeEffect(ModEffects.SPEED_BLITZING.get());
+                player.removeEffect(ModEffects.SPEED_BLITZING);
 
                 //Smash HIt
-                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT))
-                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.SMASH_HIT.getId());
+                if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT.id()))
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.SMASH_HIT.id());
             }
 
             //Slot 6
@@ -225,7 +226,7 @@ public class BaseformTransformer {
         PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)0));
 
         //Remove Effects
-        if (player.getAttribute(NeoForgeMod.STEP_HEIGHT_ADDITION.get()).hasModifier(AttributeMultipliers.STEP_UP_BASE)) player.getAttribute(NeoForgeMod.STEP_HEIGHT_ADDITION.get()).removeModifier(AttributeMultipliers.STEP_UP_BASE.getId());
+        if (player.getAttribute(Attributes.STEP_HEIGHT).hasModifier(AttributeMultipliers.STEP_UP_BASE.id())) player.getAttribute(Attributes.STEP_HEIGHT).removeModifier(AttributeMultipliers.STEP_UP_BASE.id());
         player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.10000000149011612);
         player.removeEffect(MobEffects.JUMP);
         player.removeEffect(MobEffects.DAMAGE_RESISTANCE);

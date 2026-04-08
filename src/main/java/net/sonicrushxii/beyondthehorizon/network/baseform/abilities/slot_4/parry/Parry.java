@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -94,10 +93,10 @@ public class Parry implements CustomPacketPayload
                             baseformProperties.parryTime = 1;
 
                             //Remove Gravity
-                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.0);
+                            player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
 
                             //Add Slowness for Screen
-                            if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_HOLD))
+                            if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_HOLD.id()))
                                 player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.PARRY_HOLD);
 
                             //Play Sound

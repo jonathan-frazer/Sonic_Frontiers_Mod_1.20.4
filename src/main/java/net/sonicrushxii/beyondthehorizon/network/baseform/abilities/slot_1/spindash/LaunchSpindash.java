@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -44,7 +43,7 @@ public class LaunchSpindash implements CustomPacketPayload {
 
         //Reset Climbing
         if (baseformProperties.boostLvl == 0 && !player.isSprinting())
-            player.getAttribute(NeoForgeMod.STEP_HEIGHT.get()).setBaseValue(0.0);
+            player.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.0);
     }
 
     public static void handle(LaunchSpindash msg, IPayloadContext ctx){
@@ -60,8 +59,8 @@ public class LaunchSpindash implements CustomPacketPayload {
 
                         //Enter Ball Form
                         player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
-                        player.getAttribute(NeoForgeMod.STEP_HEIGHT.get()).setBaseValue(1.5);
-                        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                        player.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(1.5);
+                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
 
                         //PlaySound
                         Level world = player.level();

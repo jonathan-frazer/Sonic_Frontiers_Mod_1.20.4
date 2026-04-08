@@ -139,7 +139,7 @@ public class CyloopMath
                         enemyHit = true;
 
                         //Double Cyloop - Launch Down
-                        if (enemy.hasEffect(ModEffects.CYLOOPED.get()) && enemy.getEffect(ModEffects.CYLOOPED.get()).getDuration() > 0) {
+                        if (enemy.hasEffect(ModEffects.CYLOOPED) && enemy.getEffect(ModEffects.CYLOOPED).getDuration() > 0) {
                             //Launch Down
                             enemy.setDeltaMovement(0.0, -1.1, 0.0);
                             player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
@@ -149,7 +149,7 @@ public class CyloopMath
                                     BaseformServer.CYLOOP_DAMAGE * 1.5F);
 
                             //Give the Cylooped Effect
-                            enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 80, 0, false, false));
+                            enemy.getEffect(ModEffects.CYLOOPED).update(new MobEffectInstance(ModEffects.CYLOOPED, 80, 0, false, false));
                         }
                         //Single Cyloop
                         else {
@@ -168,10 +168,10 @@ public class CyloopMath
                                 player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
 
                                 //Give the Cylooped Effect
-                                if (enemy.hasEffect(ModEffects.CYLOOPED.get()))
-                                    enemy.getEffect(ModEffects.CYLOOPED.get()).update(new MobEffectInstance(ModEffects.CYLOOPED.get(), 80, 0, false, false));
+                                if (enemy.hasEffect(ModEffects.CYLOOPED))
+                                    enemy.getEffect(ModEffects.CYLOOPED).update(new MobEffectInstance(ModEffects.CYLOOPED, 80, 0, false, false));
                                 else
-                                    enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED.get(), 80, 0, false, false));
+                                    enemy.addEffect(new MobEffectInstance(ModEffects.CYLOOPED, 80, 0, false, false));
                             }, 10);
                         }
 

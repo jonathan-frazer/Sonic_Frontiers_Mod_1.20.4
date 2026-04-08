@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -11,6 +12,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -58,16 +60,16 @@ public class PowerBoostDeactivate implements CustomPacketPayload {
             Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
             armorItems.next(); armorItems.next();
             try {
-                if (armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 1) {
+                if (armorItems.next().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon") == (byte) 1) {
                     ItemStack itemToPlace = new ItemStack(ModItems.BASEFORM_CHESTPLATE.get());
-                    itemToPlace.setTag(BaseformProperties.baseformArmorNBTTag);
+                    itemToPlace.set(DataComponents.CUSTOM_DATA, CustomData.of(BaseformProperties.baseformArmorNBTTag));
                     player.setItemSlot(EquipmentSlot.CHEST, itemToPlace);
                 }
             }
             catch(NullPointerException ignored){}
 
             try{
-                if(armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 2){
+                if(armorItems.next().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon") == (byte) 2){
                     EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
                     player.setItemSlot(EquipmentSlot.HEAD, BaseformProperties.baseformSonicHead);
                 }
@@ -79,12 +81,12 @@ public class PowerBoostDeactivate implements CustomPacketPayload {
         baseformProperties.powerBoost = false;
 
         //Remove Speed Multiplier
-        if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.POWERBOOST_SPEED))
-            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.POWERBOOST_SPEED.getId());
+        if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.POWERBOOST_SPEED.id()))
+            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.POWERBOOST_SPEED.id());
 
         //Remove Armor Multiplier
-        if(player.getAttribute(Attributes.ARMOR).hasModifier(AttributeMultipliers.POWERBOOST_ARMOR))
-            player.getAttribute(Attributes.ARMOR).removeModifier(AttributeMultipliers.POWERBOOST_ARMOR.getId());
+        if(player.getAttribute(Attributes.ARMOR).hasModifier(AttributeMultipliers.POWERBOOST_ARMOR.id()))
+            player.getAttribute(Attributes.ARMOR).removeModifier(AttributeMultipliers.POWERBOOST_ARMOR.id());
 
         /*player.removeEffect(MobEffects.JUMP);
         player.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));*/

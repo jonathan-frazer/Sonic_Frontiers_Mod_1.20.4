@@ -10,9 +10,10 @@ public class InitiatePowerBoostEffect extends MobEffect {
     }
 
     @Override
-    public void applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
         super.applyEffectTick(entity, amplifier);
         entity.setDeltaMovement(0.0,0.02,0.0);
+        return true;
     }
 
     @Override

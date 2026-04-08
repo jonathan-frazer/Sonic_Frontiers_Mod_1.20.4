@@ -40,7 +40,7 @@ public class CrossSlashRenderer extends EntityRenderer<CrossSlashProjectile> {
         poseStack.mulPose(Axis.XP.rotationDegrees(180.0F+entity.getXRot()));
         poseStack.translate(0D,-1.0D,0D);
 
-        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
 
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);

@@ -11,7 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
@@ -126,7 +126,7 @@ public class CycloneKick implements CustomPacketPayload {
         baseformProperties.atkRotPhase = -player.getYRot()-135f;
 
         //Remove Gravity
-        Objects.requireNonNull(player.getAttribute(NeoForgeMod.ENTITY_GRAVITY)).setBaseValue(0.0);
+        Objects.requireNonNull(player.getAttribute(Attributes.GRAVITY)).setBaseValue(0.0);
 
         //Play Sound
         player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.DOUBLE_JUMP.get(), SoundSource.MASTER, 0.75f, 1.0f);

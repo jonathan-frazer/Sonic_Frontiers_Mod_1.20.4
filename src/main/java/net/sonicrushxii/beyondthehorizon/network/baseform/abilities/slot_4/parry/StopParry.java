@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
@@ -51,11 +50,11 @@ public class StopParry implements CustomPacketPayload
         //Reset Counter to 0
         baseformProperties.parryTime = -60;
         //Return Gravity
-        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.08);
+        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
 
         //Remove Movement Speed Modifier
-        if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_HOLD))
-            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_HOLD.getId());
+        if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_HOLD.id()))
+            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_HOLD.id());
 
         //Play Sound
         player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.MASTER, 1.0f, 1.0f);
@@ -81,7 +80,7 @@ public class StopParry implements CustomPacketPayload
         baseformProperties.counterReady = true;
         baseformProperties.parryTimeSlow = 1;
         baseformProperties.counteredEntity = parryTargetId;
-        if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED))
+        if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED.id()))
             player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.PARRY_SPEED);
 
         //Play Sound
@@ -107,8 +106,8 @@ public class StopParry implements CustomPacketPayload
         baseformProperties.counteredEntity = new UUID(0L,0L);
 
         //Remove Attributes
-        if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED))
-            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_SPEED.getId());
+        if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_SPEED.id()))
+            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_SPEED.id());
 
         PacketHandler.sendToALLPlayers(
                 new SyncPlayerFormS2C(

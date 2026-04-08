@@ -66,7 +66,7 @@ public class SpeedBlitz implements CustomPacketPayload {
 
             List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
                     LivingEntity.class, boundingBox,
-                    (enemy) -> !enemy.is(player) && enemy.isAlive() && enemy.hasEffect(ModEffects.SPEED_BLITZED.get()));
+                    (enemy) -> !enemy.is(player) && enemy.isAlive() && enemy.hasEffect(ModEffects.SPEED_BLITZED));
 
             //If enemy is found then Target it
             if (!nearbyEntities.isEmpty())
@@ -120,11 +120,11 @@ public class SpeedBlitz implements CustomPacketPayload {
         player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.BLITZ.get(), SoundSource.MASTER, 0.5f, 1.0f);
 
         //Current Combo Duration
-        MobEffectInstance currComboEffect = player.getEffect(ModEffects.SPEED_BLITZING.get());
+        MobEffectInstance currComboEffect = player.getEffect(ModEffects.SPEED_BLITZING);
         if(currComboEffect == null)
-            player.addEffect(new MobEffectInstance(ModEffects.SPEED_BLITZING.get(), 20, 0, false, false));
+            player.addEffect(new MobEffectInstance(ModEffects.SPEED_BLITZING, 20, 0, false, false));
         else
-            currComboEffect.update(new MobEffectInstance(ModEffects.SPEED_BLITZING.get(), 20, 0, false, false));
+            currComboEffect.update(new MobEffectInstance(ModEffects.SPEED_BLITZING, 20, 0, false, false));
 
         //Consume Speed Blitz Dash
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);

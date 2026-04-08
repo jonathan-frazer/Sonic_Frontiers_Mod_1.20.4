@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.entities.baseform;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
@@ -33,9 +35,9 @@ public class SpinSlashCloud extends PointEntity {
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(SpinSlashCloud.class, EntityDataSerializers.OPTIONAL_UUID);
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(OWNER,Optional.empty());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(OWNER,Optional.empty());
     }
 
     @Override
@@ -107,8 +109,8 @@ public class SpinSlashCloud extends PointEntity {
                     try {
                         ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
                         if (headItem.getItem() == Items.PLAYER_HEAD) {
-                            assert headItem.getTag() != null;
-                            if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return true;
+                            assert headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag() != null;
+                            if (headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon") == (byte) 2) return true;
                         }
                     }
                     catch (NullPointerException|ClassCastException ignored){}
@@ -125,8 +127,8 @@ public class SpinSlashCloud extends PointEntity {
                         Player playerEntity = (Player)entity;
                         ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
                         if (headItem.getItem() == Items.PLAYER_HEAD) {
-                            assert headItem.getTag() != null;
-                            if (headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
+                            assert headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag() != null;
+                            if (headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon") == (byte) 2) return false;
                         }
                     }
                     catch (NullPointerException|ClassCastException ignored){}

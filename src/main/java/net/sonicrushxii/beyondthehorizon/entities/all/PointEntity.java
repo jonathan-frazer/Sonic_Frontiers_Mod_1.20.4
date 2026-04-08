@@ -17,8 +17,8 @@ public class PointEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DURATION, 200);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DURATION, 200);
     }
 
     @Override

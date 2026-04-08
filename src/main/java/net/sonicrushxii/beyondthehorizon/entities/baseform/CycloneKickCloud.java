@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.entities.baseform;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -13,6 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -32,9 +34,9 @@ public class CycloneKickCloud extends PointEntity {
     public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(SonicBoomProjectile.class, EntityDataSerializers.OPTIONAL_UUID);
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(OWNER,Optional.empty());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(OWNER,Optional.empty());
     }
 
     @Override
@@ -118,7 +120,7 @@ public class CycloneKickCloud extends PointEntity {
                     try {
                         ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
                         if (headItem.getItem() == Items.PLAYER_HEAD &&
-                                headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
+                                headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon") == (byte) 2)
                             return true;
                     }
                     catch (NullPointerException|ClassCastException ignored){}
@@ -135,7 +137,7 @@ public class CycloneKickCloud extends PointEntity {
                         Player playerEntity = (Player)entity;
                         ItemStack headItem = playerEntity.getItemBySlot(EquipmentSlot.HEAD);
                         if (headItem.getItem() == Items.PLAYER_HEAD &&
-                                headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2)
+                                headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getByte("BeyondTheHorizon") == (byte) 2)
                             return false;
                     }
                     catch (NullPointerException|ClassCastException ignored){}

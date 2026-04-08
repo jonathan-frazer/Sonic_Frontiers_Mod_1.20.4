@@ -1,31 +1,23 @@
 package net.sonicrushxii.beyondthehorizon.armor;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-// TODO: IClientItemExtensions was removed in NeoForge 1.21.1. Armor rendering needs to be updated to use the new system.
 import net.sonicrushxii.beyondthehorizon.armor.client.renderer.ArmorRenderer;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Consumer;
 
 public abstract class ModArmorItem extends ArmorItem {
     private static final String FULL_SET_ID = "hadFullSet";
     protected int fullSetTick = 0;
 
-    public ModArmorItem(ArmorMaterial pMaterial, Type pType, Properties pProperties) {
+    public ModArmorItem(Holder<ArmorMaterial> pMaterial, Type pType, Properties pProperties) {
         super(pMaterial, pType, pProperties);
     }
-
 
     public boolean equals(ArmorItem item) {
         return this == item || item.getMaterial() == this.getMaterial();
@@ -40,7 +32,7 @@ public abstract class ModArmorItem extends ArmorItem {
                     if (this.fullSetTick == 0) {
                         if (!level.isClientSide) this.initFullSetTick(stack, level, living);
                         tag.putBoolean(FULL_SET_ID, true);
-                        tag.putString("lastFullSet", this.getMaterial().getName());
+                        tag.putString("lastFullSet", this.getMaterial().getRegisteredName());
                     }
                     this.fullSetTick++;
                     if (level.isClientSide) {
@@ -58,11 +50,12 @@ public abstract class ModArmorItem extends ArmorItem {
             }
         }
     }
+
     public boolean isFullSetActive(LivingEntity living) {
         return isFullSetActive(living, this.getMaterial());
     }
 
-    public static boolean isFullSetActive(LivingEntity living, ArmorMaterial materials) {
+    public static boolean isFullSetActive(LivingEntity living, Holder<ArmorMaterial> materials) {
         if (living == null) {
             return false;
         }
@@ -84,25 +77,10 @@ public abstract class ModArmorItem extends ArmorItem {
     protected void postFullSetTick(ItemStack stack, Level level, LivingEntity living) {}
     protected void clientFullSetTick(ItemStack stack, Level level, LivingEntity living) {}
 
-    public Multimap<Attribute, AttributeModifier> getAttributeMods(EquipmentSlot slot) {return null;}
-
-    @Override
-    public @NotNull Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(@NotNull EquipmentSlot slot) {
-        HashMultimap<Attribute, AttributeModifier> builder = HashMultimap.create();
-        builder.putAll(super.getDefaultAttributeModifiers(slot));
-        if (this.getAttributeMods(slot) != null) {
-            builder.putAll(this.getAttributeMods(slot));
-        }
-        return builder;
-    }
-
     // display / model START
 
     protected abstract boolean withCustomModel();
     protected ArmorRenderer<?> getRenderer(LivingEntity living, ItemStack stack, EquipmentSlot slot) { return null;}
-
-    // TODO: initializeClient with IClientItemExtensions was removed in NeoForge 1.21.1.
-    // Armor rendering needs to be migrated to the new ArmorMaterial layer system.
 
     public static String makeCustomTextureLocation(String nameSpace, String id) {
         return ResourceLocation.fromNamespaceAndPath(nameSpace, "textures/models/armor/custom/" + id + ".png").toString();

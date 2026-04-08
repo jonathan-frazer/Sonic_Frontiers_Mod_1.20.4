@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
@@ -48,7 +47,7 @@ public class WallBoost implements CustomPacketPayload {
         //Move Upward
         player.setSprinting(false);
         baseformProperties.wallBoosting = true;
-        Objects.requireNonNull(player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get())).setBaseValue(0.0);
+        Objects.requireNonNull(player.getAttribute(Attributes.GRAVITY)).setBaseValue(0.0);
         player.setDeltaMovement(new Vec3(0, Objects.requireNonNull(player.getAttribute(Attributes.MOVEMENT_SPEED)).getValue() * 2.5, 0));
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }

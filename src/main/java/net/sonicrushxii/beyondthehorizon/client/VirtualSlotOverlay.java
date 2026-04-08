@@ -167,7 +167,8 @@ public class VirtualSlotOverlay {
     }
 
     //Register the Main Overlay
-    public static final LayeredDraw.Layer ABILITY_HUD = ((guiComponent, partialTick)-> {
+    public static final LayeredDraw.Layer ABILITY_HUD = ((guiComponent, deltaTracker)-> {
+        float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
         AbstractClientPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
         int screenWidth = guiComponent.guiWidth();

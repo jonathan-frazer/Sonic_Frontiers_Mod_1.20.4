@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.modded;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -8,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
@@ -36,7 +38,7 @@ public class ModCreativeModeTabs {
                         skullOwner.putIntArray("Id", new int[] {512370214, -95272899, -2003262887, 1067375885});
                         nbt.put("SkullOwner", skullOwner);
 
-                        sonicHead.setTag(nbt);
+                        sonicHead.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 
                         return sonicHead;
                     })
@@ -70,7 +72,7 @@ public class ModCreativeModeTabs {
                             display.putString("Name", "{\"text\":\"Sonic Head\",\"color\": \"blue\",\"italic\": false}");
                             nbt.put("display", display);
 
-                            customPlayerHead.setTag(nbt);
+                            customPlayerHead.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 
                             pOutput.accept(customPlayerHead);
                         }
