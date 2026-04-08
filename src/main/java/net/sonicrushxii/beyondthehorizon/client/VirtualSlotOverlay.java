@@ -4,11 +4,10 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
@@ -22,84 +21,84 @@ import java.util.Arrays;
 import java.util.List;
 
 public class VirtualSlotOverlay {
-    private static final ResourceLocation BASEFORM_SONIC_ICON  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation BASEFORM_SONIC_ICON  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/baseform_sonic_icon.png");
-    private static final ResourceLocation SUPER_SONIC_ICON  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation SUPER_SONIC_ICON  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/superform/super_sonic_icon.png");
-    private static final ResourceLocation EMPTY_SLOT = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation EMPTY_SLOT = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/empty_slot.png");
-    private static final ResourceLocation MIRAGE_SLOT = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation MIRAGE_SLOT = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/mirage_slot.png");
-    private static final ResourceLocation BOOST_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation BOOST_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/boost_slot.png");
-    private static final ResourceLocation CROSS_SLASH_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation CROSS_SLASH_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/cross_slash_slot.png");
-    private static final ResourceLocation CYCLONE_KICK_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation CYCLONE_KICK_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/cyclone_kick_slot.png");
-    private static final ResourceLocation CYLOOP_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation CYLOOP_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/cyloop_slot.png");
-    private static final ResourceLocation HOMING_SHOT_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation HOMING_SHOT_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/homing_shot_slot.png");
-    private static final ResourceLocation HOMING_ATTACK_SLOT = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation HOMING_ATTACK_SLOT = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/homing_slot.png");
-    private static final ResourceLocation LIGHT_SPEED_ATTACK_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation LIGHT_SPEED_ATTACK_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/light_speed_attack_slot.png");
-    private static final ResourceLocation LIGHT_SPEED_ATTACK_ACTIVE  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation LIGHT_SPEED_ATTACK_ACTIVE  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/light_speed_attack_active.png");
-    private static final ResourceLocation LOOPKICK_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation LOOPKICK_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/loopkick_slot.png");
-    private static final ResourceLocation HUMMING_TOP_SLOT = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation HUMMING_TOP_SLOT = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/humming_top_slot.png");
-    private static final ResourceLocation GRAND_SLAM_SLOT = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation GRAND_SLAM_SLOT = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/grand_slam_slot.png");
-    private static final ResourceLocation PARRY_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation PARRY_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/parry_slot.png");
-    private static final ResourceLocation PHANTOM_RUSH_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation PHANTOM_RUSH_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/phantom_rush_slot.png");
-    private static final ResourceLocation POWER_BOOST_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation POWER_BOOST_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/power_boost_slot.png");
-    private static final ResourceLocation POWER_BOOST_ACTIVE  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation POWER_BOOST_ACTIVE  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/power_boost_active.png");
-    private static final ResourceLocation SMASH_HIT_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation SMASH_HIT_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/smash_hit_slot.png");
-    private static final ResourceLocation SMASH_HIT_ACTIVE  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation SMASH_HIT_ACTIVE  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/smash_hit_active.png");
-    private static final ResourceLocation SONIC_BOOM_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation SONIC_BOOM_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/sonic_boom_slot.png");
-    private static final ResourceLocation SONIC_WIND_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation SONIC_WIND_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/sonic_wind_slot.png");
-    private static final ResourceLocation SPEED_BLITZ_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation SPEED_BLITZ_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/speed_blitz_slot.png");
-    private static final ResourceLocation SPEED_BLITZ_ACTIVE  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation SPEED_BLITZ_ACTIVE  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/speed_blitz_active.png");
-    private static final ResourceLocation SPINSLASH_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation SPINSLASH_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/spinslash_slot.png");
-    private static final ResourceLocation STOMP_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation STOMP_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/stomp_slot.png");
-    private static final ResourceLocation TORNADO_JUMP_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation TORNADO_JUMP_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/tornado_jump_slot.png");
-    private static final ResourceLocation WILDRUSH_SLOT  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation WILDRUSH_SLOT  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/custom_gui/baseform/wildrush_slot.png");
 
-    private static final ResourceLocation GOOD_100  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation GOOD_100  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/combo_system/100_good.png");
-    private static final ResourceLocation NICE_200  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation NICE_200  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/combo_system/200_nice.png");
-    private static final ResourceLocation GREAT_300  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation GREAT_300  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/combo_system/300_great.png");
-    private static final ResourceLocation JAMMIN_400  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation JAMMIN_400  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/combo_system/400_jammin.png");
-    private static final ResourceLocation COOL_500  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation COOL_500  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/combo_system/500_cool.png");
-    private static final ResourceLocation RADICAL_600  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation RADICAL_600  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/combo_system/600_radical.png");
-    private static final ResourceLocation TIGHT_800  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation TIGHT_800  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/combo_system/800_tight.png");
-    private static final ResourceLocation AWESOME_1000  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation AWESOME_1000  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/combo_system/1000_awesome.png");
-    private static final ResourceLocation EXTREME_1500  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation EXTREME_1500  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/combo_system/1500_extreme.png");
-    private static final ResourceLocation PERFECT_2000  = new ResourceLocation(BeyondTheHorizon.MOD_ID,
+    private static final ResourceLocation PERFECT_2000  = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,
             "textures/combo_system/2000_perfect.png");
 
     //Helper Methods and Records
@@ -167,7 +166,7 @@ public class VirtualSlotOverlay {
     }
 
     //Register the Main Overlay
-    public static final IGuiOverlay ABILITY_HUD = ((ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)-> {
+    public static final LayeredDraw.Layer ABILITY_HUD = ((ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)-> {
         AbstractClientPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
 

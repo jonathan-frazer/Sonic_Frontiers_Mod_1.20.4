@@ -1,6 +1,7 @@
 package net.sonicrushxii.beyondthehorizon;
 
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -15,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -446,8 +446,8 @@ public class ModUtils {
 
     public static boolean playerHoldingItem(Player player, String modid, String itemName) {
         // Get the item from the registry
-        ResourceLocation itemID = new ResourceLocation(modid, itemName);
-        var item = ForgeRegistries.ITEMS.getValue(itemID);
+        ResourceLocation itemID = ResourceLocation.fromNamespaceAndPath(modid, itemName);
+        var item = BuiltInRegistries.ITEM.get(itemID);
 
         if (item == null) {
             return false; // The item doesn't exist
@@ -467,8 +467,8 @@ public class ModUtils {
     public static boolean playerHasItem(Player player, String modid, String itemName)
     {
         // Get the item from the registry
-        ResourceLocation itemID = new ResourceLocation(modid, itemName);
-        var item = ForgeRegistries.ITEMS.getValue(itemID);
+        ResourceLocation itemID = ResourceLocation.fromNamespaceAndPath(modid, itemName);
+        var item = BuiltInRegistries.ITEM.get(itemID);
 
         if (item == null) {
             return false; // The item doesn't exist or isn't registered
@@ -490,7 +490,7 @@ public class ModUtils {
         // Convert item names into an array
         Item[] requiredItems = new Item[itemStrings.size()];
         for (int i = 0; i < itemStrings.size(); i++) {
-            requiredItems[i] = ForgeRegistries.ITEMS.getValue(new ResourceLocation(modid, itemStrings.get(i)));
+            requiredItems[i] = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(modid, itemStrings.get(i)));
         }
 
         // Check main inventory for any match (early exit)
@@ -527,7 +527,7 @@ public class ModUtils {
         Item[] requiredItems = new Item[itemsNeeded];
 
         for (int i = 0; i < itemsNeeded; i++) {
-            requiredItems[i] = ForgeRegistries.ITEMS.getValue(new ResourceLocation(modid, itemStrings.get(i)));
+            requiredItems[i] = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(modid, itemStrings.get(i)));
         }
 
         // Iterate through inventory and count matches

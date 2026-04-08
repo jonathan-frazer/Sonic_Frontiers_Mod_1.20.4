@@ -2,23 +2,28 @@ package net.sonicrushxii.beyondthehorizon;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.gui.GuiLayerManager;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.*;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
@@ -45,23 +50,23 @@ public class BeyondTheHorizon
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static void initializeMod(BeyondTheHorizon thisMod, FMLJavaModLoadingContext context)
+    public static void initializeMod(BeyondTheHorizon thisMod, ModContainer container)
     {
-        IEventBus modEventBus = context.getModEventBus();
+        IEventBus modEventBus = container.getEventBus();
 
         // Register the commonSetup method for modloading
         modEventBus.addListener(thisMod::commonSetup);
 
         // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(thisMod);
-        MinecraftForge.EVENT_BUS.register(new LoginHandler());
-        MinecraftForge.EVENT_BUS.register(new FallDamageHandler());
-        MinecraftForge.EVENT_BUS.register(new ServerTickHandler());
-        MinecraftForge.EVENT_BUS.register(new PlayerTickHandler());
-        MinecraftForge.EVENT_BUS.register(new Scheduler());
-        MinecraftForge.EVENT_BUS.register(new TimeHandler());
-        MinecraftForge.EVENT_BUS.register(new DamageHandler());
-        MinecraftForge.EVENT_BUS.register(new EquipmentChangeHandler());
+        NeoForge.EVENT_BUS.register(thisMod);
+        NeoForge.EVENT_BUS.register(new LoginHandler());
+        NeoForge.EVENT_BUS.register(new FallDamageHandler());
+        NeoForge.EVENT_BUS.register(new ServerTickHandler());
+        NeoForge.EVENT_BUS.register(new PlayerTickHandler());
+        NeoForge.EVENT_BUS.register(new Scheduler());
+        NeoForge.EVENT_BUS.register(new TimeHandler());
+        NeoForge.EVENT_BUS.register(new DamageHandler());
+        NeoForge.EVENT_BUS.register(new EquipmentChangeHandler());
 
         // Register the item to a creative tab
         modEventBus.addListener(thisMod::addCreative);
@@ -74,17 +79,17 @@ public class BeyondTheHorizon
         ModEntityTypes.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
-    public BeyondTheHorizon(FMLJavaModLoadingContext context)
+    public BeyondTheHorizon(ModContainer context)
     {
-        initializeMod(this,context);
+        initializeMod(this, context);
     }
 
-    public BeyondTheHorizon() {
-        initializeMod(this,FMLJavaModLoadingContext.get());
-    }
+//    public BeyondTheHorizon() {
+//        initializeMod(this,ModContainer.get());
+//    }
 
     @SubscribeEvent
     public void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
@@ -111,7 +116,7 @@ public class BeyondTheHorizon
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
     public static class ClientModEvents
     {
         @SubscribeEvent
@@ -138,9 +143,9 @@ public class BeyondTheHorizon
         }
 
         @SubscribeEvent
-        public static void registerGUIOverlays(RegisterGuiOverlaysEvent event) {
-            event.registerBelow(VanillaGuiOverlay.DEBUG_TEXT.id(),
-                    "ability_hud",
+        public static void registerGUIOverlays(RegisterGuiLayersEvent event) {
+            event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY,
+                    ResourceLocation.fromNamespaceAndPath(MOD_ID, "ability_hud"),
                     VirtualSlotOverlay.ABILITY_HUD);
         }
 

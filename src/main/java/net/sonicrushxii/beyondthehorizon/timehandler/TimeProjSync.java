@@ -5,9 +5,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.minecraftforge.fml.DistExecutor;
+import net.neoforged.api.distmarker.Dist;
 import net.sonicrushxii.beyondthehorizon.event_handler.client_handlers.ClientPacketHandler;
 
 public class TimeProjSync {
