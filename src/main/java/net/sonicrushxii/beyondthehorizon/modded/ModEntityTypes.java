@@ -21,7 +21,6 @@ import net.sonicrushxii.beyondthehorizon.entities.baseform.phantom_rush.PhantomR
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_boom.SonicBoomProjectile;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWind;
 
-@EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID)
 public class ModEntityTypes {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, BeyondTheHorizon.MOD_ID);
 

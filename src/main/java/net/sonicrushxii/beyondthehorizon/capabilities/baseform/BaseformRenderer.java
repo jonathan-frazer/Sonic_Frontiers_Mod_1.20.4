@@ -19,7 +19,7 @@ import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
 
-@EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
+//@EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
 public class BaseformRenderer
 {
     /**
