@@ -21,12 +21,12 @@ public class SonicBoomRenderer extends EntityRenderer<SonicBoomProjectile> {
 
     public SonicBoomRenderer(EntityRendererProvider.Context context) {
         super(context);
-        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/sonic_boom"), "main"));
+        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "baseform/sonic_boom"), "main"));
         this.model = new SonicBoomModel<>(modelPart);
     }
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull SonicBoomProjectile entity) {
-        return new ResourceLocation(BeyondTheHorizon.MOD_ID,SonicBoomModel.TEXTURE_LOCATIONS[0].textureLocation());
+        return ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,SonicBoomModel.TEXTURE_LOCATIONS[0].textureLocation());
     }
 
     @Override

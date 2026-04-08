@@ -21,13 +21,13 @@ public class HomingShotRenderer extends EntityRenderer<HomingShotProjectile> {
 
     public HomingShotRenderer(EntityRendererProvider.Context context) {
         super(context);
-        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/spinslash"), "main"));
+        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "baseform/spinslash"), "main"));
         this.model = new Spinslash<>(modelPart);
     }
     @Override
     public @NotNull ResourceLocation getTextureLocation(HomingShotProjectile entity) {
         int idx = (entity.getDuration()%(Spinslash.TEXTURE_LOCATIONS.length*2) );
-        return new ResourceLocation(BeyondTheHorizon.MOD_ID,Spinslash.TEXTURE_LOCATIONS[idx/2].textureLocation());
+        return ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,Spinslash.TEXTURE_LOCATIONS[idx/2].textureLocation());
     }
 
     @Override

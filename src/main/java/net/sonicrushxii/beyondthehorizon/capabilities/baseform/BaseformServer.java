@@ -25,10 +25,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.SpinSlashCloud;
@@ -112,7 +113,8 @@ public class BaseformServer
                 (int) Math.round(playerDirCentre.z)
         );
 
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+        {
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             //Get Data From the Player
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
@@ -133,7 +135,7 @@ public class BaseformServer
                 {
                     baseformProperties.groundTraction = false;
                     if (player.getDeltaMovement().y > -0.38 && player.getDeltaMovement().y < -0.078 &&
-                            ModUtils.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+"")
+                            ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+"")
                     )
                     {
                         player.setDeltaMovement(player.getDeltaMovement().x,-0.65,player.getDeltaMovement().z);
@@ -175,8 +177,8 @@ public class BaseformServer
                         if (player.isSprinting() && !player.isInWater() &&
                                 baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3) {
                             try {
-                                if (ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
-                                        .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)) && (player.getY()-player.blockPosition().getY()) < 0.45)
+                                if (BuiltInRegistries.BLOCK.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
+                                        .equals(BuiltInRegistries.BLOCK.getKey(Blocks.WATER)) && (player.getY()-player.blockPosition().getY()) < 0.45)
                                 {
                                     //Get Motion
                                     Vec3 lookAngle = player.getLookAngle();
@@ -184,7 +186,7 @@ public class BaseformServer
 
                                     if (!baseformProperties.isWaterBoosting)
                                     {
-                                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                                        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
                                         baseformProperties.isWaterBoosting = true;
 
                                         //Slight upward
@@ -203,8 +205,8 @@ public class BaseformServer
                         try
                         {
                             if (baseformProperties.isWaterBoosting &&
-                                    (!ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
-                                        .equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER))
+                                    (!BuiltInRegistries.BLOCK.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())
+                                        .equals(BuiltInRegistries.BLOCK.getKey(Blocks.WATER))
                                         ||
                                         !(baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3)
                                         ||
@@ -213,7 +215,7 @@ public class BaseformServer
                                         player.isInWater())
                             )
                             {
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                                 baseformProperties.isWaterBoosting = false;
                             }
                         } catch (NullPointerException ignored) {}
@@ -250,7 +252,7 @@ public class BaseformServer
                                     default:
                                 }
 
-                            if (ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock()).equals(ForgeRegistries.BLOCKS.getKey(Blocks.WATER)))
+                            if (BuiltInRegistries.BLOCK.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock()).equals(BuiltInRegistries.BLOCK.getKey(Blocks.WATER)))
                                 PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                         ParticleTypes.FALLING_WATER,
                                         player.getX()+0.00, player.getY()+1.0, player.getZ()+0.00,
@@ -261,7 +263,7 @@ public class BaseformServer
                         //Wall Boost
                         if(baseformProperties.wallBoosting)
                         {
-                            if (!ModUtils.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + ""))
+                            if (!ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + ""))
                             {
                                 //Particle
                                 if(player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR)
@@ -298,7 +300,7 @@ public class BaseformServer
                                 player.connection.send(new ClientboundSetEntityMotionPacket(player));
                             }
                             else {
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                                 baseformProperties.wallBoosting = false;
                             }
                         }
@@ -504,7 +506,7 @@ public class BaseformServer
                         if (baseformProperties.ballFormState == (byte) 2)
                         {
                             player.setDeltaMovement((ModUtils.calculateViewVector(0,player.getYRot())).scale(Math.min(10.0,baseformProperties.spinDashChargeTime/10f)));
-                            if (ModUtils.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+""))
+                            if (ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+""))
                             {
                                 player.addDeltaMovement(new Vec3(0,-1.26,0));
                             }
@@ -579,7 +581,7 @@ public class BaseformServer
                                 else {
                                     //Remove Gravity at point of impact
                                     if (baseformProperties.homingAttackAirTime == 45)
-                                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
 
                                     //At the end return all data to normal
                                     if (baseformProperties.homingAttackAirTime == 55) {
@@ -589,7 +591,7 @@ public class BaseformServer
                                 }
                             } catch (NullPointerException e)
                             {
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                                 baseformProperties.homingAttackAirTime = 0;
                                 baseformProperties.homingTarget = new UUID(0L, 0L);
                             }
@@ -688,7 +690,7 @@ public class BaseformServer
                             //Set Delta Movement
                             player.setDeltaMovement(0,0,0);
                             //Remove Gravity
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                             Vec3 currPos = new Vec3(player.getX(),player.getY(),player.getZ()).add(ModUtils.calculateViewVector(0,baseformProperties.atkRotPhase).scale(-4.0));
@@ -794,7 +796,7 @@ public class BaseformServer
 
                         if (baseformProperties.tornadoJump > 30) {
                             baseformProperties.tornadoJump = -1;
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             player.setDeltaMovement(new Vec3(0.0, 1.0, 0.0));
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
                         }
@@ -1020,7 +1022,7 @@ public class BaseformServer
                             catch (NullPointerException e)
                             {
                                 //Light Speed Attack
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                                 baseformProperties.lightSpeedAssault = -1;
                                 baseformProperties.meleeTarget = new UUID(0L, 0L);
                                 //Cooldown
@@ -1062,7 +1064,7 @@ public class BaseformServer
                                     player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                                     baseformProperties.spinSlash = -10;
-                                    player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                    player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
 
                                     //Spawn Spin Particles
                                     Scheduler.scheduleTask(()->{
@@ -1081,7 +1083,7 @@ public class BaseformServer
                                     //Continue to Next Attack
                                     Scheduler.scheduleTask(()->{
                                         //Remove Gravity
-                                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                                        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
 
                                         //Set Attack Rotation Phase
                                         baseformProperties.atkRotPhase = -player.getYRot()-135f;
@@ -1101,7 +1103,7 @@ public class BaseformServer
                         }catch(NullPointerException|ClassCastException e)
                         {
                             baseformProperties.spinSlash = 0;
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             player.removeEffect(MobEffects.GLOWING);
                         }
 
@@ -1155,7 +1157,7 @@ public class BaseformServer
                             //Cooldown
                             baseformProperties.setCooldown(BaseformActiveAbility.SPINSLASH,(byte)5);
                             //Return Gravity
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             //Remove Glowing Effect
                             player.removeEffect(MobEffects.GLOWING);
                         }
@@ -1187,12 +1189,12 @@ public class BaseformServer
                                     player.setDeltaMovement(motionDirection.add(0, -0.5, 0).scale(-0.1));
                                     player.connection.send(new ClientboundSetEntityMotionPacket(player));
                                     baseformProperties.cycloneKick = 0;
-                                    player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                    player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
 
                                     //Continue to Next Attack
                                     Scheduler.scheduleTask(()->{
                                         //Remove Gravity
-                                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                                        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
 
                                         //Set Motion to Zero
                                         player.setDeltaMovement(new Vec3(0,0,0));
@@ -1215,7 +1217,7 @@ public class BaseformServer
                         {
                             baseformProperties.cycloneKick = 0;
                             //Return Gravity
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                         }
 
                         //Cyclone Part
@@ -1258,7 +1260,7 @@ public class BaseformServer
                             //Cooldown
                             baseformProperties.setCooldown(BaseformActiveAbility.CYCLONE_KICK,(byte)5);
                             //Return Gravity
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                         }
                     }
 
@@ -1359,7 +1361,7 @@ public class BaseformServer
                             //Cooldown
                             baseformProperties.setCooldown(BaseformActiveAbility.WILDRUSH,(byte)5);
                             //Return Gravity
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                         }
                     }
 
@@ -1458,7 +1460,7 @@ public class BaseformServer
                         } catch(NullPointerException|ClassCastException e)
                         {
                             baseformProperties.loopKick = -40;
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             baseformProperties.meleeTarget = new UUID(0L, 0L);
                             //Cooldown
                             baseformProperties.setCooldown(BaseformActiveAbility.LOOPKICK,(byte)5);
@@ -1615,7 +1617,7 @@ public class BaseformServer
                                 //Reset Counter to 0
                                 baseformProperties.sonicWind = 0;
                                 //Return Gravity
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                                 //Cooldown
                                 baseformProperties.setCooldown(BaseformActiveAbility.SONIC_WIND,(byte)5);
 
@@ -1693,7 +1695,7 @@ public class BaseformServer
                                 //Reset Counter to 0
                                 baseformProperties.profanedWind = 0;
                                 //Return Gravity
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                                player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                                 //Cooldown
                                 baseformProperties.setCooldown(BaseformActiveAbility.SONIC_WIND,(byte)5);
                             }
@@ -1760,7 +1762,7 @@ public class BaseformServer
                             //Homing Shot
                             baseformProperties.homingShot = 0;
                             //Return Gravity
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                             //Cooldown
                             baseformProperties.setCooldown(BaseformActiveAbility.HOMING_SHOT,(byte)5);
                         }
@@ -2197,7 +2199,7 @@ public class BaseformServer
                         //Return Attributes to normal
                         baseformProperties.ultimateUse = 0;
                         player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.0);
-                        player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
                     }
                 }
             }
@@ -2207,7 +2209,7 @@ public class BaseformServer
                             player.getId(),
                             playerSonicForm
                     ));
-        });
+        }
 
 
     }
@@ -2215,7 +2217,8 @@ public class BaseformServer
     public static void performServerSecond(ServerPlayer player)
     {
         //Get Data From the Player
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+        {
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             //Get Data From the Player
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
             //Cooldowns
@@ -2287,6 +2290,6 @@ public class BaseformServer
                             player.getId(),
                             playerSonicForm
                     ));
-        });
+        }
     }
 }

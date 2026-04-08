@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.entities.all.LinearMovingEntity;
@@ -161,7 +161,7 @@ public class CrossSlashProjectile extends LinearMovingEntity {
         // Use BlockPos.betweenClosed to iterate over all positions in the cube
         for (BlockPos pos : BlockPos.betweenClosed(start, end)) {
             BlockState blockState = this.level().getBlockState(pos);
-            if(!ModUtils.unbreakableBlocks.contains(ForgeRegistries.BLOCKS.getKey(blockState.getBlock())+""))
+            if(!ModUtils.unbreakableBlocks.contains(BuiltInRegistries.BLOCK.getKey(blockState.getBlock())+""))
                 this.level().destroyBlock(pos,true);
         }
 

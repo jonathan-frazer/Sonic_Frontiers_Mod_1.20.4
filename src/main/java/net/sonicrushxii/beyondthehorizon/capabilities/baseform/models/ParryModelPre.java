@@ -18,7 +18,7 @@ import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 
 public class ParryModelPre<T extends Entity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "parry_pre"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "parry_pre"), "main");
 	private final ModelPart Head;
 	private final ModelPart Body;
 	private final ModelPart LeftArm;

@@ -1,10 +1,12 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform.data;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
 
 import java.util.UUID;
@@ -49,7 +51,7 @@ public class BaseformProperties extends FormProperties {
         display.putString("Name", "{\"text\":\"Sonic Head\",\"color\": \"blue\",\"italic\": false}");
         nbt.put("display", display);
 
-        baseformSonicHead.setTag(nbt);
+        baseformSonicHead.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
     }
     public static ItemStack baseformLSSonicHead; static {
         baseformLSSonicHead = new ItemStack(Items.PLAYER_HEAD);
@@ -78,7 +80,7 @@ public class BaseformProperties extends FormProperties {
         display.putString("Name", "{\"text\":\"Sonic Head\",\"color\": \"blue\",\"italic\": false}");
         nbt.put("display", display);
 
-        baseformLSSonicHead.setTag(nbt);
+        baseformLSSonicHead.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
     }
     public static ItemStack baseformPBSonicHead; static {
         baseformPBSonicHead = new ItemStack(Items.PLAYER_HEAD);
@@ -107,7 +109,7 @@ public class BaseformProperties extends FormProperties {
         display.putString("Name", "{\"text\":\"Sonic Head\",\"color\": \"blue\",\"italic\": false}");
         nbt.put("display", display);
 
-        baseformPBSonicHead.setTag(nbt);
+        baseformPBSonicHead.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
     }
 
     public int helpScreenPageNo;

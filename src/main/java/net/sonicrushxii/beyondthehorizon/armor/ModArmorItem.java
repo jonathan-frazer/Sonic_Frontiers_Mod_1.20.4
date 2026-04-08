@@ -12,7 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+// TODO: IClientItemExtensions was removed in NeoForge 1.21.1. Armor rendering needs to be updated to use the new system.
 import net.sonicrushxii.beyondthehorizon.armor.client.renderer.ArmorRenderer;
 import org.jetbrains.annotations.NotNull;
 
@@ -101,23 +101,11 @@ public abstract class ModArmorItem extends ArmorItem {
     protected abstract boolean withCustomModel();
     protected ArmorRenderer<?> getRenderer(LivingEntity living, ItemStack stack, EquipmentSlot slot) { return null;}
 
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        if (!withCustomModel()) return;
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity living, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original) {
-                HumanoidModel<?> armorModel = new HumanoidModel<>(getRenderer(living, stack, slot).makeArmorParts(slot));
-                armorModel.crouching = living.isShiftKeyDown();
-                armorModel.riding = original.riding;
-                armorModel.young = living.isBaby();
-                return armorModel;
-            }
-        });
-    }
+    // TODO: initializeClient with IClientItemExtensions was removed in NeoForge 1.21.1.
+    // Armor rendering needs to be migrated to the new ArmorMaterial layer system.
 
     public static String makeCustomTextureLocation(String nameSpace, String id) {
-        return new ResourceLocation(nameSpace, "textures/models/armor/custom/" + id + ".png").toString();
+        return ResourceLocation.fromNamespaceAndPath(nameSpace, "textures/models/armor/custom/" + id + ".png").toString();
     }
 
     // display / model END

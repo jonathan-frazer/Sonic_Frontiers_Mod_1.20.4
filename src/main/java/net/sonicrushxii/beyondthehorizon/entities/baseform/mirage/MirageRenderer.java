@@ -17,12 +17,12 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.MirageMode
 import org.jetbrains.annotations.NotNull;
 
 public class MirageRenderer extends EntityRenderer<MirageEntity> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/mirage_skin.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/mirage_skin.png");
     private final EntityModel<MirageEntity> model;
 
     public MirageRenderer(EntityRendererProvider.Context context) {
         super(context);
-        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/mirage"), "main"));
+        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "baseform/mirage"), "main"));
         this.model = new MirageModel<>(modelPart);
     }
 

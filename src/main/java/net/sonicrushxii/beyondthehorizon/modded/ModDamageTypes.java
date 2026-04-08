@@ -27,7 +27,7 @@ public enum ModDamageTypes
 
     ModDamageTypes(String jsonFilename)
     {
-        dmgResourceKey = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(BeyondTheHorizon.MOD_ID, jsonFilename));
+        dmgResourceKey = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, jsonFilename));
     }
     public ResourceKey<DamageType> getResourceKey()
     {

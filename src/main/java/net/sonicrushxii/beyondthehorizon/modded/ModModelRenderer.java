@@ -68,7 +68,7 @@ public class ModModelRenderer {
             //Perform Custom Transform
             if (customTransform != null) customTransform.accept(modelPart);
 
-            VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(new ResourceLocation(BeyondTheHorizon.MOD_ID, getTextureLocation(textures, animationLength))));
+            VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, getTextureLocation(textures, animationLength))));
             EntityModel model = modelClass.getConstructor(ModelPart.class).newInstance(modelPart);
             model.renderToBuffer(poseStack, vertexConsumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
         } catch (NullPointerException | ClassCastException | NoSuchMethodError | NoSuchFieldException |
@@ -126,7 +126,7 @@ public class ModModelRenderer {
             //Handle Custom Rendering
             else {
                 vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(
-                        new ResourceLocation(BeyondTheHorizon.MOD_ID, String.format("textures/custom_model/%s.png", texturePath))
+                        ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, String.format("textures/custom_model/%s.png", texturePath))
                 ));
 
             }
@@ -188,7 +188,7 @@ public class ModModelRenderer {
             //Handle Custom Rendering
             else {
                 vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(
-                        new ResourceLocation(BeyondTheHorizon.MOD_ID, String.format("textures/custom_model/%s.png", texturePath))
+                        ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, String.format("textures/custom_model/%s.png", texturePath))
                 ));
 
             }

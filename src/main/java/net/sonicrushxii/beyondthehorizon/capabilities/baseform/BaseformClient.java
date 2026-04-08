@@ -10,12 +10,13 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.client.DoubleTapDirection;
@@ -111,7 +112,8 @@ public class BaseformClient {
         final boolean isMoving = player.getDeltaMovement().lengthSqr() > 0.01;
 
 
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+        {
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             BaseformProperties baseformProperties = (BaseformProperties)playerSonicForm.getFormProperties();
 
             //Passive Abilities
@@ -173,7 +175,7 @@ public class BaseformClient {
                     //Double Press
 
                     //WallBoost
-                    if (!ModUtils.passableBlocks.contains(ForgeRegistries.BLOCKS.getKey(player.level().getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
+                    if (!ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(player.level().getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
                             && baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3
                             && player.isSprinting() && !baseformProperties.wallBoosting && KeyBindings.INSTANCE.doubleJump.isDown())
                     {
@@ -194,7 +196,7 @@ public class BaseformClient {
                         ClientOnlyData.lightSpeedCanceller = Scheduler.scheduleTask(() -> {
                             PacketHandler.sendToServer(new LightspeedEffect());
                             level.playLocalSound(player.getX(),player.getY(),player.getZ(),
-                                    Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(ModSounds.LIGHT_SPEED_IDLE.get().getLocation())),
+                                    Objects.requireNonNull(BuiltInRegistries.SOUND_EVENT.get(ModSounds.LIGHT_SPEED_IDLE.get().getLocation())),
                                     SoundSource.MASTER, 0.33f, 1.0f, true);
 
                             Scheduler.scheduleTask(()->{
@@ -580,11 +582,11 @@ public class BaseformClient {
             {
                 if(KeyBindings.INSTANCE.helpButton.consumeClick())
                 {
-                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, ()->()-> Minecraft.getInstance().setScreen(new HelpScreen(baseformProperties.helpScreenPageNo)));
+                    if (FMLEnvironment.dist == Dist.CLIENT) Minecraft.getInstance().setScreen(new HelpScreen(baseformProperties.helpScreenPageNo));
                     while(KeyBindings.INSTANCE.helpButton.consumeClick());
                 }
             }
-        });
+        }
     }
 
     public static void performClientSecond(AbstractClientPlayer player, CompoundTag playerNBT)

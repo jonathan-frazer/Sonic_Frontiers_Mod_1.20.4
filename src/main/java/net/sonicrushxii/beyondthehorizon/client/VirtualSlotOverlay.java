@@ -10,7 +10,8 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
@@ -166,29 +167,31 @@ public class VirtualSlotOverlay {
     }
 
     //Register the Main Overlay
-    public static final LayeredDraw.Layer ABILITY_HUD = ((ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)-> {
+    public static final LayeredDraw.Layer ABILITY_HUD = ((guiComponent, partialTick)-> {
         AbstractClientPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
+        int screenWidth = guiComponent.guiWidth();
+        int screenHeight = guiComponent.guiHeight();
 
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
-            switch(playerSonicForm.getCurrentForm())
-            {
-                case BASEFORM -> renderBaseFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
-                case SUPERFORM -> renderSuperFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
-                case STARFALLFORM -> renderStarfallFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
-                case HYPERFORM -> renderHyperFormSlots(player,gui,guiComponent,partialTick,screenWidth,screenHeight);
-            }
-        });
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        switch(playerSonicForm.getCurrentForm())
+        {
+            case BASEFORM -> renderBaseFormSlots(player,guiComponent,partialTick,screenWidth,screenHeight);
+            case SUPERFORM -> renderSuperFormSlots(player,guiComponent,partialTick,screenWidth,screenHeight);
+            case STARFALLFORM -> renderStarfallFormSlots(player,guiComponent,partialTick,screenWidth,screenHeight);
+            case HYPERFORM -> renderHyperFormSlots(player,guiComponent,partialTick,screenWidth,screenHeight);
+        }
 
     });
 
-    public static void renderBaseFormSlots(AbstractClientPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
+    public static void renderBaseFormSlots(AbstractClientPlayer player, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {
         final int[] textureDimensions = {22,22};
         int x = textureDimensions[0]; //screenWidth  - (int)(textureDimensions[0]*1.5);
         int y = 0;
 
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+        {
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
             byte[] cooldownArray = baseformProperties.getAllCooldowns();
@@ -360,24 +363,24 @@ public class VirtualSlotOverlay {
                     default: guiComponent.blit(PERFECT_2000, comboX, comboY, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
                 }
             }
-        });
+        }
 
     }
-    public static void renderSuperFormSlots(AbstractClientPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
+    public static void renderSuperFormSlots(AbstractClientPlayer player, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {
         final int[] textureDimensions = {22,22};
         int x = textureDimensions[0]; //screenWidth  - (int)(textureDimensions[0]*1.5);
         int y = 0;
 
     }
-    public static void renderStarfallFormSlots(AbstractClientPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
+    public static void renderStarfallFormSlots(AbstractClientPlayer player, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {
         final int[] textureDimensions = {22,22};
         int x = textureDimensions[0]; //screenWidth  - (int)(textureDimensions[0]*1.5);
         int y = 0;
 
     }
-    public static void renderHyperFormSlots(AbstractClientPlayer player, ForgeGui gui, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
+    public static void renderHyperFormSlots(AbstractClientPlayer player, GuiGraphics guiComponent, float partialTick, int screenWidth, int screenHeight)
     {
         final int[] textureDimensions = {22,22};
         int x = textureDimensions[0]; //screenWidth  - (int)(textureDimensions[0]*1.5);

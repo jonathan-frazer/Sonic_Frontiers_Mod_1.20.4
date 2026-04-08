@@ -21,12 +21,12 @@ public class CrossSlashRenderer extends EntityRenderer<CrossSlashProjectile> {
 
     public CrossSlashRenderer(EntityRendererProvider.Context context) {
         super(context);
-        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/cross_slash"), "main"));
+        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "baseform/cross_slash"), "main"));
         this.model = new CrossSlashModel<>(modelPart);
     }
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull CrossSlashProjectile entity) {
-        return new ResourceLocation(BeyondTheHorizon.MOD_ID,CrossSlashModel.TEXTURE_LOCATIONS[0].textureLocation());
+        return ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,CrossSlashModel.TEXTURE_LOCATIONS[0].textureLocation());
     }
 
     @Override

@@ -77,7 +77,7 @@ public class HelpScreen extends Screen {
 
     private ResourceLocation getTexture()
     {
-        return new ResourceLocation(BeyondTheHorizon.MOD_ID,"textures/help_screen_gui/sonic_block_screen_"+this.scrollIdx+".png");
+        return ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID,"textures/help_screen_gui/sonic_block_screen_"+this.scrollIdx+".png");
     }
 
     private void handlePageTurn(Button button)

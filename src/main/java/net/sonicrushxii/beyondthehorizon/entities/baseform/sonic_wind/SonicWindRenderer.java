@@ -17,12 +17,12 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.SonicWindM
 import org.jetbrains.annotations.NotNull;
 
 public class SonicWindRenderer extends EntityRenderer<SonicWind> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/sonic_wind.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/sonic_wind.png");
     private final EntityModel<SonicWind> model;
 
     public SonicWindRenderer(EntityRendererProvider.Context context) {
         super(context);
-        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(new ResourceLocation(BeyondTheHorizon.MOD_ID, "baseform/sonic_wind"), "main"));
+        ModelPart modelPart = context.bakeLayer(new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "baseform/sonic_wind"), "main"));
         this.model = new SonicWindModel<>(modelPart);
     }
     @Override

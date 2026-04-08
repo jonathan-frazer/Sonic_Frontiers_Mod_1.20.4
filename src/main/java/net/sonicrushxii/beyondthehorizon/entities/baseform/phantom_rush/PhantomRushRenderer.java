@@ -47,13 +47,13 @@ public class PhantomRushRenderer extends EntityRenderer<PhantomRushEntity> {
         {
             return switch (entity.getPoseType() / 10)
             {
-                case 0 -> new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/base_skin.png");
-                case 1 ->  new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/powerboost_skin.png");
-                case 2 ->  new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/lightspeed_skin.png");
-                default -> new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/mirage_skin.png");
+                case 0 -> ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/base_skin.png");
+                case 1 ->  ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/powerboost_skin.png");
+                case 2 ->  ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/lightspeed_skin.png");
+                default -> ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/mirage_skin.png");
             };
         }
-        else return new ResourceLocation(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/mirage_skin.png");
+        else return ResourceLocation.fromNamespaceAndPath(BeyondTheHorizon.MOD_ID, "textures/custom_model/baseform/mirage_skin.png");
     }
 
     @Override

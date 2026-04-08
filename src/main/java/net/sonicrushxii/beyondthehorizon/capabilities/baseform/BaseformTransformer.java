@@ -211,14 +211,15 @@ public class BaseformTransformer {
 
         }
         //Remove Data
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
+        {
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             playerSonicForm.deactivateBaseForm();
             PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
                             player.getId(),
                             playerSonicForm
                     ));
-        });
+        }
 
         //Deinitialize Virtual Slot Handler
         PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)0));
