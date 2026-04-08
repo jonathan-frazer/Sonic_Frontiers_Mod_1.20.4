@@ -1,37 +1,24 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 
-@Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID)
+@EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID)
 public class ModEventHandler {
-    @SubscribeEvent
-    public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event)
-    {
-        if(event.getObject() instanceof Player){
-            //Add Other Capabilities from here
-            if(!event.getObject().getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).isPresent()){
-                event.addCapability(new ResourceLocation(BeyondTheHorizon.MOD_ID, "properties"), new PlayerSonicFormProvider());
-            }
-        }
-    }
+    // In NeoForge 1.21.1, capabilities are replaced by data attachments.
+    // The onAttachCapabilitiesPlayer method is no longer needed as ModAttachments handles registration.
 
     @SubscribeEvent
     public static void onPlayerCloned(PlayerEvent.Clone event){
         if(event.isWasDeath()){
-            //Add Other Capabilities from here
-            event.getOriginal().getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(oldStore->{
-                event.getOriginal().getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(newStore->{
-                    newStore.copyFrom(oldStore);
-                });
-            });
+            PlayerSonicForm oldStore = event.getOriginal().getData(ModAttachments.PLAYER_SONIC_FORM);
+            PlayerSonicForm newStore = event.getEntity().getData(ModAttachments.PLAYER_SONIC_FORM);
+            newStore.copyFrom(oldStore);
         }
     }
 }

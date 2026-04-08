@@ -1,6 +1,9 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 import net.minecraft.sounds.SoundSource;
@@ -8,11 +11,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -21,8 +25,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class HomingAttack
+public class HomingAttack implements CustomPacketPayload
 {
+    public static final CustomPacketPayload.Type<HomingAttack> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "homing_attack"));
+
+    public static final StreamCodec<FriendlyByteBuf, HomingAttack> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), HomingAttack::new);
+
     private final UUID enemyID;
 
     public HomingAttack(UUID enemyID) {
@@ -40,6 +50,11 @@ public class HomingAttack
     public void encode(FriendlyByteBuf buffer){
         if(enemyID==null) buffer.writeUUID(new UUID(0L,0L));
         else buffer.writeUUID(enemyID);
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     //Client-Side Method
@@ -74,37 +89,35 @@ public class HomingAttack
     }
 
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(HomingAttack msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-                            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                            //Start Homing Attack
-                            if(enemyID != null)
-                            {
-                                //Homing Attack Data
-                                baseformProperties.airBoosts = 3;
-                                baseformProperties.homingAttackAirTime = 1;
-                                baseformProperties.homingTarget = enemyID;
+                        //Start Homing Attack
+                        if(msg.enemyID != null)
+                        {
+                            //Homing Attack Data
+                            baseformProperties.airBoosts = 3;
+                            baseformProperties.homingAttackAirTime = 1;
+                            baseformProperties.homingTarget = msg.enemyID;
 
-                                //Remove Gravity
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                            //Remove Gravity
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
 
-                                //Play Sound
-                                player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
-                            }
+                            //Play Sound
+                            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
+                        }
 
-                            PacketHandler.sendToALLPlayers(
-                                    new SyncPlayerFormS2C(
-                                            player.getId(),
-                                            playerSonicForm
-                                    ));
-                        });
+                        PacketHandler.sendToALLPlayers(
+                                new SyncPlayerFormS2C(
+                                        player.getId(),
+                                        playerSonicForm
+                                ));
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }

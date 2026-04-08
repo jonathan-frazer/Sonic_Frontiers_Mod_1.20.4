@@ -2,17 +2,18 @@ package net.sonicrushxii.beyondthehorizon.event_handler;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.capabilities.hyperform.HyperformHandler;
 import net.sonicrushxii.beyondthehorizon.capabilities.starfall.StarfallFormHandler;
 import net.sonicrushxii.beyondthehorizon.capabilities.superform.SuperformHandler;
 import net.sonicrushxii.beyondthehorizon.event_handler.client_handlers.ClientTickHandler;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 
 import java.util.Arrays;
 
@@ -39,10 +40,11 @@ public class PlayerTickHandler {
     }
 
     @SubscribeEvent
-    public void onPlayerTick(TickEvent.PlayerTickEvent.Pre event) {
-        if (event.player == null) return;
-        if(event.player.level().isClientSide && FMLEnvironment.dist == Dist.CLIENT) ClientTickHandler.localPlayerTick(event.player);
-        else serverPlayerTick((ServerPlayer) event.player);
+    public void onPlayerTick(PlayerTickEvent.Pre event) {
+        Player eventPlayer = event.getEntity();
+        if (eventPlayer == null) return;
+        if(eventPlayer.level().isClientSide && FMLEnvironment.dist == Dist.CLIENT) ClientTickHandler.localPlayerTick(eventPlayer);
+        else serverPlayerTick((ServerPlayer) eventPlayer);
     }
 
     private void serverPlayerTick(ServerPlayer player)
@@ -50,7 +52,8 @@ public class PlayerTickHandler {
         if (!player.isAlive())
             return;
 
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+        {
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             switch(playerSonicForm.getCurrentForm())
             {
                 case BASEFORM -> BaseformServer.performServerTick(player);
@@ -58,7 +61,7 @@ public class PlayerTickHandler {
                 case STARFALLFORM -> StarfallFormHandler.performStarfallformServerTick(player);
                 case HYPERFORM -> HyperformHandler.performHyperformServerTick(player);
             }
-        });
+        }
 
         ++tickCounter;
         if (tickCounter >= TICKS_PER_SECOND) {
@@ -69,7 +72,8 @@ public class PlayerTickHandler {
 
     private void serverPlayerSecond(ServerPlayer player)
     {
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+        {
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             switch(playerSonicForm.getCurrentForm())
             {
                 case BASEFORM -> BaseformServer.performServerSecond(player);
@@ -77,6 +81,6 @@ public class PlayerTickHandler {
                 case STARFALLFORM -> StarfallFormHandler.performStarfallformServerSecond(player);
                 case HYPERFORM -> HyperformHandler.performHyperformServerSecond(player);
             }
-        });
+        }
     }
 }

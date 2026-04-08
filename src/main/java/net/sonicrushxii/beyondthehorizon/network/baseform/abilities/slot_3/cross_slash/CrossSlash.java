@@ -1,18 +1,31 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross_slash;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
-public class CrossSlash
+public class CrossSlash implements CustomPacketPayload
 {
+    public static final CustomPacketPayload.Type<CrossSlash> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "cross_slash"));
+
+    public static final StreamCodec<FriendlyByteBuf, CrossSlash> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), CrossSlash::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
+
     public CrossSlash() {}
 
     public CrossSlash(FriendlyByteBuf buffer){}
@@ -110,31 +123,29 @@ public class CrossSlash
     }
 */
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(CrossSlash msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-                            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                            //Changed Data
-                            baseformProperties.crossSlash = 1;
+                        //Changed Data
+                        baseformProperties.crossSlash = 1;
 
-                            //Remove Gravity
-                            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                        //Remove Gravity
+                        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.0);
 
-                            //Play Sound
-                            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
+                        //Play Sound
+                        player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
-                            PacketHandler.sendToALLPlayers(
-                                    new SyncPlayerFormS2C(
-                                            player.getId(),
-                                            playerSonicForm
-                                    ));
-                        });
+                        PacketHandler.sendToALLPlayers(
+                                new SyncPlayerFormS2C(
+                                        player.getId(),
+                                        playerSonicForm
+                                ));
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }

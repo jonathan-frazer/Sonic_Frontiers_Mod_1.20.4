@@ -1,13 +1,13 @@
 package net.sonicrushxii.beyondthehorizon.network;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraftforge.network.ChannelBuilder;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.SimpleChannel;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
@@ -64,195 +64,104 @@ import net.sonicrushxii.beyondthehorizon.timehandler.TimeProjSync;
 import org.slf4j.Logger;
 
 public class PacketHandler {
-    private static final int PROTOCOL_VERSION = 1;
-    private static final SimpleChannel INSTANCE = ChannelBuilder
-            .named(new ResourceLocation(BeyondTheHorizon.MOD_ID, "main"))
-            .networkProtocolVersion(PROTOCOL_VERSION)
-            .simpleChannel();
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static void register() {
-        LOGGER.info("HELLO FROM CLIENT SETUP");
+    public static void onRegisterPayloadHandlers(RegisterPayloadHandlersEvent event) {
+        LOGGER.info("Registering payload handlers");
+        PayloadRegistrar registrar = event.registrar(BeyondTheHorizon.MOD_ID).versioned("1");
 
-        //Sync Packets
-        {
-            INSTANCE.messageBuilder(SyncPlayerFormS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(SyncPlayerFormS2C::encode).decoder(SyncPlayerFormS2C::new).consumerMainThread(SyncPlayerFormS2C::handle).add();
-            INSTANCE.messageBuilder(ParticleAuraPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(ParticleAuraPacketS2C::encode).decoder(ParticleAuraPacketS2C::new).consumerMainThread(ParticleAuraPacketS2C::handle).add();
-            INSTANCE.messageBuilder(ParticleDirPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(ParticleDirPacketS2C::encode).decoder(ParticleDirPacketS2C::new).consumerMainThread(ParticleDirPacketS2C::handle).add();
-            INSTANCE.messageBuilder(ParticleRaycastPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(ParticleRaycastPacketS2C::encode).decoder(ParticleRaycastPacketS2C::new).consumerMainThread(ParticleRaycastPacketS2C::handle).add();
-            INSTANCE.messageBuilder(PlayerPlaySoundPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(PlayerPlaySoundPacketS2C::encode).decoder(PlayerPlaySoundPacketS2C::new).consumerMainThread(PlayerPlaySoundPacketS2C::handle).add();
-            INSTANCE.messageBuilder(PlayerStopSoundPacketS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(PlayerStopSoundPacketS2C::encode).decoder(PlayerStopSoundPacketS2C::new).consumerMainThread(PlayerStopSoundPacketS2C::handle).add();
-            INSTANCE.messageBuilder(VirtualSlotSyncS2C.class, NetworkDirection.PLAY_TO_CLIENT).encoder(VirtualSlotSyncS2C::encode).decoder(VirtualSlotSyncS2C::new).consumerMainThread(VirtualSlotSyncS2C::handle).add();
-            INSTANCE.messageBuilder(TimeProjSync.class, NetworkDirection.PLAY_TO_CLIENT).encoder(TimeProjSync::encode).decoder(TimeProjSync::new).consumerMainThread(TimeProjSync::handle).add();
-            INSTANCE.messageBuilder(GoToVirtualSlotS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(GoToVirtualSlotS2C::encode).decoder(GoToVirtualSlotS2C::new).consumerMainThread(GoToVirtualSlotS2C::handle).add();
-        }
+        //Sync Packets (S2C)
+        registrar.playToClient(SyncPlayerFormS2C.TYPE, SyncPlayerFormS2C.STREAM_CODEC, SyncPlayerFormS2C::handle);
+        registrar.playToClient(ParticleAuraPacketS2C.TYPE, ParticleAuraPacketS2C.STREAM_CODEC, ParticleAuraPacketS2C::handle);
+        registrar.playToClient(ParticleDirPacketS2C.TYPE, ParticleDirPacketS2C.STREAM_CODEC, ParticleDirPacketS2C::handle);
+        registrar.playToClient(ParticleRaycastPacketS2C.TYPE, ParticleRaycastPacketS2C.STREAM_CODEC, ParticleRaycastPacketS2C::handle);
+        registrar.playToClient(PlayerPlaySoundPacketS2C.TYPE, PlayerPlaySoundPacketS2C.STREAM_CODEC, PlayerPlaySoundPacketS2C::handle);
+        registrar.playToClient(PlayerStopSoundPacketS2C.TYPE, PlayerStopSoundPacketS2C.STREAM_CODEC, PlayerStopSoundPacketS2C::handle);
+        registrar.playToClient(VirtualSlotSyncS2C.TYPE, VirtualSlotSyncS2C.STREAM_CODEC, VirtualSlotSyncS2C::handle);
+        registrar.playToClient(TimeProjSync.TYPE, TimeProjSync.STREAM_CODEC, TimeProjSync::handle);
+        registrar.playToClient(GoToVirtualSlotS2C.TYPE, GoToVirtualSlotS2C.STREAM_CODEC, GoToVirtualSlotS2C::handle);
+        registrar.playToClient(CyloopParticleS2C.TYPE, CyloopParticleS2C.STREAM_CODEC, CyloopParticleS2C::handle);
+        registrar.playToClient(WildRushRotationSyncS2C.TYPE, WildRushRotationSyncS2C.STREAM_CODEC, WildRushRotationSyncS2C::handle);
+        registrar.playToClient(WildRushParticleS2C.TYPE, WildRushParticleS2C.STREAM_CODEC, WildRushParticleS2C::handle);
+        registrar.playToClient(SonicWindParticleS2C.TYPE, SonicWindParticleS2C.STREAM_CODEC, SonicWindParticleS2C::handle);
 
-        //Base form
-        {
-            //HelpScreen
-            INSTANCE.messageBuilder(HelpScreenSync.class, NetworkDirection.PLAY_TO_SERVER).encoder(HelpScreenSync::encode).decoder(HelpScreenSync::new).consumerMainThread(HelpScreenSync::handle).add();
+        //Base form (C2S)
+        //HelpScreen
+        registrar.playToServer(HelpScreenSync.TYPE, HelpScreenSync.STREAM_CODEC, HelpScreenSync::handle);
 
-            //Passives
-            {
-                INSTANCE.messageBuilder(StartSprint.class, NetworkDirection.PLAY_TO_SERVER).encoder(StartSprint::encode).decoder(StartSprint::new).consumerMainThread(StartSprint::handle).add();
-                INSTANCE.messageBuilder(StopSprint.class, NetworkDirection.PLAY_TO_SERVER).encoder(StopSprint::encode).decoder(StopSprint::new).consumerMainThread(StopSprint::handle).add();
+        //Passives
+        registrar.playToServer(StartSprint.TYPE, StartSprint.STREAM_CODEC, StartSprint::handle);
+        registrar.playToServer(StopSprint.TYPE, StopSprint.STREAM_CODEC, StopSprint::handle);
+        registrar.playToServer(DoubleJump.TYPE, DoubleJump.STREAM_CODEC, DoubleJump::handle);
+        registrar.playToServer(DangerSenseToggle.TYPE, DangerSenseToggle.STREAM_CODEC, DangerSenseToggle::handle);
+        registrar.playToServer(WallBoost.TYPE, WallBoost.STREAM_CODEC, WallBoost::handle);
 
-                //Double Jump
-                INSTANCE.messageBuilder(DoubleJump.class, NetworkDirection.PLAY_TO_SERVER).encoder(DoubleJump::encode).decoder(DoubleJump::new).consumerMainThread(DoubleJump::handle).add();
+        //Slot 1
+        registrar.playToServer(AirBoost.TYPE, AirBoost.STREAM_CODEC, AirBoost::handle);
+        registrar.playToServer(Boost.TYPE, Boost.STREAM_CODEC, Boost::handle);
+        registrar.playToServer(Sidestep.TYPE, Sidestep.STREAM_CODEC, Sidestep::handle);
+        registrar.playToServer(LightspeedCharge.TYPE, LightspeedCharge.STREAM_CODEC, LightspeedCharge::handle);
+        registrar.playToServer(LightspeedEffect.TYPE, LightspeedEffect.STREAM_CODEC, LightspeedEffect::handle);
+        registrar.playToServer(LightspeedDecay.TYPE, LightspeedDecay.STREAM_CODEC, LightspeedDecay::handle);
+        registrar.playToServer(LightspeedCancel.TYPE, LightspeedCancel.STREAM_CODEC, LightspeedCancel::handle);
+        registrar.playToServer(PowerBoostActivate.TYPE, PowerBoostActivate.STREAM_CODEC, PowerBoostActivate::handle);
+        registrar.playToServer(PowerBoostDeactivate.TYPE, PowerBoostDeactivate.STREAM_CODEC, PowerBoostDeactivate::handle);
+        registrar.playToServer(Cyloop.TYPE, Cyloop.STREAM_CODEC, Cyloop::handle);
+        registrar.playToServer(QuickCyloop.TYPE, QuickCyloop.STREAM_CODEC, QuickCyloop::handle);
 
-                //Auto Step
+        //Slot 2
+        registrar.playToServer(ChargeSpindash.TYPE, ChargeSpindash.STREAM_CODEC, ChargeSpindash::handle);
+        registrar.playToServer(SpindashBreak.TYPE, SpindashBreak.STREAM_CODEC, SpindashBreak::handle);
+        registrar.playToServer(LaunchSpindash.TYPE, LaunchSpindash.STREAM_CODEC, LaunchSpindash::handle);
+        registrar.playToServer(HomingAttack.TYPE, HomingAttack.STREAM_CODEC, HomingAttack::handle);
+        registrar.playToServer(Dodge.TYPE, Dodge.STREAM_CODEC, Dodge::handle);
+        registrar.playToServer(HummingTop.TYPE, HummingTop.STREAM_CODEC, HummingTop::handle);
+        registrar.playToServer(SpeedBlitz.TYPE, SpeedBlitz.STREAM_CODEC, SpeedBlitz::handle);
+        registrar.playToServer(SpeedBlitzDash.TYPE, SpeedBlitzDash.STREAM_CODEC, SpeedBlitzDash::handle);
+        registrar.playToServer(SpeedBlitzOff.TYPE, SpeedBlitzOff.STREAM_CODEC, SpeedBlitzOff::handle);
+        registrar.playToServer(SetSmashHitChargeC2S.TYPE, SetSmashHitChargeC2S.STREAM_CODEC, SetSmashHitChargeC2S::handle);
+        registrar.playToServer(Stomp.TYPE, Stomp.STREAM_CODEC, Stomp::handle);
 
-                //Danger Sense
-                INSTANCE.messageBuilder(DangerSenseToggle.class, NetworkDirection.PLAY_TO_SERVER).encoder(DangerSenseToggle::encode).decoder(DangerSenseToggle::new).consumerMainThread(DangerSenseToggle::handle).add();
+        //Slot 3
+        registrar.playToServer(TornadoJump.TYPE, TornadoJump.STREAM_CODEC, TornadoJump::handle);
+        registrar.playToServer(Mirage.TYPE, Mirage.STREAM_CODEC, Mirage::handle);
+        registrar.playToServer(LightSpeedAssault.TYPE, LightSpeedAssault.STREAM_CODEC, LightSpeedAssault::handle);
+        registrar.playToServer(SpinSlash.TYPE, SpinSlash.STREAM_CODEC, SpinSlash::handle);
+        registrar.playToServer(CycloneKick.TYPE, CycloneKick.STREAM_CODEC, CycloneKick::handle);
+        registrar.playToServer(WildRush.TYPE, WildRush.STREAM_CODEC, WildRush::handle);
+        registrar.playToServer(LoopKick.TYPE, LoopKick.STREAM_CODEC, LoopKick::handle);
 
-                //Hunger
-            }
+        //Slot 4
+        registrar.playToServer(CrossSlash.TYPE, CrossSlash.STREAM_CODEC, CrossSlash::handle);
+        registrar.playToServer(EndCrossSlash.TYPE, EndCrossSlash.STREAM_CODEC, EndCrossSlash::handle);
+        registrar.playToServer(HomingShot.TYPE, HomingShot.STREAM_CODEC, HomingShot::handle);
+        registrar.playToServer(SonicBoom.TYPE, SonicBoom.STREAM_CODEC, SonicBoom::handle);
+        registrar.playToServer(EndSonicBoom.TYPE, EndSonicBoom.STREAM_CODEC, EndSonicBoom::handle);
+        registrar.playToServer(SonicWind.TYPE, SonicWind.STREAM_CODEC, SonicWind::handle);
+        registrar.playToServer(QuickSonicWind.TYPE, QuickSonicWind.STREAM_CODEC, QuickSonicWind::handle);
 
-            //Slot 1
-            {
-                //Air Boost
-                INSTANCE.messageBuilder(AirBoost.class, NetworkDirection.PLAY_TO_SERVER).encoder(AirBoost::encode).decoder(AirBoost::new).consumerMainThread(AirBoost::handle).add();
-                //Boost
-                INSTANCE.messageBuilder(Boost.class, NetworkDirection.PLAY_TO_SERVER).encoder(Boost::encode).decoder(Boost::new).consumerMainThread(Boost::handle).add();
-                INSTANCE.messageBuilder(WallBoost.class, NetworkDirection.PLAY_TO_SERVER).encoder(WallBoost::encode).decoder(WallBoost::new).consumerMainThread(WallBoost::handle).add();
+        //Slot 5
+        registrar.playToServer(Parry.TYPE, Parry.STREAM_CODEC, Parry::handle);
+        registrar.playToServer(StopParry.TYPE, StopParry.STREAM_CODEC, StopParry::handle);
+        registrar.playToServer(GrandSlam.TYPE, GrandSlam.STREAM_CODEC, GrandSlam::handle);
 
-                //Quick Step
-                INSTANCE.messageBuilder(Sidestep.class, NetworkDirection.PLAY_TO_SERVER).encoder(Sidestep::encode).decoder(Sidestep::new).consumerMainThread(Sidestep::handle).add();
-
-                //Light Speed Attack
-                INSTANCE.messageBuilder(LightspeedCharge.class, NetworkDirection.PLAY_TO_SERVER).encoder(LightspeedCharge::encode).decoder(LightspeedCharge::new).consumerMainThread(LightspeedCharge::handle).add();
-                INSTANCE.messageBuilder(LightspeedEffect.class, NetworkDirection.PLAY_TO_SERVER).encoder(LightspeedEffect::encode).decoder(LightspeedEffect::new).consumerMainThread(LightspeedEffect::handle).add();
-                INSTANCE.messageBuilder(LightspeedDecay.class, NetworkDirection.PLAY_TO_SERVER).encoder(LightspeedDecay::encode).decoder(LightspeedDecay::new).consumerMainThread(LightspeedDecay::handle).add();
-                INSTANCE.messageBuilder(LightspeedCancel.class, NetworkDirection.PLAY_TO_SERVER).encoder(LightspeedCancel::encode).decoder(LightspeedCancel::new).consumerMainThread(LightspeedCancel::handle).add();
-
-                //Power Boost
-                INSTANCE.messageBuilder(PowerBoostActivate.class, NetworkDirection.PLAY_TO_SERVER).encoder(PowerBoostActivate::encode).decoder(PowerBoostActivate::new).consumerMainThread(PowerBoostActivate::handle).add();
-                INSTANCE.messageBuilder(PowerBoostDeactivate.class, NetworkDirection.PLAY_TO_SERVER).encoder(PowerBoostDeactivate::encode).decoder(PowerBoostDeactivate::new).consumerMainThread(PowerBoostDeactivate::handle).add();
-
-                //Cyloop
-                INSTANCE.messageBuilder(Cyloop.class,NetworkDirection.PLAY_TO_SERVER).encoder(Cyloop::encode).decoder(Cyloop::new).consumerMainThread(Cyloop::handle).add();
-                INSTANCE.messageBuilder(CyloopParticleS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(CyloopParticleS2C::encode).decoder(CyloopParticleS2C::new).consumerMainThread(CyloopParticleS2C::handle).add();
-
-                //Quick Cyloop
-                INSTANCE.messageBuilder(QuickCyloop.class,NetworkDirection.PLAY_TO_SERVER).encoder(QuickCyloop::encode).decoder(QuickCyloop::new).consumerMainThread(QuickCyloop::handle).add();
-            }
-
-            //Slot 2
-            {
-                //Spin Dash
-                INSTANCE.messageBuilder(ChargeSpindash.class, NetworkDirection.PLAY_TO_SERVER).encoder(ChargeSpindash::encode).decoder(ChargeSpindash::new).consumerMainThread(ChargeSpindash::handle).add();
-                INSTANCE.messageBuilder(SpindashBreak.class, NetworkDirection.PLAY_TO_SERVER).encoder(SpindashBreak::encode).decoder(SpindashBreak::new).consumerMainThread(SpindashBreak::handle).add();
-                INSTANCE.messageBuilder(LaunchSpindash.class, NetworkDirection.PLAY_TO_SERVER).encoder(LaunchSpindash::encode).decoder(LaunchSpindash::new).consumerMainThread(LaunchSpindash::handle).add();
-
-                //Homing Attack
-                INSTANCE.messageBuilder(HomingAttack.class, NetworkDirection.PLAY_TO_SERVER).encoder(HomingAttack::encode).decoder(HomingAttack::new).consumerMainThread(HomingAttack::handle).add();
-
-                //Dodge
-                INSTANCE.messageBuilder(Dodge.class,NetworkDirection.PLAY_TO_SERVER).encoder(Dodge::encode).decoder(Dodge::new).consumerMainThread(Dodge::handle).add();
-
-                //Humming Top
-                INSTANCE.messageBuilder(HummingTop.class,NetworkDirection.PLAY_TO_SERVER).encoder(HummingTop::encode).decoder(HummingTop::new).consumerMainThread(HummingTop::handle).add();
-
-                //Speed Blitz
-                INSTANCE.messageBuilder(SpeedBlitz.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpeedBlitz::encode).decoder(SpeedBlitz::new).consumerMainThread(SpeedBlitz::handle).add();
-                INSTANCE.messageBuilder(SpeedBlitzDash.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpeedBlitzDash::encode).decoder(SpeedBlitzDash::new).consumerMainThread(SpeedBlitzDash::handle).add();
-                INSTANCE.messageBuilder(SpeedBlitzOff.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpeedBlitzOff::encode).decoder(SpeedBlitzOff::new).consumerMainThread(SpeedBlitzOff::handle).add();
-
-                //Set Smash Hit Charge
-                INSTANCE.messageBuilder(SetSmashHitChargeC2S.class,NetworkDirection.PLAY_TO_SERVER).encoder(SetSmashHitChargeC2S::encode).decoder(SetSmashHitChargeC2S::new).consumerMainThread(SetSmashHitChargeC2S::handle).add();
-
-                //Stomp
-                INSTANCE.messageBuilder(Stomp.class,NetworkDirection.PLAY_TO_SERVER).encoder(Stomp::encode).decoder(Stomp::new).consumerMainThread(Stomp::handle).add();
-            }
-
-            //Slot 3
-            {
-                // Tornado Jump
-                INSTANCE.messageBuilder(TornadoJump.class,NetworkDirection.PLAY_TO_SERVER).encoder(TornadoJump::encode).decoder(TornadoJump::new).consumerMainThread(TornadoJump::handle).add();
-                INSTANCE.messageBuilder(Mirage.class,NetworkDirection.PLAY_TO_SERVER).encoder(Mirage::encode).decoder(Mirage::new).consumerMainThread(Mirage::handle).add();
-                INSTANCE.messageBuilder(LightSpeedAssault.class,NetworkDirection.PLAY_TO_SERVER).encoder(LightSpeedAssault::encode).decoder(LightSpeedAssault::new).consumerMainThread(LightSpeedAssault::handle).add();
-
-                //Spin Slash
-                INSTANCE.messageBuilder(SpinSlash.class,NetworkDirection.PLAY_TO_SERVER).encoder(SpinSlash::encode).decoder(SpinSlash::new).consumerMainThread(SpinSlash::handle).add();
-
-                //Cyclone Kick
-                INSTANCE.messageBuilder(CycloneKick.class,NetworkDirection.PLAY_TO_SERVER).encoder(CycloneKick::encode).decoder(CycloneKick::new).consumerMainThread(CycloneKick::handle).add();
-
-                //Wild Rush
-                INSTANCE.messageBuilder(WildRush.class,NetworkDirection.PLAY_TO_SERVER).encoder(WildRush::encode).decoder(WildRush::new).consumerMainThread(WildRush::handle).add();
-                INSTANCE.messageBuilder(WildRushRotationSyncS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(WildRushRotationSyncS2C::encode).decoder(WildRushRotationSyncS2C::new).consumerMainThread(WildRushRotationSyncS2C::handle).add();
-                INSTANCE.messageBuilder(WildRushParticleS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(WildRushParticleS2C::encode).decoder(WildRushParticleS2C::new).consumerMainThread(WildRushParticleS2C::handle).add();
-
-                //Loop Kick
-                INSTANCE.messageBuilder(LoopKick.class,NetworkDirection.PLAY_TO_SERVER).encoder(LoopKick::encode).decoder(LoopKick::new).consumerMainThread(LoopKick::handle).add();
-            }
-
-            //Slot 4
-            {
-                //Cross Slash
-                INSTANCE.messageBuilder(CrossSlash.class,NetworkDirection.PLAY_TO_SERVER).encoder(CrossSlash::encode).decoder(CrossSlash::new).consumerMainThread(CrossSlash::handle).add();
-                INSTANCE.messageBuilder(EndCrossSlash.class,NetworkDirection.PLAY_TO_SERVER).encoder(EndCrossSlash::encode).decoder(EndCrossSlash::new).consumerMainThread(EndCrossSlash::handle).add();
-
-                //Homing Shot
-                INSTANCE.messageBuilder(HomingShot.class,NetworkDirection.PLAY_TO_SERVER).encoder(HomingShot::encode).decoder(HomingShot::new).consumerMainThread(HomingShot::handle).add();
-
-                //Sonic Boom
-                INSTANCE.messageBuilder(SonicBoom.class,NetworkDirection.PLAY_TO_SERVER).encoder(SonicBoom::encode).decoder(SonicBoom::new).consumerMainThread(SonicBoom::handle).add();
-                INSTANCE.messageBuilder(EndSonicBoom.class,NetworkDirection.PLAY_TO_SERVER).encoder(EndSonicBoom::encode).decoder(EndSonicBoom::new).consumerMainThread(EndSonicBoom::handle).add();
-
-                //Sonic Wind
-                INSTANCE.messageBuilder(SonicWind.class,NetworkDirection.PLAY_TO_SERVER).encoder(SonicWind::encode).decoder(SonicWind::new).consumerMainThread(SonicWind::handle).add();
-                INSTANCE.messageBuilder(QuickSonicWind.class,NetworkDirection.PLAY_TO_SERVER).encoder(QuickSonicWind::encode).decoder(QuickSonicWind::new).consumerMainThread(QuickSonicWind::handle).add();
-                INSTANCE.messageBuilder(SonicWindParticleS2C.class,NetworkDirection.PLAY_TO_CLIENT).encoder(SonicWindParticleS2C::encode).decoder(SonicWindParticleS2C::new).consumerMainThread(SonicWindParticleS2C::handle).add();
-            }
-
-            //Slot 5
-            {
-                //Parry
-                INSTANCE.messageBuilder(Parry.class,NetworkDirection.PLAY_TO_SERVER).encoder(Parry::encode).decoder(Parry::new).consumerMainThread(Parry::handle).add();
-                INSTANCE.messageBuilder(StopParry.class,NetworkDirection.PLAY_TO_SERVER).encoder(StopParry::encode).decoder(StopParry::new).consumerMainThread(StopParry::handle).add();
-
-                //Grand Slam
-                INSTANCE.messageBuilder(GrandSlam.class,NetworkDirection.PLAY_TO_SERVER).encoder(GrandSlam::encode).decoder(GrandSlam::new).consumerMainThread(GrandSlam::handle).add();
-            }
-
-            //Slot 6
-            {
-                //Ultimate
-                INSTANCE.messageBuilder(UltimateActivate.class,NetworkDirection.PLAY_TO_SERVER).encoder(UltimateActivate::encode).decoder(UltimateActivate::new).consumerMainThread(UltimateActivate::handle).add();
-            }
-        }
-
-        //Super form
-        {
-
-        }
-
-        //Starfall form
-        {
-
-        }
-
-        //Hyper form
-        {
-
-        }
+        //Slot 6
+        registrar.playToServer(UltimateActivate.TYPE, UltimateActivate.STREAM_CODEC, UltimateActivate::handle);
     }
 
-    public static void sendToServer(Object msg) {
-        INSTANCE.send(msg,PacketDistributor.SERVER.noArg());
+    public static void sendToServer(CustomPacketPayload msg) {
+        PacketDistributor.sendToServer(msg);
     }
 
-    public static void sendToPlayer(ServerPlayer player, Object msg) {
-        INSTANCE.send(msg,PacketDistributor.PLAYER.with(player));
+    public static void sendToPlayer(ServerPlayer player, CustomPacketPayload msg) {
+        PacketDistributor.sendToPlayer(player, msg);
     }
 
-    public static void sendToChunkPlayers(LevelChunk levelChunk, Object msg) {
-        INSTANCE.send(msg,PacketDistributor.TRACKING_CHUNK.with(levelChunk));
+    public static void sendToChunkPlayers(LevelChunk levelChunk, CustomPacketPayload msg) {
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) levelChunk.getLevel(), levelChunk.getPos(), msg);
     }
 
-    public static void sendToALLPlayers(Object msg) {
-        INSTANCE.send(msg,PacketDistributor.ALL.noArg());
+    public static void sendToALLPlayers(CustomPacketPayload msg) {
+        PacketDistributor.sendToAllPlayers(msg);
     }
-
 }

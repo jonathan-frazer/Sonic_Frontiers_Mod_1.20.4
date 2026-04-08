@@ -16,9 +16,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.DamageHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
@@ -45,11 +46,11 @@ public class BaseformHandler {
             Entity damageGiver = event.getSource().getEntity();
 
             //End Mirage Timer if Damage is taken
-            receiver.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
+            {
+                PlayerSonicForm playerSonicForm = receiver.getData(ModAttachments.PLAYER_SONIC_FORM);
                 if (baseformProperties.mirageTimer > 1)
                     baseformProperties.mirageTimer = 141;
-
-            });
+            }
 
             boolean isFireworkDmg = "fireworks".equals(event.getSource().getMsgId());
 
@@ -221,11 +222,12 @@ public class BaseformHandler {
                 //Sound
                 damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), ModSounds.SMASH_HIT.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
-                damageGiver.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                {
+                    PlayerSonicForm playerSonicForm = damageGiver.getData(ModAttachments.PLAYER_SONIC_FORM);
                     //Get Data From the Player
                     BaseformProperties updatedBaseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
                     updatedBaseformProperties.smashHit = 0;
-                });
+                }
             }//Speed Blitz
             else if(baseformProperties.speedBlitz && event.getSource().is(DamageTypes.PLAYER_ATTACK))
             {

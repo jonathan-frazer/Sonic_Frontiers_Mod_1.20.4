@@ -1,12 +1,18 @@
 package net.sonicrushxii.beyondthehorizon.network.sync;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 
-public class GoToVirtualSlotS2C {
+public class GoToVirtualSlotS2C implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<GoToVirtualSlotS2C> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "go_to_virtual_slot_s2c"));
+
+    public static final StreamCodec<FriendlyByteBuf, GoToVirtualSlotS2C> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), GoToVirtualSlotS2C::new);
 
     byte targetSlot;
 
@@ -22,14 +28,15 @@ public class GoToVirtualSlotS2C {
         buf.writeByte(this.targetSlot);
     }
 
-    public void handle(CustomPayloadEvent.Context ctx) {
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
+    public static void handle(GoToVirtualSlotS2C msg, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             // This code is run on the client side
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                VirtualSlotHandler.goToSlot(targetSlot);
-            });
+            VirtualSlotHandler.goToSlot(msg.targetSlot);
         });
-
-        ctx.setPacketHandled(true);
     }
 }

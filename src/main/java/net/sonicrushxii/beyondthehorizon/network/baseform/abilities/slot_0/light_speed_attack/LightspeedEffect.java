@@ -1,6 +1,9 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -8,10 +11,11 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
@@ -21,7 +25,12 @@ import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
 import java.util.Iterator;
 
-public class LightspeedEffect {
+public class LightspeedEffect implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<LightspeedEffect> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "lightspeed_effect"));
+
+    public static final StreamCodec<FriendlyByteBuf, LightspeedEffect> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), LightspeedEffect::new);
 
     public LightspeedEffect() {}
 
@@ -31,6 +40,11 @@ public class LightspeedEffect {
 
     public void encode(FriendlyByteBuf buffer){
 
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public static void performLightspeedEffect(ServerPlayer player)
@@ -85,27 +99,25 @@ public class LightspeedEffect {
         player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.MASTER, 1.0f, 1.0f);
 
         //Add Tag
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
-            baseformProperties.lightSpeedState = (byte)2;
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        baseformProperties.lightSpeedState = (byte)2;
 
-            PacketHandler.sendToALLPlayers(
-                    new SyncPlayerFormS2C(
-                            player.getId(),
-                            playerSonicForm
-                    ));
-        });
+        PacketHandler.sendToALLPlayers(
+                new SyncPlayerFormS2C(
+                        player.getId(),
+                        playerSonicForm
+                ));
     }
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(LightspeedEffect msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null)
                         performLightspeedEffect(player);
 
                 });
-        ctx.setPacketHandled(true);
     }
 }
 

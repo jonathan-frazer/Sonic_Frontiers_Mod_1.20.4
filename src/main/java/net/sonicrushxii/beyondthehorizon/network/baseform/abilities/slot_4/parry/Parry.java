@@ -1,20 +1,33 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
-public class Parry
+public class Parry implements CustomPacketPayload
 {
+    public static final CustomPacketPayload.Type<Parry> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "parry"));
+
+    public static final StreamCodec<FriendlyByteBuf, Parry> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), Parry::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
+
     public Parry() {}
 
     public Parry(FriendlyByteBuf buffer){}
@@ -67,39 +80,37 @@ public class Parry
     }
     */
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(Parry msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-                            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                            if(baseformProperties.parryTime == 0)
-                            {
-                                //Changed Data
-                                baseformProperties.parryTime = 1;
+                        if(baseformProperties.parryTime == 0)
+                        {
+                            //Changed Data
+                            baseformProperties.parryTime = 1;
 
-                                //Remove Gravity
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+                            //Remove Gravity
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.0);
 
-                                //Add Slowness for Screen
-                                if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_HOLD))
-                                    player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.PARRY_HOLD);
+                            //Add Slowness for Screen
+                            if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_HOLD))
+                                player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.PARRY_HOLD);
 
-                                //Play Sound
-                                player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
-                            }
+                            //Play Sound
+                            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
+                        }
 
 
-                            PacketHandler.sendToALLPlayers(
-                                    new SyncPlayerFormS2C(
-                                            player.getId(),
-                                            playerSonicForm
-                                    ));
-                        });
+                        PacketHandler.sendToALLPlayers(
+                                new SyncPlayerFormS2C(
+                                        player.getId(),
+                                        playerSonicForm
+                                ));
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }

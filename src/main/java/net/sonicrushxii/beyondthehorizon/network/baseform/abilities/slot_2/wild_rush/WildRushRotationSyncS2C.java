@@ -1,12 +1,23 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 
-public class WildRushRotationSyncS2C {
+public class WildRushRotationSyncS2C implements CustomPacketPayload {
+
+    public static final CustomPacketPayload.Type<WildRushRotationSyncS2C> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "wild_rush_rotation_sync_s2c"));
+
+    public static final StreamCodec<FriendlyByteBuf, WildRushRotationSyncS2C> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), WildRushRotationSyncS2C::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
+
     private float yaw;
     private float pitch;
 
@@ -25,11 +36,10 @@ public class WildRushRotationSyncS2C {
         buf.writeFloat(this.pitch);
     }
 
-    public void handle(CustomPayloadEvent.Context ctx) {
-        ctx.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            BaseformClient.ClientOnlyData.wildRushYawPitch[0] = yaw;
-            BaseformClient.ClientOnlyData.wildRushYawPitch[1] = pitch;
-        }));
-        ctx.setPacketHandled(true);
+    public static void handle(WildRushRotationSyncS2C msg, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
+            BaseformClient.ClientOnlyData.wildRushYawPitch[0] = msg.yaw;
+            BaseformClient.ClientOnlyData.wildRushYawPitch[1] = msg.pitch;
+        });
     }
 }

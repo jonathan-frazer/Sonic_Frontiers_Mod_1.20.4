@@ -2,29 +2,25 @@ package net.sonicrushxii.beyondthehorizon;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.gui.GuiLayerManager;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.*;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotOverlay;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointRenderer;
@@ -41,7 +37,7 @@ import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import net.sonicrushxii.beyondthehorizon.timehandler.TimeHandler;
 import org.slf4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
+// The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(BeyondTheHorizon.MOD_ID)
 public class BeyondTheHorizon
 {
@@ -71,12 +67,16 @@ public class BeyondTheHorizon
         // Register the item to a creative tab
         modEventBus.addListener(thisMod::addCreative);
 
+        // Register payload handlers for networking
+        modEventBus.addListener(PacketHandler::onRegisterPayloadHandlers);
+
         // Register Stuff
         ModCreativeModeTabs.register(modEventBus);
         ModItems.register(modEventBus);
         ModSounds.register(modEventBus);
         ModEffects.register(modEventBus);
         ModEntityTypes.register(modEventBus);
+        ModAttachments.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -87,20 +87,10 @@ public class BeyondTheHorizon
         initializeMod(this, context);
     }
 
-//    public BeyondTheHorizon() {
-//        initializeMod(this,ModContainer.get());
-//    }
-
-    @SubscribeEvent
-    public void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-        event.register(PlayerSonicForm.class);
-    }
-
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         // Some common setup code
         LOGGER.info("HELLO FROM COMMON SETUP");
-        event.enqueueWork(PacketHandler::register);
     }
 
     // Add the example block item to the building blocks tab

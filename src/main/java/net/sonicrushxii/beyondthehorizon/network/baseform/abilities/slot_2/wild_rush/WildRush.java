@@ -2,7 +2,10 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -10,12 +13,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
@@ -27,8 +31,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class WildRush
+public class WildRush implements CustomPacketPayload
 {
+    public static final CustomPacketPayload.Type<WildRush> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "wild_rush"));
+
+    public static final StreamCodec<FriendlyByteBuf, WildRush> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), WildRush::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
+
     private final UUID enemyID;
 
     public WildRush(UUID enemyID) {
@@ -80,81 +93,79 @@ public class WildRush
     }
 
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(WildRush msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-                            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                            //Start Wild Rush
-                            if(enemyID != null)
-                            {
-                                //Check if target is real
-                                Entity target = player.serverLevel().getEntity(enemyID);
-                                if(target == null) return;
+                        //Start Wild Rush
+                        if(msg.enemyID != null)
+                        {
+                            //Check if target is real
+                            Entity target = player.serverLevel().getEntity(msg.enemyID);
+                            if(target == null) return;
 
-                                //Changed Data
-                                baseformProperties.wildRushTime = 1;
-                                baseformProperties.wildRushPtr = 0;
-                                baseformProperties.meleeTarget = enemyID;
+                            //Changed Data
+                            baseformProperties.wildRushTime = 1;
+                            baseformProperties.wildRushPtr = 0;
+                            baseformProperties.meleeTarget = msg.enemyID;
 
-                                //Teleport Player to Position
-                                Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
-                                Vec3 enemyPos = new Vec3(target.getX(),target.getY(),target.getZ());
-                                Vec3 subtraction = playerPos.subtract(enemyPos);
-                                Vec3 tpDir = (new Vec3(subtraction.x(),0,subtraction.z())).normalize().scale(16.0);
+                            //Teleport Player to Position
+                            Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+                            Vec3 enemyPos = new Vec3(target.getX(),target.getY(),target.getZ());
+                            Vec3 subtraction = playerPos.subtract(enemyPos);
+                            Vec3 tpDir = (new Vec3(subtraction.x(),0,subtraction.z())).normalize().scale(16.0);
 
-                                Vec3 newDir = tpDir.reverse().normalize();
-                                Vec3 newPlayerPosition = enemyPos.add(tpDir.add(0,2,0));
+                            Vec3 newDir = tpDir.reverse().normalize();
+                            Vec3 newPlayerPosition = enemyPos.add(tpDir.add(0,2,0));
 
-                                float[] yawPitch = ModUtils.getYawPitchFromVec(newDir);
+                            float[] yawPitch = ModUtils.getYawPitchFromVec(newDir);
 
-                                player.teleportTo(player.serverLevel(),
-                                        newPlayerPosition.x(),
-                                        newPlayerPosition.y(),
-                                        newPlayerPosition.z(),
-                                        Collections.emptySet(),
-                                        yawPitch[0], yawPitch[1]);
-                                player.connection.send(new ClientboundTeleportEntityPacket(player));
+                            player.teleportTo(player.serverLevel(),
+                                    newPlayerPosition.x(),
+                                    newPlayerPosition.y(),
+                                    newPlayerPosition.z(),
+                                    Collections.emptySet(),
+                                    yawPitch[0], yawPitch[1]);
+                            player.connection.send(new ClientboundTeleportEntityPacket(player));
 
-                                //Draw Line
-                                PacketHandler.sendToALLPlayers(
-                                        new ParticleRaycastPacketS2C(
-                                                new DustParticleOptions(new Vector3f(0f,0f,1f),2.5f),
-                                                playerPos.add(0,1.25,0),newPlayerPosition.add(0,1.25,0)
-                                        )
-                                );
-
-                                //Store all the new Positions
-                                //                                                      Z                           Y                                        X
-                                Vec3 pos0 = newPlayerPosition.add(newDir.scale(4).add(0,1.5,0).add(newDir.scale(2.9).cross(new Vec3(0, 1, 0))));
-                                Vec3 pos1 = newPlayerPosition.add(newDir.scale(8).add(0,0.75,0).add(newDir.scale(2.9).cross(new Vec3(0, -1, 0))));
-                                Vec3 pos2 = newPlayerPosition.add(newDir.scale(12).add(0,2.0,0).add(newDir.scale(0.7).cross(new Vec3(0, 1, 0))));
-                                Vec3 pos3 = newPlayerPosition.add(newDir.scale(16).add(0,0,0).add(newDir.scale(1.6).cross(new Vec3(0, 1, 0))));
-                                Vec3 pos4 = newPlayerPosition.add(newDir.scale(20).add(0,1,0).add(newDir.scale(2.9).cross(new Vec3(0, -1, 0))));
-                                baseformProperties.wildRushPX[0] = (int)pos0.x();   baseformProperties.wildRushPY[0] = (int)pos0.y();   baseformProperties.wildRushPZ[0] = (int)pos0.z();
-                                baseformProperties.wildRushPX[1] = (int)pos1.x();   baseformProperties.wildRushPY[1] = (int)pos1.y();   baseformProperties.wildRushPZ[1] = (int)pos1.z();
-                                baseformProperties.wildRushPX[2] = (int)pos2.x();   baseformProperties.wildRushPY[2] = (int)pos2.y();   baseformProperties.wildRushPZ[2] = (int)pos2.z();
-                                baseformProperties.wildRushPX[3] = (int)pos3.x();   baseformProperties.wildRushPY[3] = (int)pos3.y();   baseformProperties.wildRushPZ[3] = (int)pos3.z();
-                                baseformProperties.wildRushPX[4] = (int)pos4.x();   baseformProperties.wildRushPY[4] = (int)pos4.y();   baseformProperties.wildRushPZ[4] = (int)pos4.z();
-
-                                //Remove Gravity
-                                Objects.requireNonNull(player.getAttribute(ForgeMod.ENTITY_GRAVITY.get())).setBaseValue(0.0);
-
-                                //Play Sound
-                                player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
-                            }
-
+                            //Draw Line
                             PacketHandler.sendToALLPlayers(
-                                    new SyncPlayerFormS2C(
-                                            player.getId(),
-                                            playerSonicForm
-                                    ));
-                        });
+                                    new ParticleRaycastPacketS2C(
+                                            new DustParticleOptions(new Vector3f(0f,0f,1f),2.5f),
+                                            playerPos.add(0,1.25,0),newPlayerPosition.add(0,1.25,0)
+                                    )
+                            );
+
+                            //Store all the new Positions
+                            //                                                      Z                           Y                                        X
+                            Vec3 pos0 = newPlayerPosition.add(newDir.scale(4).add(0,1.5,0).add(newDir.scale(2.9).cross(new Vec3(0, 1, 0))));
+                            Vec3 pos1 = newPlayerPosition.add(newDir.scale(8).add(0,0.75,0).add(newDir.scale(2.9).cross(new Vec3(0, -1, 0))));
+                            Vec3 pos2 = newPlayerPosition.add(newDir.scale(12).add(0,2.0,0).add(newDir.scale(0.7).cross(new Vec3(0, 1, 0))));
+                            Vec3 pos3 = newPlayerPosition.add(newDir.scale(16).add(0,0,0).add(newDir.scale(1.6).cross(new Vec3(0, 1, 0))));
+                            Vec3 pos4 = newPlayerPosition.add(newDir.scale(20).add(0,1,0).add(newDir.scale(2.9).cross(new Vec3(0, -1, 0))));
+                            baseformProperties.wildRushPX[0] = (int)pos0.x();   baseformProperties.wildRushPY[0] = (int)pos0.y();   baseformProperties.wildRushPZ[0] = (int)pos0.z();
+                            baseformProperties.wildRushPX[1] = (int)pos1.x();   baseformProperties.wildRushPY[1] = (int)pos1.y();   baseformProperties.wildRushPZ[1] = (int)pos1.z();
+                            baseformProperties.wildRushPX[2] = (int)pos2.x();   baseformProperties.wildRushPY[2] = (int)pos2.y();   baseformProperties.wildRushPZ[2] = (int)pos2.z();
+                            baseformProperties.wildRushPX[3] = (int)pos3.x();   baseformProperties.wildRushPY[3] = (int)pos3.y();   baseformProperties.wildRushPZ[3] = (int)pos3.z();
+                            baseformProperties.wildRushPX[4] = (int)pos4.x();   baseformProperties.wildRushPY[4] = (int)pos4.y();   baseformProperties.wildRushPZ[4] = (int)pos4.z();
+
+                            //Remove Gravity
+                            Objects.requireNonNull(player.getAttribute(NeoForgeMod.ENTITY_GRAVITY)).setBaseValue(0.0);
+
+                            //Play Sound
+                            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);
+                        }
+
+                        PacketHandler.sendToALLPlayers(
+                                new SyncPlayerFormS2C(
+                                        player.getId(),
+                                        playerSonicForm
+                                ));
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }

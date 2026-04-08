@@ -4,16 +4,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformRenderer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 
-@Mod.EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
+@EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
 public class RenderHandler {
     @SubscribeEvent
     public static void onPreRenderLiving(RenderLivingEvent.Pre<?, ?> event) {
@@ -22,7 +23,8 @@ public class RenderHandler {
         {
             try {
                 LivingEntity entity = event.getEntity();
-                entity.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                {
+                    PlayerSonicForm playerSonicForm = entity.getData(ModAttachments.PLAYER_SONIC_FORM);
                     switch(playerSonicForm.getCurrentForm())
                     {
                         case BASEFORM -> BaseformRenderer.onRenderPlayerModelPre(event, (Player)entity,(BaseformProperties) playerSonicForm.getFormProperties());
@@ -32,7 +34,7 @@ public class RenderHandler {
                         case HYPERFORM
                          */
                     }
-                });
+                }
             } catch (NullPointerException | NoSuchMethodError | ClassCastException ignored) {}
 
             /*
@@ -40,17 +42,17 @@ public class RenderHandler {
                 LivingEntity entity = event.getEntity();
                 AbstractClientPlayer player = Minecraft.getInstance().player;
 
-                if (player != null && entity.is(player))
-                    player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
-                        switch(playerSonicForm.getCurrentForm())
-                        {
-                            case BASEFORM -> BaseformRenderer.onRenderPlayerModelPre(event, player, (BaseformProperties)playerSonicForm.getFormProperties());
-                                //case SUPERFORM
-                                //case STARFALLFORM
-                                //case HYPERFORM
+                if (player != null && entity.is(player)) {
+                    PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                    switch(playerSonicForm.getCurrentForm())
+                    {
+                        case BASEFORM -> BaseformRenderer.onRenderPlayerModelPre(event, player, (BaseformProperties)playerSonicForm.getFormProperties());
+                            //case SUPERFORM
+                            //case STARFALLFORM
+                            //case HYPERFORM
 
-                        }
-                    });
+                    }
+                }
 
             } catch (NullPointerException | NoSuchMethodError | ClassCastException ignored) {}
             */
@@ -64,7 +66,8 @@ public class RenderHandler {
         //Manage Render to Self
         {
             AbstractClientPlayer player = Minecraft.getInstance().player;
-            player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+            {
+                PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
                 switch(playerSonicForm.getCurrentForm())
                 {
                     case BASEFORM:      BaseformRenderer.onRenderToSelfPre(event, event.getEntity(), (BaseformProperties) playerSonicForm.getFormProperties());
@@ -73,7 +76,7 @@ public class RenderHandler {
                     case HYPERFORM:
                     case PLAYER:
                 }
-            });
+            }
 
         }
 
@@ -87,7 +90,8 @@ public class RenderHandler {
         {
             try {
                 LivingEntity entity = event.getEntity();
-                entity.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                {
+                    PlayerSonicForm playerSonicForm = entity.getData(ModAttachments.PLAYER_SONIC_FORM);
                     switch(playerSonicForm.getCurrentForm())
                     {
                         case BASEFORM -> BaseformRenderer.onRenderPlayerModelPost(event, (Player)entity,(BaseformProperties) playerSonicForm.getFormProperties());
@@ -97,7 +101,7 @@ public class RenderHandler {
                         case HYPERFORM
                          */
                     }
-                });
+                }
             } catch (NullPointerException | NoSuchMethodError | ClassCastException ignored) {}
 
             /*
@@ -126,7 +130,8 @@ public class RenderHandler {
         //Manage Render to Self
         {
             AbstractClientPlayer player = Minecraft.getInstance().player;
-            player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+            {
+                PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
                 switch(playerSonicForm.getCurrentForm())
                 {
                     case BASEFORM: BaseformRenderer.onRenderToSelfPost(event, event.getEntity(), (BaseformProperties) playerSonicForm.getFormProperties());
@@ -135,7 +140,7 @@ public class RenderHandler {
                     case HYPERFORM:
                     case PLAYER:
                 }
-            });
+            }
         }
     }
 }

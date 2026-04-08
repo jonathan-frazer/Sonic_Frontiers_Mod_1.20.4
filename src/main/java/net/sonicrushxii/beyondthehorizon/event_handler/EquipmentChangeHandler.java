@@ -1,15 +1,19 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.minecraft.world.item.component.CustomData;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformTransformer;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
@@ -41,19 +45,22 @@ public class EquipmentChangeHandler {
                 return;
             }
 
-            player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
+            {
+                PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
                 ItemStack headItem = player.getItemBySlot(EquipmentSlot.HEAD);
+                CustomData customData = headItem.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+                CompoundTag tag = customData.copyTag();
                 try {
                     if (playerSonicForm.getCurrentForm() == SonicForm.PLAYER &&
                             headItem.getItem() == Items.PLAYER_HEAD &&
-                            headItem.getTag().getByte("BeyondTheHorizon") == (byte) 2) {
+                            tag.getByte("BeyondTheHorizon") == (byte) 2) {
                         BaseformTransformer.performActivation(player);
                     }
                 }catch(NullPointerException ignored){}
 
                 try {
                     if (playerSonicForm.getCurrentForm() == SonicForm.BASEFORM &&
-                            (headItem.getTag().getByte("BeyondTheHorizon") != (byte) 2)) {
+                            (tag.getByte("BeyondTheHorizon") != (byte) 2)) {
                         BaseformTransformer.performActivation(player);
                     }
                 }catch(NullPointerException ignored){
@@ -65,7 +72,7 @@ public class EquipmentChangeHandler {
                                 player.getId(),
                                 playerSonicForm
                         ));
-            });
+            }
 
         }
     }

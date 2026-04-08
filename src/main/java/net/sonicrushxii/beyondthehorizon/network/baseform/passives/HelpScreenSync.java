@@ -1,15 +1,25 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.passives;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
-public class HelpScreenSync
+public class HelpScreenSync implements CustomPacketPayload
 {
+    public static final CustomPacketPayload.Type<HelpScreenSync> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "help_screen_sync"));
+
+    public static final StreamCodec<FriendlyByteBuf, HelpScreenSync> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), HelpScreenSync::new);
+
     private final int helpScreenNum;
 
     public HelpScreenSync(int helpScreenNum) {
@@ -24,24 +34,27 @@ public class HelpScreenSync
         buffer.writeInt(this.helpScreenNum);
     }
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
+    public static void handle(HelpScreenSync msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null)
                     {
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-                            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
-                            baseformProperties.helpScreenPageNo = this.helpScreenNum;
+                        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        baseformProperties.helpScreenPageNo = msg.helpScreenNum;
 
-                            PacketHandler.sendToALLPlayers(
-                                    new SyncPlayerFormS2C(
-                                            player.getId(),
-                                            playerSonicForm
-                                    ));
-                        });
+                        PacketHandler.sendToALLPlayers(
+                                new SyncPlayerFormS2C(
+                                        player.getId(),
+                                        playerSonicForm
+                                ));
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }

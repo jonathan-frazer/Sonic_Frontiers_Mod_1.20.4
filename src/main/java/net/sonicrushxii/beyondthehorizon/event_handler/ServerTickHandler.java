@@ -1,6 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -10,10 +11,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 
 public class ServerTickHandler
@@ -22,7 +26,7 @@ public class ServerTickHandler
     private static final int TICKS_PER_SECOND = 20;
 
     @SubscribeEvent
-    public void onServerTick(TickEvent.ServerTickEvent.Post event)
+    public void onServerTick(ServerTickEvent.Post event)
     {
         // Get the server instance
         MinecraftServer server = event.getServer(); // Get the level (world) you want to execute the command in
@@ -50,10 +54,12 @@ public class ServerTickHandler
 
                         //Item cleanup
                         try {
-                            if(itemInfo.getTag().getByte("BeyondTheHorizon") == (byte) 1)
+                            CustomData customData = itemInfo.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+                            CompoundTag tag = customData.copyTag();
+                            if(tag.getByte("BeyondTheHorizon") == (byte) 1)
                                 itemEntity.remove(Entity.RemovalReason.KILLED);
 
-                            if(itemInfo.getItem() == Items.PLAYER_HEAD && itemInfo.getTag().getByte("BeyondTheHorizon") == (byte)2)
+                            if(itemInfo.getItem() == Items.PLAYER_HEAD && tag.getByte("BeyondTheHorizon") == (byte)2)
                                 itemEntity.setItem(BaseformProperties.baseformSonicHead);
 
                         }catch(NullPointerException ignored) {  }
@@ -68,10 +74,10 @@ public class ServerTickHandler
                                         ItemStack itemInfo1 = itemEntity1.getItem();
                                         if (itemInfo1.getItem() != Items.POTION) return false;
                                         if (itemInfo1.getCount() != 1) return false;
-                                        CompoundTag itemNBT1 = itemInfo1.getTag();
-                                        if (itemNBT1 == null) return false;
-                                        if (!itemNBT1.contains("Potion")) return false;
-                                        return itemNBT1.getString("Potion").equals("minecraft:strong_swiftness");
+                                        PotionContents potionContents = itemInfo1.get(DataComponents.POTION_CONTENTS);
+                                        if (potionContents == null) return false;
+                                        return potionContents.potion().isPresent() &&
+                                                potionContents.potion().get().is(Potions.STRONG_SWIFTNESS);
                                     })) {
                                 for (ItemEntity itemEntity2 : world.getEntitiesOfClass(ItemEntity.class,
                                         new AABB(itemEntity1.getX() + 1, itemEntity1.getY() + 1, itemEntity1.getZ() + 1,

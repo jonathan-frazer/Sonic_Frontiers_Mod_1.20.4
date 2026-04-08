@@ -2,17 +2,21 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.quic
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
@@ -25,13 +29,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class QuickCyloop {
+public class QuickCyloop implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<QuickCyloop> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "quick_cyloop"));
+
+    public static final StreamCodec<FriendlyByteBuf, QuickCyloop> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), QuickCyloop::new);
 
     public QuickCyloop() {}
 
     public QuickCyloop(FriendlyByteBuf buffer){}
 
     public void encode(FriendlyByteBuf buffer){}
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 
     //Server-Side Method
     public static LivingEntity scanFoward(ServerPlayer player)
@@ -69,70 +83,68 @@ public class QuickCyloop {
 
     public static void performQkCyloop(ServerPlayer player)
     {
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            LivingEntity enemy = scanFoward(player);
+        LivingEntity enemy = scanFoward(player);
 
-            if(enemy == null)
-                return;
+        if(enemy == null)
+            return;
 
-            //Consume Meter
-            baseformProperties.qkCyloopMeter -= 50.0;
+        //Consume Meter
+        baseformProperties.qkCyloopMeter -= 50.0;
 
-            //Cyloop Regeneration
-            if(player.hasEffect(MobEffects.SATURATION)) Objects.requireNonNull(player.getEffect(MobEffects.SATURATION)).update(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
-            else                                        player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
+        //Cyloop Regeneration
+        if(player.hasEffect(MobEffects.SATURATION)) Objects.requireNonNull(player.getEffect(MobEffects.SATURATION)).update(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
+        else                                        player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 50, 0, false, false));
 
-            //Activate Cyloop
-            baseformProperties.quickCyloop = 1;
-            baseformProperties.atkRotPhase = -player.getYRot()-135f;
+        //Activate Cyloop
+        baseformProperties.quickCyloop = 1;
+        baseformProperties.atkRotPhase = -player.getYRot()-135f;
 
-            //Target Enemy
-            baseformProperties.qkCyloopTarget = enemy.getUUID();
+        //Target Enemy
+        baseformProperties.qkCyloopTarget = enemy.getUUID();
 
-            //PlaySound in Minecraft
-            PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(
-                    player.blockPosition(),
-                    ModSounds.CYLOOP.get().getLocation())
-            );
+        //PlaySound in Minecraft
+        PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(
+                player.blockPosition(),
+                ModSounds.CYLOOP.get().getLocation())
+        );
 
-            //Get Right in Front of the enemy
-            Vec3 lookAngle = ModUtils.calculateViewVector(0f, player.getYRot());
+        //Get Right in Front of the enemy
+        Vec3 lookAngle = ModUtils.calculateViewVector(0f, player.getYRot());
 
-            double destX, destY, destZ;
-            destX = enemy.getX() - lookAngle.x * 1.1;
-            destY = enemy.getY();
-            destZ = enemy.getZ() - lookAngle.z * 1.1;
+        double destX, destY, destZ;
+        destX = enemy.getX() - lookAngle.x * 1.1;
+        destY = enemy.getY();
+        destZ = enemy.getZ() - lookAngle.z * 1.1;
 
-            //Dash to Enemy
-            PacketHandler.sendToALLPlayers(new ParticleRaycastPacketS2C(
-                    new DustParticleOptions(new Vector3f(0.000f,1.000f,1.000f), 2.0f),
-                    new Vec3(player.getX(),player.getY(),player.getZ()),
-                    new Vec3(destX,destY,destZ)
-            ));
-            player.teleportTo(destX, destY, destZ);
-            PacketHandler.sendToALLPlayers(new CyloopParticleS2C(new Vec3(destX, destY, destZ)));
-            player.connection.send(new ClientboundTeleportEntityPacket(player));
+        //Dash to Enemy
+        PacketHandler.sendToALLPlayers(new ParticleRaycastPacketS2C(
+                new DustParticleOptions(new Vector3f(0.000f,1.000f,1.000f), 2.0f),
+                new Vec3(player.getX(),player.getY(),player.getZ()),
+                new Vec3(destX,destY,destZ)
+        ));
+        player.teleportTo(destX, destY, destZ);
+        PacketHandler.sendToALLPlayers(new CyloopParticleS2C(new Vec3(destX, destY, destZ)));
+        player.connection.send(new ClientboundTeleportEntityPacket(player));
 
-            PacketHandler.sendToALLPlayers(
-                    new SyncPlayerFormS2C(
-                            player.getId(),
-                            playerSonicForm
-                    ));
-        });
+        PacketHandler.sendToALLPlayers(
+                new SyncPlayerFormS2C(
+                        player.getId(),
+                        playerSonicForm
+                ));
     }
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(QuickCyloop msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null)
                     {
                         performQkCyloop(player);
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }
 

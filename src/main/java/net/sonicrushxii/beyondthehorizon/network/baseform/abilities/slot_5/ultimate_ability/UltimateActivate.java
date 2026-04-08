@@ -1,6 +1,9 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -10,12 +13,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.event_handler.EquipmentChangeHandler;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -25,8 +29,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-public class UltimateActivate
+public class UltimateActivate implements CustomPacketPayload
 {
+    public static final CustomPacketPayload.Type<UltimateActivate> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "ultimate_activate"));
+
+    public static final StreamCodec<FriendlyByteBuf, UltimateActivate> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), UltimateActivate::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
+
     private final UUID enemyID;
 
     public UltimateActivate(UUID enemyID) {
@@ -79,59 +92,57 @@ public class UltimateActivate
     }
 
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(UltimateActivate msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-                            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                            //Ultimate Target Reticle
-                            if(enemyID != null)
+                        //Ultimate Target Reticle
+                        if(msg.enemyID != null)
+                        {
+                            //Changed Data
+                            baseformProperties.ultimateUse = 1;
+                            baseformProperties.ultReady = false;
+                            baseformProperties.ultimateAtkMeter = 0.0;
+                            baseformProperties.ultTarget = msg.enemyID;
+
+                            //Attributes
+                            player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.0);
+                            player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+
+                            //Deactivate PowerBoost
                             {
-                                //Changed Data
-                                baseformProperties.ultimateUse = 1;
-                                baseformProperties.ultReady = false;
-                                baseformProperties.ultimateAtkMeter = 0.0;
-                                baseformProperties.ultTarget = enemyID;
-
-                                //Attributes
-                                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
-                                player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
-
-                                //Deactivate PowerBoost
+                                //Dequip Head
+                                if(baseformProperties.lightSpeedState != (byte)2)
                                 {
-                                    //Dequip Head
-                                    if(baseformProperties.lightSpeedState != (byte)2)
-                                    {
-                                        Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
-                                        armorItems.next(); armorItems.next(); armorItems.next();
-                                        try{
-                                            if(armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 2){
-                                                EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
-                                                player.setItemSlot(EquipmentSlot.HEAD, BaseformProperties.baseformSonicHead);
-                                            }
+                                    Iterator<ItemStack> armorItems = player.getArmorSlots().iterator();
+                                    armorItems.next(); armorItems.next(); armorItems.next();
+                                    try{
+                                        if(armorItems.next().getTag().getByte("BeyondTheHorizon") == (byte) 2){
+                                            EquipmentChangeHandler.playerHeadEquipmentLock.put(player.getUUID(),true);
+                                            player.setItemSlot(EquipmentSlot.HEAD, BaseformProperties.baseformSonicHead);
                                         }
-                                        catch(NullPointerException ignored){}
                                     }
-
-                                    //Power Boost
-                                    baseformProperties.powerBoost = false;
+                                    catch(NullPointerException ignored){}
                                 }
 
-                                //Play Sound
-                                player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.ULTIMATE_MUSIC.get(), SoundSource.MASTER, 1.0f, 1.0f);
+                                //Power Boost
+                                baseformProperties.powerBoost = false;
                             }
 
-                            PacketHandler.sendToALLPlayers(
-                                    new SyncPlayerFormS2C(
-                                            player.getId(),
-                                            playerSonicForm
-                                    ));
-                        });
+                            //Play Sound
+                            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.ULTIMATE_MUSIC.get(), SoundSource.MASTER, 1.0f, 1.0f);
+                        }
+
+                        PacketHandler.sendToALLPlayers(
+                                new SyncPlayerFormS2C(
+                                        player.getId(),
+                                        playerSonicForm
+                                ));
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }

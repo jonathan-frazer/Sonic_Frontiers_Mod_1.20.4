@@ -13,8 +13,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.ForgeMod;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModItems;
@@ -57,8 +58,8 @@ public class BaseformTransformer {
             player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
 
             //Step Height
-            if (!player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).hasModifier(AttributeMultipliers.STEP_UP_BASE))
-                player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).addTransientModifier(AttributeMultipliers.STEP_UP_BASE);
+            if (!player.getAttribute(NeoForgeMod.STEP_HEIGHT_ADDITION.get()).hasModifier(AttributeMultipliers.STEP_UP_BASE))
+                player.getAttribute(NeoForgeMod.STEP_HEIGHT_ADDITION.get()).addTransientModifier(AttributeMultipliers.STEP_UP_BASE);
 
             //Jump
             if(!player.hasEffect(MobEffects.JUMP)) player.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, 2, false, false));
@@ -79,14 +80,15 @@ public class BaseformTransformer {
 
 
         //Add Data
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
+        {
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             playerSonicForm.activateBaseForm();
             PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
                             player.getId(),
                             playerSonicForm
                     ));
-        });
+        }
 
         //Initialize Virtual Slot Handler
         PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)6));
@@ -158,7 +160,7 @@ public class BaseformTransformer {
                 //Double Jump
 
                 //Auto Step
-                player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(0.0);
+                player.getAttribute(NeoForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(0.0);
 
                 //Danger Sense
                 PacketHandler.sendToPlayer(player, new PlayerStopSoundPacketS2C(
@@ -172,7 +174,7 @@ public class BaseformTransformer {
             //Slot 1
             {
                 //Reset Water Boost
-                player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                player.getAttribute(NeoForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
 
                 //Reset Light Speed Attack
                 if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.LIGHTSPEED_MODE))
@@ -222,7 +224,7 @@ public class BaseformTransformer {
         PacketHandler.sendToPlayer(player,new VirtualSlotSyncS2C((byte)0));
 
         //Remove Effects
-        if (player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).hasModifier(AttributeMultipliers.STEP_UP_BASE)) player.getAttribute(ForgeMod.STEP_HEIGHT_ADDITION.get()).removeModifier(AttributeMultipliers.STEP_UP_BASE.getId());
+        if (player.getAttribute(NeoForgeMod.STEP_HEIGHT_ADDITION.get()).hasModifier(AttributeMultipliers.STEP_UP_BASE)) player.getAttribute(NeoForgeMod.STEP_HEIGHT_ADDITION.get()).removeModifier(AttributeMultipliers.STEP_UP_BASE.getId());
         player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.10000000149011612);
         player.removeEffect(MobEffects.JUMP);
         player.removeEffect(MobEffects.DAMAGE_RESISTANCE);

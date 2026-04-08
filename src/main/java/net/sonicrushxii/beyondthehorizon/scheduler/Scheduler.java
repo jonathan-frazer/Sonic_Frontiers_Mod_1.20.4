@@ -1,7 +1,7 @@
 package net.sonicrushxii.beyondthehorizon.scheduler;
 
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,7 +17,7 @@ public class Scheduler {
     }
 
     @SubscribeEvent
-    public void onServerTick(TickEvent.ServerTickEvent.Pre event)
+    public void onServerTick(ServerTickEvent.Pre event)
     {
         Iterator<ScheduledTask> iterator = tasks.iterator();
         while (iterator.hasNext()) {

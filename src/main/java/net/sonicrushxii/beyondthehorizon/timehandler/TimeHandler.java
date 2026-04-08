@@ -8,9 +8,10 @@ import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 
 import java.util.HashSet;
@@ -21,7 +22,7 @@ public class TimeHandler {
     private static HashSet<UUID> slowedProjectiles = new HashSet<>();
 
     @SubscribeEvent
-    public void onServerTick(TickEvent.ServerTickEvent.Post event) {
+    public void onServerTick(ServerTickEvent.Post event) {
         // Get the server instance
         MinecraftServer server = event.getServer(); // Get the level (world) you want to execute the command in
 
@@ -48,42 +49,41 @@ public class TimeHandler {
                     //Player Interactions
                     if (entity instanceof ServerPlayer player) {
                         final int DimIdx = dimIdx; //Effectively Final Variable
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
-                            try
+                        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        try
+                        {
+                            //If Player has the given tag, then Continue
+                            if (!timeAffector.isContainedBy(playerSonicForm.getFormProperties()))
+                                continue;
+
+                            //Slow Projectiles
+                            for(Projectile projectile : world.getEntitiesOfClass(Projectile.class,
+                                    new AABB(player.getX()+32,player.getY()+32,player.getZ()+32,
+                                            player.getX()-32,player.getY()-32,player.getZ()-32),
+                                    (projectile)->!slowedProjectiles.contains(projectile.getUUID())))
                             {
-                                //If Player has the given tag, then Continue
-                                if (!timeAffector.isContainedBy(playerSonicForm.getFormProperties()))
-                                    return;
+                                //Remove Gravity, Lower Speed
+                                projectile.setNoGravity(true);
+                                projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.25));
 
-                                //Slow Projectiles
-                                for(Projectile projectile : world.getEntitiesOfClass(Projectile.class,
-                                        new AABB(player.getX()+32,player.getY()+32,player.getZ()+32,
-                                                player.getX()-32,player.getY()-32,player.getZ()-32),
-                                        (projectile)->!slowedProjectiles.contains(projectile.getUUID())))
-                                {
-                                    //Remove Gravity, Lower Speed
-                                    projectile.setNoGravity(true);
-                                    projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.25));
+                                PacketHandler.sendToALLPlayers(new TimeProjSync(projectile.getId(),
+                                        projectile.getDeltaMovement(),projectile.isNoGravity()));
 
-                                    PacketHandler.sendToALLPlayers(new TimeProjSync(projectile.getId(),
-                                            projectile.getDeltaMovement(),projectile.isNoGravity()));
+                                slowedProjectiles.add(projectile.getUUID());
+                            }
 
-                                    slowedProjectiles.add(projectile.getUUID());
-                                }
+                            //Slow down Time
+                            if (!timeAffector.dimensionalUsers.get(DimIdx))
+                            {
+                                TickRateManager tickRateManager = world.tickRateManager();
+                                tickRateManager.setTickRate(tickRateManager.tickrate() / timeAffector.getTimeFactor());
+                            }
+                            //Set a Value Indicating current dimension has a user of this Time Affector
+                            timeAffector.dimensionalUsers.set(DimIdx, true);
+                            //Flag variable
+                            timeAffector.noPlayerPresent.set(false);
 
-                                //Slow down Time
-                                if (!timeAffector.dimensionalUsers.get(DimIdx))
-                                {
-                                    TickRateManager tickRateManager = world.tickRateManager();
-                                    tickRateManager.setTickRate(tickRateManager.tickrate() / timeAffector.getTimeFactor());
-                                }
-                                //Set a Value Indicating current dimension has a user of this Time Affector
-                                timeAffector.dimensionalUsers.set(DimIdx, true);
-                                //Flag variable
-                                timeAffector.noPlayerPresent.set(false);
-
-                            } catch(NoSuchFieldException | IllegalAccessException ignored) {}
-                        });
+                        } catch(NoSuchFieldException | IllegalAccessException ignored) {}
                     }
                 }
 

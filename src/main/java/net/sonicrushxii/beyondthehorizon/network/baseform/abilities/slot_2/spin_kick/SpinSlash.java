@@ -1,7 +1,10 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -12,11 +15,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
@@ -24,7 +28,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class SpinSlash {
+public class SpinSlash implements CustomPacketPayload {
+
+    public static final CustomPacketPayload.Type<SpinSlash> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "spin_slash"));
+
+    public static final StreamCodec<FriendlyByteBuf, SpinSlash> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), SpinSlash::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     private final UUID enemyID;
 
@@ -78,49 +91,46 @@ public class SpinSlash {
 
     public static void performSpinSlash(ServerPlayer player, UUID enemyID)
     {
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            //Check if target is real
-            Entity target = player.serverLevel().getEntity(enemyID);
-            if(target == null)  return;
+        //Check if target is real
+        Entity target = player.serverLevel().getEntity(enemyID);
+        if(target == null)  return;
 
-            //Set Data
-            if(player.hasEffect(MobEffects.GLOWING)) player.getEffect(MobEffects.GLOWING).update(new MobEffectInstance(MobEffects.GLOWING, 120, 1, false, false));
-            else                                     player.addEffect(new MobEffectInstance(MobEffects.GLOWING, 120, 1, false, false));
-            baseformProperties.spinSlash = -60;
-            baseformProperties.meleeTarget = enemyID;
-            baseformProperties.atkRotPhase = -player.getYRot()-135f;
+        //Set Data
+        if(player.hasEffect(MobEffects.GLOWING)) player.getEffect(MobEffects.GLOWING).update(new MobEffectInstance(MobEffects.GLOWING, 120, 1, false, false));
+        else                                     player.addEffect(new MobEffectInstance(MobEffects.GLOWING, 120, 1, false, false));
+        baseformProperties.spinSlash = -60;
+        baseformProperties.meleeTarget = enemyID;
+        baseformProperties.atkRotPhase = -player.getYRot()-135f;
 
-            //Reset Momentum
-            player.setDeltaMovement(0,0,0);
-            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+        //Reset Momentum
+        player.setDeltaMovement(0,0,0);
+        player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
-            //Play Sound
-            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.MASTER, 2.0f, 2.0f);
+        //Play Sound
+        player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.MASTER, 2.0f, 2.0f);
 
 
-            //Remove Gravity
-            player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.0);
+        //Remove Gravity
+        player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.0);
 
-            PacketHandler.sendToALLPlayers(
-                    new SyncPlayerFormS2C(
-                            player.getId(),
-                            playerSonicForm
-                    ));
-        });
+        PacketHandler.sendToALLPlayers(
+                new SyncPlayerFormS2C(
+                        player.getId(),
+                        playerSonicForm
+                ));
     }
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(SpinSlash msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
-                    if(player != null && enemyID != null)
+                    ServerPlayer player = (ServerPlayer) ctx.player();
+                    if(player != null && msg.enemyID != null)
                     {
-                        performSpinSlash(player,enemyID);
+                        performSpinSlash(player,msg.enemyID);
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }
-

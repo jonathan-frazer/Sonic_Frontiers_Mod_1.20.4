@@ -2,9 +2,13 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spee
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -13,11 +17,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
@@ -29,13 +33,23 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class SpeedBlitz {
+public class SpeedBlitz implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<SpeedBlitz> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "speed_blitz"));
+
+    public static final StreamCodec<FriendlyByteBuf, SpeedBlitz> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), SpeedBlitz::new);
 
     public SpeedBlitz() {}
 
     public SpeedBlitz(FriendlyByteBuf buffer) {}
 
     public void encode(FriendlyByteBuf buffer) {}
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 
     public static Vec3 scanFoward(Player player)
     {
@@ -74,18 +88,17 @@ public class SpeedBlitz {
 
     public static void performToggleSpeedBlitz(ServerPlayer player)
     {
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            //Add Data
-            baseformProperties.speedBlitz = !baseformProperties.speedBlitz;
+        //Add Data
+        baseformProperties.speedBlitz = !baseformProperties.speedBlitz;
 
-            PacketHandler.sendToALLPlayers(
-                    new SyncPlayerFormS2C(
-                            player.getId(),
-                            playerSonicForm
-                    ));
-        });
+        PacketHandler.sendToALLPlayers(
+                new SyncPlayerFormS2C(
+                        player.getId(),
+                        playerSonicForm
+                ));
     }
 
     public static void performSpeedDash(ServerPlayer player, Vec3 enemyPos)
@@ -114,19 +127,18 @@ public class SpeedBlitz {
             currComboEffect.update(new MobEffectInstance(ModEffects.SPEED_BLITZING.get(), 20, 0, false, false));
 
         //Consume Speed Blitz Dash
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
-            baseformProperties.speedBlitzDashes -= 1;
-            PacketHandler.sendToALLPlayers(
-                    new SyncPlayerFormS2C(
-                            player.getId(),
-                            playerSonicForm
-                    ));
-        });
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        baseformProperties.speedBlitzDashes -= 1;
+        PacketHandler.sendToALLPlayers(
+                new SyncPlayerFormS2C(
+                        player.getId(),
+                        playerSonicForm
+                ));
 
         //Check if position is Safe
         Level world = player.level();
-        String destinationBlockName = ForgeRegistries.BLOCKS.getKey(
+        String destinationBlockName = BuiltInRegistries.BLOCK.getKey(
                 world.getBlockState(
                         new BlockPos(
                                 (int)Math.round(newPlayerPos.x),
@@ -148,29 +160,27 @@ public class SpeedBlitz {
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(SpeedBlitz msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null)
                     {
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-                            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                            Vec3 enemyPos = scanFoward(player);
-                            if(enemyPos == null)
-                                performToggleSpeedBlitz(player);
-                            else if(baseformProperties.speedBlitzDashes > 0)
-                                performSpeedDash(player,enemyPos);
+                        Vec3 enemyPos = scanFoward(player);
+                        if(enemyPos == null)
+                            performToggleSpeedBlitz(player);
+                        else if(baseformProperties.speedBlitzDashes > 0)
+                            performSpeedDash(player,enemyPos);
 
-                            PacketHandler.sendToALLPlayers(
-                                    new SyncPlayerFormS2C(
-                                            player.getId(),
-                                            playerSonicForm
-                                    ));
-                        });
+                        PacketHandler.sendToALLPlayers(
+                                new SyncPlayerFormS2C(
+                                        player.getId(),
+                                        playerSonicForm
+                                ));
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }

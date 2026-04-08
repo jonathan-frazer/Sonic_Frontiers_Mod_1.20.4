@@ -2,12 +2,16 @@ package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
@@ -19,7 +23,13 @@ import org.joml.Vector3f;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public class Cyloop {
+public class Cyloop implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<Cyloop> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "cyloop"));
+
+    public static final StreamCodec<FriendlyByteBuf, Cyloop> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), Cyloop::new);
+
     public static final int MAX_CYLOOP_SIZE = 75;
 
     private final boolean activate;
@@ -34,6 +44,11 @@ public class Cyloop {
 
     public void encode(FriendlyByteBuf buffer){
         buffer.writeBoolean(this.activate);
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     private static void deleteFromLast(Deque<Vec3> currCoords)
@@ -90,61 +105,59 @@ public class Cyloop {
 
     public static void toggleCyloop(ServerPlayer player, boolean activate)
     {
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            //If Activating
-            if(activate)
-            {
-                //Set Timer
-                baseformProperties.cylooping = 1;
+        //If Activating
+        if(activate)
+        {
+            //Set Timer
+            baseformProperties.cylooping = 1;
 
-                //Play Sound
-                PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(player.blockPosition(),
-                        ModSounds.CYLOOP.get().getLocation())
-                );
+            //Play Sound
+            PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(player.blockPosition(),
+                    ModSounds.CYLOOP.get().getLocation())
+            );
 
-                //Initialize list
-                BaseformServer.cyloopCoords.put(
-                        player.getUUID(),
-                        new ArrayDeque<Vec3>(50)
-                );
-            }
+            //Initialize list
+            BaseformServer.cyloopCoords.put(
+                    player.getUUID(),
+                    new ArrayDeque<Vec3>(50)
+            );
+        }
 
-            //If Deactivating
-            if(!activate)
-            {
-                //Set Timer
-                baseformProperties.cylooping = 0;
+        //If Deactivating
+        if(!activate)
+        {
+            //Set Timer
+            baseformProperties.cylooping = 0;
 
-                //StopSound in Minecraft
-                PacketHandler.sendToALLPlayers(new PlayerStopSoundPacketS2C(
-                        ModSounds.CYLOOP.get().getLocation())
-                );
+            //StopSound in Minecraft
+            PacketHandler.sendToALLPlayers(new PlayerStopSoundPacketS2C(
+                    ModSounds.CYLOOP.get().getLocation())
+            );
 
-                //Ready the Coordinates
-                CyloopMath.cyloopEffect(player,
-                        BaseformServer.cyloopCoords.get(player.getUUID()).toArray());
-            }
+            //Ready the Coordinates
+            CyloopMath.cyloopEffect(player,
+                    BaseformServer.cyloopCoords.get(player.getUUID()).toArray());
+        }
 
-            PacketHandler.sendToALLPlayers(
-                    new SyncPlayerFormS2C(
-                            player.getId(),
-                            playerSonicForm
-                    ));
-        });
+        PacketHandler.sendToALLPlayers(
+                new SyncPlayerFormS2C(
+                        player.getId(),
+                        playerSonicForm
+                ));
     }
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(Cyloop msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null)
                     {
-                        toggleCyloop(player,activate);
+                        toggleCyloop(player,msg.activate);
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }
 

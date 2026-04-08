@@ -1,13 +1,15 @@
 package net.sonicrushxii.beyondthehorizon.capabilities;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.hyperform.HyperformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.starfall.StarfallFormProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.superform.SuperformProperties;
 
-public class PlayerSonicForm {
+public class PlayerSonicForm implements INBTSerializable<CompoundTag> {
     private SonicForm currentForm;
     private FormProperties formProperties;
 
@@ -103,5 +105,17 @@ public class PlayerSonicForm {
             case STARFALLFORM -> new StarfallFormProperties(formDetails);
             case HYPERFORM -> new HyperformProperties(formDetails);
         };
+    }
+
+    @Override
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        CompoundTag nbt = new CompoundTag();
+        saveNBTData(nbt);
+        return nbt;
+    }
+
+    @Override
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+        loadNBTData(nbt);
     }
 }

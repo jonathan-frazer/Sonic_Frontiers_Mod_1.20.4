@@ -2,13 +2,14 @@ package net.sonicrushxii.beyondthehorizon.event_handler;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformTransformer;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
@@ -25,7 +26,8 @@ public class LoginHandler {
 
     private void onServerLogin(ServerPlayer player)
     {
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+        {
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             if(playerSonicForm.getCurrentForm() == SonicForm.BASEFORM)
             {
                 BaseformTransformer.performActivation(player);
@@ -42,7 +44,7 @@ public class LoginHandler {
                 //Revert Dodge
                 if(baseformProperties.dodgeInvul) {
                     baseformProperties.dodgeInvul = false;
-                    player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).setBaseValue(0.08);
+                    player.getAttribute(NeoForgeMod.ENTITY_GRAVITY).setBaseValue(0.08);
                 }
 
                 //Reset Combo Meter
@@ -58,6 +60,6 @@ public class LoginHandler {
                             player.getId(),
                             playerSonicForm
                     ));
-        });
+        }
     }
 }

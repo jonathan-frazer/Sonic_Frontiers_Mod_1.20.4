@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.client.event.RenderLivingEvent;
+import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.capabilities.all.FormProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;

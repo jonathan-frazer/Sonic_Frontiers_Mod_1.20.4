@@ -1,10 +1,11 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 
 public class FallDamageHandler {
 
@@ -12,10 +13,9 @@ public class FallDamageHandler {
     public void onLivingFall(LivingFallEvent event) {
         if(event.getEntity() instanceof ServerPlayer player)
         {
-            player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
-                if(playerSonicForm.getCurrentForm() == SonicForm.BASEFORM)
-                    event.setDistance(0.0f);
-            });
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+            if(playerSonicForm.getCurrentForm() == SonicForm.BASEFORM)
+                event.setDistance(0.0f);
         }
     }
 }

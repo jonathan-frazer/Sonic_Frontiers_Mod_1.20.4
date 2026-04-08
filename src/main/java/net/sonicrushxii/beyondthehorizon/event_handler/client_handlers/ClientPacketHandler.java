@@ -13,10 +13,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import org.joml.Vector3f;
 
 import java.util.Objects;
@@ -34,7 +34,8 @@ public class ClientPacketHandler
         if (player == null) return;
 
         // Update the player's capability data on the client side
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> playerSonicForm.copyFrom(player_SonicForm));
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        playerSonicForm.copyFrom(player_SonicForm);
     }
 
     public static void clientParticleAura(String particle_Type, double absX, double absY, double absZ, double speed, float radiusX, float radiusY, float radiusZ, short count, boolean force, float red, float green, float blue, float scale) {
@@ -43,7 +44,7 @@ public class ClientPacketHandler
         AbstractClientPlayer player = mc.player;
 
         if (player != null && world != null) {
-            ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(new ResourceLocation(particle_Type));
+            ParticleType<?> particleType = BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(particle_Type));
             ParticleOptions particleOptions;
 
             if (particleType == ParticleTypes.DUST) {
@@ -66,7 +67,7 @@ public class ClientPacketHandler
         AbstractClientPlayer player = mc.player;
 
         if (player != null && world != null) {
-            ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(new ResourceLocation(particle_Type));
+            ParticleType<?> particleType = BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(particle_Type));
             ParticleOptions particleOptions;
 
             if (particleType == ParticleTypes.DUST) {
@@ -88,7 +89,7 @@ public class ClientPacketHandler
         ClientLevel world = Minecraft.getInstance().level;
         if (world != null)
         {
-            ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(new ResourceLocation(particle_Type));
+            ParticleType<?> particleType = BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(particle_Type));
             ParticleOptions particleOptions;
 
             if (particleType == ParticleTypes.DUST) {
@@ -115,7 +116,7 @@ public class ClientPacketHandler
         if(player != null && world != null) {
             if(player.blockPosition().distSqr(emitterPosition) < 576)
                 world.playLocalSound(emitterPosition.getX(),emitterPosition.getY(),emitterPosition.getZ(),
-                        Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(soundLocation)),
+                        Objects.requireNonNull(BuiltInRegistries.SOUND_EVENT.get(soundLocation)),
                         SoundSource.MASTER, volume, pitch, true);
         }
     }

@@ -1,6 +1,9 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -8,12 +11,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
@@ -25,7 +29,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class CycloneKick {
+public class CycloneKick implements CustomPacketPayload {
+
+    public static final CustomPacketPayload.Type<CycloneKick> TYPE =
+        new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "cyclone_kick"));
+
+    public static final StreamCodec<FriendlyByteBuf, CycloneKick> STREAM_CODEC =
+        StreamCodec.of((buf, msg) -> msg.encode(buf), CycloneKick::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     private final UUID enemyID;
 
@@ -79,63 +92,60 @@ public class CycloneKick {
 
     public static void performCycloneKick(ServerPlayer player, UUID enemyID)
     {
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            boolean instantCyclone = (enemyID == null);
+        boolean instantCyclone = (enemyID == null);
 
-            if(!instantCyclone)
-            {
-                //Check if target is real
-                Entity target = player.serverLevel().getEntity(enemyID);
-                if(target == null)  instantCyclone = true;
-            }
+        if(!instantCyclone)
+        {
+            //Check if target is real
+            Entity target = player.serverLevel().getEntity(enemyID);
+            if(target == null)  instantCyclone = true;
+        }
 
-            if(!instantCyclone)
-            {
-                //Set Data
-                baseformProperties.cycloneKick = -60;
-                baseformProperties.meleeTarget = enemyID;
-            }
-            else
-            {
-                //Set Data
-                baseformProperties.cycloneKick = 1;
-                Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
-                Scheduler.scheduleTask(()-> ModUtils.summonEntity(ModEntityTypes.BASEFORM_CYCLONE_KICK_CLOUD.get(),
-                    player.serverLevel(),
-                    playerPos.add
-                            (ModUtils.calculateViewVector(0,player.getYRot()).scale(1.4)),
-                    (aoeCloud) -> aoeCloud.setDuration(60)),5);
-                baseformProperties.meleeTarget = new UUID(0L,0L);
-            }
+        if(!instantCyclone)
+        {
+            //Set Data
+            baseformProperties.cycloneKick = -60;
+            baseformProperties.meleeTarget = enemyID;
+        }
+        else
+        {
+            //Set Data
+            baseformProperties.cycloneKick = 1;
+            Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
+            Scheduler.scheduleTask(()-> ModUtils.summonEntity(ModEntityTypes.BASEFORM_CYCLONE_KICK_CLOUD.get(),
+                player.serverLevel(),
+                playerPos.add
+                        (ModUtils.calculateViewVector(0,player.getYRot()).scale(1.4)),
+                (aoeCloud) -> aoeCloud.setDuration(60)),5);
+            baseformProperties.meleeTarget = new UUID(0L,0L);
+        }
 
-            baseformProperties.atkRotPhase = -player.getYRot()-135f;
+        baseformProperties.atkRotPhase = -player.getYRot()-135f;
 
-            //Remove Gravity
-            Objects.requireNonNull(player.getAttribute(ForgeMod.ENTITY_GRAVITY.get())).setBaseValue(0.0);
+        //Remove Gravity
+        Objects.requireNonNull(player.getAttribute(NeoForgeMod.ENTITY_GRAVITY)).setBaseValue(0.0);
 
-            //Play Sound
-            player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.DOUBLE_JUMP.get(), SoundSource.MASTER, 0.75f, 1.0f);
+        //Play Sound
+        player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.DOUBLE_JUMP.get(), SoundSource.MASTER, 0.75f, 1.0f);
 
-            PacketHandler.sendToALLPlayers(
-                    new SyncPlayerFormS2C(
-                            player.getId(),
-                            playerSonicForm
-                    ));
-        });
+        PacketHandler.sendToALLPlayers(
+                new SyncPlayerFormS2C(
+                        player.getId(),
+                        playerSonicForm
+                ));
     }
 
-    public void handle(CustomPayloadEvent.Context ctx){
+    public static void handle(CycloneKick msg, IPayloadContext ctx){
         ctx.enqueueWork(
                 ()->{
-                    ServerPlayer player = ctx.getSender();
+                    ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null)
                     {
-                        performCycloneKick(player,enemyID);
+                        performCycloneKick(player,msg.enemyID);
                     }
                 });
-        ctx.setPacketHandled(true);
     }
 }
-

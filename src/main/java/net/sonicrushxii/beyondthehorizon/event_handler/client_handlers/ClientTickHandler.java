@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.hyperform.HyperformHandler;
@@ -14,6 +14,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.superform.SuperformHandler
 import net.sonicrushxii.beyondthehorizon.client.DoubleTapDirection;
 import net.sonicrushxii.beyondthehorizon.client.DoubleTapHandler;
 import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 
 public class ClientTickHandler {
@@ -28,7 +29,8 @@ public class ClientTickHandler {
 
             CompoundTag playerNBT = player.serializeNBT();
 
-            player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+            {
+                PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
                 switch(playerSonicForm.getCurrentForm())
                 {
                     case BASEFORM -> BaseformClient.performClientTick(player,playerNBT);
@@ -36,7 +38,7 @@ public class ClientTickHandler {
                     case STARFALLFORM -> StarfallFormHandler.performStarfallformClientTick(player);
                     case HYPERFORM -> HyperformHandler.performHyperformClientTick(player);
                 }
-            });
+            }
 
 
             //Play Second
@@ -64,7 +66,8 @@ public class ClientTickHandler {
 
                     //Perform the Function
                     if(DoubleTapHandler.doubleTapLock == false){
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                        {
+                            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
                             switch(playerSonicForm.getCurrentForm())
                             {
                                 case BASEFORM -> BaseformClient.performDoublePress(player,(BaseformProperties) playerSonicForm.getFormProperties(), DoubleTapDirection.LEFT_PRESS);
@@ -74,7 +77,7 @@ public class ClientTickHandler {
                         case HYPERFORM
                          */
                             }
-                        });
+                        }
 
                         //Prevent it from being pressed for a lil bit
                         DoubleTapHandler.doubleTapLock = true;
@@ -99,7 +102,8 @@ public class ClientTickHandler {
 
                     //Perform the Function
                     if(DoubleTapHandler.doubleTapLock == false) {
-                        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
+                        {
+                            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
                             switch(playerSonicForm.getCurrentForm())
                             {
                                 case BASEFORM -> BaseformClient.performDoublePress(player,(BaseformProperties) playerSonicForm.getFormProperties(), DoubleTapDirection.RIGHT_PRESS);
@@ -109,7 +113,7 @@ public class ClientTickHandler {
                         case HYPERFORM
                          */
                             }
-                        });
+                        }
                         //Prevent it from being pressed for a lil bit
                         DoubleTapHandler.doubleTapLock = true;
                         Scheduler.scheduleTask(()->{
@@ -123,15 +127,15 @@ public class ClientTickHandler {
 
     public static void localPlayerSecond(Player pPlayer, CompoundTag playerNBT)
     {
-        if(pPlayer instanceof AbstractClientPlayer player)
-            player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm -> {
-                switch(playerSonicForm.getCurrentForm())
-                {
-                    case BASEFORM -> BaseformClient.performClientSecond(player,playerNBT);
-                    case SUPERFORM -> SuperformHandler.performSuperformClientSecond(player);
-                    case STARFALLFORM -> StarfallFormHandler.performStarfallformClientSecond(player);
-                    case HYPERFORM -> HyperformHandler.performHyperformClientSecond(player);
-                }
-            });
+        if(pPlayer instanceof AbstractClientPlayer player) {
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+            switch(playerSonicForm.getCurrentForm())
+            {
+                case BASEFORM -> BaseformClient.performClientSecond(player,playerNBT);
+                case SUPERFORM -> SuperformHandler.performSuperformClientSecond(player);
+                case STARFALLFORM -> StarfallFormHandler.performStarfallformClientSecond(player);
+                case HYPERFORM -> HyperformHandler.performHyperformClientSecond(player);
+            }
+        }
     }
 }

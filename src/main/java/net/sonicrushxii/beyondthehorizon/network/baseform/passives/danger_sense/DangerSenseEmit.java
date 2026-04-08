@@ -6,8 +6,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicFormProvider;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.*;
@@ -26,21 +27,20 @@ public class DangerSenseEmit {
 
     public static void stopDangerSenseSound(ServerPlayer player)
     {
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm->{
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
-            baseformProperties.dangerSensePlaying = false;
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        baseformProperties.dangerSensePlaying = false;
 
-            PacketHandler.sendToPlayer(player, new PlayerStopSoundPacketS2C(
-                            ModSounds.DANGER_SENSE.get().getLocation()
-                    )
-            );
+        PacketHandler.sendToPlayer(player, new PlayerStopSoundPacketS2C(
+                        ModSounds.DANGER_SENSE.get().getLocation()
+                )
+        );
 
-            PacketHandler.sendToALLPlayers(
-                    new SyncPlayerFormS2C(
-                            player.getId(),
-                            playerSonicForm
-                    ));
-        });
+        PacketHandler.sendToALLPlayers(
+                new SyncPlayerFormS2C(
+                        player.getId(),
+                        playerSonicForm
+                ));
     }
 
     public static boolean nearbyAngryMobs(ServerPlayer player, Level world)
@@ -62,78 +62,77 @@ public class DangerSenseEmit {
 
     public static void performDangerSenseEmit(ServerPlayer player)
     {
-        player.getCapability(PlayerSonicFormProvider.PLAYER_SONIC_FORM).ifPresent(playerSonicForm-> {
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-            Level world = player.level();
-            List<Entity> nearbyEntities = world.getEntities(player, player.getBoundingBox().inflate(10.0), entity -> entity instanceof Mob);
+        Level world = player.level();
+        List<Entity> nearbyEntities = world.getEntities(player, player.getBoundingBox().inflate(10.0), entity -> entity instanceof Mob);
 
-            for (Entity entity : nearbyEntities) {
-                if (entity instanceof Mob mob) {
-                    UUID aggro = null;
-                    if (mob.getTarget() != null) aggro = mob.getTarget().getUUID();
-                    if (aggro != null && aggro.equals(player.getUUID())) {
-                        if (!baseformProperties.dangerSensePlaying)
-                        {
-                            //Play Sound
-                            PacketHandler.sendToPlayer(player, new PlayerPlaySoundPacketS2C(
-                                    player.blockPosition(),
-                                    ModSounds.DANGER_SENSE.get().getLocation())
-                            );
+        for (Entity entity : nearbyEntities) {
+            if (entity instanceof Mob mob) {
+                UUID aggro = null;
+                if (mob.getTarget() != null) aggro = mob.getTarget().getUUID();
+                if (aggro != null && aggro.equals(player.getUUID())) {
+                    if (!baseformProperties.dangerSensePlaying)
+                    {
+                        //Play Sound
+                        PacketHandler.sendToPlayer(player, new PlayerPlaySoundPacketS2C(
+                                player.blockPosition(),
+                                ModSounds.DANGER_SENSE.get().getLocation())
+                        );
 
-                            //Change the tag
-                            baseformProperties.dangerSensePlaying = true;
-                            PacketHandler.sendToALLPlayers(
-                                    new SyncPlayerFormS2C(
-                                            player.getId(),
-                                            playerSonicForm
-                                    ));
+                        //Change the tag
+                        baseformProperties.dangerSensePlaying = true;
+                        PacketHandler.sendToALLPlayers(
+                                new SyncPlayerFormS2C(
+                                        player.getId(),
+                                        playerSonicForm
+                                ));
 
-                            //Schedule Sound Stopping
-                            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-                            scheduledFutures.put(player.getStringUUID(), executor.schedule(
-                                    () -> stopDangerSenseSound(player),
-                                    5,
-                                    TimeUnit.SECONDS
-                            ));
-                        }
-
-                        // Define the vector and position
-                        Vec3 vector = player.getLookAngle();
-                        Vec3 position = mob.position().subtract(player.position());
-
-                        vector.subtract(0, vector.y(), 0);
-                        position.subtract(0, position.y(), 0);
-
-                        // Calculate the vector to the position
-                        Vec3 vectorToPosition = position.subtract(vector);
-                        Vec3 crossProduct = vectorToPosition.cross(position);
-
-                        Vec3 playerPos = (crossProduct.y() > 0) //If Mob is on the Right
-                                ? player.getLookAngle() //Gets where player is looking
-                                .cross(new Vec3(0, 1, 0)).scale(0.75) //It shifts it to the right
-                                .add(player.position().add(player.getLookAngle().scale(0.5))) //Adds Players current position, offset ^ ^ ^0.5
-                                .add(0, 1.5, 0) //Offsets that by Up By a Bit
-                                : player.getLookAngle() //Gets where player is looking
-                                .cross(new Vec3(0, 1, 0)).scale(-0.75) //It shifts it to the right
-                                .add(player.position().add(player.getLookAngle().scale(0.5))) //Adds Players current position, offset ^ ^ ^0.5
-                                .add(0, 1.5, 0); //Offsets that by Up By a Bit
-
-                        PacketHandler.sendToPlayer(player, new ParticleRaycastPacketS2C(
-                                ParticleTypes.ELECTRIC_SPARK,
-                                playerPos,
-                                mob.getPosition(0).add(0, 1.75, 0)
+                        //Schedule Sound Stopping
+                        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+                        scheduledFutures.put(player.getStringUUID(), executor.schedule(
+                                () -> stopDangerSenseSound(player),
+                                5,
+                                TimeUnit.SECONDS
                         ));
                     }
+
+                    // Define the vector and position
+                    Vec3 vector = player.getLookAngle();
+                    Vec3 position = mob.position().subtract(player.position());
+
+                    vector.subtract(0, vector.y(), 0);
+                    position.subtract(0, position.y(), 0);
+
+                    // Calculate the vector to the position
+                    Vec3 vectorToPosition = position.subtract(vector);
+                    Vec3 crossProduct = vectorToPosition.cross(position);
+
+                    Vec3 playerPos = (crossProduct.y() > 0) //If Mob is on the Right
+                            ? player.getLookAngle() //Gets where player is looking
+                            .cross(new Vec3(0, 1, 0)).scale(0.75) //It shifts it to the right
+                            .add(player.position().add(player.getLookAngle().scale(0.5))) //Adds Players current position, offset ^ ^ ^0.5
+                            .add(0, 1.5, 0) //Offsets that by Up By a Bit
+                            : player.getLookAngle() //Gets where player is looking
+                            .cross(new Vec3(0, 1, 0)).scale(-0.75) //It shifts it to the right
+                            .add(player.position().add(player.getLookAngle().scale(0.5))) //Adds Players current position, offset ^ ^ ^0.5
+                            .add(0, 1.5, 0); //Offsets that by Up By a Bit
+
+                    PacketHandler.sendToPlayer(player, new ParticleRaycastPacketS2C(
+                            ParticleTypes.ELECTRIC_SPARK,
+                            playerPos,
+                            mob.getPosition(0).add(0, 1.75, 0)
+                    ));
                 }
             }
+        }
 
-            if (!nearbyAngryMobs(player, world) && baseformProperties.dangerSensePlaying) {
-                stopDangerSenseSound(player);
-                ScheduledFuture<?> scheduledFuture = scheduledFutures.getOrDefault(player.getStringUUID(), null);
-                if (scheduledFuture != null)
-                    scheduledFuture.cancel(false);
-            }
-        });
+        if (!nearbyAngryMobs(player, world) && baseformProperties.dangerSensePlaying) {
+            stopDangerSenseSound(player);
+            ScheduledFuture<?> scheduledFuture = scheduledFutures.getOrDefault(player.getStringUUID(), null);
+            if (scheduledFuture != null)
+                scheduledFuture.cancel(false);
+        }
     }
 }
