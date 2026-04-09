@@ -1,11 +1,11 @@
 {
-  "item.beyondthehorizon.sonic_baseform_armor_chestplate": "Sonic Chestplate",
-  "item.beyondthehorizon.sonic_baseform_armor_leggings": "Sonic Leggings",
-  "item.beyondthehorizon.sonic_baseform_armor_boots": "Sonic Shoes",
+  "item.beyondthehorizon.baseform_chestplate": "Sonic Chestplate",
+  "item.beyondthehorizon.baseform_leggings": "Sonic Leggings",
+  "item.beyondthehorizon.baseform_boots": "Sonic Shoes",
 
-  "item.beyondthehorizon.sonic_baseform_lightspeed_chestplate": "Sonic Chestplate(Lightspeed)",
-  "item.beyondthehorizon.sonic_baseform_lightspeed_leggings": "Sonic Leggings(Lightspeed)",
-  "item.beyondthehorizon.sonic_baseform_lightspeed_boots": "Sonic Shoes(Lightspeed)",
+  "item.beyondthehorizon.baseform_lightspeed_chestplate": "Sonic Chestplate(Lightspeed)",
+  "item.beyondthehorizon.baseform_lightspeed_leggings": "Sonic Leggings(Lightspeed)",
+  "item.beyondthehorizon.baseform_lightspeed_boots": "Sonic Shoes(Lightspeed)",
 
   "sounds.sonic.baseform.air_boost": "Air Boost(Sonic Frontiers)",
   "sounds.sonic.baseform.blitz": "Blitz(Sonic Frontiers)",
@@ -71,7 +71,7 @@
   "key.beyondthehorizon.FrontiersUltUse": "Use Ultimate Ability",
   "key.beyondthehorizon.FrontiersHelp": "Help Key",
 
-  "creativetab.sonic_tab" : "Sonic Frontiers",
+  "beyondthehorizon.creative_mode_tab" : "Sonic Frontiers Tab",
   "Sonic Wind": "Sonic Wind",
   "Sonic Wind!": "Sonic Wind!",
   "Sonic Eagle": "Sonic Eagle"

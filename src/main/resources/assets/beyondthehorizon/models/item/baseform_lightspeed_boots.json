@@ -1,6 +1,6 @@
 {
     "parent": "minecraft:item/generated",
     "textures": {
-      "layer0": "beyondthehorizon:item/sonic_starfall_armor_boots"
+      "layer0": "beyondthehorizon:item/baseform_lightspeed_boots"
     }
 }
