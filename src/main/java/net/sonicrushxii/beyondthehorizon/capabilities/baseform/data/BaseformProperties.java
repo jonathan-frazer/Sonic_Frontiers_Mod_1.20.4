@@ -159,6 +159,9 @@ public class BaseformProperties extends FormProperties {
     public UUID meleeTarget;
     public byte spinSlash;
     public byte cycloneKick;
+    public byte windmillKick;
+    public byte afterimage;
+    public byte afterimageCounter;
     public byte wildRushTime;
     public byte wildRushPtr;
     public int[] wildRushPX;
@@ -239,6 +242,9 @@ public class BaseformProperties extends FormProperties {
         meleeTarget = new UUID(0L,0L);
         spinSlash = (byte)0;
         cycloneKick = (byte)0;
+        windmillKick = (byte)0;
+        afterimage = (byte)0;
+        afterimageCounter = (byte)0;
         wildRushTime = 0;
         wildRushPtr = 0;
         wildRushPX = new int[]{0,0,0,0,0};
@@ -321,6 +327,9 @@ public class BaseformProperties extends FormProperties {
         meleeTarget = nbt.getUUID("MeleeTarget");
         spinSlash = nbt.getByte("SpinSlash");
         cycloneKick = nbt.getByte("CycloneKick");
+        windmillKick = nbt.getByte("WindmillKick");
+        afterimage = nbt.getByte("Afterimage");
+        afterimageCounter = nbt.getByte("AfterimageCounter");
         wildRushTime = nbt.getByte("WildRushTime");
         wildRushPtr = nbt.getByte("WildRushPhase");
         wildRushPX = nbt.getIntArray("wildRushPtrsX");
@@ -406,6 +415,9 @@ public class BaseformProperties extends FormProperties {
         nbt.putUUID("MeleeTarget", meleeTarget);
         nbt.putByte("SpinSlash",spinSlash);
         nbt.putByte("CycloneKick",cycloneKick);
+        nbt.putByte("WindmillKick",windmillKick);
+        nbt.putByte("Afterimage",afterimage);
+        nbt.putByte("AfterimageCounter",afterimageCounter);
         nbt.putByte("WildRushTime",wildRushTime);
         nbt.putByte("WildRushPhase",wildRushPtr);
         nbt.putIntArray("wildRushPtrsX",wildRushPX);
@@ -461,6 +473,8 @@ public class BaseformProperties extends FormProperties {
         boolean lightSpeedRush = (this.lightSpeedAssault > 0);
         boolean spinSlash = (this.spinSlash != 0);
         boolean cycloneKick = (this.cycloneKick != 0);
+        boolean windmillKick = (this.windmillKick > 0);
+        boolean afterimage = (this.afterimage > 0);
         boolean wildRush = (this.wildRushTime != 0);
         boolean loopKick = (this.loopKick > 24);
 
@@ -470,7 +484,7 @@ public class BaseformProperties extends FormProperties {
 
         return quickCyloop ||
                 ballForm || homingAttack || speedBlitzDash || melee || hummingTop || stomping ||
-                tornadoJump || mirageTimer || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick ||
+                tornadoJump || mirageTimer || lightSpeedRush || spinSlash || cycloneKick || windmillKick || afterimage || wildRush || loopKick ||
                 homingShot ||
                 ultimate;
     }
@@ -490,6 +504,7 @@ public class BaseformProperties extends FormProperties {
         boolean lightSpeedRush = (this.lightSpeedAssault > 0);
         boolean spinSlash = (this.spinSlash != 0);
         boolean cycloneKick = (this.cycloneKick != 0);
+        boolean windmillKick = (this.windmillKick > 0);
         boolean wildRush = (this.wildRushTime > 0);
         boolean loopKick = (this.loopKick > 0);
 
@@ -504,7 +519,7 @@ public class BaseformProperties extends FormProperties {
 
         return quickCyloop ||
                 homingAttack || hummingTop || ballform || speedBlitzDash || stomping ||
-                tornadoJump || lightSpeedRush || spinSlash || cycloneKick || wildRush || loopKick ||
+                tornadoJump || lightSpeedRush || spinSlash || cycloneKick || windmillKick || wildRush || loopKick ||
                 crossSlash || homingShot || sonicBoom || sonicWind ||
                 parry || grandSlam ||
                 ultimate;

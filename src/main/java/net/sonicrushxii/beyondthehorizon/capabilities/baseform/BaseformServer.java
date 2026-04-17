@@ -48,6 +48,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.afterimage.AfterimageCounter;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.EndWindmillKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushRotationSyncS2C;
@@ -88,6 +90,7 @@ public class BaseformServer
     private static final float LOOPKICK_DAMAGE = 24.0f;
     public static final float SPINSLASH_DAMAGE = 3.5f;
     public static final float CYCLONE_KICK_DAMAGE = 3.5f;
+    public static final float WINDMILL_KICK_DAMAGE = 3.5f;
 
     //Ranged
     public static final float SONIC_BOOM_DAMAGE = 7.0f;
@@ -814,14 +817,13 @@ public class BaseformServer
                         if (baseformProperties.mirageTimer > 0)
                             baseformProperties.mirageTimer += 1;
 
-                        //End Ability if no Cloud is detected
+                        //Teleport near cloud on activation (timer == 9), cloud radius no longer ends the ability
                         if(baseformProperties.mirageTimer >= 8)
                         {
-                            try {
-                                List<MirageCloud> mirageClouds = level.getEntitiesOfClass(MirageCloud.class, new AABB(
-                                        player.getX() + 6, player.getY() + 6, player.getZ() + 6,
-                                        player.getX() - 6, player.getY() - 6, player.getZ() - 6));
-                                if (mirageClouds.isEmpty()) throw new NullPointerException("No Cloud");
+                            List<MirageCloud> mirageClouds = level.getEntitiesOfClass(MirageCloud.class, new AABB(
+                                    player.getX() + 6, player.getY() + 6, player.getZ() + 6,
+                                    player.getX() - 6, player.getY() - 6, player.getZ() - 6));
+                            if (!mirageClouds.isEmpty()) {
                                 MirageCloud mirageCloud = mirageClouds.get(0);
                                 double newX = mirageCloud.getX()+ ModUtils.random.nextDouble(-5,5);
                                 double newY = mirageCloud.getY()+ ModUtils.random.nextDouble(0,1.5);
@@ -836,8 +838,6 @@ public class BaseformServer
                                             Collections.emptySet(), yawPitch[0], yawPitch[1]);
                                     player.connection.send(new ClientboundTeleportEntityPacket(player));
                                 }
-                            }catch (NullPointerException | IndexOutOfBoundsException e) {
-                                baseformProperties.mirageTimer = 141;
                             }
                         }
 
@@ -1264,6 +1264,57 @@ public class BaseformServer
                             baseformProperties.setCooldown(BaseformActiveAbility.CYCLONE_KICK,(byte)5);
                             //Return Gravity
                             player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+                        }
+                    }
+
+                    //Windmill Kick
+                    {
+                        if (baseformProperties.windmillKick > 0) {
+                            baseformProperties.windmillKick += 1;
+
+                            // Multi-hit: damage + brief stun every 5 ticks
+                            if (baseformProperties.windmillKick % 5 == 0) {
+                                Vec3 playerPos = new Vec3(player.getX(), player.getY(), player.getZ());
+                                for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class,
+                                        new AABB(playerPos.x+2.5, playerPos.y+2.5, playerPos.z+2.5,
+                                                 playerPos.x-2.5, playerPos.y-2.5, playerPos.z-2.5),
+                                        e -> e != player && e.isAlive())) {
+                                    if (target.hurtTime == 0) {
+                                        target.hurt(ModDamageTypes.getDamageSource(level,
+                                                ModDamageTypes.SONIC_MELEE.getResourceKey(), player), WINDMILL_KICK_DAMAGE);
+                                        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 5, false, false));
+                                    }
+                                }
+                                // Deflect nearby projectiles
+                                for (net.minecraft.world.entity.projectile.Projectile proj : level.getEntitiesOfClass(
+                                        net.minecraft.world.entity.projectile.Projectile.class,
+                                        new AABB(playerPos.x+2, playerPos.y+2, playerPos.z+2,
+                                                 playerPos.x-2, playerPos.y-2, playerPos.z-2))) {
+                                    Vec3 deflect = new Vec3(proj.getX()-player.getX(), 0.2, proj.getZ()-player.getZ()).normalize();
+                                    proj.setDeltaMovement(deflect.scale(1.5));
+                                }
+                            }
+
+                            // Cap at 3 seconds
+                            if (baseformProperties.windmillKick >= 60) {
+                                EndWindmillKick.finishWindmillKick(player);
+                            }
+                        }
+                    }
+
+                    //Afterimage
+                    {
+                        if (baseformProperties.afterimage > 0) {
+                            baseformProperties.afterimage += 1;
+                            if (baseformProperties.afterimage > 60) {
+                                baseformProperties.afterimage = 0;
+                                if (player.hasEffect(MobEffects.INVISIBILITY))
+                                    player.removeEffect(MobEffects.INVISIBILITY);
+                                PacketHandler.sendToALLPlayers(new SyncPlayerFormS2C(player.getId(), playerSonicForm));
+                            }
+                        }
+                        if (baseformProperties.afterimageCounter > 0) {
+                            baseformProperties.afterimageCounter -= 1;
                         }
                     }
 

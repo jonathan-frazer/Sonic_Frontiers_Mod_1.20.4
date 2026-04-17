@@ -32,9 +32,13 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spind
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.SpindashBreak;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.afterimage.Afterimage;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.afterimage.AfterimageCounter;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.CycloneKick;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.EndWindmillKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.SpinSlash;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.WindmillKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.LightSpeedAssault;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.Mirage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.tornado_jump.TornadoJump;
@@ -128,6 +132,10 @@ public class PacketHandler {
         registrar.playToServer(LightSpeedAssault.TYPE, LightSpeedAssault.STREAM_CODEC, LightSpeedAssault::handle);
         registrar.playToServer(SpinSlash.TYPE, SpinSlash.STREAM_CODEC, SpinSlash::handle);
         registrar.playToServer(CycloneKick.TYPE, CycloneKick.STREAM_CODEC, CycloneKick::handle);
+        registrar.playToServer(WindmillKick.TYPE, WindmillKick.STREAM_CODEC, WindmillKick::handle);
+        registrar.playToServer(EndWindmillKick.TYPE, EndWindmillKick.STREAM_CODEC, EndWindmillKick::handle);
+        registrar.playToServer(Afterimage.TYPE, Afterimage.STREAM_CODEC, Afterimage::handle);
+        registrar.playToServer(AfterimageCounter.TYPE, AfterimageCounter.STREAM_CODEC, AfterimageCounter::handle);
         registrar.playToServer(WildRush.TYPE, WildRush.STREAM_CODEC, WildRush::handle);
         registrar.playToServer(LoopKick.TYPE, LoopKick.STREAM_CODEC, LoopKick::handle);
 

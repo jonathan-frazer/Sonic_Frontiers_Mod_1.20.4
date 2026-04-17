@@ -28,11 +28,13 @@ import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
+import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleDirPacketS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -72,6 +74,23 @@ public class BaseformHandler {
             if ((baseformProperties.selectiveInvul() || receiver.hasEffect(ModEffects.SPEED_BLITZING)) &&
                     !(damageGiver instanceof Player) && (event.getSource().getDirectEntity() == event.getSource().getEntity()))
                 event.setCanceled(true);
+
+            //Afterimage Counter: teleport behind attacker, negate damage
+            if (baseformProperties.afterimageCounter > 0 && damageGiver != null && !event.isCanceled()) {
+                Vec3 attackerLook = damageGiver.getLookAngle();
+                double behindX = damageGiver.getX() - attackerLook.x * 3;
+                double behindZ = damageGiver.getZ() - attackerLook.z * 3;
+                float facingYaw = (float)(Math.atan2(-attackerLook.x, attackerLook.z) * 180.0 / Math.PI);
+                receiver.teleportTo(receiver.serverLevel(), behindX, damageGiver.getY(), behindZ,
+                        Collections.emptySet(), facingYaw, 0);
+                baseformProperties.afterimageCounter = 0;
+                baseformProperties.afterimage = 0;
+                PlayerSonicForm playerSonicForm = receiver.getData(ModAttachments.PLAYER_SONIC_FORM);
+                receiver.level().playSound(null, receiver.getX(), receiver.getY(), receiver.getZ(),
+                        SoundEvents.ENDERMAN_TELEPORT, SoundSource.MASTER, 1.0f, 1.0f);
+                PacketHandler.sendToALLPlayers(new SyncPlayerFormS2C(receiver.getId(), playerSonicForm));
+                event.setCanceled(true);
+            }
 
             //Parry
             if(baseformProperties.parryTime > 0)
