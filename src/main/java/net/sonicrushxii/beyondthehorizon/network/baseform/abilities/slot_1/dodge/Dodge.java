@@ -25,18 +25,24 @@ public class Dodge implements CustomPacketPayload {
     public static final StreamCodec<FriendlyByteBuf, Dodge> STREAM_CODEC =
         StreamCodec.of((buf, msg) -> msg.encode(buf), Dodge::new);
 
-    private final boolean dodgingRight;
+    // direction: 0 = left, 1 = right, 2 = backward
+    private final byte direction;
 
     public Dodge(boolean dodgingRight) {
-        this.dodgingRight = dodgingRight;
+        this.direction = dodgingRight ? (byte)1 : (byte)0;
+    }
+
+    // Backward dodge constructor
+    public Dodge(Object ignored) {
+        this.direction = 2;
     }
 
     public Dodge(FriendlyByteBuf buffer){
-        this.dodgingRight = buffer.readBoolean();
+        this.direction = buffer.readByte();
     }
 
     public void encode(FriendlyByteBuf buffer){
-        buffer.writeBoolean(this.dodgingRight);
+        buffer.writeByte(this.direction);
     }
 
     @Override
@@ -44,7 +50,7 @@ public class Dodge implements CustomPacketPayload {
         return TYPE;
     }
 
-    public static void performDodge(ServerPlayer player, boolean dodgingRight)
+    public static void performDodge(ServerPlayer player, byte direction)
     {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
         BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
@@ -67,8 +73,15 @@ public class Dodge implements CustomPacketPayload {
         player.level().playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.MASTER, 0.5f, 1f);
 
         //Delta Movement
-        Vec3 directionVector = player.getLookAngle().cross(new Vec3(0, (dodgingRight)?1:-1, 0));
-        player.setDeltaMovement(directionVector.scale(2.0));
+        Vec3 dodgeVector;
+        if (direction == 2) {
+            // Backward dodge: opposite of look direction
+            Vec3 look = player.getLookAngle();
+            dodgeVector = new Vec3(-look.x, 0, -look.z).normalize().scale(2.0);
+        } else {
+            dodgeVector = player.getLookAngle().cross(new Vec3(0, (direction == 1) ? 1 : -1, 0)).scale(2.0);
+        }
+        player.setDeltaMovement(dodgeVector);
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
         PacketHandler.sendToALLPlayers(
@@ -84,7 +97,7 @@ public class Dodge implements CustomPacketPayload {
                     ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null)
                     {
-                        performDodge(player,msg.dodgingRight);
+                        performDodge(player, msg.direction);
                     }
                 });
     }

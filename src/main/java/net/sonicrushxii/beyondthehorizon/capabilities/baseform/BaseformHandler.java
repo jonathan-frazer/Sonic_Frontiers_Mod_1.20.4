@@ -92,6 +92,14 @@ public class BaseformHandler {
                 event.setCanceled(true);
             }
 
+            //Block (parry held > 0.5s)
+            if(baseformProperties.isBlocking && !event.isCanceled())
+            {
+                event.setAmount(event.getAmount() * 0.5f);
+                receiver.level().playSound(null, receiver.getX(), receiver.getY(), receiver.getZ(),
+                        SoundEvents.SHIELD_BLOCK, SoundSource.MASTER, 1.0f, 1.0f);
+            }
+
             //Grand Slam
             if(baseformProperties.grandSlamTime > 0)
                 event.setCanceled(true);

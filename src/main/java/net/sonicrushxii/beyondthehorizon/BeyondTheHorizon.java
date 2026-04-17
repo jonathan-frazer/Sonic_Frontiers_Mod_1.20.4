@@ -144,7 +144,10 @@ public class BeyondTheHorizon
         public static void registerKeys(RegisterKeyMappingsEvent event){
             event.register(KeyBindings.INSTANCE.doubleJump);
             event.register(KeyBindings.INSTANCE.toggleDangerSense);
-            event.register(KeyBindings.INSTANCE.virtualSlotUse);
+            event.register(KeyBindings.INSTANCE.cycleSlotKey);
+            event.register(KeyBindings.INSTANCE.meleeSlotKey);
+            event.register(KeyBindings.INSTANCE.rangedSlotKey);
+            event.register(KeyBindings.INSTANCE.dashKey);
             event.register(KeyBindings.INSTANCE.useAbility1);
             event.register(KeyBindings.INSTANCE.useAbility2);
             event.register(KeyBindings.INSTANCE.useAbility3);

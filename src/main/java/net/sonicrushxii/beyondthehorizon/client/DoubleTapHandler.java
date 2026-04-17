@@ -57,5 +57,23 @@ public class DoubleTapHandler
     public static boolean pressedLeft = false;
     public static boolean releasedRight  = false;
     public static boolean releasedLeft = false;
+
+    // Back-press (S key double-tap) for backward dodge
+    private static final ScheduledExecutorService backExecutor = Executors.newScheduledThreadPool(1);
+    private static ScheduledFuture<?> backFuture = null;
+    public static boolean pressedBack = false;
+    public static boolean releasedBack = false;
+
+    public static void scheduleResetBackPress() {
+        backFuture = backExecutor.schedule(() -> {
+            pressedBack = false; releasedBack = false;
+        }, 400, TimeUnit.MILLISECONDS);
+    }
+
+    public static void markDoubleBackPress() {
+        pressedBack = false;
+        releasedBack = false;
+        if (backFuture != null) backFuture.cancel(false);
+    }
 }
 

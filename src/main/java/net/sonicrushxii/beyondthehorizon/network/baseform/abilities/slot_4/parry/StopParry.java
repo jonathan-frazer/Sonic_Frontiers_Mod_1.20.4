@@ -49,6 +49,7 @@ public class StopParry implements CustomPacketPayload
 
         //Reset Counter to 0
         baseformProperties.parryTime = -60;
+        baseformProperties.isBlocking = false;
         //Return Gravity
         player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
 
@@ -71,8 +72,8 @@ public class StopParry implements CustomPacketPayload
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
         BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-        //Move to Counter Slot
-        PacketHandler.sendToPlayer(player,new GoToVirtualSlotS2C((byte)4));
+        //Move to Melee Slot (GrandSlam is in the Melee slot)
+        PacketHandler.sendToPlayer(player,new GoToVirtualSlotS2C((byte)4)); // SLOT_MELEE = 4
 
         performStopParry(player);
 

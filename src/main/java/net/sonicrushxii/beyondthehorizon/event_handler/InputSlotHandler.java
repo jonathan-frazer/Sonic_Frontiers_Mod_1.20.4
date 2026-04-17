@@ -1,6 +1,5 @@
 package net.sonicrushxii.beyondthehorizon.event_handler;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.neoforged.api.distmarker.Dist;
@@ -21,78 +20,60 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 @EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class InputSlotHandler {
 
-    @SubscribeEvent
-    public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
-        boolean isScrollingUp = (event.getScrollDeltaY() >= 0);
+    // Slot cycling is now handled via Middle Mouse Button (cycleSlotKey) in ClientTickHandler.
+    // Mouse 4 toggles Melee slot; Mouse 5 toggles Ranged slot — also handled in ClientTickHandler.
 
-        // Get the Minecraft instance and the player
+    @SubscribeEvent
+    public static void onInteractionKey(InputEvent.InteractionKeyMappingTriggered event) {
         Minecraft mc = Minecraft.getInstance();
         AbstractClientPlayer player = mc.player;
 
-        if(player == null || !player.level().isClientSide())
+        if (player == null || !player.level().isClientSide())
             return;
 
-
-        // Baseform Slot Handler
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+        if (playerSonicForm.getCurrentForm() == SonicForm.PLAYER)
+            return;
+
         FormProperties formProperties = playerSonicForm.getFormProperties();
 
-        if (playerSonicForm.getCurrentForm() != SonicForm.PLAYER &&
-                KeyBindings.INSTANCE.virtualSlotUse.isDown())
-        {
-            // Cancel the event to prevent the hotbar from scrolling
-            event.setCanceled(true);
-
-            //If was on Second Slot then turn off Speed Blitz
-            try
-            {
-                BaseformProperties baseformProperties = (BaseformProperties) formProperties;
-                if(baseformProperties.speedBlitz && VirtualSlotHandler.getCurrAbility() == (byte)1)
-                {
+        // Cycle slots: Middle Mouse Button click
+        if (KeyBindings.INSTANCE.cycleSlotKey.consumeClick()) {
+            try {
+                BaseformProperties bp = (BaseformProperties) formProperties;
+                if (bp.speedBlitz && VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_COMBO) {
                     PacketHandler.sendToServer(new SpeedBlitzOff());
                 }
-            }catch (ClassCastException|NullPointerException ignored){}
+            } catch (ClassCastException | NullPointerException ignored) {}
 
-
-            if(isScrollingUp)    VirtualSlotHandler.scrollUpByOne();
-            else                 VirtualSlotHandler.scrollDownByOne();
-
-            //Consume All clicks before switching over to another slot
-            while(KeyBindings.INSTANCE.useAbility1.consumeClick());
-            while(KeyBindings.INSTANCE.useAbility2.consumeClick());
-            while(KeyBindings.INSTANCE.useAbility3.consumeClick());
-            while(KeyBindings.INSTANCE.useAbility4.consumeClick());
-            while(KeyBindings.INSTANCE.useAbility5.consumeClick());
-            while(KeyBindings.INSTANCE.useAbility6.consumeClick());
-        }
-    }
-
-    @SubscribeEvent
-    public static void onKeyPress(InputEvent.Key event) {
-        // Get the Minecraft instance and the player
-        Minecraft mc = Minecraft.getInstance();
-        AbstractClientPlayer player = mc.player;
-
-        if(player == null || !player.level().isClientSide())
-            return;
-
-        // Baseform Slot Handler
-        PlayerSonicForm playerSonicForm2 = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-        if (playerSonicForm2.getCurrentForm() != SonicForm.PLAYER &&
-                KeyBindings.INSTANCE.virtualSlotUse.isDown())
-        {
-            int key = event.getKey();
-            if (key >= InputConstants.KEY_1 && key <= InputConstants.KEY_9) {
-                VirtualSlotHandler.setSlot((byte)(key-InputConstants.KEY_1));
-                //Consume All clicks before switching over to another slot
-                while(KeyBindings.INSTANCE.useAbility1.consumeClick());
-                while(KeyBindings.INSTANCE.useAbility2.consumeClick());
-                while(KeyBindings.INSTANCE.useAbility3.consumeClick());
-                while(KeyBindings.INSTANCE.useAbility4.consumeClick());
-                while(KeyBindings.INSTANCE.useAbility5.consumeClick());
-                while(KeyBindings.INSTANCE.useAbility6.consumeClick());
-            }
+            VirtualSlotHandler.cycleScrollableSlot();
+            VirtualSlotHandler.consumeAllAbilityClicks();
         }
 
+        // Toggle Melee slot: Mouse 4
+        if (KeyBindings.INSTANCE.meleeSlotKey.consumeClick()) {
+            try {
+                BaseformProperties bp = (BaseformProperties) formProperties;
+                if (bp.speedBlitz && VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_COMBO) {
+                    PacketHandler.sendToServer(new SpeedBlitzOff());
+                }
+            } catch (ClassCastException | NullPointerException ignored) {}
+
+            VirtualSlotHandler.toggleMeleeSlot();
+            VirtualSlotHandler.consumeAllAbilityClicks();
+        }
+
+        // Toggle Ranged slot: Mouse 5
+        if (KeyBindings.INSTANCE.rangedSlotKey.consumeClick()) {
+            try {
+                BaseformProperties bp = (BaseformProperties) formProperties;
+                if (bp.speedBlitz && VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_COMBO) {
+                    PacketHandler.sendToServer(new SpeedBlitzOff());
+                }
+            } catch (ClassCastException | NullPointerException ignored) {}
+
+            VirtualSlotHandler.toggleRangedSlot();
+            VirtualSlotHandler.consumeAllAbilityClicks();
+        }
     }
 }

@@ -376,14 +376,19 @@ public class BaseformClient {
                 }
             }
 
-            //Slot 3
+            // Slot cycling: cycle through 4 scrollable slots via cycleSlotKey (handled in InputSlotHandler)
+
+            //Melee Slot (slot 4, toggled via Mouse 4)
             {
-                //Tornado Jump
+                final boolean inMeleeSlot = VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_MELEE;
+
+                //Tornado Jump / Mirage / Light Speed Assault
                 {
-                    if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() && baseformProperties.tornadoJump == 0
+                    if (inMeleeSlot && !baseformProperties.isAttacking() && baseformProperties.tornadoJump == 0
                             && !player.isShiftKeyDown() && KeyBindings.INSTANCE.useAbility1.isDown()) {
                         PacketHandler.sendToServer(new TornadoJump());
                         baseformProperties.tornadoJump = 1;
+                        VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                     }
 
                     if (baseformProperties.tornadoJump == -1 && player.onGround())
@@ -392,7 +397,7 @@ public class BaseformClient {
 
                 //Mirage
                 {
-                    if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() && baseformProperties.lightSpeedState != 2
+                    if (inMeleeSlot && !baseformProperties.isAttacking() && baseformProperties.lightSpeedState != 2
                             && baseformProperties.mirageTimer <= 0 && player.isShiftKeyDown() && baseformProperties.getCooldown(BaseformActiveAbility.MIRAGE) == 0
                             && player.onGround() && KeyBindings.INSTANCE.useAbility1.isDown()) {
                         PacketHandler.sendToServer(new Mirage());
@@ -402,7 +407,7 @@ public class BaseformClient {
 
                 //Light Speed Assault
                 {
-                    if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() && baseformProperties.lightSpeedState == 2 &&
+                    if (inMeleeSlot && !baseformProperties.isAttacking() && baseformProperties.lightSpeedState == 2 &&
                             player.isShiftKeyDown() && player.onGround() && baseformProperties.getCooldown(BaseformActiveAbility.MIRAGE) == 0 &&
                             KeyBindings.INSTANCE.useAbility1.isDown()) {
                         ClientOnlyData.lightSpeedReticle = null;
@@ -410,67 +415,78 @@ public class BaseformClient {
                         if(ClientOnlyData.lightSpeedReticle != null) {
                             PacketHandler.sendToServer(new LightSpeedAssault(ClientOnlyData.lightSpeedReticle));
                             baseformProperties.lightSpeedAssault = 1;
+                            VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                         }
                     }
                 }
 
-                //Spin Slash
+                //Windmill Kick (default useAbility2) / Spin Slash (shift variant)
                 {
-                    if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
-                            !player.isShiftKeyDown() && baseformProperties.getCooldown(BaseformActiveAbility.SPINSLASH) == 0 &&
+                    // Spin Slash (shift + X)
+                    if (inMeleeSlot && !baseformProperties.isAttacking() &&
+                            player.isShiftKeyDown() && baseformProperties.getCooldown(BaseformActiveAbility.SPINSLASH) == 0 &&
                             KeyBindings.INSTANCE.useAbility2.isDown()) {
                         ClientOnlyData.spinSlashReticle = null;
                         SpinSlash.scanFoward(player);
                         if(ClientOnlyData.spinSlashReticle != null) {
                             PacketHandler.sendToServer(new SpinSlash(ClientOnlyData.spinSlashReticle));
                             baseformProperties.spinSlash = -60;
+                            VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                         }
                     }
-                }
-
-                //Cyclone Kick
-                {
-                    if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
-                            baseformProperties.getCooldown(BaseformActiveAbility.CYCLONE_KICK) == 0 && player.isShiftKeyDown() &&
+                    // Cyclone Kick slot kept as placeholder; Windmill Kick replaces it (no-shift X)
+                    if (inMeleeSlot && !baseformProperties.isAttacking() &&
+                            !player.isShiftKeyDown() && baseformProperties.getCooldown(BaseformActiveAbility.CYCLONE_KICK) == 0 &&
                             KeyBindings.INSTANCE.useAbility2.isDown())
                     {
                         ClientOnlyData.cycloneReticle = null;
                         CycloneKick.scanFoward(player);
                         PacketHandler.sendToServer(new CycloneKick(ClientOnlyData.cycloneReticle));
+                        // Non-holdable: return to Combo after using
+                        VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                     }
                 }
 
-                //Wild Rush
+                //Wild Rush (useAbility4 = C key) / Loop Kick (shift variant)
                 {
-                    if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
-                            baseformProperties.getCooldown(BaseformActiveAbility.WILDRUSH) == 0 &&
-                            KeyBindings.INSTANCE.useAbility3.isDown())
-                    {
-                        WildRush.scanFoward(player);
-                        if(ClientOnlyData.wildRushReticle != null) {
-                            PacketHandler.sendToServer(new WildRush(ClientOnlyData.wildRushReticle));
-                            baseformProperties.wildRushTime = 1;
+                    if (inMeleeSlot && !baseformProperties.isAttacking()) {
+                        if (!player.isShiftKeyDown() && baseformProperties.getCooldown(BaseformActiveAbility.WILDRUSH) == 0 &&
+                                KeyBindings.INSTANCE.useAbility4.isDown()) {
+                            WildRush.scanFoward(player);
+                            if(ClientOnlyData.wildRushReticle != null) {
+                                PacketHandler.sendToServer(new WildRush(ClientOnlyData.wildRushReticle));
+                                baseformProperties.wildRushTime = 1;
+                                VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
+                            }
+                        }
+                        // Loop Kick: shift variant of Wild Rush (shift + C)
+                        else if (player.isShiftKeyDown() && baseformProperties.getCooldown(BaseformActiveAbility.LOOPKICK) == 0 &&
+                                KeyBindings.INSTANCE.useAbility4.isDown()) {
+                            PacketHandler.sendToServer(new LoopKick());
+                            baseformProperties.loopKick = 1;
+                            VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                         }
                     }
                 }
 
-                //Loop Kick
+                //GrandSlam (useAbility5 = F key, no parry prerequisite)
                 {
-                    if (VirtualSlotHandler.getCurrAbility() == 2 && !baseformProperties.isAttacking() &&
-                            baseformProperties.getCooldown(BaseformActiveAbility.LOOPKICK) == 0 &&
-                            KeyBindings.INSTANCE.useAbility4.isDown()) {
-                        PacketHandler.sendToServer(new LoopKick());
-                        baseformProperties.loopKick = 1;
+                    if (inMeleeSlot && (!baseformProperties.isAttacking() || baseformProperties.parryTime < 0) &&
+                            !player.isShiftKeyDown() && KeyBindings.INSTANCE.useAbility5.isDown())
+                    {
+                        PacketHandler.sendToServer(new GrandSlam());
+                        VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                     }
                 }
             }
 
-            //Slot 4
+            //Ranged Slot (slot 5, toggled via Mouse 5)
             {
+                final boolean inRangedSlot = VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_RANGED;
 
-                //Sonic Boom
+                //Sonic Boom (useAbility1 = R key, holdable - stays in ranged)
                 {
-                    if (VirtualSlotHandler.getCurrAbility() == 3 && !baseformProperties.isAttacking() &&
+                    if (inRangedSlot && !baseformProperties.isAttacking() &&
                             baseformProperties.getCooldown(BaseformActiveAbility.SONIC_BOOM) == 0 &&
                             KeyBindings.INSTANCE.useAbility1.isDown())
                     {
@@ -478,7 +494,7 @@ public class BaseformClient {
                         baseformProperties.sonicBoom = 1;
                     }
 
-                    if (VirtualSlotHandler.getCurrAbility() == 3 && baseformProperties.sonicBoom > 0 &&
+                    if (inRangedSlot && baseformProperties.sonicBoom > 0 &&
                             !KeyBindings.INSTANCE.useAbility1.isDown())
                     {
                         PacketHandler.sendToServer(new EndSonicBoom());
@@ -486,9 +502,9 @@ public class BaseformClient {
                     }
                 }
 
-                //Cross Slash
+                //Cross Slash (useAbility2 = X key, holdable - stays in ranged)
                 {
-                    if (VirtualSlotHandler.getCurrAbility() == 3 && !baseformProperties.isAttacking() &&
+                    if (inRangedSlot && !baseformProperties.isAttacking() &&
                             baseformProperties.getCooldown(BaseformActiveAbility.CROSS_SLASH) == 0 &&
                             KeyBindings.INSTANCE.useAbility2.isDown())
                     {
@@ -496,7 +512,7 @@ public class BaseformClient {
                         baseformProperties.crossSlash = 1;
                     }
 
-                    if (VirtualSlotHandler.getCurrAbility() == 3 && baseformProperties.crossSlash > 0 &&
+                    if (inRangedSlot && baseformProperties.crossSlash > 0 &&
                             !KeyBindings.INSTANCE.useAbility2.isDown())
                     {
                         PacketHandler.sendToServer(new EndCrossSlash());
@@ -504,9 +520,9 @@ public class BaseformClient {
                     }
                 }
 
-                //Sonic Wind
+                //Sonic Wind (useAbility3 = V key)
                 {
-                    if (VirtualSlotHandler.getCurrAbility() == 3 && !baseformProperties.isAttacking() &&
+                    if (inRangedSlot && !baseformProperties.isAttacking() &&
                             baseformProperties.getCooldown(BaseformActiveAbility.SONIC_WIND) == 0 &&
                             KeyBindings.INSTANCE.useAbility3.isDown())
                     {
@@ -516,6 +532,7 @@ public class BaseformClient {
                             player.displayClientMessage(Component.translatable("Sonic Wind!").withStyle(Style.EMPTY.withColor(0x00EEFF)),true);
                             PacketHandler.sendToServer(new SonicWind());
                             baseformProperties.sonicWind = 1;
+                            VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                         }
                         //Quick Version
                         if(player.isShiftKeyDown() && baseformProperties.profanedWind == 0)
@@ -523,25 +540,26 @@ public class BaseformClient {
                             player.displayClientMessage(Component.translatable("Sonic Wind").withStyle(Style.EMPTY.withColor(0x00FFFF)),true);
                             PacketHandler.sendToServer(new QuickSonicWind());
                             baseformProperties.profanedWind = 1;
+                            VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                         }
                     }
                 }
 
-                //Homing Shot
+                //Homing Shot (useAbility4 = C key)
                 {
-                    if (VirtualSlotHandler.getCurrAbility() == 3 && !baseformProperties.isAttacking() &&
+                    if (inRangedSlot && !baseformProperties.isAttacking() &&
                             baseformProperties.getCooldown(BaseformActiveAbility.HOMING_SHOT) == 0 &&
                             KeyBindings.INSTANCE.useAbility4.isDown())
                     {
                         PacketHandler.sendToServer(new HomingShot());
                         baseformProperties.homingShot = 1;
+                        VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                     }
                 }
             }
 
-            //Slot 5
+            //Parry / Block (Left Alt key - universal, not slot-specific)
             {
-                //Parry
                 if(!baseformProperties.isAttacking() && KeyBindings.INSTANCE.parryKey.isDown())
                 {
                     PacketHandler.sendToServer(new Parry());
@@ -552,21 +570,14 @@ public class BaseformClient {
                     PacketHandler.sendToServer(new StopParry());
                     baseformProperties.parryTime = 0;
                 }
-
-                //GrandSlam
-                if((!baseformProperties.isAttacking() || baseformProperties.parryTime < 0) && VirtualSlotHandler.getCurrAbility() == 4
-                        && KeyBindings.INSTANCE.useSingleAbility.isDown())
-                {
-                    PacketHandler.sendToServer(new GrandSlam());
-                }
-
             }
 
-            //Slot 6
+            //Ultimate Slot (slot 2)
             {
-                //Ultimate Ability
+                final boolean inUltSlot = VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_ULTIMATE;
+                //Ultimate Ability (useAbility1 = R key in Ultimate slot, or useUltimateAbility = H key)
                 if(!baseformProperties.isAttacking() && baseformProperties.ultReady &&
-                        KeyBindings.INSTANCE.useUltimateAbility.isDown())
+                        (KeyBindings.INSTANCE.useUltimateAbility.isDown() || (inUltSlot && KeyBindings.INSTANCE.useAbility1.isDown())))
                 {
                     ClientOnlyData.ultTargetReticle = null;
                     UltimateActivate.scanFoward(player);
@@ -600,18 +611,19 @@ public class BaseformClient {
             return;
 
         //Quickstep
-        if(player.isSprinting() && VirtualSlotHandler.getCurrAbility() == 0 && baseformProperties.boostLvl > 0)
+        if(player.isSprinting() && VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_BOOST && baseformProperties.boostLvl > 0)
         {
             switch(doubleTapDirection) {
                 case RIGHT_PRESS: PacketHandler.sendToServer(new Sidestep(true)); break;
                 case LEFT_PRESS: PacketHandler.sendToServer(new Sidestep(false)); break;
             }
         }
-        //Dodge
+        //Dodge (left/right: shift + double-tap A/D; backward: shift + double-tap S)
         else if(player.isShiftKeyDown()){
             switch(doubleTapDirection){
                 case RIGHT_PRESS: PacketHandler.sendToServer(new Dodge(true)); break;
                 case LEFT_PRESS: PacketHandler.sendToServer(new Dodge(false)); break;
+                case BACK_PRESS: PacketHandler.sendToServer(new Dodge(null)); break;
             }
         }
     }

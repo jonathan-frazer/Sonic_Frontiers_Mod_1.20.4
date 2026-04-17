@@ -73,8 +73,9 @@ public class BaseformServer
     public static final Map<UUID,Deque<Vec3>> cyloopCoords = new HashMap<>();
     private static final float QK_CYLOOP_DAMAGE = 15.0f;
 
-    //Combo
-    private static final float HOMING_ATTACK_DAMAGE = 11.0f;
+    //Combo — base 15dmg + 10 per boost level (15/25/35/45 for levels 0/1/2/3)
+    private static final float HOMING_ATTACK_BASE_DAMAGE = 15.0f;
+    private static final float HOMING_ATTACK_DAMAGE = 15.0f;
     private static final float BALLFORM_DAMAGE = 10.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
     public static final float STOMP_DAMAGE = 8.0f;
@@ -82,7 +83,7 @@ public class BaseformServer
 
     //Melee
     public static final float TORNADO_JUMP_DMG = 1.0f;
-    public static final float SPEED_BLITZ_DASH_DAMAGE = 5.0f;
+    public static final float SPEED_BLITZ_DASH_DAMAGE = 8.0f;
     private static final float WILDRUSH_DAMAGE = 24.0f;
     private static final float LOOPKICK_DAMAGE = 24.0f;
     public static final float SPINSLASH_DAMAGE = 3.5f;
@@ -572,9 +573,10 @@ public class BaseformServer
                                         player.setDeltaMovement(0.0, 0.8, 0.0);
                                         player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
-                                        //Damage Enemy
+                                        //Damage Enemy — scales with boost level
+                                        float homingDmg = HOMING_ATTACK_BASE_DAMAGE + (baseformProperties.boostLvl * 10.0f);
                                         enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
-                                                HOMING_ATTACK_DAMAGE);
+                                                homingDmg);
                                     }
 
                                 }
@@ -1772,23 +1774,35 @@ public class BaseformServer
 
                 //Slot 5
                 {
-                    //Parry
+                    //Parry / Block
                     {
                         try {
                             if (baseformProperties.parryTime > 0)
                             {
-                                //
                                 baseformProperties.parryTime += 1;
                                 player.setDeltaMovement(0.0, 0.0, 0.0);
                                 player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                // After 0.5s (10 ticks), transition to block mode
+                                if (baseformProperties.parryTime == 11) {
+                                    baseformProperties.isBlocking = true;
+                                    // Restore gravity and allow movement in block mode
+                                    player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+                                    if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.PARRY_HOLD.id()))
+                                        player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.PARRY_HOLD.id());
+                                }
 
                                 // End Ability
                                 if (baseformProperties.parryTime == Byte.MAX_VALUE) {
                                     throw new InterruptedException("Duration End");
                                 }
+                            } else {
+                                // Not parrying: ensure blocking is cleared
+                                if (baseformProperties.isBlocking) baseformProperties.isBlocking = false;
                             }
                         } catch(NullPointerException|ClassCastException|InterruptedException e)
                         {
+                            baseformProperties.isBlocking = false;
                             StopParry.performStopParry(player);
                         }
 

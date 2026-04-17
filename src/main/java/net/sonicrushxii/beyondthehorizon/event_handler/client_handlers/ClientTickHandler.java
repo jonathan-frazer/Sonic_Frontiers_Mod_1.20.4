@@ -121,6 +121,32 @@ public class ClientTickHandler {
                         },DOUBLE_TAP_COOLDOWN);
                     }
                 }
+
+                // Back double-tap (S key) for backward dodge
+                if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_S) &&
+                        !DoubleTapHandler.pressedBack && !DoubleTapHandler.releasedBack)
+                    DoubleTapHandler.pressedBack = true;
+                if (!InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_S) &&
+                        DoubleTapHandler.pressedBack && !DoubleTapHandler.releasedBack) {
+                    DoubleTapHandler.releasedBack = true;
+                    DoubleTapHandler.scheduleResetBackPress();
+                }
+                if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_S) &&
+                        DoubleTapHandler.pressedBack && DoubleTapHandler.releasedBack && !mc.isPaused() && mc.screen == null) {
+                    DoubleTapHandler.markDoubleBackPress();
+
+                    if (DoubleTapHandler.doubleTapLock == false) {
+                        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        switch(playerSonicForm.getCurrentForm())
+                        {
+                            case BASEFORM -> BaseformClient.performDoublePress(player, (BaseformProperties) playerSonicForm.getFormProperties(), DoubleTapDirection.BACK_PRESS);
+                        }
+                        DoubleTapHandler.doubleTapLock = true;
+                        Scheduler.scheduleTask(()->{
+                            DoubleTapHandler.doubleTapLock = false;
+                        }, DOUBLE_TAP_COOLDOWN);
+                    }
+                }
             }
         }
     }

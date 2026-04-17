@@ -182,6 +182,7 @@ public class BaseformProperties extends FormProperties {
     public boolean counterReady;
     public UUID counteredEntity;
     public byte grandSlamTime;
+    public boolean isBlocking; // true when parry key held > 0.5s (10 ticks at 20TPS)
 
     //Slot 6
     public double ultimateAtkMeter;
@@ -261,6 +262,7 @@ public class BaseformProperties extends FormProperties {
         counterReady = false;
         counteredEntity = new UUID(0L,0L);
         grandSlamTime = (byte)0;
+        isBlocking = false;
 
         //Slot 6
         ultimateAtkMeter = 0.0;
@@ -342,6 +344,7 @@ public class BaseformProperties extends FormProperties {
         counterReady = nbt.getBoolean("CounterReady");
         counteredEntity = nbt.getUUID("CounteredEntity");
         grandSlamTime = nbt.getByte("GrandSlamTime");
+        isBlocking = nbt.getBoolean("IsBlocking");
 
         //Slot 6
         ultimateAtkMeter = nbt.getDouble("UltimateMeter");
@@ -426,6 +429,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putBoolean("CounterReady",counterReady);
         nbt.putUUID("CounteredEntity",counteredEntity);
         nbt.putByte("GrandSlamTime",grandSlamTime);
+        nbt.putBoolean("IsBlocking",isBlocking);
 
         //Slot 6
         nbt.putDouble("UltimateMeter",ultimateAtkMeter);

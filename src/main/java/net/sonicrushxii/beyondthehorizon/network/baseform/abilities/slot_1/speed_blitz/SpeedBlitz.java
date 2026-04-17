@@ -103,11 +103,11 @@ public class SpeedBlitz implements CustomPacketPayload {
 
     public static void performSpeedDash(ServerPlayer player, Vec3 enemyPos)
     {
-        //Calculate new Position
+        //Calculate new Position — place player 7 blocks from target, still facing them
         Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
         Vec3 tpDirection = enemyPos.subtract(playerPos).normalize();
 
-        Vec3 newPlayerPos = enemyPos.add(tpDirection.scale(3));
+        Vec3 newPlayerPos = enemyPos.add(tpDirection.scale(7));
         float[] yawPitch = ModUtils.calculateFacing(newPlayerPos,enemyPos);
 
         //Display Raycast Particle
