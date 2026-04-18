@@ -48,7 +48,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.afterimage.AfterimageCounter;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.EndSmashBarrage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.EndWindmillKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushParticleS2C;
@@ -91,6 +91,7 @@ public class BaseformServer
     public static final float SPINSLASH_DAMAGE = 3.5f;
     public static final float CYCLONE_KICK_DAMAGE = 3.5f;
     public static final float WINDMILL_KICK_DAMAGE = 3.5f;
+    private static final float SMASH_BARRAGE_DAMAGE = 4.0f;
 
     //Ranged
     public static final float SONIC_BOOM_DAMAGE = 7.0f;
@@ -171,6 +172,10 @@ public class BaseformServer
                     //Air Boosts
                     if (baseformProperties.airBoosts < 3 && player.onGround())
                         baseformProperties.airBoosts = 3;
+
+                    //Air spindash one-use reset on landing
+                    if (baseformProperties.airSpindashUsed && player.onGround())
+                        baseformProperties.airSpindashUsed = false;
 
                     //Exit Ball form While swimming
                     if(player.isInWater())
@@ -491,7 +496,15 @@ public class BaseformServer
                     //Spindash
                     {
                         if (baseformProperties.ballFormState == (byte) 1) {
-                            baseformProperties.spinDashChargeTime++;
+                            // Charge time no longer builds (always max), but keep for animation
+                            // Player can move freely; damage nearby enemies like a moving ball
+                            for(LivingEntity nearbyEntity : level.getEntitiesOfClass(LivingEntity.class,
+                                    new AABB(player.getX()+1.0,player.getY()+1.0,player.getZ()+1.0,
+                                            player.getX()-1.0,player.getY()-1.0,player.getZ()-1.0),
+                                    (e)->!e.is(player)))
+                                if (nearbyEntity.hurtTime == 0)
+                                    nearbyEntity.hurt(ModDamageTypes.getDamageSource(level,
+                                            ModDamageTypes.SONIC_BALL.getResourceKey(), player), BALLFORM_DAMAGE * 0.5f);
 
                             Vec3 playerLookVector = player.getLookAngle();
 
@@ -510,7 +523,7 @@ public class BaseformServer
                         }
                         if (baseformProperties.ballFormState == (byte) 2)
                         {
-                            player.setDeltaMovement((ModUtils.calculateViewVector(0,player.getYRot())).scale(Math.min(10.0,baseformProperties.spinDashChargeTime/10f)));
+                            player.setDeltaMovement((ModUtils.calculateViewVector(0,player.getYRot())).scale(10.0));
                             if (ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+""))
                             {
                                 player.addDeltaMovement(new Vec3(0,-1.26,0));
@@ -520,9 +533,14 @@ public class BaseformServer
                             for(LivingEntity nearbyEntity : level.getEntitiesOfClass(LivingEntity.class,
                                     new AABB(player.getX()+1.5,player.getY()+1.5,player.getZ()+1.5,
                                             player.getX()-1.5,player.getY()-1.5,player.getZ()-1.5),
-                                    (nearbyEntity)->!nearbyEntity.is(player)))
+                                    (nearbyEntity)->!nearbyEntity.is(player))) {
                                 nearbyEntity.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
-                                        Math.min(50.0f,baseformProperties.spinDashChargeTime/2f));
+                                        50.0f);
+                                // Directional knockback away in player's facing direction
+                                Vec3 knockDir = player.getDeltaMovement().normalize();
+                                nearbyEntity.setDeltaMovement(knockDir.scale(2.0));
+                                player.connection.send(new ClientboundSetEntityMotionPacket(nearbyEntity));
+                            }
 
                             PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
                                     new DustParticleOptions(new Vector3f(0.0f, 0.2f, 1.0f), 1f),
@@ -646,18 +664,20 @@ public class BaseformServer
                             //Add Time
                             baseformProperties.hummingTop += 1;
 
-                            //Go Forward
+                            //Go Forward at current run speed
                             Vec3 lookAngle = player.getLookAngle();
-                            player.setDeltaMovement(new Vec3(lookAngle.x,-0.1,lookAngle.z).scale(1.0));
+                            double hummingSpeed = Math.max(1.0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 15.0);
+                            player.setDeltaMovement(new Vec3(lookAngle.x,-0.1,lookAngle.z).scale(hummingSpeed));
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
-                            //Damage and Move Entities
+                            //Damage and Move Entities (dmg = player attack damage)
+                            float hummingDmg = (float) Math.max(HUMMING_TOP_DAMAGE, player.getAttribute(Attributes.ATTACK_DAMAGE).getValue());
                             for(LivingEntity enemy: level.getEntitiesOfClass(LivingEntity.class,
                                     new AABB(player.getX()+1.0,player.getY()+0.75,player.getZ()+1.0,
                                             player.getX()-1.0,player.getY()-0.25,player.getZ()-1.0),(enemy)->!enemy.is(player)))
                             {
                                 enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), player),
-                                        HUMMING_TOP_DAMAGE);
+                                        hummingDmg);
                                 enemy.teleportTo(player.getX()+lookAngle.x*2.0,player.getY()+lookAngle.y*2.0,player.getZ()+lookAngle.z*2.0);
                                 player.connection.send(new ClientboundTeleportEntityPacket(enemy));
                             }
@@ -744,6 +764,29 @@ public class BaseformServer
                                     level.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SMASH_CHARGE.get(), SoundSource.MASTER, 1.0f, 1.0f);
                                     baseformProperties.smashHit += 1;
                                     break;
+                        }
+                    }
+
+                    //Smash Barrage
+                    {
+                        if (baseformProperties.smashBarrage > 0) {
+                            baseformProperties.smashBarrage += 1;
+
+                            // Hit enemies in small radius every 3 ticks
+                            if (baseformProperties.smashBarrage % 3 == 0) {
+                                for (LivingEntity enemy : player.level().getEntitiesOfClass(LivingEntity.class,
+                                        new AABB(player.getX() + 2.5, player.getY() + 2.0, player.getZ() + 2.5,
+                                                 player.getX() - 2.5, player.getY() - 1.0, player.getZ() - 2.5),
+                                        target -> !target.is(player))) {
+                                    enemy.hurt(ModDamageTypes.getDamageSource(level,
+                                            ModDamageTypes.SONIC_MELEE.getResourceKey(), player), SMASH_BARRAGE_DAMAGE);
+                                }
+                            }
+
+                            // Auto-end after 60 ticks (3s)
+                            if (baseformProperties.smashBarrage >= 60) {
+                                EndSmashBarrage.finishSmashBarrage(player);
+                            }
                         }
                     }
 

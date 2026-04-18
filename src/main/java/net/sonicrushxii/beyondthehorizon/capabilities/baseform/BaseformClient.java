@@ -257,17 +257,19 @@ public class BaseformClient {
             {
                 //Spin Dash
                 {
-                    //Charge Spindash
+                    //Peelout (look UP + shift + R = instant max speed, no ball form)
+                    if(VirtualSlotHandler.getCurrAbility() == 1 && player.isShiftKeyDown() &&
+                            player.getXRot() < -80.0 && player.onGround() && baseformProperties.ballFormState == (byte) 0 &&
+                            baseformProperties.getCooldown(BaseformActiveAbility.PEELOUT) == 0 &&
+                            KeyBindings.INSTANCE.useAbility1.consumeClick() && !baseformProperties.isAttacking()) {
+                        PacketHandler.sendToServer(new net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.Peelout());
+                        while(KeyBindings.INSTANCE.useAbility1.consumeClick());
+                    }
+
+                    //Charge Spindash (look DOWN + shift + R = ball form, free movement)
                     if(VirtualSlotHandler.getCurrAbility() == 1 && player.isShiftKeyDown() &&
                             player.getXRot() > 80.0 && baseformProperties.ballFormState == (byte) 0 &&
                             KeyBindings.INSTANCE.useAbility1.isDown() && !baseformProperties.isAttacking()) {
-                        //Set Camera
-                        player.setXRot(0.0f);
-
-                        //Let go of Z
-                        minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), KeyBindings.INSTANCE.useAbility1.getKey().getValue(), 0, GLFW.GLFW_RELEASE, 0);
-
-                        //Send Packet
                         baseformProperties.ballFormState = 1;
                         PacketHandler.sendToServer(new ChargeSpindash());
                     }
@@ -301,13 +303,15 @@ public class BaseformClient {
                     {
                         //Perform an Obligatory Scan Foward again
                         HomingAttack.scanFoward(player);
-                        //If scan fails do air boost
-                        if(ClientOnlyData.homingAttackReticle == null && !ClientOnlyData.airBoostLock) {
+                        //If scan fails do air boost (only once in air unless enemy hit)
+                        if(ClientOnlyData.homingAttackReticle == null && !ClientOnlyData.airBoostLock
+                                && !baseformProperties.airSpindashUsed) {
                             PacketHandler.sendToServer(new AirBoost());
+                            baseformProperties.airSpindashUsed = true;
                             ClientOnlyData.airBoostLock = true;
                             Scheduler.scheduleTask(()-> ClientOnlyData.airBoostLock = false,5);
                         }
-                        else
+                        else if (ClientOnlyData.homingAttackReticle != null)
                             PacketHandler.sendToServer(new HomingAttack(ClientOnlyData.homingAttackReticle));
                     }
 
@@ -350,6 +354,20 @@ public class BaseformClient {
 
                 }
 
+                //Smash Barrage (shift + V = useAbility3 in Combo slot)
+                {
+                    if (VirtualSlotHandler.getCurrAbility() == 1 && player.isShiftKeyDown() &&
+                            baseformProperties.getCooldown(BaseformActiveAbility.SMASH_BARRAGE) == 0 &&
+                            baseformProperties.smashBarrage == 0 && KeyBindings.INSTANCE.useAbility3.isDown()) {
+                        PacketHandler.sendToServer(new net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SmashBarrage());
+                        baseformProperties.smashBarrage = 1;
+                    }
+                    if (baseformProperties.smashBarrage > 0 && !KeyBindings.INSTANCE.useAbility3.isDown()) {
+                        PacketHandler.sendToServer(new net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.EndSmashBarrage());
+                        baseformProperties.smashBarrage = 0;
+                    }
+                }
+
                 //Smash Hit
                 {
                     //Increase Smash hit
@@ -372,11 +390,15 @@ public class BaseformClient {
                     }
                 }
 
-                //Stomp
+                //Stomp/Updraft (F in air = kick up; shift+F = Sonic Eagle down)
                 {
                     if(VirtualSlotHandler.getCurrAbility() == 1 && baseformProperties.getCooldown(BaseformActiveAbility.STOMP) == (byte)0
-                            &&  !player.onGround() && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.isDown())
-                        PacketHandler.sendToServer(new Stomp());
+                            && !player.onGround() && !baseformProperties.isAttacking() && KeyBindings.INSTANCE.useAbility5.isDown()) {
+                        if (player.isShiftKeyDown())
+                            PacketHandler.sendToServer(new Stomp((byte)1));
+                        else
+                            PacketHandler.sendToServer(new Stomp());
+                    }
                 }
             }
 

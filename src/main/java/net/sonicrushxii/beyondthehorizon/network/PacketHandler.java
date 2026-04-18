@@ -24,7 +24,10 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.quick
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.dodge.Dodge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.homing_attack.HomingAttack;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.EndSmashBarrage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SetSmashHitChargeC2S;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.SmashBarrage;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.Peelout;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitz;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitzDash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitzOff;
@@ -124,6 +127,9 @@ public class PacketHandler {
         registrar.playToServer(SpeedBlitzDash.TYPE, SpeedBlitzDash.STREAM_CODEC, SpeedBlitzDash::handle);
         registrar.playToServer(SpeedBlitzOff.TYPE, SpeedBlitzOff.STREAM_CODEC, SpeedBlitzOff::handle);
         registrar.playToServer(SetSmashHitChargeC2S.TYPE, SetSmashHitChargeC2S.STREAM_CODEC, SetSmashHitChargeC2S::handle);
+        registrar.playToServer(SmashBarrage.TYPE, SmashBarrage.STREAM_CODEC, SmashBarrage::handle);
+        registrar.playToServer(EndSmashBarrage.TYPE, EndSmashBarrage.STREAM_CODEC, EndSmashBarrage::handle);
+        registrar.playToServer(Peelout.TYPE, Peelout.STREAM_CODEC, Peelout::handle);
         registrar.playToServer(Stomp.TYPE, Stomp.STREAM_CODEC, Stomp::handle);
 
         //Slot 3

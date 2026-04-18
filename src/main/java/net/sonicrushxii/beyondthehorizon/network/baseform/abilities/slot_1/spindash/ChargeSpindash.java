@@ -42,15 +42,14 @@ public class ChargeSpindash implements CustomPacketPayload {
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
                         BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                        //Initialize Counter
-                        baseformProperties.spinDashChargeTime = 0;
+                        //Initialize Counter (always max per PDF — duration/speed at max regardless of charge)
+                        baseformProperties.spinDashChargeTime = 100;
 
-                        //Set Data -> Charging
+                        //Set Data -> Charging (ball form, free movement)
                         baseformProperties.ballFormState = (byte)1;
 
-                        //Lock Player in Position
-                        player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.0);
-                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.80);
+                        //Slightly slow player but allow movement
+                        player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.04);
 
                         //PlaySound
                         Level world = player.level();

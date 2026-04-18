@@ -3,7 +3,7 @@ package net.sonicrushxii.beyondthehorizon.capabilities.baseform.data;
 //If Adding abilities, add it to here, as well as adding it to the VirtualSlotOverlay
 public enum BaseformActiveAbility {
     BOOST,LIGHT_SPEED_ATTACK,POWER_BOOST,CYLOOP,
-    HOMING_ATTACK,HUMMING_TOP,SPEED_BLITZ,SMASH_HIT,STOMP,
+    HOMING_ATTACK,HUMMING_TOP,SPEED_BLITZ,SMASH_HIT,SMASH_BARRAGE,STOMP,PEELOUT,
     TORNADO_JUMP,MIRAGE,SPINSLASH,CYCLONE_KICK,WINDMILL_KICK,WILDRUSH,LOOPKICK,AFTERIMAGE,
     SONIC_BOOM,CROSS_SLASH,SONIC_WIND,HOMING_SHOT,
     GRAND_SLAM,

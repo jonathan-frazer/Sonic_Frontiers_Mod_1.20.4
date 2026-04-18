@@ -36,7 +36,7 @@ public class VirtualSlotSyncS2C implements CustomPacketPayload {
 
     public static void handle(VirtualSlotSyncS2C msg, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
-            VirtualSlotHandler.initialize(msg.slotLength);
+            VirtualSlotHandler.initialize();
         });
     }
 }

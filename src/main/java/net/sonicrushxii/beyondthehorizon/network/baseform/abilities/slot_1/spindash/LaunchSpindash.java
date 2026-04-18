@@ -67,8 +67,8 @@ public class LaunchSpindash implements CustomPacketPayload {
                         PacketHandler.sendToALLPlayers(new PlayerStopSoundPacketS2C(ModSounds.SPINDASH_CHARGE.get().getLocation()));
                         world.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SPINDASH_RELEASE.get(), SoundSource.MASTER, 1.0f, 1.0f);
 
-                        //Schedule Reversion from Spindash
-                        Scheduler.scheduleTask(()-> performRevertSpindash(player,baseformProperties),Math.max(50,Math.min(baseformProperties.spinDashChargeTime, 100)));
+                        //Always max duration per PDF
+                        Scheduler.scheduleTask(()-> performRevertSpindash(player,baseformProperties), 100);
 
                         PacketHandler.sendToALLPlayers(
                                 new SyncPlayerFormS2C(

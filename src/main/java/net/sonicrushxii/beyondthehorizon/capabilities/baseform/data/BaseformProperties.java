@@ -146,6 +146,8 @@ public class BaseformProperties extends FormProperties {
     public byte homingAttackAirTime;
     public boolean dodgeInvul;
     public byte hummingTop;
+    public byte smashBarrage;
+    public boolean airSpindashUsed;
     public boolean speedBlitz;
     public byte speedBlitzDashTimer;
     public byte speedBlitzDashes;
@@ -229,6 +231,8 @@ public class BaseformProperties extends FormProperties {
         homingAttackAirTime = 0;
         dodgeInvul = false;
         hummingTop = 0;
+        smashBarrage = 0;
+        airSpindashUsed = false;
         speedBlitz = false;
         speedBlitzDashTimer = (byte)0;
         speedBlitzDashes = 4;
@@ -314,6 +318,8 @@ public class BaseformProperties extends FormProperties {
         homingAttackAirTime = nbt.getByte("HomingTime");
         dodgeInvul = nbt.getBoolean("isDodging");
         hummingTop = nbt.getByte("hummingTop");
+        smashBarrage = nbt.getByte("SmashBarrage");
+        airSpindashUsed = nbt.getBoolean("AirSpindashUsed");
         speedBlitz = nbt.getBoolean("speedBlitzOn");
         speedBlitzDashTimer = nbt.getByte("speedBlitzDash");
         speedBlitzDashes = nbt.getByte("speedBlitzes");
@@ -402,6 +408,8 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("HomingTime",homingAttackAirTime);
         nbt.putBoolean("isDodging",dodgeInvul);
         nbt.putByte("hummingTop", hummingTop);
+        nbt.putByte("SmashBarrage", smashBarrage);
+        nbt.putBoolean("AirSpindashUsed", airSpindashUsed);
         nbt.putBoolean("speedBlitzOn",speedBlitz);
         nbt.putByte("speedBlitzDash",speedBlitzDashTimer);
         nbt.putByte("speedBlitzes",speedBlitzDashes);
@@ -466,6 +474,7 @@ public class BaseformProperties extends FormProperties {
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 50);
         boolean melee = meleeHitCount > 3;
         boolean hummingTop = this.hummingTop > 0;
+        boolean smashBarrage = (this.smashBarrage > 0);
         boolean stomping = (this.stomp > 0);
 
         boolean tornadoJump = (this.tornadoJump != 0);
@@ -483,7 +492,7 @@ public class BaseformProperties extends FormProperties {
         boolean ultimate = (this.ultimateUse > 0);
 
         return quickCyloop ||
-                ballForm || homingAttack || speedBlitzDash || melee || hummingTop || stomping ||
+                ballForm || homingAttack || speedBlitzDash || melee || hummingTop || smashBarrage || stomping ||
                 tornadoJump || mirageTimer || lightSpeedRush || spinSlash || cycloneKick || windmillKick || afterimage || wildRush || loopKick ||
                 homingShot ||
                 ultimate;
@@ -498,6 +507,7 @@ public class BaseformProperties extends FormProperties {
         boolean speedBlitzDash = (this.speedBlitzDashTimer > 0);
         boolean homingAttack = (homingAttackAirTime > 0 && homingAttackAirTime < 44);
         boolean hummingTop = (this.hummingTop > 0);
+        boolean smashBarrage = (this.smashBarrage > 0);
         boolean stomping = (this.stomp > 0);
 
         boolean tornadoJump = (this.tornadoJump > 0);
@@ -518,7 +528,7 @@ public class BaseformProperties extends FormProperties {
         boolean ultimate = (this.ultimateUse > 0);
 
         return quickCyloop ||
-                homingAttack || hummingTop || ballform || speedBlitzDash || stomping ||
+                homingAttack || hummingTop || smashBarrage || ballform || speedBlitzDash || stomping ||
                 tornadoJump || lightSpeedRush || spinSlash || cycloneKick || windmillKick || wildRush || loopKick ||
                 crossSlash || homingShot || sonicBoom || sonicWind ||
                 parry || grandSlam ||
