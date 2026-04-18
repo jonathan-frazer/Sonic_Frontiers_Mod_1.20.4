@@ -1,5 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.power_boost;
 
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -79,6 +80,11 @@ public class PowerBoostDeactivate implements CustomPacketPayload {
 
         //Power Boost
         baseformProperties.powerBoost = false;
+        baseformProperties.powerBoostLevel = 0;
+
+        //Restore tick rate
+        CommandSourceStack cs = player.createCommandSourceStack().withPermission(4).withSuppressedOutput();
+        player.serverLevel().getServer().getCommands().performPrefixedCommand(cs, "tick rate 20");
 
         //Remove Speed Multiplier
         if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.POWERBOOST_SPEED.id()))

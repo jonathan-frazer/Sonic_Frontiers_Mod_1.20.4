@@ -12,6 +12,7 @@ import net.sonicrushxii.beyondthehorizon.BeyondTheHorizon;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.Cyloop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.AirBoost;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.BoostAuraToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Boost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Sidestep;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCancel;
@@ -105,6 +106,7 @@ public class PacketHandler {
 
         //Slot 1
         registrar.playToServer(AirBoost.TYPE, AirBoost.STREAM_CODEC, AirBoost::handle);
+        registrar.playToServer(BoostAuraToggle.TYPE, BoostAuraToggle.STREAM_CODEC, BoostAuraToggle::handle);
         registrar.playToServer(Boost.TYPE, Boost.STREAM_CODEC, Boost::handle);
         registrar.playToServer(Sidestep.TYPE, Sidestep.STREAM_CODEC, Sidestep::handle);
         registrar.playToServer(LightspeedCharge.TYPE, LightspeedCharge.STREAM_CODEC, LightspeedCharge::handle);

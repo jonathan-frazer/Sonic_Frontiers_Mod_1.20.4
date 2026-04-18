@@ -11,7 +11,9 @@ public class AttributeMultipliers {
     public static final AttributeModifier LIGHTSPEED_MODE = new AttributeModifier(
             ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "lightspeed_mode"), 1.0F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     public static final AttributeModifier POWERBOOST_SPEED = new AttributeModifier(
-            ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "power_boost_speed"), 0.60F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "power_boost_speed"), 0.25F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+    public static final AttributeModifier BOOST_AURA_SPEED = new AttributeModifier(
+            ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "boost_aura_speed"), 0.15F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     public static final AttributeModifier POWERBOOST_ARMOR = new AttributeModifier(
             ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "power_boost_armor"), 3.67F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     public static final AttributeModifier SMASH_HIT = new AttributeModifier(

@@ -17,7 +17,11 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
+import net.minecraft.server.level.ServerPlayer;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import org.joml.Vector3f;
@@ -136,9 +140,14 @@ public class SpinSlashCloud extends PointEntity {
                 }))
         {
             //Damage Enemy
+            float dmg = BaseformServer.SPINSLASH_DAMAGE;
+            if (this.getOwner() instanceof ServerPlayer owner) {
+                PlayerSonicForm psf = owner.getData(ModAttachments.PLAYER_SONIC_FORM);
+                dmg += ((BaseformProperties) psf.getFormProperties()).boostLvl * 10.0f;
+            }
             enemy.hurt(
                     ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(),this.getOwner()),
-                    BaseformServer.SPINSLASH_DAMAGE
+                    dmg
             );
         }
     }

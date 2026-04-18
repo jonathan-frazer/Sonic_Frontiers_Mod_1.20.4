@@ -78,6 +78,7 @@ public class BaseformServer
     //Combo — base 15dmg + 10 per boost level (15/25/35/45 for levels 0/1/2/3)
     private static final float HOMING_ATTACK_BASE_DAMAGE = 15.0f;
     private static final float HOMING_ATTACK_DAMAGE = 15.0f;
+    private static final float BOOST_AURA_DAMAGE = 15.0f;
     private static final float BALLFORM_DAMAGE = 10.0f;
     private static final float HUMMING_TOP_DAMAGE = 3.0f;
     public static final float STOMP_DAMAGE = 8.0f;
@@ -343,6 +344,22 @@ public class BaseformServer
                         );
                     }
 
+                    //Boost Aura (damaging aura while boosting)
+                    if (baseformProperties.boostAura && baseformProperties.boosted && player.isSprinting()
+                            && player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR
+                            && (player.tickCount % 5 == 0)) {
+                        float auraDmg = BOOST_AURA_DAMAGE + (baseformProperties.boostLvl * 10.0f);
+                        for (LivingEntity enemy : level.getEntitiesOfClass(LivingEntity.class,
+                                new AABB(player.getX() + 2.5, player.getY() + 2.0, player.getZ() + 2.5,
+                                         player.getX() - 2.5, player.getY() - 2.0, player.getZ() - 2.5),
+                                target -> !target.is(player))) {
+                            enemy.hurt(ModDamageTypes.getDamageSource(level, ModDamageTypes.SONIC_MELEE.getResourceKey(), player), auraDmg);
+                            Vec3 knockDir = enemy.position().subtract(player.position()).normalize();
+                            enemy.setDeltaMovement(knockDir.scale(1.5));
+                            player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
+                        }
+                    }
+
                     //Base Cyloop
                     if(baseformProperties.cylooping != 0)
                     {
@@ -504,7 +521,7 @@ public class BaseformServer
                                     (e)->!e.is(player)))
                                 if (nearbyEntity.hurtTime == 0)
                                     nearbyEntity.hurt(ModDamageTypes.getDamageSource(level,
-                                            ModDamageTypes.SONIC_BALL.getResourceKey(), player), BALLFORM_DAMAGE * 0.5f);
+                                            ModDamageTypes.SONIC_BALL.getResourceKey(), player), (BALLFORM_DAMAGE + baseformProperties.boostLvl * 10.0f) * 0.5f);
 
                             Vec3 playerLookVector = player.getLookAngle();
 
@@ -631,7 +648,7 @@ public class BaseformServer
                                         player.getX()-0.5,player.getY(),player.getZ()-0.5),(enemy)->!enemy.is(player)))
                         {
                             enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player),
-                                    BALLFORM_DAMAGE);
+                                    BALLFORM_DAMAGE + baseformProperties.boostLvl * 10.0f);
                             player.addDeltaMovement(new Vec3(0.0,0.3,0.0));
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
                         }
@@ -708,7 +725,7 @@ public class BaseformServer
                             ),(enemy)->!enemy.is(player)))
                             {
                                 enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player),
-                                        SPEED_BLITZ_DASH_DAMAGE);
+                                        SPEED_BLITZ_DASH_DAMAGE + baseformProperties.boostLvl * 10.0f);
                             }
                         }
                         if(baseformProperties.speedBlitzDashTimer == 5)

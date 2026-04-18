@@ -218,16 +218,26 @@ public class BaseformClient {
                         PacketHandler.sendToServer(new LightspeedCancel());
                     }
                 }
-                //Power Boost
+                //Power Boost (V: increment level 1-4; Shift+V: reset/deactivate)
                 {
-                    //Activate if Player Presses Z
                     if(VirtualSlotHandler.getCurrAbility() == 0 && !baseformProperties.isAttacking() &&
                             baseformProperties.getCooldown(BaseformActiveAbility.POWER_BOOST) == (byte) 0 &&
                             KeyBindings.INSTANCE.useAbility3.consumeClick())
                     {
-                        if(baseformProperties.powerBoost)   PacketHandler.sendToServer(new PowerBoostDeactivate());
-                        else                                PacketHandler.sendToServer(new PowerBoostActivate());
+                        if (player.isShiftKeyDown() && baseformProperties.powerBoost)
+                            PacketHandler.sendToServer(new PowerBoostDeactivate());
+                        else if (!player.isShiftKeyDown() && baseformProperties.powerBoostLevel < 4)
+                            PacketHandler.sendToServer(new PowerBoostActivate());
                         while(KeyBindings.INSTANCE.useAbility3.consumeClick());
+                    }
+                }
+
+                //Boost Aura (C key in Boost slot)
+                {
+                    if (VirtualSlotHandler.getCurrAbility() == 0 &&
+                            KeyBindings.INSTANCE.useAbility4.consumeClick()) {
+                        PacketHandler.sendToServer(new net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.BoostAuraToggle());
+                        while (KeyBindings.INSTANCE.useAbility4.consumeClick());
                     }
                 }
 
@@ -375,7 +385,7 @@ public class BaseformClient {
                             && KeyBindings.INSTANCE.useAbility4.isDown())
                     {
                         //Add Number
-                        baseformProperties.smashHit = (byte) Math.min(baseformProperties.smashHit+ (byte)((baseformProperties.powerBoost)?2:1),65);
+                        baseformProperties.smashHit = (byte) Math.min(baseformProperties.smashHit+ (byte)((baseformProperties.powerBoostLevel > 0)?2:1),65);
                         PacketHandler.sendToServer(new SetSmashHitChargeC2S(baseformProperties.smashHit));
                     }
 

@@ -17,9 +17,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
+import net.minecraft.server.level.ServerPlayer;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.entities.all.LinearMovingEntity;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 
 import javax.annotation.Nullable;
@@ -131,10 +135,15 @@ public class SonicBoomProjectile extends LinearMovingEntity {
             );
             if (!enemies.isEmpty() && this.getDuration() < this.MAX_DURATION-4) {
                 try {// Synchronize on server only
+                    float dmg = BaseformServer.SONIC_BOOM_DAMAGE;
+                    if (this.getOwner() instanceof ServerPlayer owner) {
+                        PlayerSonicForm psf = owner.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        dmg += ((BaseformProperties) psf.getFormProperties()).boostLvl * 10.0f;
+                    }
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(
                                 ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), this.getOwner()),
-                                BaseformServer.SONIC_BOOM_DAMAGE
+                                dmg
                         );
                     }
                 }catch(NullPointerException ignored){}

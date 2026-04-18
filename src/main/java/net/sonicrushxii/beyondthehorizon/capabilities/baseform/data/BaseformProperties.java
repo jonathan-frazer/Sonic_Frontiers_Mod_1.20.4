@@ -134,6 +134,8 @@ public class BaseformProperties extends FormProperties {
     public boolean isWaterBoosting;
     public byte lightSpeedState;
     public boolean powerBoost;
+    public byte powerBoostLevel;
+    public boolean boostAura;
     public short cylooping;
     public byte quickCyloop;
     public UUID qkCyloopTarget;
@@ -219,6 +221,8 @@ public class BaseformProperties extends FormProperties {
         isWaterBoosting = false;
         lightSpeedState = 0;
         powerBoost = false;
+        powerBoostLevel = 0;
+        boostAura = false;
         cylooping = 0;
         quickCyloop = 0;
         qkCyloopTarget = new UUID(0L,0L);
@@ -306,6 +310,8 @@ public class BaseformProperties extends FormProperties {
         isWaterBoosting = nbt.getBoolean("IsWaterBoosting");
         lightSpeedState = nbt.getByte("LightSpeedState");
         powerBoost = nbt.getBoolean("PowerBoost");
+        powerBoostLevel = nbt.getByte("PowerBoostLevel");
+        boostAura = nbt.getBoolean("BoostAura");
         cylooping = nbt.getShort("cyloopTime");
         quickCyloop = nbt.getByte("quickCyloop");
         qkCyloopTarget = nbt.getUUID("QkCyloopTarget");
@@ -396,6 +402,8 @@ public class BaseformProperties extends FormProperties {
         nbt.putBoolean("IsWaterBoosting",isWaterBoosting);
         nbt.putByte("LightSpeedState",lightSpeedState);
         nbt.putBoolean("PowerBoost",powerBoost);
+        nbt.putByte("PowerBoostLevel",powerBoostLevel);
+        nbt.putBoolean("BoostAura",boostAura);
         nbt.putShort("cyloopTime",cylooping);
         nbt.putByte("QuickCyloop",quickCyloop);
         nbt.putUUID("QkCyloopTarget",qkCyloopTarget);

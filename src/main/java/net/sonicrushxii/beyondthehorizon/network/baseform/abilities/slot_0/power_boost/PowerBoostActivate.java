@@ -5,7 +5,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,6 +12,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
@@ -86,25 +86,32 @@ public class PowerBoostActivate implements CustomPacketPayload {
             player.setItemSlot(EquipmentSlot.HEAD, BaseformProperties.baseformPBSonicHead);
         }
 
-        //Power Boost Data
+        //Increment Power Boost Level (1-4)
+        baseformProperties.powerBoostLevel = (byte) Math.min(baseformProperties.powerBoostLevel + 1, 4);
         baseformProperties.powerBoost = true;
-        player.setDeltaMovement(0.0,0.0,0.0);
-        player.connection.send(new ClientboundSetEntityMotionPacket(player));
-        player.addEffect(new MobEffectInstance(ModEffects.INITATE_POWER_BOOST,6,0,false,false,false));
 
-        //Perform Blast
+        //Perform Blast firework
         {
-            //Commands
             CommandSourceStack commandSourceStack = player.createCommandSourceStack().withPermission(4).withSuppressedOutput();
             MinecraftServer server = player.serverLevel().getServer();
-            server.
-                    getCommands().
-                    performPrefixedCommand(commandSourceStack,"summon firework_rocket ~ ~ ~ {Life:0,LifeTime:0,FireworksItem:{id:\"firework_rocket\",Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1b,Colors:[I;255,16777215],FadeColors:[I;65535,65535]}]}}}}");
+            server.getCommands().performPrefixedCommand(commandSourceStack,
+                    "summon firework_rocket ~ ~ ~ {Life:0,LifeTime:0,FireworksItem:{id:\"firework_rocket\",Count:1,tag:{Fireworks:{Explosions:[{Type:4,Flicker:1b,Colors:[I;255,16777215],FadeColors:[I;65535,65535]}]}}}}");
         }
 
-        //Add Speed Multiplier
-        if (!player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.POWERBOOST_SPEED.id()))
-            player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(AttributeMultipliers.POWERBOOST_SPEED);
+        //Tick rate per level: 75%/50%/25%/lowest
+        {
+            CommandSourceStack cs = player.createCommandSourceStack().withPermission(4).withSuppressedOutput();
+            int[] tickRates = {15, 10, 5, 1};
+            int rate = tickRates[baseformProperties.powerBoostLevel - 1];
+            player.serverLevel().getServer().getCommands().performPrefixedCommand(cs, "tick rate " + rate);
+        }
+
+        //Update Speed Multiplier (0.25 per level: 25%/50%/75%/100%)
+        if (player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.POWERBOOST_SPEED.id()))
+            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.POWERBOOST_SPEED.id());
+        double speedBonus = 0.25 * baseformProperties.powerBoostLevel;
+        player.getAttribute(Attributes.MOVEMENT_SPEED).addTransientModifier(
+                new AttributeModifier(AttributeMultipliers.POWERBOOST_SPEED.id(), speedBonus, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
         //Add Armor Multiplier
         if(!player.getAttribute(Attributes.ARMOR).hasModifier(AttributeMultipliers.POWERBOOST_ARMOR.id()))
