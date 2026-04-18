@@ -2,8 +2,6 @@ package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -148,7 +146,7 @@ public class BaseformHandler {
                     //Perform Knockup/Knockdown
                     assert damageGiver != null;
 
-                    if (!damageGiver.onGround())
+                    if (!damageGiver.onGround() && !damageTaker.onGround())
                     {
                         damageTaker.setDeltaMovement(Vec3.ZERO);
                         damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
@@ -168,35 +166,15 @@ public class BaseformHandler {
                     }
                     if (baseformProperties.meleeHitCount == 3)
                     {
-                        if (damageGiver.isShiftKeyDown()||damageGiver.getXRot() < 0) {
-                            damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 10, false, false));
-                            damageTaker.addEffect(new MobEffectInstance(ModEffects.COMBO_EFFECT, 40, 0, false, false));
-                            damageTaker.moveTo(damageTaker.getX(), damageTaker.getY() + 5.0, damageTaker.getZ());
-                        }
-                        else if(damageGiver.getXRot() > 0)
-                        {
-                            //Sonic Eagle
-                            damageGiver.displayClientMessage(Component.translatable("Sonic Eagle").withStyle(Style.EMPTY.withColor(0xFFA500)),true);
-
-                            PacketHandler.sendToALLPlayers(new ParticleDirPacketS2C(
-                                    ParticleTypes.FLAME,
-                                    damageTaker.getX(), damageTaker.getY()+damageTaker.getEyeHeight(), damageTaker.getZ(),
-                                    0.0,-0.1,0.0 ,0.65f, 0.65f, 0.65f, 30,
-                                    true)
-                            );
-                            //Sound Effect
-                            damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.MASTER, 1.0f, 1.0f);
-
-                            damageGiver.removeEffect(MobEffects.SLOW_FALLING);
-                            damageTaker.removeEffect(ModEffects.COMBO_EFFECT);
-                            damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),damageGiver), 6.0f);
-                            damageTaker.addDeltaMovement(new Vec3(0.0, -0.85, 0.0));
-                            damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
-                        }
+                        // 4th hit: extra damage and light forward knockback
+                        damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), damageGiver), 8.0f);
+                        Vec3 knockDir = damageGiver.getLookAngle();
+                        damageTaker.addDeltaMovement(new Vec3(knockDir.x * 0.8, 0.3, knockDir.z * 0.8));
+                        damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
                     }
 
                     //Increase Count
-                    baseformProperties.meleeHitCount = (byte) ((baseformProperties.meleeHitCount + 1) % 5);
+                    baseformProperties.meleeHitCount = (byte) ((baseformProperties.meleeHitCount + 1) % 4);
 
                     //Cancel the Current Combo schedule
                     ScheduledTask currentSchedule = hitSchedule.get(damageGiver.getUUID());
@@ -293,14 +271,7 @@ public class BaseformHandler {
                                         (event.getSource().is(ModDamageTypes.SONIC_CYLOOP.getResourceKey()))?event.getAmount()*2.0:event.getAmount()/1.3);
 
                 if(baseformProperties.ultimateAtkMeter > 100.0)
-                {
-                    if(!baseformProperties.ultReady) {
-                        assert damageGiver != null;
-                        damageGiver.level().playSound(null,damageGiver.getX(),damageGiver.getY(),damageGiver.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.MASTER, 1.0f, 2.0f);
-                    }
-                    baseformProperties.ultReady = true;
                     baseformProperties.ultimateAtkMeter = 100.0;
-                }
             }
 
             //Combo Display Increase
@@ -313,8 +284,11 @@ public class BaseformHandler {
             )
             {
                 //Increase Counter
-                if(!event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()) || baseformProperties.rangedComboTrip <= 0)
-                    baseformProperties.comboPointCount += 1;
+                if(!event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()) || baseformProperties.rangedComboTrip <= 0) {
+                    // Melee attacks only score every 2 hits
+                    if (!event.getSource().is(DamageTypes.PLAYER_ATTACK) || baseformProperties.meleeHitCount % 2 == 0)
+                        baseformProperties.comboPointCount += 1;
+                }
 
                 //Gives Ranged attack is a ~1 sec Delay
                 if(event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()) && baseformProperties.rangedComboTrip <= 0)

@@ -15,6 +15,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.BoostAuraToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Boost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.Sidestep;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.UniversalDash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCancel;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedCharge;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.light_speed_attack.LightspeedDecay;
@@ -54,6 +55,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.cross
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.homing_shot.HomingShot;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.EndSonicBoom;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_boom.SonicBoom;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wave.SonicWavePacket;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.QuickSonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWind;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWindParticleS2C;
@@ -66,6 +68,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.InstaShield;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.wall_boost.WallBoost;
 import net.sonicrushxii.beyondthehorizon.network.sync.*;
 import net.sonicrushxii.beyondthehorizon.timehandler.TimeProjSync;
@@ -101,8 +104,12 @@ public class PacketHandler {
         registrar.playToServer(StartSprint.TYPE, StartSprint.STREAM_CODEC, StartSprint::handle);
         registrar.playToServer(StopSprint.TYPE, StopSprint.STREAM_CODEC, StopSprint::handle);
         registrar.playToServer(DoubleJump.TYPE, DoubleJump.STREAM_CODEC, DoubleJump::handle);
+        registrar.playToServer(InstaShield.TYPE, InstaShield.STREAM_CODEC, InstaShield::handle);
         registrar.playToServer(DangerSenseToggle.TYPE, DangerSenseToggle.STREAM_CODEC, DangerSenseToggle::handle);
         registrar.playToServer(WallBoost.TYPE, WallBoost.STREAM_CODEC, WallBoost::handle);
+
+        //Universal (any slot)
+        registrar.playToServer(UniversalDash.TYPE, UniversalDash.STREAM_CODEC, UniversalDash::handle);
 
         //Slot 1
         registrar.playToServer(AirBoost.TYPE, AirBoost.STREAM_CODEC, AirBoost::handle);
@@ -155,6 +162,7 @@ public class PacketHandler {
         registrar.playToServer(EndSonicBoom.TYPE, EndSonicBoom.STREAM_CODEC, EndSonicBoom::handle);
         registrar.playToServer(SonicWind.TYPE, SonicWind.STREAM_CODEC, SonicWind::handle);
         registrar.playToServer(QuickSonicWind.TYPE, QuickSonicWind.STREAM_CODEC, QuickSonicWind::handle);
+        registrar.playToServer(SonicWavePacket.TYPE, SonicWavePacket.STREAM_CODEC, SonicWavePacket::handle);
 
         //Slot 5
         registrar.playToServer(Parry.TYPE, Parry.STREAM_CODEC, Parry::handle);

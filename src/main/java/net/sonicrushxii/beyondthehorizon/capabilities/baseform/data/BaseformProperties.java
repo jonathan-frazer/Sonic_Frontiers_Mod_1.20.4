@@ -194,6 +194,7 @@ public class BaseformProperties extends FormProperties {
     //Slot 6
     public double ultimateAtkMeter;
     public boolean ultReady;
+    public short ultimateCooldown;
     public short ultimateUse;
     public UUID ultTarget;
 
@@ -280,7 +281,8 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 6
         ultimateAtkMeter = 0.0;
-        ultReady = false;
+        ultReady = true;
+        ultimateCooldown = 0;
         ultimateUse = (short)0;
         ultTarget = new UUID(0L,0L);
     }
@@ -289,7 +291,11 @@ public class BaseformProperties extends FormProperties {
     {
         //Common
         helpScreenPageNo = nbt.getInt("HelpScreenPage");
-        abilityCooldowns = nbt.getByteArray("AbilityCooldowns");
+        {
+            byte[] loaded = nbt.getByteArray("AbilityCooldowns");
+            abilityCooldowns = new byte[BaseformActiveAbility.values().length];
+            System.arraycopy(loaded, 0, abilityCooldowns, 0, Math.min(loaded.length, abilityCooldowns.length));
+        }
         meleeHitCount = nbt.getByte("hitsPerformed");
         comboPointCount = nbt.getShort("comboPointCount");
         comboPointDisplay = nbt.getShort("comboPointDisplay");
@@ -369,7 +375,8 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 6
         ultimateAtkMeter = nbt.getDouble("UltimateMeter");
-        ultReady = nbt.getBoolean("UltimateReady");
+        ultimateCooldown = nbt.getShort("UltimateCooldown");
+        ultReady = (ultimateCooldown == 0);
         ultimateUse = nbt.getShort("UltimateUse");
         ultTarget = nbt.getUUID("UltimateTargetUUID");
     }
@@ -461,7 +468,7 @@ public class BaseformProperties extends FormProperties {
 
         //Slot 6
         nbt.putDouble("UltimateMeter",ultimateAtkMeter);
-        nbt.putBoolean("UltimateReady",ultReady);
+        nbt.putShort("UltimateCooldown",ultimateCooldown);
         nbt.putShort("UltimateUse",ultimateUse);
         nbt.putUUID("UltimateTargetUUID",ultTarget);
 

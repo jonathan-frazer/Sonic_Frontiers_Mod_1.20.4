@@ -69,6 +69,8 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability.UltimateActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.InstaShield;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.boost.UniversalDash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.wall_boost.WallBoost;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
@@ -132,6 +134,15 @@ public class BaseformClient {
                             && playerNBT.getCompound("abilities").getByte("flying") == 0
                             && !baseformProperties.isAttacking()) {
                         PacketHandler.sendToServer(new DoubleJump());
+                        while(KeyBindings.INSTANCE.doubleJump.consumeClick());
+                    }
+                    // Insta-shield: brief invulnerability on 3rd jump attempt
+                    else if (KeyBindings.INSTANCE.doubleJump.consumeClick()
+                            && !player.onGround() && !player.isSpectator()
+                            && !baseformProperties.hasDoubleJump
+                            && playerNBT.getCompound("abilities").getByte("flying") == 0
+                            && !baseformProperties.isAttacking()) {
+                        PacketHandler.sendToServer(new InstaShield());
                         while(KeyBindings.INSTANCE.doubleJump.consumeClick());
                     }
                 }
@@ -615,6 +626,27 @@ public class BaseformClient {
                         baseformProperties.homingShot = 1;
                         VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                     }
+                }
+
+                //Sonic Wave/Storm (useAbility5 = F key; ground=Wave, air=Storm)
+                {
+                    if (inRangedSlot && !baseformProperties.isAttacking() &&
+                            baseformProperties.getCooldown(BaseformActiveAbility.SONIC_WAVE) == 0 &&
+                            KeyBindings.INSTANCE.useAbility5.consumeClick()) {
+                        PacketHandler.sendToServer(new net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wave.SonicWavePacket());
+                        VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
+                        while (KeyBindings.INSTANCE.useAbility5.consumeClick());
+                    }
+                }
+            }
+
+            //Universal Dash (G key - any slot)
+            {
+                if (!baseformProperties.isAttacking() &&
+                        baseformProperties.getCooldown(BaseformActiveAbility.UNIVERSAL_DASH) == 0 &&
+                        KeyBindings.INSTANCE.dashKey.consumeClick()) {
+                    PacketHandler.sendToServer(new UniversalDash());
+                    while (KeyBindings.INSTANCE.dashKey.consumeClick());
                 }
             }
 

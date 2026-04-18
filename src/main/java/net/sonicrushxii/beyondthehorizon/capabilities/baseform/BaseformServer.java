@@ -2354,6 +2354,10 @@ public class BaseformServer
                     if(allCooldowns[i] != (byte)-1)
                         allCooldowns[i] = (byte) Math.max(0, allCooldowns[i] - 1);
                 }
+                // Ultimate cooldown exceeds byte range; stored separately
+                if (baseformProperties.ultimateCooldown > 0)
+                    baseformProperties.ultimateCooldown--;
+                baseformProperties.ultReady = (baseformProperties.ultimateCooldown == 0);
             }
 
             //Data

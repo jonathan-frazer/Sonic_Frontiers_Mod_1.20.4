@@ -19,6 +19,7 @@ import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageCloud;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageEntity;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.phantom_rush.PhantomRushEntity;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_boom.SonicBoomProjectile;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wave.SonicWaveEntity;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_wind.SonicWind;
 
 public class ModEntityTypes {
@@ -52,6 +53,10 @@ public class ModEntityTypes {
             () -> EntityType.Builder.<CrossSlashProjectile>of(CrossSlashProjectile::new, MobCategory.MISC)
                     .sized(1F, 5F)  // Define the size of the entity
                     .build("baseform/cross_slash"));
+    public static final DeferredHolder<EntityType<?>, EntityType<SonicWaveEntity>> BASEFORM_SONIC_WAVE = ENTITY_TYPES.register("baseform/sonic_wave",
+            () -> EntityType.Builder.<SonicWaveEntity>of(SonicWaveEntity::new, MobCategory.MISC)
+                    .sized(1F, 2F)
+                    .build("baseform/sonic_wave"));
     public static final DeferredHolder<EntityType<?>, EntityType<SonicWind>> BASEFORM_SONIC_WIND = ENTITY_TYPES.register("baseform/sonic_wind",
             () -> EntityType.Builder.<SonicWind>of(SonicWind::new, MobCategory.MISC)
                     .sized(1F, 5F)  // Define the size of the entity
