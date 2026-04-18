@@ -21,6 +21,7 @@ import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleRaycastPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
+import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 import org.joml.Vector3f;
 
 public class AirBoost implements CustomPacketPayload {
@@ -73,10 +74,17 @@ public class AirBoost implements CustomPacketPayload {
             //Ballform
             baseformProperties.ballFormState = (byte)3;
 
-            //Add Trajectory
-            player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
-            player.addDeltaMovement(player.getLookAngle().scale(2*player.getAttribute(Attributes.MOVEMENT_SPEED).getValue()));
+            //Hover briefly (zero movement, no gravity), then launch in look direction after 5 ticks
+            Vec3 launchDir = player.getLookAngle();
+            double launchSpeed = 2 * player.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
+            player.setDeltaMovement(0, 0, 0);
+            player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
+            Scheduler.scheduleTask(() -> {
+                player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+                player.setDeltaMovement(launchDir.scale(launchSpeed));
+                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+            }, 5);
         }
 
         PacketHandler.sendToALLPlayers(

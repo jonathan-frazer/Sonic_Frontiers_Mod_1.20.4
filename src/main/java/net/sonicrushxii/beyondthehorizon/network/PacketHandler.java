@@ -62,6 +62,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.grand_slam.GrandSlam;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.Parry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability.PhantomRushActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability.UltimateActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.HelpScreenSync;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
@@ -171,6 +172,7 @@ public class PacketHandler {
 
         //Slot 6
         registrar.playToServer(UltimateActivate.TYPE, UltimateActivate.STREAM_CODEC, UltimateActivate::handle);
+        registrar.playToServer(PhantomRushActivate.TYPE, PhantomRushActivate.STREAM_CODEC, PhantomRushActivate::handle);
     }
 
     public static void sendToServer(CustomPacketPayload msg) {

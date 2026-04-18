@@ -66,6 +66,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.grand_slam.GrandSlam;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.Parry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability.PhantomRushActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_5.ultimate_ability.UltimateActivate;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseToggle;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.doublejump.DoubleJump;
@@ -403,8 +404,8 @@ public class BaseformClient {
                     //If Smash hit is Enabled
                     if(baseformProperties.smashHit > 0)
                     {
-                        //Turn off automatically if you switch to another slot or start another attack
-                        if(VirtualSlotHandler.getCurrAbility() != 1 || baseformProperties.isAttacking() || !KeyBindings.INSTANCE.useAbility4.isDown()) {
+                        //Turn off automatically if you switch to another slot or start another attack (speed blitz dash is allowed simultaneously)
+                        if(VirtualSlotHandler.getCurrAbility() != 1 || (baseformProperties.isAttacking() && baseformProperties.speedBlitzDashTimer == 0) || !KeyBindings.INSTANCE.useAbility4.isDown()) {
                             baseformProperties.smashHit = 0;
                             PacketHandler.sendToServer(new SetSmashHitChargeC2S((byte) 0));
                         }
@@ -667,8 +668,22 @@ public class BaseformClient {
             //Ultimate Slot (slot 2)
             {
                 final boolean inUltSlot = VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_ULTIMATE;
+                //Phantom Rush (Shift+H — standalone punch-rush without around-the-world)
+                if(!baseformProperties.isAttacking() && baseformProperties.getCooldown(BaseformActiveAbility.PHANTOM_RUSH) == 0 &&
+                        player.isShiftKeyDown() && KeyBindings.INSTANCE.useUltimateAbility.isDown())
+                {
+                    ClientOnlyData.ultTargetReticle = null;
+                    PhantomRushActivate.scanForward(player);
+                    if(ClientOnlyData.ultTargetReticle != null)
+                    {
+                        PacketHandler.sendToServer(new PhantomRushActivate(ClientOnlyData.ultTargetReticle));
+                        baseformProperties.ultimateUse = 1;
+                    }
+                }
+
                 //Ultimate Ability (useAbility1 = R key in Ultimate slot, or useUltimateAbility = H key)
                 if(!baseformProperties.isAttacking() && baseformProperties.ultReady &&
+                        !player.isShiftKeyDown() &&
                         (KeyBindings.INSTANCE.useUltimateAbility.isDown() || (inUltSlot && KeyBindings.INSTANCE.useAbility1.isDown())))
                 {
                     ClientOnlyData.ultTargetReticle = null;

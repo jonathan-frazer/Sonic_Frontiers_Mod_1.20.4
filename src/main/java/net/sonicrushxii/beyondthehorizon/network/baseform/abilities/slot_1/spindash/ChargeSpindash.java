@@ -48,8 +48,8 @@ public class ChargeSpindash implements CustomPacketPayload {
                         //Set Data -> Charging (ball form, free movement)
                         baseformProperties.ballFormState = (byte)1;
 
-                        //Slightly slow player but allow movement
-                        player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.04);
+                        //Slight slowdown during charge (does not stop player completely)
+                        player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.25);
 
                         //PlaySound
                         Level world = player.level();

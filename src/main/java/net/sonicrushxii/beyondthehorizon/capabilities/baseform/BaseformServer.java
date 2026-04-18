@@ -152,13 +152,19 @@ public class BaseformServer
                 if(player.onGround())
                     baseformProperties.groundTraction = true;
 
-                //Combo Meter
+                //Combo Meter — 30-tick delay after landing before finalizing score
                 if(player.onGround() && baseformProperties.comboPointCount > 0 && !baseformProperties.isAttacking() &&
-                        !(baseformProperties.homingAttackAirTime > 0))
+                        !(baseformProperties.homingAttackAirTime > 0) && baseformProperties.comboLandDelay == 0)
                 {
-                    baseformProperties.comboPointDisplay = baseformProperties.comboPointCount;
-                    baseformProperties.comboPointCount = 0;
-                    Scheduler.scheduleTask(()-> baseformProperties.comboPointDisplay = 0,100);
+                    baseformProperties.comboLandDelay = 30;
+                }
+                if(baseformProperties.comboLandDelay > 0) {
+                    baseformProperties.comboLandDelay -= 1;
+                    if(baseformProperties.comboLandDelay == 0 && baseformProperties.comboPointCount > 0) {
+                        baseformProperties.comboPointDisplay = baseformProperties.comboPointCount;
+                        baseformProperties.comboPointCount = 0;
+                        Scheduler.scheduleTask(()-> baseformProperties.comboPointDisplay = 0,100);
+                    }
                 }
 
                 //Subdue Hunger
@@ -681,23 +687,29 @@ public class BaseformServer
                             //Add Time
                             baseformProperties.hummingTop += 1;
 
-                            //Go Forward at current run speed
                             Vec3 lookAngle = player.getLookAngle();
-                            double hummingSpeed = Math.max(1.0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 15.0);
-                            player.setDeltaMovement(new Vec3(lookAngle.x,-0.1,lookAngle.z).scale(hummingSpeed));
-                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                             //Damage and Move Entities (dmg = player attack damage)
                             float hummingDmg = (float) Math.max(HUMMING_TOP_DAMAGE, player.getAttribute(Attributes.ATTACK_DAMAGE).getValue());
-                            for(LivingEntity enemy: level.getEntitiesOfClass(LivingEntity.class,
+                            List<LivingEntity> juggledEnemies = level.getEntitiesOfClass(LivingEntity.class,
                                     new AABB(player.getX()+1.0,player.getY()+0.75,player.getZ()+1.0,
-                                            player.getX()-1.0,player.getY()-0.25,player.getZ()-1.0),(enemy)->!enemy.is(player)))
+                                            player.getX()-1.0,player.getY()-0.25,player.getZ()-1.0),(enemy)->!enemy.is(player));
+                            for(LivingEntity enemy: juggledEnemies)
                             {
                                 enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(), player),
                                         hummingDmg);
                                 enemy.teleportTo(player.getX()+lookAngle.x*2.0,player.getY()+lookAngle.y*2.0,player.getZ()+lookAngle.z*2.0);
                                 player.connection.send(new ClientboundTeleportEntityPacket(enemy));
                             }
+
+                            //Move at current running speed; hover in place while juggling an enemy
+                            if(juggledEnemies.isEmpty()) {
+                                double hummingSpeed = Math.max(1.0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 15.0);
+                                player.setDeltaMovement(new Vec3(lookAngle.x,-0.1,lookAngle.z).scale(hummingSpeed));
+                            } else {
+                                player.setDeltaMovement(0, 0, 0);
+                            }
+                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                         }
 
@@ -840,13 +852,14 @@ public class BaseformServer
                             //Increase Time
                             baseformProperties.tornadoJump += 1;
 
-                            //Particle
-                            PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                    new DustParticleOptions(new Vector3f(0.0f, 1.0f, 1.0f), 1.5f),
-                                    player.getX(), player.getY() + 1, player.getZ(),
-                                    0.0, 0.55f, 0.55f, 0.55f, 10,
-                                    true)
-                            );
+                            //Particle — column shape: 5 layers from feet to 2 blocks above
+                            for (int col = 0; col < 5; col++) {
+                                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                        new DustParticleOptions(new Vector3f(0.0f, 1.0f, 1.0f), 1.5f),
+                                        player.getX(), player.getY() + col * 0.45, player.getZ(),
+                                        0.0, 0.35f, 0.05f, 0.35f, 2,
+                                        true));
+                            }
 
                             //Motion
                             Vec3 motionDirection = new Vec3(
@@ -2151,6 +2164,12 @@ public class BaseformServer
                                         1.0F);
                             }
 
+                            //Phantom Rush Only — end after uppercut phase
+                            else if(baseformProperties.phantomRushOnly)
+                            {
+                                throw new InterruptedException("Phantom Rush Only");
+                            }
+
                             //Coriolis Punch
                             else if(baseformProperties.ultimateUse < 200)
                             {
@@ -2324,6 +2343,7 @@ public class BaseformServer
 
                         //Return Attributes to normal
                         baseformProperties.ultimateUse = 0;
+                        baseformProperties.phantomRushOnly = false;
                         player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.0);
                         player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
                     }

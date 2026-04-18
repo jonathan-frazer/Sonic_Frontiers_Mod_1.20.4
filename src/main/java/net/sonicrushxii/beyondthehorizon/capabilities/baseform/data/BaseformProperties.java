@@ -116,6 +116,7 @@ public class BaseformProperties extends FormProperties {
     private final byte[] abilityCooldowns;
     public short comboPointCount;
     public short comboPointDisplay;
+    public byte comboLandDelay;
     public float atkRotPhase;
 
     //Passives
@@ -197,6 +198,7 @@ public class BaseformProperties extends FormProperties {
     public short ultimateCooldown;
     public short ultimateUse;
     public UUID ultTarget;
+    public boolean phantomRushOnly;
 
     public BaseformProperties()
     {
@@ -205,6 +207,7 @@ public class BaseformProperties extends FormProperties {
         meleeHitCount = 0;
         comboPointCount = 0;
         comboPointDisplay = 0;
+        comboLandDelay = 0;
         atkRotPhase = 0.0f;
 
         //Passives
@@ -285,6 +288,7 @@ public class BaseformProperties extends FormProperties {
         ultimateCooldown = 0;
         ultimateUse = (short)0;
         ultTarget = new UUID(0L,0L);
+        phantomRushOnly = false;
     }
 
     public BaseformProperties(CompoundTag nbt)
@@ -299,6 +303,7 @@ public class BaseformProperties extends FormProperties {
         meleeHitCount = nbt.getByte("hitsPerformed");
         comboPointCount = nbt.getShort("comboPointCount");
         comboPointDisplay = nbt.getShort("comboPointDisplay");
+        comboLandDelay = nbt.getByte("comboLandDelay");
         atkRotPhase = nbt.getFloat("atkRotPhase");
 
         //Passives
@@ -379,6 +384,7 @@ public class BaseformProperties extends FormProperties {
         ultReady = (ultimateCooldown == 0);
         ultimateUse = nbt.getShort("UltimateUse");
         ultTarget = nbt.getUUID("UltimateTargetUUID");
+        phantomRushOnly = nbt.getBoolean("PhantomRushOnly");
     }
 
     @Override
@@ -392,6 +398,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("hitsPerformed", meleeHitCount);
         nbt.putShort("comboPointCount",comboPointCount);
         nbt.putShort("comboPointDisplay",comboPointDisplay);
+        nbt.putByte("comboLandDelay",comboLandDelay);
         nbt.putFloat("atkRotPhase", atkRotPhase);
 
         //Passives
@@ -471,6 +478,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putShort("UltimateCooldown",ultimateCooldown);
         nbt.putShort("UltimateUse",ultimateUse);
         nbt.putUUID("UltimateTargetUUID",ultTarget);
+        nbt.putBoolean("PhantomRushOnly",phantomRushOnly);
 
         return nbt;
     }
