@@ -59,6 +59,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_3.sonic_wind.SonicWindParticleS2C;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.AttributeMultipliers;
+import net.sonicrushxii.beyondthehorizon.network.baseform.passives.wall_boost.WallBoost;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StartSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.StopSprint;
 import net.sonicrushxii.beyondthehorizon.network.baseform.passives.danger_sense.DangerSenseEmit;
@@ -145,7 +146,7 @@ public class BaseformServer
                             ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+"")
                     )
                     {
-                        player.setDeltaMovement(player.getDeltaMovement().x,-0.65,player.getDeltaMovement().z);
+                        player.setDeltaMovement(player.getDeltaMovement().x,-0.35,player.getDeltaMovement().z);
                         player.connection.send(new ClientboundSetEntityMotionPacket(player));
                     }
                 }
@@ -288,7 +289,21 @@ public class BaseformServer
                         //Wall Boost
                         if(baseformProperties.wallBoosting)
                         {
-                            if (!ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + ""))
+                            BlockPos pp = player.blockPosition();
+                            boolean stillTouching = switch (baseformProperties.wallRunSurface) {
+                                case 1 -> !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pp.offset(0, 0, -1)).getBlock())+"")
+                                       || !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pp.offset(0, 1, -1)).getBlock())+"");
+                                case 2 -> !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pp.offset(0, 0, 1)).getBlock())+"")
+                                       || !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pp.offset(0, 1, 1)).getBlock())+"");
+                                case 3 -> !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pp.offset(1, 0, 0)).getBlock())+"")
+                                       || !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pp.offset(1, 1, 0)).getBlock())+"");
+                                case 4 -> !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pp.offset(-1, 0, 0)).getBlock())+"")
+                                       || !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pp.offset(-1, 1, 0)).getBlock())+"");
+                                case 5 -> !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(pp.offset(0, 2, 0)).getBlock())+"");
+                                default -> false;
+                            };
+
+                            if (stillTouching)
                             {
                                 //Particle
                                 if(player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR)
@@ -320,13 +335,19 @@ public class BaseformServer
                                         default:
                                     }
 
-                                //Motion
-                                player.setDeltaMovement(new Vec3(0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 2.5, 0));
+                                //Motion — project look onto the surface plane each tick
+                                Vec3 look = player.getLookAngle();
+                                Vec3 normal = WallBoost.surfaceNormal(baseformProperties.wallRunSurface);
+                                Vec3 proj = look.subtract(normal.scale(look.dot(normal)));
+                                if (proj.lengthSqr() < 0.001) proj = new Vec3(0, 1, 0);
+                                double speed = player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 2.5;
+                                player.setDeltaMovement(proj.normalize().scale(speed));
                                 player.connection.send(new ClientboundSetEntityMotionPacket(player));
                             }
                             else {
                                 player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
                                 baseformProperties.wallBoosting = false;
+                                baseformProperties.wallRunSurface = 0;
                             }
                         }
                     }

@@ -28,59 +28,93 @@ public class WallBoost implements CustomPacketPayload {
         StreamCodec.of((buf, msg) -> msg.encode(buf), WallBoost::new);
 
     public WallBoost() {}
-
-    public WallBoost(FriendlyByteBuf buffer) {
-
-    }
-
-    public void encode(FriendlyByteBuf buffer){
-
-    }
+    public WallBoost(FriendlyByteBuf buffer) {}
+    public void encode(FriendlyByteBuf buffer) {}
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
+
+    // 0=none, 1=N(-Z), 2=S(+Z), 3=E(+X), 4=W(-X), 5=ceiling
+    public static Vec3 surfaceNormal(byte surface) {
+        return switch (surface) {
+            case 1 -> new Vec3(0, 0, 1);
+            case 2 -> new Vec3(0, 0, -1);
+            case 3 -> new Vec3(-1, 0, 0);
+            case 4 -> new Vec3(1, 0, 0);
+            case 5 -> new Vec3(0, -1, 0);
+            default -> Vec3.ZERO;
+        };
     }
 
-    public static void performWallBoost(ServerPlayer player, BaseformProperties baseformProperties)
-    {
-        //Move Upward
-        player.setSprinting(false);
+    public static boolean isSolid(ServerPlayer player, BlockPos pos) {
+        return !ModUtils.passableBlocks.contains(
+            BuiltInRegistries.BLOCK.getKey(player.level().getBlockState(pos).getBlock()) + "");
+    }
+
+    // Picks the wall/ceiling surface the player should run on.
+    public static byte detectSurface(ServerPlayer player) {
+        BlockPos pp = player.blockPosition();
+        // {dx, dz} for N, S, E, W
+        int[][] dirs = {{0, -1}, {0, 1}, {1, 0}, {-1, 0}};
+
+        Vec3 look = player.getLookAngle();
+        Vec3 lookH = new Vec3(look.x, 0, look.z);
+        if (lookH.lengthSqr() > 0.001) lookH = lookH.normalize();
+
+        byte best = 0;
+        double bestDot = 0.3; // minimum dot threshold to count as "facing the wall"
+
+        for (int i = 0; i < 4; i++) {
+            int dx = dirs[i][0], dz = dirs[i][1];
+            boolean solidLow  = isSolid(player, pp.offset(dx, 0, dz));
+            boolean solidHigh = isSolid(player, pp.offset(dx, 1, dz));
+            if (solidLow || solidHigh) {
+                double dot = lookH.x * dx + lookH.z * dz;
+                if (dot > bestDot) {
+                    bestDot = dot;
+                    best = (byte)(i + 1);
+                }
+            }
+        }
+
+        if (best != 0) return best;
+
+        // Ceiling fallback
+        if (isSolid(player, pp.offset(0, 2, 0))) return 5;
+        return 0;
+    }
+
+    public static void performWallBoost(ServerPlayer player, BaseformProperties baseformProperties) {
+        byte surface = detectSurface(player);
+        if (surface == 0) return;
+
+        baseformProperties.wallRunSurface = surface;
         baseformProperties.wallBoosting = true;
+        player.setSprinting(false);
         Objects.requireNonNull(player.getAttribute(Attributes.GRAVITY)).setBaseValue(0.0);
-        player.setDeltaMovement(new Vec3(0, Objects.requireNonNull(player.getAttribute(Attributes.MOVEMENT_SPEED)).getValue() * 2.5, 0));
+
+        Vec3 look = player.getLookAngle();
+        Vec3 normal = surfaceNormal(surface);
+        Vec3 proj = look.subtract(normal.scale(look.dot(normal)));
+        if (proj.lengthSqr() < 0.001) proj = new Vec3(0, 1, 0);
+        double speed = Objects.requireNonNull(player.getAttribute(Attributes.MOVEMENT_SPEED)).getValue() * 2.5;
+        player.setDeltaMovement(proj.normalize().scale(speed));
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }
 
     public static void handle(WallBoost msg, IPayloadContext ctx) {
-        ctx.enqueueWork(
-                ()->{
-                    ServerPlayer player = (ServerPlayer) ctx.player();
-                    if(player != null)
-                    {
-                        Vec3 playerDirCentre = ModUtils.calculateViewVector(0.0f, player.getViewYRot(0)).scale(0.75);
-                        BlockPos centrePos = player.blockPosition().offset(
-                                (int) Math.round(playerDirCentre.x),
-                                (Math.round(player.getY()) > player.getY()) ? 1 : 0,
-                                (int) Math.round(playerDirCentre.z)
-                        );
+        ctx.enqueueWork(() -> {
+            ServerPlayer player = (ServerPlayer) ctx.player();
+            if (player == null) return;
 
-                        PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        BaseformProperties baseformProperties =  (BaseformProperties) playerSonicForm.getFormProperties();
-                        //Wall Boost
-                        if (!ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(player.level().getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
-                                && baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3
-                                && player.isSprinting())
-                        {
-                            WallBoost.performWallBoost(player,baseformProperties);
-                            PacketHandler.sendToALLPlayers(
-                                    new SyncPlayerFormS2C(
-                                            player.getId(),
-                                            playerSonicForm
-                                    ));
-                        }
-                    }
-                });
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+
+            if (baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3
+                    && player.isSprinting() && !baseformProperties.wallBoosting) {
+                WallBoost.performWallBoost(player, baseformProperties);
+                PacketHandler.sendToALLPlayers(new SyncPlayerFormS2C(player.getId(), playerSonicForm));
+            }
+        });
     }
 }
-

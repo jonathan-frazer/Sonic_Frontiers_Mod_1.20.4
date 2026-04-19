@@ -192,12 +192,22 @@ public class BaseformClient {
                     //Quickstep
                     //Double Press
 
-                    //WallBoost
-                    if (!ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(player.level().getBlockState(centrePos.offset(0, 1, 0)).getBlock()) + "")
-                            && baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3
-                            && player.isSprinting() && !baseformProperties.wallBoosting && KeyBindings.INSTANCE.doubleJump.isDown())
+                    //WallBoost — auto-trigger when sprinting into a wall taller than auto-step or under a ceiling
                     {
-                        PacketHandler.sendToServer(new WallBoost());
+                        BlockPos pp = player.blockPosition();
+                        // Wall ahead: both foot and head level solid = 2+ block wall
+                        boolean wallAhead =
+                            !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(player.level().getBlockState(centrePos).getBlock()) + "")
+                            && !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(player.level().getBlockState(centrePos.above()).getBlock()) + "");
+                        // Ceiling 2 blocks above player's feet
+                        boolean ceilingAbove =
+                            !ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(player.level().getBlockState(pp.above(2)).getBlock()) + "");
+
+                        if ((wallAhead || ceilingAbove) && baseformProperties.boostLvl >= 1 && baseformProperties.boostLvl <= 3
+                                && player.isSprinting() && !baseformProperties.wallBoosting)
+                        {
+                            PacketHandler.sendToServer(new WallBoost());
+                        }
                     }
 
                 }

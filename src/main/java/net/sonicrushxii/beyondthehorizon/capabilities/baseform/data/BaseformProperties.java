@@ -129,6 +129,7 @@ public class BaseformProperties extends FormProperties {
     public byte momentumTimer;      // transient — not serialized
     public float momentumSpeed;     // transient — not serialized
     public byte bounceWindowTimer;  // transient — not serialized
+    public byte wallRunSurface;     // transient — 0=none 1=N 2=S 3=E 4=W 5=ceiling
 
     //Slot 1
     public byte airBoosts;
