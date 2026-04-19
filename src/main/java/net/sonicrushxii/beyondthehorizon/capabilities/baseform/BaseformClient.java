@@ -44,6 +44,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.SpindashBreak;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.BounceJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.afterimage.Afterimage;
@@ -97,6 +98,7 @@ public class BaseformClient {
 
         public static float[] wildRushYawPitch = {0f,0f};
         private static boolean airBoostLock = false;
+        public static boolean bounceRequestSent = false;
     }
 
     public static void performClientTick(AbstractClientPlayer player, CompoundTag playerNBT) {
@@ -420,6 +422,20 @@ public class BaseformClient {
                             PacketHandler.sendToServer(new Stomp((byte)1));
                         else
                             PacketHandler.sendToServer(new Stomp());
+                    }
+                }
+
+                //Ball form bounce — send once per landing when jump is held
+                {
+                    if(baseformProperties.stomp > 0 && baseformProperties.ballFormState > 0) {
+                        if(!player.onGround())
+                            ClientOnlyData.bounceRequestSent = false;
+                        else if(Minecraft.getInstance().options.keyJump.isDown() && !ClientOnlyData.bounceRequestSent) {
+                            PacketHandler.sendToServer(new BounceJump());
+                            ClientOnlyData.bounceRequestSent = true;
+                        }
+                    } else {
+                        ClientOnlyData.bounceRequestSent = false;
                     }
                 }
             }

@@ -56,6 +56,7 @@ public class StartSprint implements CustomPacketPayload {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
         BaseformProperties baseformProperties =  (BaseformProperties) playerSonicForm.getFormProperties();
         baseformProperties.sprintFlag = true;
+        baseformProperties.momentumTimer = 0;
 
         //Activate Auto Step
         AutoStep.performStepUpActivate(player);

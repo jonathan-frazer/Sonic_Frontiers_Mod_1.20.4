@@ -36,6 +36,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.ChargeSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.LaunchSpindash;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.spindash.SpindashBreak;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.BounceJump;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.afterimage.Afterimage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.afterimage.AfterimageCounter;
@@ -141,6 +142,7 @@ public class PacketHandler {
         registrar.playToServer(EndSmashBarrage.TYPE, EndSmashBarrage.STREAM_CODEC, EndSmashBarrage::handle);
         registrar.playToServer(Peelout.TYPE, Peelout.STREAM_CODEC, Peelout::handle);
         registrar.playToServer(Stomp.TYPE, Stomp.STREAM_CODEC, Stomp::handle);
+        registrar.playToServer(BounceJump.TYPE, BounceJump.STREAM_CODEC, BounceJump::handle);
 
         //Slot 3
         registrar.playToServer(TornadoJump.TYPE, TornadoJump.STREAM_CODEC, TornadoJump::handle);

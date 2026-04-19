@@ -103,11 +103,29 @@ public class SpeedBlitz implements CustomPacketPayload {
 
     public static void performSpeedDash(ServerPlayer player, Vec3 enemyPos)
     {
-        //Calculate new Position — place player 7 blocks from target, still facing them
         Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
         Vec3 tpDirection = enemyPos.subtract(playerPos).normalize();
+        Level world = player.level();
 
-        Vec3 newPlayerPos = enemyPos.add(tpDirection.scale(7));
+        // Find best passable position from 7 down to 1 block past enemy
+        Vec3 newPlayerPos = null;
+        for(int dist = 7; dist >= 1; dist--) {
+            Vec3 candidate = enemyPos.add(tpDirection.scale(dist));
+            BlockPos feetPos = new BlockPos((int)Math.round(candidate.x),(int)Math.round(candidate.y),(int)Math.round(candidate.z));
+            String feetBlock = BuiltInRegistries.BLOCK.getKey(world.getBlockState(feetPos).getBlock()) + "";
+            String headBlock = BuiltInRegistries.BLOCK.getKey(world.getBlockState(feetPos.above()).getBlock()) + "";
+            if(ModUtils.passableBlocks.contains(feetBlock) && ModUtils.passableBlocks.contains(headBlock)) {
+                newPlayerPos = candidate;
+                break;
+            }
+        }
+
+        if(newPlayerPos == null) {
+            player.setDeltaMovement(new Vec3(0.0,0.0,0.0));
+            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+            return;
+        }
+
         float[] yawPitch = ModUtils.calculateFacing(newPlayerPos,enemyPos);
 
         //Display Raycast Particle
@@ -130,30 +148,13 @@ public class SpeedBlitz implements CustomPacketPayload {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
         BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
         baseformProperties.speedBlitzDashes -= 1;
-        PacketHandler.sendToALLPlayers(
-                new SyncPlayerFormS2C(
-                        player.getId(),
-                        playerSonicForm
-                ));
+        PacketHandler.sendToALLPlayers(new SyncPlayerFormS2C(player.getId(), playerSonicForm));
 
-        //Check if position is Safe
-        Level world = player.level();
-        String destinationBlockName = BuiltInRegistries.BLOCK.getKey(
-                world.getBlockState(
-                        new BlockPos(
-                                (int)Math.round(newPlayerPos.x),
-                                (int)Math.round(newPlayerPos.y+1),
-                                (int)Math.round(newPlayerPos.z)
-                        )
-                ).getBlock())+"";
-        //Set New Position
-        if(ModUtils.passableBlocks.contains(destinationBlockName))
-        {
-            player.teleportTo(player.serverLevel(), newPlayerPos.x, newPlayerPos.y, newPlayerPos.z,
-                    Collections.emptySet(), yawPitch[0], yawPitch[1]);
-            player.connection.send(new ClientboundPlayerPositionPacket(newPlayerPos.x, newPlayerPos.y, newPlayerPos.z,
-                    yawPitch[0], yawPitch[1], Collections.emptySet(), 0));
-        }
+        //Teleport to best passable position
+        player.teleportTo(player.serverLevel(), newPlayerPos.x, newPlayerPos.y, newPlayerPos.z,
+                Collections.emptySet(), yawPitch[0], yawPitch[1]);
+        player.connection.send(new ClientboundPlayerPositionPacket(newPlayerPos.x, newPlayerPos.y, newPlayerPos.z,
+                yawPitch[0], yawPitch[1], Collections.emptySet(), 0));
 
         //Set Speed to Zero
         player.setDeltaMovement(new Vec3(0.0,0.0,0.0));

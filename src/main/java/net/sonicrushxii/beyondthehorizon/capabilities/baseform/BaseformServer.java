@@ -167,6 +167,14 @@ public class BaseformServer
                     }
                 }
 
+                //Momentum — gradual speed decay when stopping sprint at a high boost level
+                if(baseformProperties.momentumTimer > 0) {
+                    baseformProperties.momentumTimer--;
+                    float t = baseformProperties.momentumTimer / 20.0f;
+                    float decayedSpeed = 0.5f + (baseformProperties.momentumSpeed - 0.5f) * t;
+                    player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(decayedSpeed);
+                }
+
                 //Subdue Hunger
                 if (player.getFoodData().getFoodLevel() <= 7)
                     player.addEffect(new MobEffectInstance(MobEffects.SATURATION, 1, 0, false, false));
@@ -838,8 +846,27 @@ public class BaseformServer
                             }
 
                             //Deactivate Stomp
-                            if(baseformProperties.stomp == Byte.MAX_VALUE || player.onGround() || player.isInWater())
+                            if(!player.onGround()) baseformProperties.bounceWindowTimer = 0;
+                            if(baseformProperties.stomp == Byte.MAX_VALUE || player.isInWater()) {
+                                baseformProperties.bounceCount = 0;
+                                baseformProperties.bounceWindowTimer = 0;
                                 Stomp.performEndStomp(player);
+                            } else if(player.onGround()) {
+                                if(baseformProperties.ballFormState > 0 && baseformProperties.bounceCount < 3) {
+                                    // Open a 5-tick window for the client BounceJump packet
+                                    baseformProperties.bounceWindowTimer++;
+                                    baseformProperties.stomp = 1;
+                                    if(baseformProperties.bounceWindowTimer > 5) {
+                                        baseformProperties.bounceCount = 0;
+                                        baseformProperties.bounceWindowTimer = 0;
+                                        Stomp.performEndStomp(player);
+                                    }
+                                } else {
+                                    baseformProperties.bounceCount = 0;
+                                    baseformProperties.bounceWindowTimer = 0;
+                                    Stomp.performEndStomp(player);
+                                }
+                            }
                         }
                     }
                 }

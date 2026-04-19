@@ -126,6 +126,9 @@ public class BaseformProperties extends FormProperties {
     public boolean dangerSenseActive;
     public boolean dangerSensePlaying;
     public byte meleeHitCount;
+    public byte momentumTimer;      // transient — not serialized
+    public float momentumSpeed;     // transient — not serialized
+    public byte bounceWindowTimer;  // transient — not serialized
 
     //Slot 1
     public byte airBoosts;
@@ -156,6 +159,7 @@ public class BaseformProperties extends FormProperties {
     public byte speedBlitzDashes;
     public byte smashHit;
     public byte stomp;
+    public byte bounceCount;
 
     //Slot 3
     public byte tornadoJump;
@@ -246,6 +250,7 @@ public class BaseformProperties extends FormProperties {
         speedBlitzDashes = 4;
         smashHit = (byte)0;
         stomp = (byte)0;
+        bounceCount = 0;
 
         //Slot 3
         tornadoJump = (byte)0;
@@ -342,6 +347,7 @@ public class BaseformProperties extends FormProperties {
         speedBlitzDashes = nbt.getByte("speedBlitzes");
         smashHit = nbt.getByte("smashHitTime");
         stomp = nbt.getByte("stompTime");
+        bounceCount = nbt.getByte("bounceCount");
 
         //Slot 3
         tornadoJump = nbt.getByte("tornadoJump");
@@ -437,6 +443,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("speedBlitzes",speedBlitzDashes);
         nbt.putByte("smashHitTime",smashHit);
         nbt.putByte("stompTime",stomp);
+        nbt.putByte("bounceCount",bounceCount);
 
         //Slot 3
         nbt.putByte("tornadoJump",tornadoJump);

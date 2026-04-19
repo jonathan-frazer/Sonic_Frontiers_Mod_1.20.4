@@ -42,8 +42,14 @@ public class StopSprint implements CustomPacketPayload {
         BaseformProperties baseformProperties =  (BaseformProperties) playerSonicForm.getFormProperties();
         baseformProperties.sprintFlag = false;
 
-        //Undo Boost
-        player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.50);
+        // Momentum: decay from boost speed instead of instant drop
+        double currentSpeed = player.getAttribute(Attributes.MOVEMENT_SPEED).getBaseValue();
+        if(currentSpeed > 0.5) {
+            baseformProperties.momentumSpeed = (float) currentSpeed;
+            baseformProperties.momentumTimer = 20;
+        } else {
+            player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.50);
+        }
 
         PacketHandler.sendToALLPlayers(
                 new SyncPlayerFormS2C(
