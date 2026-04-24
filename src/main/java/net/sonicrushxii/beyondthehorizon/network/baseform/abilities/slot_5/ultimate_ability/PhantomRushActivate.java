@@ -50,7 +50,6 @@ public class PhantomRushActivate implements CustomPacketPayload {
         buffer.writeUUID(enemyID != null ? enemyID : new UUID(0L, 0L));
     }
 
-    // Client-side target scan (shared with UltimateActivate)
     public static void scanForward(Player player) {
         UltimateActivate.scanFoward(player);
     }

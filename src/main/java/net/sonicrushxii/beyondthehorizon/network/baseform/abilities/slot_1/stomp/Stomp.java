@@ -33,7 +33,6 @@ public class Stomp implements CustomPacketPayload {
     public static final StreamCodec<FriendlyByteBuf, Stomp> STREAM_CODEC =
         StreamCodec.of((buf, msg) -> msg.encode(buf), Stomp::new);
 
-    // 0 = Updraft (kick up, default), 1 = Sonic Eagle (kick down, shift)
     private final byte variant;
 
     public Stomp() { this.variant = 0; }
@@ -65,7 +64,7 @@ public class Stomp implements CustomPacketPayload {
         {
             //Damage Enemy
             enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_MELEE.getResourceKey(),player),
-                    BaseformServer.STOMP_DAMAGE);
+                    BaseformServer.STOMP_DAMAGE + baseformProperties.boostLvl * 10.0f);
         }
 
         //Particle
@@ -90,13 +89,12 @@ public class Stomp implements CustomPacketPayload {
         BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
         baseformProperties.stomp = 1;
 
-        // Kick enemies upward with stun (1.5s = 30 ticks)
         for (LivingEntity enemy : player.level().getEntitiesOfClass(LivingEntity.class,
                 new AABB(player.getX()+2.5, player.getY()+2.0, player.getZ()+2.5,
                          player.getX()-2.5, player.getY()-1.0, player.getZ()-2.5),
                 target -> !target.is(player))) {
             enemy.hurt(ModDamageTypes.getDamageSource(player.level(),
-                    ModDamageTypes.SONIC_MELEE.getResourceKey(), player), BaseformServer.STOMP_DAMAGE);
+                    ModDamageTypes.SONIC_MELEE.getResourceKey(), player), BaseformServer.STOMP_DAMAGE + baseformProperties.boostLvl * 10.0f);
             enemy.setDeltaMovement(0, 1.5, 0);
             player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
             enemy.addEffect(new MobEffectInstance(ModEffects.COMBO_EFFECT, 30, 0, false, false));
@@ -112,7 +110,6 @@ public class Stomp implements CustomPacketPayload {
         BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
         baseformProperties.stomp = 1;
 
-        // Kick enemies downward (Sonic Eagle: 1s stun = 20 ticks)
         player.setDeltaMovement(0.0, -2.0, 0.0);
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
         for (LivingEntity enemy : player.level().getEntitiesOfClass(LivingEntity.class,
@@ -120,7 +117,7 @@ public class Stomp implements CustomPacketPayload {
                          player.getX()-2.5, player.getY()-4.0, player.getZ()-2.5),
                 target -> !target.is(player))) {
             enemy.hurt(ModDamageTypes.getDamageSource(player.level(),
-                    ModDamageTypes.SONIC_MELEE.getResourceKey(), player), BaseformServer.STOMP_DAMAGE);
+                    ModDamageTypes.SONIC_MELEE.getResourceKey(), player), BaseformServer.STOMP_DAMAGE + baseformProperties.boostLvl * 10.0f);
             enemy.setDeltaMovement(0, -5.0, 0);
             player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
             enemy.addEffect(new MobEffectInstance(ModEffects.COMBO_EFFECT, 20, 0, false, false));

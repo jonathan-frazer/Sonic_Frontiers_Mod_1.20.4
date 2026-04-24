@@ -79,10 +79,13 @@ public class DamageHandler {
         if(!(event.getEntity() instanceof ServerPlayer player)) return;
         if(PlayerTickHandler.hasAllChaosEmeralds(player)) {
             event.setCanceled(true);
-            player.setHealth(4.0f);
+            player.setHealth(player.getMaxHealth());
             consumeChaosEmeralds(player);
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.TOTEM_USE, SoundSource.MASTER, 1.0f, 1.0f);
+            PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+            playerSonicForm.activateSuperForm();
+            PacketHandler.sendToALLPlayers(new SyncPlayerFormS2C(player.getId(), playerSonicForm));
         }
     }
 
@@ -107,10 +110,8 @@ public class DamageHandler {
 
     public static boolean isDamageSourceModded(DamageSource damageSource)
     {
-        //Checks all the ModDamageTypes
         for(ModDamageTypes modDamageType : ModDamageTypes.values())
-            return damageSource.is(modDamageType.getResourceKey());
-
+            if(damageSource.is(modDamageType.getResourceKey())) return true;
         return false;
     }
 }

@@ -17,6 +17,7 @@ import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProp
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.models.*;
 import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.sonicrushxii.beyondthehorizon.modded.ModModelRenderer;
 
 //@EventBusSubscriber(modid = BeyondTheHorizon.MOD_ID, value= Dist.CLIENT)
@@ -368,7 +369,20 @@ public class BaseformRenderer
             poseStack.popPose();
             event.setCanceled(true);
         }
-        //Boost
+        //Boost 3 Overspeed — peelout animation
+        else if(baseformProperties.boostLvl == 3 && player.isSprinting()
+                && player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() > 1.5)
+        {
+            poseStack.pushPose();
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+            poseStack.translate(0D,-1.5D,0D);
+            ModModelRenderer.renderSonicPeelout(SonicPeeloutModel.class,event,poseStack,baseformProperties,(modelPart)-> modelPart.getChild("Head").xRot = (float)(player.getXRot()*Math.PI/180));
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
+        //Boost 3
         else if(baseformProperties.boostLvl == 3 && player.isSprinting())
         {
             poseStack.pushPose();

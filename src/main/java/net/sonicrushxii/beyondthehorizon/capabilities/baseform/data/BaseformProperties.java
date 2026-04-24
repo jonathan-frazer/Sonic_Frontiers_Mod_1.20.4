@@ -126,10 +126,14 @@ public class BaseformProperties extends FormProperties {
     public boolean dangerSenseActive;
     public boolean dangerSensePlaying;
     public byte meleeHitCount;
-    public byte momentumTimer;      // transient — not serialized
-    public float momentumSpeed;     // transient — not serialized
-    public byte bounceWindowTimer;  // transient — not serialized
-    public byte wallRunSurface;     // transient — 0=none 1=N 2=S 3=E 4=W 5=ceiling
+    public byte momentumTimer;
+    public float momentumSpeed;
+    public byte bounceWindowTimer;
+    public byte wallRunSurface;
+    public short sprintTimer;
+    public short stopTimer;
+    public byte overSpeedLevel;
+    public short boost3PushTimer;
 
     //Slot 1
     public byte airBoosts;
@@ -195,7 +199,7 @@ public class BaseformProperties extends FormProperties {
     public boolean counterReady;
     public UUID counteredEntity;
     public byte grandSlamTime;
-    public boolean isBlocking; // true when parry key held > 0.5s (10 ticks at 20TPS)
+    public boolean isBlocking;
 
     //Slot 6
     public double ultimateAtkMeter;
@@ -221,6 +225,10 @@ public class BaseformProperties extends FormProperties {
         sprintFlag = false;
         dangerSenseActive = true;
         dangerSensePlaying = false;
+        sprintTimer = 0;
+        stopTimer = 0;
+        overSpeedLevel = 0;
+        boost3PushTimer = 0;
 
         //Slot 1
         airBoosts = 3;
@@ -491,12 +499,10 @@ public class BaseformProperties extends FormProperties {
         return nbt;
     }
 
-    //Cooldown Manager
     public byte[] getAllCooldowns() {return abilityCooldowns;}
     public byte getCooldown(BaseformActiveAbility ability){return abilityCooldowns[ability.ordinal()];}
     public void setCooldown(BaseformActiveAbility ability, byte seconds){abilityCooldowns[ability.ordinal()] = seconds;}
 
-    //Decides when to apply Selective Invulnerability
     public boolean selectiveInvul()
     {
         boolean quickCyloop = (this.quickCyloop > 0);
@@ -529,7 +535,6 @@ public class BaseformProperties extends FormProperties {
                 ultimate;
     }
 
-    //Checks if Player is in the middle of another attack
     public boolean isAttacking()
     {
         boolean quickCyloop = (this.quickCyloop > 0);
@@ -566,7 +571,6 @@ public class BaseformProperties extends FormProperties {
                 ultimate;
     }
 
-    //Ball form
     public boolean shouldBeInBallform()
     {
         boolean regular = this.ballFormState >= 1;

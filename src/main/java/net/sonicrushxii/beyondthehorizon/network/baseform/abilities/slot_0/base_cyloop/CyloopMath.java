@@ -10,7 +10,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
@@ -139,6 +142,8 @@ public class CyloopMath
                         enemyHit = true;
 
                         //Double Cyloop - Launch Down
+                        PlayerSonicForm cyloopPsf = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        float cyloopBoostBonus = ((BaseformProperties) cyloopPsf.getFormProperties()).boostLvl * 10.0f;
                         if (enemy.hasEffect(ModEffects.CYLOOPED) && enemy.getEffect(ModEffects.CYLOOPED).getDuration() > 0) {
                             //Launch Down
                             enemy.setDeltaMovement(0.0, -1.1, 0.0);
@@ -146,7 +151,7 @@ public class CyloopMath
 
                             //Deal Damage
                             enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_CYLOOP.getResourceKey(), player),
-                                    BaseformServer.CYLOOP_DAMAGE * 1.5F);
+                                    (BaseformServer.CYLOOP_DAMAGE + cyloopBoostBonus) * 1.5F);
 
                             //Give the Cylooped Effect
                             enemy.getEffect(ModEffects.CYLOOPED).update(new MobEffectInstance(ModEffects.CYLOOPED, 80, 0, false, false));
@@ -155,7 +160,7 @@ public class CyloopMath
                         else {
                             //Damage
                             enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_CYLOOP.getResourceKey(), player),
-                                    BaseformServer.CYLOOP_DAMAGE);
+                                    BaseformServer.CYLOOP_DAMAGE + cyloopBoostBonus);
 
                             //Launch Up
                             enemy.setDeltaMovement(0.0, 1.1, 0.0);

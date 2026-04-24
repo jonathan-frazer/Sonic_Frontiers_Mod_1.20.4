@@ -50,7 +50,6 @@ public class SetSmashHitChargeC2S implements CustomPacketPayload {
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
                         BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
 
-                        // Smash Attack no longer slows player while charging — remove any leftover modifier
                         if(player.getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AttributeMultipliers.SMASH_HIT.id()))
                             player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AttributeMultipliers.SMASH_HIT.id());
 

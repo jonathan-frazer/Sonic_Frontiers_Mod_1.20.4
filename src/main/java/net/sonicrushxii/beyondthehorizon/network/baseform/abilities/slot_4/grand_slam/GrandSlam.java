@@ -44,7 +44,7 @@ public class GrandSlam implements CustomPacketPayload
 
                         //Activate Grandslam
 
-                        if(baseformProperties.grandSlamTime == 0 && baseformProperties.parryTimeSlow > 0)
+                        if(baseformProperties.grandSlamTime == 0)
                         {
                             //Reset Data
                             baseformProperties.parryTimeSlow = 0;

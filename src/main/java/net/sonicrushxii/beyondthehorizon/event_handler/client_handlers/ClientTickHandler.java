@@ -5,7 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
+import net.sonicrushxii.beyondthehorizon.KeyBindings;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.capabilities.SonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformClient;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.capabilities.hyperform.HyperformHandler;
@@ -13,8 +15,11 @@ import net.sonicrushxii.beyondthehorizon.capabilities.starfall.StarfallFormHandl
 import net.sonicrushxii.beyondthehorizon.capabilities.superform.SuperformHandler;
 import net.sonicrushxii.beyondthehorizon.client.DoubleTapDirection;
 import net.sonicrushxii.beyondthehorizon.client.DoubleTapHandler;
+import net.sonicrushxii.beyondthehorizon.client.VirtualSlotHandler;
 import net.sonicrushxii.beyondthehorizon.event_handler.PlayerTickHandler;
 import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
+import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.speed_blitz.SpeedBlitzOff;
 import net.sonicrushxii.beyondthehorizon.scheduler.Scheduler;
 
 public class ClientTickHandler {
@@ -28,6 +33,39 @@ public class ClientTickHandler {
                 return;
 
             CompoundTag playerNBT = player.serializeNBT(player.registryAccess());
+
+            {
+                PlayerSonicForm psf = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+                if (psf.getCurrentForm() != SonicForm.PLAYER) {
+                    if (KeyBindings.INSTANCE.cycleSlotKey.consumeClick()) {
+                        try {
+                            BaseformProperties bp = (BaseformProperties) psf.getFormProperties();
+                            if (bp.speedBlitz && VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_COMBO)
+                                PacketHandler.sendToServer(new SpeedBlitzOff());
+                        } catch (ClassCastException | NullPointerException ignored) {}
+                        VirtualSlotHandler.cycleScrollableSlot();
+                        VirtualSlotHandler.consumeAllAbilityClicks();
+                    }
+                    if (KeyBindings.INSTANCE.meleeSlotKey.consumeClick()) {
+                        try {
+                            BaseformProperties bp = (BaseformProperties) psf.getFormProperties();
+                            if (bp.speedBlitz && VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_COMBO)
+                                PacketHandler.sendToServer(new SpeedBlitzOff());
+                        } catch (ClassCastException | NullPointerException ignored) {}
+                        VirtualSlotHandler.toggleMeleeSlot();
+                        VirtualSlotHandler.consumeAllAbilityClicks();
+                    }
+                    if (KeyBindings.INSTANCE.rangedSlotKey.consumeClick()) {
+                        try {
+                            BaseformProperties bp = (BaseformProperties) psf.getFormProperties();
+                            if (bp.speedBlitz && VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_COMBO)
+                                PacketHandler.sendToServer(new SpeedBlitzOff());
+                        } catch (ClassCastException | NullPointerException ignored) {}
+                        VirtualSlotHandler.toggleRangedSlot();
+                        VirtualSlotHandler.consumeAllAbilityClicks();
+                    }
+                }
+            }
 
             {
                 PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
@@ -122,7 +160,6 @@ public class ClientTickHandler {
                     }
                 }
 
-                // Back double-tap (S key) for backward dodge
                 if (InputConstants.isKeyDown(mc.getWindow().getWindow(), InputConstants.KEY_S) &&
                         !DoubleTapHandler.pressedBack && !DoubleTapHandler.releasedBack)
                     DoubleTapHandler.pressedBack = true;

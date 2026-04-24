@@ -107,24 +107,8 @@ public class SpeedBlitz implements CustomPacketPayload {
         Vec3 tpDirection = enemyPos.subtract(playerPos).normalize();
         Level world = player.level();
 
-        // Find best passable position from 7 down to 1 block past enemy
-        Vec3 newPlayerPos = null;
-        for(int dist = 7; dist >= 1; dist--) {
-            Vec3 candidate = enemyPos.add(tpDirection.scale(dist));
-            BlockPos feetPos = new BlockPos((int)Math.round(candidate.x),(int)Math.round(candidate.y),(int)Math.round(candidate.z));
-            String feetBlock = BuiltInRegistries.BLOCK.getKey(world.getBlockState(feetPos).getBlock()) + "";
-            String headBlock = BuiltInRegistries.BLOCK.getKey(world.getBlockState(feetPos.above()).getBlock()) + "";
-            if(ModUtils.passableBlocks.contains(feetBlock) && ModUtils.passableBlocks.contains(headBlock)) {
-                newPlayerPos = candidate;
-                break;
-            }
-        }
-
-        if(newPlayerPos == null) {
-            player.setDeltaMovement(new Vec3(0.0,0.0,0.0));
-            player.connection.send(new ClientboundSetEntityMotionPacket(player));
-            return;
-        }
+        Vec3 candidate7 = enemyPos.add(tpDirection.scale(7));
+        Vec3 newPlayerPos = candidate7;
 
         float[] yawPitch = ModUtils.calculateFacing(newPlayerPos,enemyPos);
 

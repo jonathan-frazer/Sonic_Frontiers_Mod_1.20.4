@@ -104,9 +104,8 @@ public class UltimateActivate implements CustomPacketPayload
                         //Ultimate Target Reticle
                         if(msg.enemyID != null)
                         {
-                            //Changed Data
                             baseformProperties.ultimateUse = 1;
-                            baseformProperties.ultimateCooldown = 6000;
+                            baseformProperties.ultimateCooldown = 300;
                             baseformProperties.ultReady = false;
                             baseformProperties.ultTarget = msg.enemyID;
 

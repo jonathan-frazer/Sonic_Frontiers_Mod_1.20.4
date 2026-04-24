@@ -60,7 +60,6 @@ public class DoubleJump implements CustomPacketPayload {
 
                         //Thrust
                         if (player.isSprinting()) {
-                            // Directional dash in look direction when sprinting
                             Vec3 look = player.getLookAngle();
                             player.setDeltaMovement(look.x * 2.0, 0.3, look.z * 2.0);
                         } else {

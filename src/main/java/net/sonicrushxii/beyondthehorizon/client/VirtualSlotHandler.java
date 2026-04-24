@@ -6,8 +6,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.sonicrushxii.beyondthehorizon.KeyBindings;
 
 public class VirtualSlotHandler {
-    // 4 scrollable slots: 0=Boost, 1=Combo, 2=Ultimate, 3=Transformation
-    // 2 toggle slots: 4=Melee (Mouse4), 5=Ranged (Mouse5)
     public static final byte SCROLLABLE_SLOT_COUNT = 4;
     public static final byte TOTAL_SLOT_COUNT = 6;
     public static final byte SLOT_BOOST = 0;
@@ -31,17 +29,14 @@ public class VirtualSlotHandler {
 
     public static byte getSlotLength() {return TOTAL_SLOT_COUNT;}
 
-    // Cycles only through the 4 scrollable slots (0-3) via Middle Mouse Button
     public static void cycleScrollableSlot() {
         if (currAbility >= SCROLLABLE_SLOT_COUNT) {
-            // If in Melee or Ranged, cycle back to Combo first
             currAbility = SLOT_COMBO;
         } else {
             currAbility = (byte) ((currAbility + 1) % SCROLLABLE_SLOT_COUNT);
         }
     }
 
-    // Toggle Melee slot (Mouse 4): go to Melee, or return to Combo if already there
     public static void toggleMeleeSlot() {
         if (currAbility == SLOT_MELEE) {
             currAbility = SLOT_COMBO;
@@ -50,7 +45,6 @@ public class VirtualSlotHandler {
         }
     }
 
-    // Toggle Ranged slot (Mouse 5): go to Ranged, or return to Combo if already there
     public static void toggleRangedSlot() {
         if (currAbility == SLOT_RANGED) {
             currAbility = SLOT_COMBO;

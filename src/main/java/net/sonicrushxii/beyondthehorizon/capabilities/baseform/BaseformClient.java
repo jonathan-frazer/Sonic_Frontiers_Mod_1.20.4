@@ -256,7 +256,6 @@ public class BaseformClient {
                     }
                 }
 
-                //Boost Aura (C key in Boost slot)
                 {
                     if (VirtualSlotHandler.getCurrAbility() == 0 &&
                             KeyBindings.INSTANCE.useAbility4.consumeClick()) {
@@ -291,7 +290,6 @@ public class BaseformClient {
             {
                 //Spin Dash
                 {
-                    //Peelout (look UP + shift + R = instant max speed, no ball form)
                     if(VirtualSlotHandler.getCurrAbility() == 1 && player.isShiftKeyDown() &&
                             player.getXRot() < -80.0 && player.onGround() && baseformProperties.ballFormState == (byte) 0 &&
                             baseformProperties.getCooldown(BaseformActiveAbility.PEELOUT) == 0 &&
@@ -388,7 +386,6 @@ public class BaseformClient {
 
                 }
 
-                //Smash Barrage (shift + V = useAbility3 in Combo slot)
                 {
                     if (VirtualSlotHandler.getCurrAbility() == 1 && player.isShiftKeyDown() &&
                             baseformProperties.getCooldown(BaseformActiveAbility.SMASH_BARRAGE) == 0 &&
@@ -494,9 +491,7 @@ public class BaseformClient {
                     }
                 }
 
-                //Windmill Kick (X key, holdable) / Spin Slash (shift+X)
                 {
-                    // Spin Slash (shift + X)
                     if (inMeleeSlot && !baseformProperties.isAttacking() &&
                             player.isShiftKeyDown() && baseformProperties.getCooldown(BaseformActiveAbility.SPINSLASH) == 0 &&
                             KeyBindings.INSTANCE.useAbility2.isDown()) {
@@ -600,7 +595,6 @@ public class BaseformClient {
                     }
                 }
 
-                //Cross Slash (useAbility2 = X key, holdable - stays in ranged)
                 {
                     if (inRangedSlot && !baseformProperties.isAttacking() &&
                             baseformProperties.getCooldown(BaseformActiveAbility.CROSS_SLASH) == 0 &&
@@ -694,7 +688,6 @@ public class BaseformClient {
             //Ultimate Slot (slot 2)
             {
                 final boolean inUltSlot = VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_ULTIMATE;
-                //Phantom Rush (Shift+H — standalone punch-rush without around-the-world)
                 if(!baseformProperties.isAttacking() && baseformProperties.getCooldown(BaseformActiveAbility.PHANTOM_RUSH) == 0 &&
                         player.isShiftKeyDown() && KeyBindings.INSTANCE.useUltimateAbility.isDown())
                 {

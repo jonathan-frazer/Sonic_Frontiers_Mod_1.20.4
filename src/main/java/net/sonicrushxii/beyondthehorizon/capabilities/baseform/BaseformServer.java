@@ -104,8 +104,6 @@ public class BaseformServer
     //Counter
     private static final float GRAND_SLAM_DMG = 21.0f;
 
-    //Ultimate
-    private static final double ULT_DECAY_RATE = 0.075;
     public static final float PHANTOM_RUSH_DAMAGE = 10.0f;
     public static final float ULTIMATE_DAMAGE = 120.0f;
 
@@ -174,6 +172,62 @@ public class BaseformServer
                     float t = baseformProperties.momentumTimer / 20.0f;
                     float decayedSpeed = 0.5f + (baseformProperties.momentumSpeed - 0.5f) * t;
                     player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(decayedSpeed);
+                }
+
+                //Sprint overspeed — continuous sprint builds toward a 1.5x speed burst at 140 ticks
+                if(baseformProperties.sprintFlag) {
+                    if(baseformProperties.sprintTimer < 32767) baseformProperties.sprintTimer++;
+
+                    if(baseformProperties.boostLvl == 0 && baseformProperties.overSpeedLevel == 0
+                            && baseformProperties.sprintTimer <= 40) {
+                        float rampSpeed = 0.1f + baseformProperties.sprintTimer / 40.0f * 0.4f;
+                        player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(rampSpeed);
+                    }
+
+                    if(baseformProperties.sprintTimer == 140 && baseformProperties.overSpeedLevel == 0) {
+                        player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(StartSprint.overSpeedValue(baseformProperties));
+                        StartSprint.sonicBoomEffect(player);
+                        baseformProperties.overSpeedLevel = 1;
+                    }
+
+                    if(baseformProperties.boostLvl == 3 && baseformProperties.overSpeedLevel >= 1) {
+                        if(baseformProperties.boost3PushTimer < 200) baseformProperties.boost3PushTimer++;
+                        if(baseformProperties.boost3PushTimer >= 200) {
+                            baseformProperties.boost3PushTimer = 0;
+                            if(baseformProperties.overSpeedLevel < 4) {
+                                baseformProperties.overSpeedLevel++;
+                                player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(StartSprint.overSpeedValue(baseformProperties));
+                                StartSprint.sonicBoomEffect(player);
+                            }
+                        }
+                    } else {
+                        baseformProperties.boost3PushTimer = 0;
+                    }
+
+                    if(baseformProperties.overSpeedLevel > 0 && player.isCrouching()) {
+                        baseformProperties.overSpeedLevel = 0;
+                        baseformProperties.sprintTimer = 0;
+                        baseformProperties.boost3PushTimer = 0;
+                        float baseSpeed = switch(baseformProperties.boostLvl) {
+                            case 1 -> 0.75f; case 2 -> 1.0f; case 3 -> 1.25f; default -> 0.5f;
+                        };
+                        player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(baseSpeed);
+                        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                            ModSounds.MAX_BOOST.get(), SoundSource.MASTER, 0.6f, 0.7f);
+                    }
+                } else {
+                    baseformProperties.sprintTimer = 0;
+                    if(baseformProperties.overSpeedLevel > 0) {
+                        baseformProperties.stopTimer++;
+                        int revertThreshold = player.onGround() ? 60 : 100;
+                        if(baseformProperties.stopTimer >= revertThreshold) {
+                            baseformProperties.overSpeedLevel = 0;
+                            baseformProperties.stopTimer = 0;
+                            baseformProperties.boost3PushTimer = 0;
+                        }
+                    } else {
+                        baseformProperties.stopTimer = 0;
+                    }
                 }
 
                 //Subdue Hunger
@@ -507,7 +561,7 @@ public class BaseformServer
 
                                     //Deal Damage
                                     enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_CYLOOP.getResourceKey(),player),
-                                            QK_CYLOOP_DAMAGE*1.5F);
+                                            (QK_CYLOOP_DAMAGE + baseformProperties.boostLvl * 10.0f) * 1.5F);
 
                                     //Give the Cylooped Effect
                                     enemy.getEffect(ModEffects.CYLOOPED).update(new MobEffectInstance(ModEffects.CYLOOPED, 20, 0, false, false));
@@ -517,7 +571,7 @@ public class BaseformServer
                                 {
                                     //Damage
                                     enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_CYLOOP.getResourceKey(),player),
-                                            QK_CYLOOP_DAMAGE);
+                                            QK_CYLOOP_DAMAGE + baseformProperties.boostLvl * 10.0f);
 
                                     //Launch Up
                                     enemy.setDeltaMovement(0.0,1.1,0.0);
@@ -575,9 +629,13 @@ public class BaseformServer
                         }
                         if (baseformProperties.ballFormState == (byte) 2)
                         {
-                            player.setDeltaMovement((ModUtils.calculateViewVector(0,player.getYRot())).scale(10.0));
-                            if (ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+""))
-                            {
+                            boolean airborne = ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+"");
+                            if(airborne) {
+                                player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
+                                player.setDeltaMovement((ModUtils.calculateViewVector(0,player.getYRot())).scale(10.0));
+                            } else {
+                                player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+                                player.setDeltaMovement((ModUtils.calculateViewVector(0,player.getYRot())).scale(10.0));
                                 player.addDeltaMovement(new Vec3(0,-1.26,0));
                             }
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
@@ -587,8 +645,7 @@ public class BaseformServer
                                             player.getX()-1.5,player.getY()-1.5,player.getZ()-1.5),
                                     (nearbyEntity)->!nearbyEntity.is(player))) {
                                 nearbyEntity.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
-                                        50.0f);
-                                // Directional knockback away in player's facing direction
+                                        50.0f + baseformProperties.boostLvl * 10.0f);
                                 Vec3 knockDir = player.getDeltaMovement().normalize();
                                 nearbyEntity.setDeltaMovement(knockDir.scale(2.0));
                                 player.connection.send(new ClientboundSetEntityMotionPacket(nearbyEntity));
@@ -733,7 +790,7 @@ public class BaseformServer
 
                             //Move at current running speed; hover in place while juggling an enemy
                             if(juggledEnemies.isEmpty()) {
-                                double hummingSpeed = Math.max(1.0, player.getAttribute(Attributes.MOVEMENT_SPEED).getValue() * 15.0);
+                                double hummingSpeed = player.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
                                 player.setDeltaMovement(new Vec3(lookAngle.x,-0.1,lookAngle.z).scale(hummingSpeed));
                             } else {
                                 player.setDeltaMovement(0, 0, 0);
@@ -818,6 +875,13 @@ public class BaseformServer
                                             playerInFrontOf.x(), playerInFrontOf.y()+player.getEyeHeight()/2, playerInFrontOf.z(),
                                     0.0, 0.2f, 0.2f, 0.2f, 3, true)
                                     );
+                                    if(baseformProperties.powerBoost) {
+                                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                            new DustParticleOptions(new Vector3f(0.8f, 0.9f, 1.0f), 2.0f),
+                                            playerInFrontOf.x(), playerInFrontOf.y()+player.getEyeHeight()/2, playerInFrontOf.z(),
+                                            2.0, 0.6f, 0.6f, 0.6f, 30, false));
+                                        level.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.MASTER, 0.4f, 1.6f);
+                                    }
                                     //Sound
                                     level.playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.SMASH_CHARGE.get(), SoundSource.MASTER, 1.0f, 1.0f);
                                     baseformProperties.smashHit += 1;
@@ -837,7 +901,7 @@ public class BaseformServer
                                                  player.getX() - 2.5, player.getY() - 1.0, player.getZ() - 2.5),
                                         target -> !target.is(player))) {
                                     enemy.hurt(ModDamageTypes.getDamageSource(level,
-                                            ModDamageTypes.SONIC_MELEE.getResourceKey(), player), SMASH_BARRAGE_DAMAGE);
+                                            ModDamageTypes.SONIC_MELEE.getResourceKey(), player), SMASH_BARRAGE_DAMAGE + baseformProperties.boostLvl * 10.0f);
                                 }
                             }
 
@@ -874,7 +938,8 @@ public class BaseformServer
                                 Stomp.performEndStomp(player);
                             } else if(player.onGround()) {
                                 if(baseformProperties.ballFormState > 0 && baseformProperties.bounceCount < 3) {
-                                    // Open a 5-tick window for the client BounceJump packet
+                                    if(baseformProperties.bounceWindowTimer == 0)
+                                        stompImpactBreakBlocks(player, level);
                                     baseformProperties.bounceWindowTimer++;
                                     baseformProperties.stomp = 1;
                                     if(baseformProperties.bounceWindowTimer > 5) {
@@ -883,6 +948,8 @@ public class BaseformServer
                                         Stomp.performEndStomp(player);
                                     }
                                 } else {
+                                    if(baseformProperties.bounceWindowTimer == 0)
+                                        stompImpactBreakBlocks(player, level);
                                     baseformProperties.bounceCount = 0;
                                     baseformProperties.bounceWindowTimer = 0;
                                     Stomp.performEndStomp(player);
@@ -1129,13 +1196,14 @@ public class BaseformServer
                                     player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                                     //Hurt Enemy
+                                    float lightSpeedDmg = LIGHT_SPEED_ASSAULT + baseformProperties.boostLvl * 10.0f;
                                     enemy.hurt(
                                             ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
-                                            LIGHT_SPEED_ASSAULT
+                                            lightSpeedDmg
                                     );
 
                                     //Increment Meter
-                                    baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter + LIGHT_SPEED_ASSAULT;
+                                    baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter + lightSpeedDmg;
 
                                     enemy.setDeltaMovement(player.getLookAngle().scale(2.0));
                                     player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
@@ -1402,7 +1470,7 @@ public class BaseformServer
                                         e -> e != player && e.isAlive())) {
                                     if (target.hurtTime == 0) {
                                         target.hurt(ModDamageTypes.getDamageSource(level,
-                                                ModDamageTypes.SONIC_MELEE.getResourceKey(), player), WINDMILL_KICK_DAMAGE);
+                                                ModDamageTypes.SONIC_MELEE.getResourceKey(), player), WINDMILL_KICK_DAMAGE + baseformProperties.boostLvl * 10.0f);
                                         target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 5, false, false));
                                     }
                                 }
@@ -1519,7 +1587,7 @@ public class BaseformServer
                                         wildRushTarget.setDeltaMovement(motionDirection.scale(1.75f));
                                         wildRushTarget.hurt(
                                                 ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
-                                                WILDRUSH_DAMAGE
+                                                WILDRUSH_DAMAGE + baseformProperties.boostLvl * 10.0f
                                         );
 
                                         player.connection.send(new ClientboundSetEntityMotionPacket(wildRushTarget));
@@ -1621,7 +1689,7 @@ public class BaseformServer
                                         loopKickTarget.setDeltaMovement(player.getLookAngle().scale(1.75f));
                                         loopKickTarget.hurt(
                                                 ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
-                                                LOOPKICK_DAMAGE
+                                                LOOPKICK_DAMAGE + baseformProperties.boostLvl * 10.0f
                                         );
                                         player.connection.send(new ClientboundSetEntityMotionPacket(loopKickTarget));
                                         throw new NullPointerException("Move Successful");
@@ -2047,7 +2115,7 @@ public class BaseformServer
                             {
                                 //Damage Target
                                 counterTarget.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL_COMBO_IMMUNE.getResourceKey(),player),
-                                        GRAND_SLAM_DMG);
+                                        GRAND_SLAM_DMG + baseformProperties.boostLvl * 10.0f);
 
                                 //Knock Counter Target away
                                 counterTarget.setDeltaMovement(
@@ -2090,34 +2158,6 @@ public class BaseformServer
 
                 //Slot 6
                 {
-                    //Meter Decay
-                    baseformProperties.ultimateAtkMeter = baseformProperties.ultimateAtkMeter - ULT_DECAY_RATE;
-
-                    //Ultimate Ready
-                    if(baseformProperties.ultReady) {
-                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                new DustParticleOptions(new Vector3f(0.4667F, 0F, 0.9961F), 1f),
-                                player.getX() + 0.00, player.getY() + 0.85, player.getZ() + 0.00,
-                                0.0, 0.80f, 1.00f, 0.80f, 1,
-                                false)
-                        );
-                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                                new DustParticleOptions(new Vector3f(0.05F, 0.05F, 1.0F), 1f),
-                                player.getX() + 0.00, player.getY() + 0.85, player.getZ() + 0.00,
-                                0.0, 0.80f, 1.00f, 0.80f, 1,
-                                false)
-                        );
-                    }
-
-
-                    if(baseformProperties.ultimateAtkMeter < 0.0)
-                    {
-                        if(baseformProperties.ultReady)
-                            level.playSound(null,player.getX(),player.getY(),player.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.MASTER, 1.0f, 2.0f);
-
-                        baseformProperties.ultReady = false;
-                        baseformProperties.ultimateAtkMeter = 0.0;
-                    }
 
                     try
                     {
@@ -2358,7 +2398,7 @@ public class BaseformServer
 
                                     //Final Dmg
                                     enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_ULTIMATE.getResourceKey(),player),
-                                            ULTIMATE_DAMAGE);
+                                            ULTIMATE_DAMAGE + baseformProperties.boostLvl * 10.0f);
                                 }
                                 else{
                                     //Freeze them in place
@@ -2423,6 +2463,16 @@ public class BaseformServer
                         allCooldowns[i] = (byte) Math.max(0, allCooldowns[i] - 1);
                 }
                 // Ultimate cooldown exceeds byte range; stored separately
+                if (baseformProperties.ultimateCooldown == 1) {
+                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                            new DustParticleOptions(new Vector3f(0.4667F, 0F, 0.9961F), 1f),
+                            player.getX(), player.getY() + 0.85, player.getZ(),
+                            0.0, 0.80f, 1.00f, 0.80f, 6, false));
+                    PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                            new DustParticleOptions(new Vector3f(0.05F, 0.05F, 1.0F), 1f),
+                            player.getX(), player.getY() + 0.85, player.getZ(),
+                            0.0, 0.80f, 1.00f, 0.80f, 6, false));
+                }
                 if (baseformProperties.ultimateCooldown > 0)
                     baseformProperties.ultimateCooldown--;
                 baseformProperties.ultReady = (baseformProperties.ultimateCooldown == 0);
@@ -2432,7 +2482,7 @@ public class BaseformServer
             //Effects
             {
                 //Speed
-                if(baseformProperties.boostLvl == 0)
+                if(baseformProperties.boostLvl == 0 && baseformProperties.overSpeedLevel == 0)
                     Objects.requireNonNull(player.getAttribute(Attributes.MOVEMENT_SPEED)).setBaseValue(0.5);
 
                 //Jump
@@ -2488,6 +2538,20 @@ public class BaseformServer
                             player.getId(),
                             playerSonicForm
                     ));
+        }
+    }
+
+    private static void stompImpactBreakBlocks(ServerPlayer player, Level level) {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        BlockPos center = player.blockPosition().below();
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                BlockPos pos = center.offset(dx, 0, dz);
+                if (!level.getBlockState(pos).isAir() && level.getBlockState(pos).getDestroySpeed(level, pos) >= 0
+                        && level.getBlockState(pos).getDestroySpeed(level, pos) <= 3.0f) {
+                    serverLevel.destroyBlock(pos, true, player);
+                }
+            }
         }
     }
 }

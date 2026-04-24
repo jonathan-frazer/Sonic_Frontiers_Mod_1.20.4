@@ -38,10 +38,8 @@ public class LaunchSpindash implements CustomPacketPayload {
 
     public static void performRevertSpindash(ServerPlayer player, BaseformProperties baseformProperties)
     {
-        //Remove Ballform
         baseformProperties.ballFormState = (byte) 0;
-
-        //Reset Climbing
+        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
         if (baseformProperties.boostLvl == 0 && !player.isSprinting())
             player.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.0);
     }

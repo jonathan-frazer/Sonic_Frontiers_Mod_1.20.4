@@ -37,7 +37,6 @@ public class InstaShield implements CustomPacketPayload {
             PlayerSonicForm psf = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             BaseformProperties props = (BaseformProperties) psf.getFormProperties();
 
-            // 0.5s (10 ticks) of invulnerability
             props.dodgeInvul = true;
             PacketHandler.sendToALLPlayers(new SyncPlayerFormS2C(player.getId(), psf));
 

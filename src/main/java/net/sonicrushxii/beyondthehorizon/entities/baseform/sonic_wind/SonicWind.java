@@ -17,8 +17,12 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
+import net.minecraft.server.level.ServerPlayer;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.entities.all.LinearMovingEntity;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import org.joml.Vector3f;
@@ -145,10 +149,15 @@ public class SonicWind extends LinearMovingEntity {
             );
             if (!enemies.isEmpty() && this.getDuration() < this.MAX_DURATION-4) {
                 try {// Synchronize on server only
+                    float sonicWindDmg = BaseformServer.SONIC_WIND_DAMAGE;
+                    if (this.getOwner() instanceof ServerPlayer owner) {
+                        PlayerSonicForm psf = owner.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        sonicWindDmg += ((BaseformProperties) psf.getFormProperties()).boostLvl * 10.0f;
+                    }
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(
                                 ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), this.getOwner()),
-                                BaseformServer.SONIC_WIND_DAMAGE
+                                sonicWindDmg
                         );
                     }
                 }catch(NullPointerException ignored){}

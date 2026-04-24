@@ -18,7 +18,11 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
+import net.minecraft.server.level.ServerPlayer;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
@@ -228,10 +232,15 @@ public class HomingShotProjectile extends Entity {
             );
             if (!enemies.isEmpty()) {
                 try {// Synchronize on server only
+                    float homingShotDmg = BaseformServer.HOMING_SHOT_DAMAGE;
+                    if (this.getOwner() instanceof ServerPlayer owner) {
+                        PlayerSonicForm psf = owner.getData(ModAttachments.PLAYER_SONIC_FORM);
+                        homingShotDmg += ((BaseformProperties) psf.getFormProperties()).boostLvl * 10.0f;
+                    }
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(
                                 ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), this.getOwner()),
-                                BaseformServer.HOMING_SHOT_DAMAGE
+                                homingShotDmg
                         );
                     }
 

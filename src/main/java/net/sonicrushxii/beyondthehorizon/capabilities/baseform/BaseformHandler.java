@@ -1,7 +1,6 @@
 package net.sonicrushxii.beyondthehorizon.capabilities.baseform;
 
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -24,8 +23,6 @@ import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
-import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_4.parry.StopParry;
-import net.sonicrushxii.beyondthehorizon.network.sync.ParticleAuraPacketS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleDirPacketS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -73,7 +70,6 @@ public class BaseformHandler {
                     !(damageGiver instanceof Player) && (event.getSource().getDirectEntity() == event.getSource().getEntity()))
                 event.setCanceled(true);
 
-            //Afterimage Counter: teleport behind attacker, negate damage
             if (baseformProperties.afterimageCounter > 0 && damageGiver != null && !event.isCanceled()) {
                 Vec3 attackerLook = damageGiver.getLookAngle();
                 double behindX = damageGiver.getX() - attackerLook.x * 3;
@@ -90,26 +86,9 @@ public class BaseformHandler {
                 event.setCanceled(true);
             }
 
-            //Parry
-            if(baseformProperties.parryTime > 0)
-            {
-                assert damageGiver != null;
-                Vec3 motionDir =  (new Vec3(damageGiver.getX(),damageGiver.getY(),damageGiver.getZ()))
-                        .subtract(new Vec3(receiver.getX(),receiver.getY(),receiver.getZ())).normalize();
+            // Parry success removed — block-only after 0.5s hold (isBlocking handles damage reduction below)
+            // Counter mechanic moved to Afterimage (C key in Melee slot)
 
-                //Particle
-                PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
-                        ParticleTypes.FLASH,
-                        receiver.getX(),receiver.getY()+receiver.getEyeHeight()/2,receiver.getZ(),
-                        0.001,0.01F,damageGiver.getEyeHeight()/2,0.01F,1,true));
-
-                //Succeed Parry
-                StopParry.performParrySuccess(receiver, damageGiver.getUUID());
-                damageGiver.setDeltaMovement(motionDir.scale(1.0));
-                event.setCanceled(true);
-            }
-
-            //Block (parry held > 0.5s)
             if(baseformProperties.isBlocking && !event.isCanceled())
             {
                 event.setAmount(event.getAmount() * 0.5f);
@@ -150,6 +129,7 @@ public class BaseformHandler {
                     {
                         damageTaker.setDeltaMovement(Vec3.ZERO);
                         damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
+                        damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, COMBO_TIME + 10, 0, false, false));
                     }
 
                     if (baseformProperties.meleeHitCount == 2)
@@ -166,7 +146,6 @@ public class BaseformHandler {
                     }
                     if (baseformProperties.meleeHitCount == 3)
                     {
-                        // 4th hit: extra damage and light forward knockback
                         damageTaker.hurt(ModDamageTypes.getDamageSource(damageGiver.level(), ModDamageTypes.SONIC_MELEE.getResourceKey(), damageGiver), 8.0f);
                         Vec3 knockDir = damageGiver.getLookAngle();
                         damageTaker.addDeltaMovement(new Vec3(knockDir.x * 0.8, 0.3, knockDir.z * 0.8));
@@ -241,6 +220,9 @@ public class BaseformHandler {
                 if(!damageGiver.hasEffect(ModEffects.SPEED_BLITZING) && damageGiver.onGround())
                     baseformProperties.speedBlitzDashes = 4;
 
+                //Set Speed Blitz damage (8 base + 10 per boost level)
+                event.setAmount(8.0f + baseformProperties.boostLvl * 10.0f);
+
                 //Current Combo Duration
                 MobEffectInstance currComboEffect = damageTaker.getEffect(ModEffects.SPEED_BLITZED);
                 if(currComboEffect == null)
@@ -285,7 +267,6 @@ public class BaseformHandler {
             {
                 //Increase Counter
                 if(!event.getSource().is(ModDamageTypes.SONIC_RANGED.getResourceKey()) || baseformProperties.rangedComboTrip <= 0) {
-                    // Melee attacks only score every 2 hits
                     if (!event.getSource().is(DamageTypes.PLAYER_ATTACK) || baseformProperties.meleeHitCount % 2 == 0)
                         baseformProperties.comboPointCount += 1;
                 }

@@ -18,8 +18,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
+import net.minecraft.server.level.ServerPlayer;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
 import org.joml.Vector3f;
@@ -147,11 +151,17 @@ public class PhantomRushCloud extends PointEntity {
             Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
 
             //Damage Enemy
-            if(!enemy.isInvulnerable())
+            if(!enemy.isInvulnerable()) {
+                float phantomRushDmg = BaseformServer.PHANTOM_RUSH_DAMAGE;
+                if (this.getOwner() instanceof ServerPlayer owner) {
+                    PlayerSonicForm psf = owner.getData(ModAttachments.PLAYER_SONIC_FORM);
+                    phantomRushDmg += ((BaseformProperties) psf.getFormProperties()).boostLvl * 10.0f;
+                }
                 enemy.hurt(
                             ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_ULTIMATE.getResourceKey(),this.getOwner()),
-                            BaseformServer.PHANTOM_RUSH_DAMAGE
+                            phantomRushDmg
                     );
+            }
 
             //Suck Enemies inward
             Vec3 motionDir = currentPos.subtract(enemyPos)

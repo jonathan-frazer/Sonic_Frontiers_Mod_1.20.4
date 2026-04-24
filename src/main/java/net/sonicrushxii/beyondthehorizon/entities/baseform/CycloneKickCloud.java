@@ -18,8 +18,12 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.level.ServerPlayer;
+import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.BaseformServer;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.entities.all.PointEntity;
+import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.entities.baseform.sonic_boom.SonicBoomProjectile;
 import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_cyloop.CyloopMath;
@@ -152,9 +156,14 @@ public class CycloneKickCloud extends PointEntity {
 
             if(CyloopMath.xzDistSqr(currentPos,enemyPos) < 3.0) {
                 //Damage Enemy
+                float cycloneDmg = BaseformServer.CYCLONE_KICK_DAMAGE;
+                if (this.getOwner() instanceof ServerPlayer owner) {
+                    PlayerSonicForm psf = owner.getData(ModAttachments.PLAYER_SONIC_FORM);
+                    cycloneDmg += ((BaseformProperties) psf.getFormProperties()).boostLvl * 10.0f;
+                }
                 enemy.hurt(
                         ModDamageTypes.getDamageSource(this.level(), ModDamageTypes.SONIC_RANGED.getResourceKey(),this.getOwner()),
-                        BaseformServer.CYCLONE_KICK_DAMAGE
+                        cycloneDmg
                 );
                 //Play Sound
                 if(!this.level().isClientSide)

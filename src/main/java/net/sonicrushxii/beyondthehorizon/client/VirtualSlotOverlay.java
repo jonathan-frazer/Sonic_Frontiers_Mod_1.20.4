@@ -234,13 +234,31 @@ public class VirtualSlotOverlay {
                         ));
                         break;
 
-                    case 2:
+                    case 2: // SLOT_ULTIMATE
+                        slotName = "Ultimate";
+                        iconTextures = (List.of(
+                                new Ability(PHANTOM_RUSH_SLOT, null, cooldownArray[BaseformActiveAbility.PHANTOM_RUSH.ordinal()],
+                                        baseformProperties.ultimateAtkMeter,
+                                        (baseformProperties.ultReady) ? 0xFF0033DD : 0xFF00DDDD)
+                        ));
+                        keyBindings.set(0, KeyBindings.INSTANCE.useUltimateAbility.getKey());
+                        break;
+
+                    case 3: // SLOT_TRANSFORMATION
+                        slotName = "Transform";
+                        iconTextures = new ArrayList<Ability>();
+                        if(PlayerTickHandler.hasAllChaosEmeralds(player))
+                            iconTextures.add(new Ability(SUPER_SONIC_ICON, null, (byte)0, null, null));
+                        break;
+
+                    case 4: // SLOT_MELEE
                         slotName = "Melee";
-                        iconTextures = (Arrays.asList(
+                        iconTextures = new ArrayList<>(Arrays.asList(
                                 new Ability(TORNADO_JUMP_SLOT, null, cooldownArray[BaseformActiveAbility.TORNADO_JUMP.ordinal()], null, null),
                                 new Ability(SPINSLASH_SLOT, null, cooldownArray[BaseformActiveAbility.SPINSLASH.ordinal()], null, null),
                                 new Ability(WILDRUSH_SLOT, null, cooldownArray[BaseformActiveAbility.WILDRUSH.ordinal()], null, null),
-                                new Ability(LOOPKICK_SLOT, null, cooldownArray[BaseformActiveAbility.LOOPKICK.ordinal()], null, null)
+                                new Ability(LOOPKICK_SLOT, null, cooldownArray[BaseformActiveAbility.LOOPKICK.ordinal()], null, null),
+                                new Ability(GRAND_SLAM_SLOT, null, cooldownArray[BaseformActiveAbility.GRAND_SLAM.ordinal()], null, null)
                         ));
                         if (player.isShiftKeyDown()) {
                             iconTextures.set(0, new Ability(MIRAGE_SLOT, null, cooldownArray[BaseformActiveAbility.MIRAGE.ordinal()], null, null));
@@ -248,7 +266,7 @@ public class VirtualSlotOverlay {
                         }
                         break;
 
-                    case 3:
+                    case 5: // SLOT_RANGED
                         slotName = "Ranged";
                         iconTextures = (Arrays.asList(
                                 new Ability(SONIC_BOOM_SLOT, null, cooldownArray[BaseformActiveAbility.SONIC_BOOM.ordinal()], null, null),
@@ -256,21 +274,6 @@ public class VirtualSlotOverlay {
                                 new Ability(SONIC_WIND_SLOT, null, cooldownArray[BaseformActiveAbility.SONIC_WIND.ordinal()], null, null),
                                 new Ability(HOMING_SHOT_SLOT, null, cooldownArray[BaseformActiveAbility.HOMING_SHOT.ordinal()], null, null))
                         );
-                        break;
-
-                    case 4:
-                        slotName = "Counter";
-                        iconTextures = (List.of(
-                                new Ability(GRAND_SLAM_SLOT, null, cooldownArray[BaseformActiveAbility.GRAND_SLAM.ordinal()], null, null))
-                        );
-                        keyBindings.set(0, KeyBindings.INSTANCE.useSingleAbility.getKey());
-                        break;
-
-                    case 5:
-                        slotName = "Transform";
-                        iconTextures = new ArrayList<Ability>();
-                        if(PlayerTickHandler.hasAllChaosEmeralds(player))
-                            iconTextures.add(new Ability(SUPER_SONIC_ICON, null, (byte)0, null, null));
                         break;
 
                     default:

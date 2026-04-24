@@ -50,12 +50,10 @@ public class UniversalDash implements CustomPacketPayload {
             Vec3 look = player.getLookAngle();
             double speed = player.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
 
-            // Dash trajectory — no ball curl (unlike AirBoost)
             player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
             player.addDeltaMovement(look.scale(2 * speed));
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
-            // Damage aura: hit enemies in dash radius with boost-scaled damage
             float dashDmg = 6.0f + props.boostLvl * 10.0f;
             Vec3 playerPos = player.position().add(0, 1, 0);
             AABB dashBox = new AABB(
@@ -73,7 +71,7 @@ public class UniversalDash implements CustomPacketPayload {
                 player.connection.send(new ClientboundSetEntityMotionPacket(target));
             }
 
-            props.setCooldown(BaseformActiveAbility.UNIVERSAL_DASH, (byte) 20);
+            props.setCooldown(BaseformActiveAbility.UNIVERSAL_DASH, (byte) 1);
 
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 ModSounds.AIR_BOOST.get(), SoundSource.MASTER, 1.0f, 1.2f);

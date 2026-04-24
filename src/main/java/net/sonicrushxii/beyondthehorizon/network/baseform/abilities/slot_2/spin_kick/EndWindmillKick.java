@@ -52,7 +52,7 @@ public class EndWindmillKick implements CustomPacketPayload {
             target.setDeltaMovement(launchDir.scale(2.0));
             player.connection.send(new ClientboundSetEntityMotionPacket(target));
             target.hurt(ModDamageTypes.getDamageSource(player.level(),
-                    ModDamageTypes.SONIC_MELEE.getResourceKey(), player), 8.0f);
+                    ModDamageTypes.SONIC_MELEE.getResourceKey(), player), 8.0f + baseformProperties.boostLvl * 10.0f);
         }
 
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),

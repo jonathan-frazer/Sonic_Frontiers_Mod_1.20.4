@@ -51,29 +51,40 @@ public class StartSprint implements CustomPacketPayload {
                 0.001, 0.0f, 1, true));
     }
 
+    public static double overSpeedValue(BaseformProperties props) {
+        float baseSpeed = switch(props.boostLvl) {
+            case 1 -> 0.75f; case 2 -> 1.0f; case 3 -> 1.25f; default -> 0.5f;
+        };
+        if(props.overSpeedLevel <= 1) return baseSpeed * 1.5;
+        return baseSpeed * 1.5 + (props.overSpeedLevel - 1) * 0.25;
+    }
+
     public static void performStartSprint(ServerPlayer player)
     {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
         BaseformProperties baseformProperties =  (BaseformProperties) playerSonicForm.getFormProperties();
         baseformProperties.sprintFlag = true;
         baseformProperties.momentumTimer = 0;
+        baseformProperties.stopTimer = 0;
 
-        //Activate Auto Step
         AutoStep.performStepUpActivate(player);
 
-        //Apply Boost Levels
-        switch(baseformProperties.boostLvl)
-        {
-            case 0: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
-                    break;
-            case 1: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.75);
-                    break;
-            case 2: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.00);
-                    break;
-            case 3: if(!baseformProperties.boosted) sonicBoomEffect(player);
-                    baseformProperties.boosted = true;
-                    player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
-                    break;
+        if(baseformProperties.overSpeedLevel > 0) {
+            player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(overSpeedValue(baseformProperties));
+        } else {
+            baseformProperties.sprintTimer = 0;
+            switch(baseformProperties.boostLvl) {
+                case 0: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.1);
+                        break;
+                case 1: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.75);
+                        break;
+                case 2: player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.00);
+                        break;
+                case 3: if(!baseformProperties.boosted) sonicBoomEffect(player);
+                        baseformProperties.boosted = true;
+                        player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.25);
+                        break;
+            }
         }
 
         PacketHandler.sendToALLPlayers(
