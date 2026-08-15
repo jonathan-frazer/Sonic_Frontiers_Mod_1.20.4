@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
-import java.util.Objects;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformActiveAbility;
@@ -40,31 +39,37 @@ public class SonicWavePacket implements CustomPacketPayload {
             if (player == null) return;
 
             PlayerSonicForm psf = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-            BaseformProperties props = (BaseformProperties) psf.getFormProperties();
+            if (!(psf.getFormProperties() instanceof BaseformProperties props)) return;
 
             boolean isAir = !player.onGround();
-            Vec3 look = player.getLookAngle();
+            // Use yaw-based directions so looking straight up/down never produces a zero vector
+            double yawRad = Math.toRadians(player.getYRot());
+            double fwdX = -Math.sin(yawRad);
+            double fwdZ =  Math.cos(yawRad);
 
             SonicWaveEntity wave = new SonicWaveEntity(ModEntityTypes.BASEFORM_SONIC_WAVE.get(), player.level());
             wave.setPos(player.getX(), player.getY() + 1.0, player.getZ());
             wave.setOwner(player.getUUID());
 
             if (isAir) {
-                // Storm: diagonal downward path
+                // Storm: diagonal downward path along horizontal facing direction
                 wave.setIsStorm(true);
                 wave.setDuration(60); // 3 seconds in air
-                Vec3 stormDir = new Vec3(look.x, -0.5, look.z).normalize().scale(1.5);
+                Vec3 stormDir = new Vec3(fwdX, -0.5, fwdZ).normalize().scale(1.5);
                 wave.setMovementDirection(stormDir);
             } else {
-                // Wave: flat ground slide
+                // Wave: flat ground slide along horizontal facing direction
                 wave.setIsStorm(false);
                 wave.setDuration(40); // 2 seconds on ground
-                Vec3 waveDir = new Vec3(look.x, 0, look.z).normalize().scale(1.5);
+                Vec3 waveDir = new Vec3(fwdX, 0, fwdZ).scale(1.5);
                 wave.setMovementDirection(waveDir);
                 // Brief spin — no gravity during cast
-                Objects.requireNonNull(player.getAttribute(Attributes.GRAVITY)).setBaseValue(0.0);
-                net.sonicrushxii.beyondthehorizon.scheduler.Scheduler.scheduleTask(
-                        () -> player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08), 10);
+                var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                if (gravAttr != null) gravAttr.setBaseValue(0.0);
+                net.sonicrushxii.beyondthehorizon.scheduler.Scheduler.scheduleTask(() -> {
+                    var g = player.getAttribute(Attributes.GRAVITY);
+                    if (g != null) g.setBaseValue(0.08);
+                }, 10);
             }
 
             player.level().addFreshEntity(wave);

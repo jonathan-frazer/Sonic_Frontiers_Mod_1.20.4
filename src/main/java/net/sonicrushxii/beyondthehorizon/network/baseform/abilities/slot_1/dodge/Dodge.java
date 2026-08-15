@@ -53,15 +53,18 @@ public class Dodge implements CustomPacketPayload {
     public static void performDodge(ServerPlayer player, byte direction)
     {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties))
+            return;
 
         //Get Invul Frames
         baseformProperties.dodgeInvul = true;
-        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
+        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+        if (gravAttr != null) gravAttr.setBaseValue(0.0);
 
         Scheduler.scheduleTask(()->{
             baseformProperties.dodgeInvul = false;
-            player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+            var gravAttrDelayed = player.getAttribute(Attributes.GRAVITY);
+            if (gravAttrDelayed != null) gravAttrDelayed.setBaseValue(0.08);
             PacketHandler.sendToALLPlayers(
                     new SyncPlayerFormS2C(
                             player.getId(),
@@ -75,9 +78,9 @@ public class Dodge implements CustomPacketPayload {
         //Delta Movement
         Vec3 dodgeVector;
         if (direction == 2) {
-            // Backward dodge: opposite of look direction
-            Vec3 look = player.getLookAngle();
-            dodgeVector = new Vec3(-look.x, 0, -look.z).normalize().scale(2.0);
+            // Backward dodge: drive from yaw only so looking straight up/down never zeroes the vector
+            double yawRad = Math.toRadians(player.getYRot());
+            dodgeVector = new Vec3(Math.sin(yawRad), 0, -Math.cos(yawRad)).scale(2.0);
         } else {
             dodgeVector = player.getLookAngle().cross(new Vec3(0, (direction == 1) ? 1 : -1, 0)).scale(2.0);
         }

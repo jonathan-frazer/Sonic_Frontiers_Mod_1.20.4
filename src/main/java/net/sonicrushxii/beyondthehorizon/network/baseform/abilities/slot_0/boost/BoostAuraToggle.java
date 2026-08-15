@@ -35,7 +35,7 @@ public class BoostAuraToggle implements CustomPacketPayload {
             ServerPlayer player = (ServerPlayer) ctx.player();
             if (player != null) {
                 PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                 baseformProperties.boostAura = !baseformProperties.boostAura;
 

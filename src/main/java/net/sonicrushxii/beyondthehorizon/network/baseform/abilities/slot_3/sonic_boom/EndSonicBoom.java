@@ -41,12 +41,13 @@ public class EndSonicBoom implements CustomPacketPayload
     public static void performEndSonicBoom(ServerPlayer player)
     {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
         //Reset Counter to 0
         baseformProperties.sonicBoom = 0;
         //Return Gravity
-        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+        if (gravAttr != null) gravAttr.setBaseValue(0.08);
         //Cooldown
         baseformProperties.setCooldown(BaseformActiveAbility.SONIC_BOOM, (byte) 5);
         //Play Sound

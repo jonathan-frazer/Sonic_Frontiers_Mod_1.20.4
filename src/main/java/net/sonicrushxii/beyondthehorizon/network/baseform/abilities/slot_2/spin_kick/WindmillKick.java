@@ -34,10 +34,11 @@ public class WindmillKick implements CustomPacketPayload {
             ServerPlayer player = (ServerPlayer) ctx.player();
             if (player == null) return;
             PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+            if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
             baseformProperties.windmillKick = 1;
-            Objects.requireNonNull(player.getAttribute(Attributes.GRAVITY)).setBaseValue(0.0);
+            var gravAttr = player.getAttribute(Attributes.GRAVITY);
+            if (gravAttr != null) gravAttr.setBaseValue(0.0);
 
             PacketHandler.sendToALLPlayers(new SyncPlayerFormS2C(player.getId(), playerSonicForm));
         });

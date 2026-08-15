@@ -247,6 +247,24 @@ public class BaseformServer
                     if (baseformProperties.airSpindashUsed && player.onGround())
                         baseformProperties.airSpindashUsed = false;
 
+                    //Air dash count reset on landing
+                    if (baseformProperties.airDashCount > 0 && player.onGround())
+                        baseformProperties.airDashCount = 0;
+
+                    //Air combo hover — maintain Y position for ~0.5s per hit
+                    if (baseformProperties.airComboHoverTimer > 0) {
+                        if (player.onGround()) {
+                            baseformProperties.airComboHoverTimer = 0;
+                        } else {
+                            baseformProperties.airComboHoverTimer--;
+                            Vec3 vel = player.getDeltaMovement();
+                            if (vel.y < 0) {
+                                player.setDeltaMovement(vel.x, 0.0, vel.z);
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                            }
+                        }
+                    }
+
                     //Exit Ball form While swimming
                     if(player.isInWater())
                         baseformProperties.ballFormState = 0;
@@ -433,20 +451,25 @@ public class BaseformServer
                         );
                     }
 
-                    //Boost Aura (damaging aura while boosting)
-                    if (baseformProperties.boostAura && baseformProperties.boosted && player.isSprinting()
+                    //Boost Aura (damaging aura — active while toggled on)
+                    if (baseformProperties.boostAura
                             && player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR
                             && (player.tickCount % 5 == 0)) {
                         float auraDmg = BOOST_AURA_DAMAGE + (baseformProperties.boostLvl * 10.0f);
                         for (LivingEntity enemy : level.getEntitiesOfClass(LivingEntity.class,
-                                new AABB(player.getX() + 2.5, player.getY() + 2.0, player.getZ() + 2.5,
-                                         player.getX() - 2.5, player.getY() - 2.0, player.getZ() - 2.5),
+                                new AABB(player.getX() - 2.5, player.getY() - 2.0, player.getZ() - 2.5,
+                                         player.getX() + 2.5, player.getY() + 2.0, player.getZ() + 2.5),
                                 target -> !target.is(player))) {
                             enemy.hurt(ModDamageTypes.getDamageSource(level, ModDamageTypes.SONIC_MELEE.getResourceKey(), player), auraDmg);
                             Vec3 knockDir = enemy.position().subtract(player.position()).normalize();
                             enemy.setDeltaMovement(knockDir.scale(1.5));
                             player.connection.send(new ClientboundSetEntityMotionPacket(enemy));
                         }
+                        PacketHandler.sendToALLPlayers(new ParticleAuraPacketS2C(
+                                new DustParticleOptions(new Vector3f(1.0f, 0.6f, 0.0f), 1.5f),
+                                player.getX(), player.getY() + 0.85, player.getZ(),
+                                0.01, 0.8f, 0.4f, 0.8f, 10, true)
+                        );
                     }
 
                     //Base Cyloop
@@ -605,8 +628,8 @@ public class BaseformServer
                             // Charge time no longer builds (always max), but keep for animation
                             // Player can move freely; damage nearby enemies like a moving ball
                             for(LivingEntity nearbyEntity : level.getEntitiesOfClass(LivingEntity.class,
-                                    new AABB(player.getX()+1.0,player.getY()+1.0,player.getZ()+1.0,
-                                            player.getX()-1.0,player.getY()-1.0,player.getZ()-1.0),
+                                    new AABB(player.getX()-1.0,player.getY()-1.0,player.getZ()-1.0,
+                                            player.getX()+1.0,player.getY()+1.0,player.getZ()+1.0),
                                     (e)->!e.is(player)))
                                 if (nearbyEntity.hurtTime == 0)
                                     nearbyEntity.hurt(ModDamageTypes.getDamageSource(level,
@@ -631,8 +654,11 @@ public class BaseformServer
                         {
                             boolean airborne = ModUtils.passableBlocks.contains(BuiltInRegistries.BLOCK.getKey(level.getBlockState(player.blockPosition().offset(0, -1, 0)).getBlock())+"");
                             if(airborne) {
-                                player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
-                                player.setDeltaMovement((ModUtils.calculateViewVector(0,player.getYRot())).scale(10.0));
+                                var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                                if (gravAttr != null) gravAttr.setBaseValue(0.08);
+                                Vec3 horiz = ModUtils.calculateViewVector(0, player.getYRot()).scale(10.0);
+                                Vec3 current = player.getDeltaMovement();
+                                player.setDeltaMovement(horiz.x, current.y, horiz.z);
                             } else {
                                 player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
                                 player.setDeltaMovement((ModUtils.calculateViewVector(0,player.getYRot())).scale(10.0));
@@ -641,8 +667,8 @@ public class BaseformServer
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                             for(LivingEntity nearbyEntity : level.getEntitiesOfClass(LivingEntity.class,
-                                    new AABB(player.getX()+1.5,player.getY()+1.5,player.getZ()+1.5,
-                                            player.getX()-1.5,player.getY()-1.5,player.getZ()-1.5),
+                                    new AABB(player.getX()-1.5,player.getY()-1.5,player.getZ()-1.5,
+                                            player.getX()+1.5,player.getY()+1.5,player.getZ()+1.5),
                                     (nearbyEntity)->!nearbyEntity.is(player))) {
                                 nearbyEntity.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
                                         50.0f + baseformProperties.boostLvl * 10.0f);
@@ -662,69 +688,55 @@ public class BaseformServer
 
                     //Homing Attack
                     {
-                        //Perform homing attack
-                        if(baseformProperties.homingAttackAirTime > 0)
-                        {
+                        if (baseformProperties.homingAttackAirTime > 0) {
                             try {
-                                //Increment Counter
                                 baseformProperties.homingAttackAirTime += 1;
 
-                                //Get Target
-                                assert baseformProperties.homingTarget != null;
-                                LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.homingTarget);
-
-                                if(enemy == null)
-                                {
-                                    baseformProperties.homingAttackAirTime = 0;
-                                    throw new NullPointerException("Enemy died/doesn't exist anymore");
-                                }
-                                Vec3 playerPos = player.getPosition(0);
-                                Vec3 enemyPos = enemy.getPosition(0);
-                                double distanceFromEnemy = playerPos.distanceTo(enemyPos);
-
-
-                                //Homing
                                 if (baseformProperties.homingAttackAirTime < 45) {
-                                    player.setDeltaMovement(enemyPos.subtract(playerPos).normalize().scale(1.5));
-                                    player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                    LivingEntity enemy = (LivingEntity) serverLevel.getEntity(baseformProperties.homingTarget);
 
-                                    //Fail
-                                    if (distanceFromEnemy > 16.0) {
-                                        //Homing Attack Data
-                                        baseformProperties.homingAttackAirTime = 44;
-                                    }
-
-                                    //Succeed
-                                    if (distanceFromEnemy < 1.5) {
-                                        //Homing Attack Data
-                                        baseformProperties.homingAttackAirTime = 44;
-
-                                        //Launch Up
-                                        player.setDeltaMovement(0.0, 0.8, 0.0);
-                                        player.connection.send(new ClientboundSetEntityMotionPacket(player));
-
-                                        //Damage Enemy — scales with boost level
-                                        float homingDmg = HOMING_ATTACK_BASE_DAMAGE + (baseformProperties.boostLvl * 10.0f);
-                                        enemy.hurt(ModDamageTypes.getDamageSource(player.level(),ModDamageTypes.SONIC_BALL.getResourceKey(),player),
-                                                homingDmg);
-                                    }
-
-                                }
-                                //Ending Segment
-                                else {
-                                    //Remove Gravity at point of impact
-                                    if (baseformProperties.homingAttackAirTime == 45)
-                                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
-
-                                    //At the end return all data to normal
-                                    if (baseformProperties.homingAttackAirTime == 55) {
+                                    if (enemy == null) {
+                                        // Target despawned — abort immediately
+                                        var g = player.getAttribute(Attributes.GRAVITY);
+                                        if (g != null) g.setBaseValue(0.08);
                                         baseformProperties.homingAttackAirTime = 0;
                                         baseformProperties.homingTarget = new UUID(0L, 0L);
+                                    } else {
+                                        Vec3 playerPos = player.getPosition(0);
+                                        Vec3 enemyPos = enemy.getPosition(0);
+                                        double distanceFromEnemy = playerPos.distanceTo(enemyPos);
+
+                                        player.setDeltaMovement(enemyPos.subtract(playerPos).normalize().scale(1.5));
+                                        player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                        if (distanceFromEnemy < 1.5) {
+                                            // Hit: damage, launch up, reset immediately for fast chaining
+                                            float homingDmg = HOMING_ATTACK_BASE_DAMAGE + (baseformProperties.boostLvl * 10.0f);
+                                            enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player), homingDmg);
+                                            player.setDeltaMovement(0.0, 0.8, 0.0);
+                                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                                            var g = player.getAttribute(Attributes.GRAVITY);
+                                            if (g != null) g.setBaseValue(0.08);
+                                            baseformProperties.homingAttackAirTime = 0;
+                                            baseformProperties.homingTarget = new UUID(0L, 0L);
+                                        } else if (distanceFromEnemy > 16.0) {
+                                            // Out of range — abort
+                                            var g = player.getAttribute(Attributes.GRAVITY);
+                                            if (g != null) g.setBaseValue(0.08);
+                                            baseformProperties.homingAttackAirTime = 0;
+                                            baseformProperties.homingTarget = new UUID(0L, 0L);
+                                        }
                                     }
+                                } else {
+                                    // Timed out after 44 ticks — reset immediately
+                                    var g = player.getAttribute(Attributes.GRAVITY);
+                                    if (g != null) g.setBaseValue(0.08);
+                                    baseformProperties.homingAttackAirTime = 0;
+                                    baseformProperties.homingTarget = new UUID(0L, 0L);
                                 }
-                            } catch (NullPointerException e)
-                            {
-                                player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+                            } catch (NullPointerException e) {
+                                var g = player.getAttribute(Attributes.GRAVITY);
+                                if (g != null) g.setBaseValue(0.08);
                                 baseformProperties.homingAttackAirTime = 0;
                                 baseformProperties.homingTarget = new UUID(0L, 0L);
                             }
@@ -736,8 +748,8 @@ public class BaseformServer
 
                         //Damage Enemy
                         for(LivingEntity enemy: level.getEntitiesOfClass(LivingEntity.class,
-                                new AABB(player.getX()+0.5,player.getY()+1.0,player.getZ()+0.5,
-                                        player.getX()-0.5,player.getY(),player.getZ()-0.5),(enemy)->!enemy.is(player)))
+                                new AABB(player.getX()-0.5,player.getY(),player.getZ()-0.5,
+                                        player.getX()+0.5,player.getY()+1.0,player.getZ()+0.5),(enemy)->!enemy.is(player)))
                         {
                             enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player),
                                     BALLFORM_DAMAGE + baseformProperties.boostLvl * 10.0f);
@@ -817,10 +829,10 @@ public class BaseformServer
                                     0.001, 0.15f, 1.05f, 0.15f, 9,
                                     true));
 
-                            for(LivingEntity enemy : level.getEntitiesOfClass(LivingEntity.class,new AABB(
-                                    player.getX()+1.5, player.getY()+2.0, player.getZ()+1.5,
-                                    player.getX()-1.5, player.getY()-1, player.getZ()-1.5
-                            ),(enemy)->!enemy.is(player)))
+                            for(LivingEntity enemy : level.getEntitiesOfClass(LivingEntity.class, new AABB(
+                                    player.getX()-1.5, player.getY()-1.0, player.getZ()-1.5,
+                                    player.getX()+1.5, player.getY()+2.0, player.getZ()+1.5
+                            ), e -> !e.is(player)))
                             {
                                 enemy.hurt(ModDamageTypes.getDamageSource(player.level(), ModDamageTypes.SONIC_BALL.getResourceKey(), player),
                                         SPEED_BLITZ_DASH_DAMAGE + baseformProperties.boostLvl * 10.0f);
@@ -828,23 +840,24 @@ public class BaseformServer
                         }
                         if(baseformProperties.speedBlitzDashTimer == 5)
                         {
-                            //Set Delta Movement
-                            player.setDeltaMovement(0,0,0);
-                            //Remove Gravity
-                            player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+                            player.setDeltaMovement(0, 0, 0);
+                            var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                            if (gravAttr != null) gravAttr.setBaseValue(0.08);
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
-                            Vec3 currPos = new Vec3(player.getX(),player.getY(),player.getZ()).add(ModUtils.calculateViewVector(0,baseformProperties.atkRotPhase).scale(-4.0));
-                            Vec3 playerPos = new Vec3(player.getX(),player.getY(),player.getZ());
-                            for(LivingEntity enemy : level.getEntitiesOfClass(LivingEntity.class,new AABB(
-                                    currPos.x+4.0, currPos.y+2.0, currPos.z+4.0,
-                                    currPos.x-4.0, currPos.y-2.0, currPos.z-4.0
-                            ),(enemy)->!enemy.is(player)))
-                            {
-                                Vec3 enemyPos = new Vec3(enemy.getX(),enemy.getY(),enemy.getZ());
-                                float[] yawPitch = ModUtils.getYawPitchFromVec(enemyPos.subtract(playerPos));
-                                player.teleportTo(player.serverLevel(), player.getX(), player.getY(), player.getZ(),
-                                        EnumSet.of(RelativeMovement.X,RelativeMovement.Y,RelativeMovement.Z), yawPitch[0], yawPitch[1]);
+                            // Search along the dash trail for a hit enemy
+                            Vec3 searchOrigin = player.position().add(
+                                ModUtils.calculateViewVector(0, baseformProperties.atkRotPhase).scale(-4.0));
+                            for (LivingEntity enemy : level.getEntitiesOfClass(LivingEntity.class, new AABB(
+                                    searchOrigin.x - 4.0, searchOrigin.y - 2.0, searchOrigin.z - 4.0,
+                                    searchOrigin.x + 4.0, searchOrigin.y + 2.0, searchOrigin.z + 4.0),
+                                    e -> !e.is(player))) {
+                                // Teleport to 7 blocks behind the enemy (behind their own facing direction)
+                                Vec3 behindEnemy = enemy.position().subtract(enemy.getLookAngle().scale(7.0));
+                                float[] yawPitch = ModUtils.getYawPitchFromVec(enemy.position().subtract(behindEnemy));
+                                player.teleportTo(player.serverLevel(),
+                                        behindEnemy.x, enemy.getY(), behindEnemy.z,
+                                        EnumSet.noneOf(RelativeMovement.class), yawPitch[0], yawPitch[1]);
                                 player.connection.send(new ClientboundTeleportEntityPacket(player));
                                 break;
                             }
@@ -897,8 +910,8 @@ public class BaseformServer
                             // Hit enemies in small radius every 3 ticks
                             if (baseformProperties.smashBarrage % 3 == 0) {
                                 for (LivingEntity enemy : player.level().getEntitiesOfClass(LivingEntity.class,
-                                        new AABB(player.getX() + 2.5, player.getY() + 2.0, player.getZ() + 2.5,
-                                                 player.getX() - 2.5, player.getY() - 1.0, player.getZ() - 2.5),
+                                        new AABB(player.getX() - 2.5, player.getY() - 1.0, player.getZ() - 2.5,
+                                                 player.getX() + 2.5, player.getY() + 2.0, player.getZ() + 2.5),
                                         target -> !target.is(player))) {
                                     enemy.hurt(ModDamageTypes.getDamageSource(level,
                                             ModDamageTypes.SONIC_MELEE.getResourceKey(), player), SMASH_BARRAGE_DAMAGE + baseformProperties.boostLvl * 10.0f);
@@ -1435,6 +1448,20 @@ public class BaseformServer
                                     );
                                     player.setDeltaMovement(motionDirection.scale(1.0 + ((offSetCycloneKick < 36) ? 0.01 : -0.01) * offSetCycloneKick));
                                     player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                    // Multi-hit DPS every 5 ticks during spin
+                                    if (offSetCycloneKick % 5 == 0) {
+                                        for (LivingEntity enemy : level.getEntitiesOfClass(LivingEntity.class,
+                                                new AABB(player.getX() - 2.5, player.getY() - 2.0, player.getZ() - 2.5,
+                                                         player.getX() + 2.5, player.getY() + 2.0, player.getZ() + 2.5),
+                                                e -> !e.is(player) && e.isAlive())) {
+                                            if (enemy.hurtTime == 0) {
+                                                enemy.hurt(ModDamageTypes.getDamageSource(level,
+                                                        ModDamageTypes.SONIC_MELEE.getResourceKey(), player),
+                                                        CYCLONE_KICK_DAMAGE + baseformProperties.boostLvl * 10.0f);
+                                            }
+                                        }
+                                    }
                                 }
                                 if(baseformProperties.cycloneKick == 64)
                                 {
@@ -1465,8 +1492,8 @@ public class BaseformServer
                             if (baseformProperties.windmillKick % 5 == 0) {
                                 Vec3 playerPos = new Vec3(player.getX(), player.getY(), player.getZ());
                                 for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class,
-                                        new AABB(playerPos.x+2.5, playerPos.y+2.5, playerPos.z+2.5,
-                                                 playerPos.x-2.5, playerPos.y-2.5, playerPos.z-2.5),
+                                        new AABB(playerPos.x-2.5, playerPos.y-2.5, playerPos.z-2.5,
+                                                 playerPos.x+2.5, playerPos.y+2.5, playerPos.z+2.5),
                                         e -> e != player && e.isAlive())) {
                                     if (target.hurtTime == 0) {
                                         target.hurt(ModDamageTypes.getDamageSource(level,
@@ -1860,7 +1887,8 @@ public class BaseformServer
                                 //Reset Counter to 0
                                 baseformProperties.sonicWind = 0;
                                 //Return Gravity
-                                player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+                                var swGrav = player.getAttribute(Attributes.GRAVITY);
+                                if (swGrav != null) swGrav.setBaseValue(0.08);
                                 //Cooldown
                                 baseformProperties.setCooldown(BaseformActiveAbility.SONIC_WIND,(byte)5);
 
@@ -1938,7 +1966,8 @@ public class BaseformServer
                                 //Reset Counter to 0
                                 baseformProperties.profanedWind = 0;
                                 //Return Gravity
-                                player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+                                var qswGrav = player.getAttribute(Attributes.GRAVITY);
+                                if (qswGrav != null) qswGrav.setBaseValue(0.08);
                                 //Cooldown
                                 baseformProperties.setCooldown(BaseformActiveAbility.SONIC_WIND,(byte)5);
                             }
@@ -2432,8 +2461,10 @@ public class BaseformServer
                         //Return Attributes to normal
                         baseformProperties.ultimateUse = 0;
                         baseformProperties.phantomRushOnly = false;
-                        player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.0);
-                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+                        var krAttr = player.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
+                        if (krAttr != null) krAttr.setBaseValue(0.0);
+                        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                        if (gravAttr != null) gravAttr.setBaseValue(0.08);
                     }
                 }
             }
@@ -2475,7 +2506,7 @@ public class BaseformServer
                 }
                 if (baseformProperties.ultimateCooldown > 0)
                     baseformProperties.ultimateCooldown--;
-                baseformProperties.ultReady = (baseformProperties.ultimateCooldown == 0);
+                baseformProperties.ultReady = (baseformProperties.ultimateCooldown == 0 && baseformProperties.ultimateAtkMeter >= 100.0);
             }
 
             //Data

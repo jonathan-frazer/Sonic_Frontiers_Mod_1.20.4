@@ -39,7 +39,8 @@ public class LaunchSpindash implements CustomPacketPayload {
     public static void performRevertSpindash(ServerPlayer player, BaseformProperties baseformProperties)
     {
         baseformProperties.ballFormState = (byte) 0;
-        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+        if (gravAttr != null) gravAttr.setBaseValue(0.08);
         if (baseformProperties.boostLvl == 0 && !player.isSprinting())
             player.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.0);
     }
@@ -50,7 +51,7 @@ public class LaunchSpindash implements CustomPacketPayload {
                     ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                         //Set Data -> Charging
                         baseformProperties.ballFormState = (byte)2;
@@ -58,7 +59,8 @@ public class LaunchSpindash implements CustomPacketPayload {
                         //Enter Ball Form
                         player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.5);
                         player.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(1.5);
-                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.08);
+                        var gravAttr2 = player.getAttribute(Attributes.GRAVITY);
+                        if (gravAttr2 != null) gravAttr2.setBaseValue(0.08);
 
                         //PlaySound
                         Level world = player.level();

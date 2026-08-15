@@ -43,9 +43,16 @@ public class UniversalDash implements CustomPacketPayload {
             if (player == null) return;
 
             PlayerSonicForm psf = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-            BaseformProperties props = (BaseformProperties) psf.getFormProperties();
+            if (!(psf.getFormProperties() instanceof BaseformProperties props)) return;
 
             if (props.getCooldown(BaseformActiveAbility.UNIVERSAL_DASH) != 0) return;
+
+            if (player.onGround()) {
+                props.airDashCount = 0;
+            } else {
+                if (props.airDashCount >= 1) return;
+                props.airDashCount++;
+            }
 
             Vec3 look = player.getLookAngle();
             double speed = player.getAttribute(Attributes.MOVEMENT_SPEED).getValue();

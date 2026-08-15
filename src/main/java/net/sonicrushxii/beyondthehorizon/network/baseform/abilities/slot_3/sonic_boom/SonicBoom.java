@@ -84,13 +84,14 @@ public class SonicBoom implements CustomPacketPayload
                     ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                         //Changed Data
                         baseformProperties.sonicBoom = 1;
 
                         //Remove Gravity
-                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
+                        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                        if (gravAttr != null) gravAttr.setBaseValue(0.0);
 
                         //Play Sound
                         PacketHandler.sendToALLPlayers(new PlayerPlaySoundPacketS2C(

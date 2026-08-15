@@ -138,7 +138,8 @@ public class SonicBoomProjectile extends LinearMovingEntity {
                     float dmg = BaseformServer.SONIC_BOOM_DAMAGE;
                     if (this.getOwner() instanceof ServerPlayer owner) {
                         PlayerSonicForm psf = owner.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        dmg += ((BaseformProperties) psf.getFormProperties()).boostLvl * 10.0f;
+                        if (psf.getFormProperties() instanceof BaseformProperties bp)
+                            dmg += bp.boostLvl * 10.0f;
                     }
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(

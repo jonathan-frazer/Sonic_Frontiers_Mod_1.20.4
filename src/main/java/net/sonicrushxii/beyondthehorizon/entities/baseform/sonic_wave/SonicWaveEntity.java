@@ -92,24 +92,28 @@ public class SonicWaveEntity extends LinearMovingEntity {
 
         // Damage + pull every 3 ticks
         if (this.tickCount % 3 == 0) {
-            double hw = isStorm() ? 2.0 : 4.0; // wave has wider cone
-            double hh = 2.0;
-            float dmg = BaseformServer.SONIC_WIND_DAMAGE;
-            LivingEntity owner = getOwner();
-            if (owner instanceof ServerPlayer sp) {
-                PlayerSonicForm psf = sp.getData(ModAttachments.PLAYER_SONIC_FORM);
-                dmg += ((BaseformProperties) psf.getFormProperties()).boostLvl * 10.0f;
-            }
-            Vec3 pull = movementDirection.normalize().scale(1.2);
-            for (LivingEntity enemy : this.level().getEntitiesOfClass(LivingEntity.class,
-                    new AABB(getX() + hw, getY() + hh, getZ() + hw,
-                             getX() - hw, getY() - hh, getZ() - hw),
-                    e -> !e.is(this) && !e.is(owner))) {
-                enemy.hurt(ModDamageTypes.getDamageSource(this.level(),
-                        ModDamageTypes.SONIC_RANGED.getResourceKey(), owner), dmg);
-                // Pull in wave direction
-                enemy.setDeltaMovement(enemy.getDeltaMovement().add(pull));
-            }
+            try {
+                double hw = isStorm() ? 2.0 : 4.0; // wave has wider cone
+                double hh = 2.0;
+                float dmg = BaseformServer.SONIC_WIND_DAMAGE;
+                LivingEntity owner = getOwner();
+                if (owner instanceof ServerPlayer sp) {
+                    PlayerSonicForm psf = sp.getData(ModAttachments.PLAYER_SONIC_FORM);
+                    if (psf.getFormProperties() instanceof BaseformProperties bp)
+                        dmg += bp.boostLvl * 10.0f;
+                }
+                Vec3 pull = movementDirection.lengthSqr() > 1e-8
+                        ? movementDirection.normalize().scale(1.2) : Vec3.ZERO;
+                for (LivingEntity enemy : this.level().getEntitiesOfClass(LivingEntity.class,
+                        new AABB(getX() - hw, getY() - hh, getZ() - hw,
+                                 getX() + hw, getY() + hh, getZ() + hw),
+                        e -> !e.is(this) && !e.is(owner))) {
+                    enemy.hurt(ModDamageTypes.getDamageSource(this.level(),
+                            ModDamageTypes.SONIC_RANGED.getResourceKey(), owner), dmg);
+                    // Pull in wave direction
+                    enemy.setDeltaMovement(enemy.getDeltaMovement().add(pull));
+                }
+            } catch (NullPointerException ignored) {}
         }
     }
 }

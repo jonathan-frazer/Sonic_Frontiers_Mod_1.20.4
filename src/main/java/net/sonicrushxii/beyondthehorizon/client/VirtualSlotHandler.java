@@ -30,10 +30,16 @@ public class VirtualSlotHandler {
     public static byte getSlotLength() {return TOTAL_SLOT_COUNT;}
 
     public static void cycleScrollableSlot() {
+        cycleScrollableSlot(true);
+    }
+
+    public static void cycleScrollableSlot(boolean forward) {
         if (currAbility >= SCROLLABLE_SLOT_COUNT) {
             currAbility = SLOT_COMBO;
-        } else {
+        } else if (forward) {
             currAbility = (byte) ((currAbility + 1) % SCROLLABLE_SLOT_COUNT);
+        } else {
+            currAbility = (byte) ((currAbility - 1 + SCROLLABLE_SLOT_COUNT) % SCROLLABLE_SLOT_COUNT);
         }
     }
 

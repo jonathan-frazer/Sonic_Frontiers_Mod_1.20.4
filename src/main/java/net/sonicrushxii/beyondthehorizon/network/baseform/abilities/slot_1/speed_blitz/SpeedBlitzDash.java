@@ -42,7 +42,7 @@ public class SpeedBlitzDash implements CustomPacketPayload {
                     if(player != null)
                     {
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                         //Speed Dash Timer
                         baseformProperties.speedBlitzDashTimer = 1;
@@ -56,7 +56,8 @@ public class SpeedBlitzDash implements CustomPacketPayload {
                         player.connection.send(new ClientboundSetEntityMotionPacket(player));
 
                         //Remove Gravity
-                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
+                        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                        if (gravAttr != null) gravAttr.setBaseValue(0.0);
 
                         PacketHandler.sendToALLPlayers(
                                 new SyncPlayerFormS2C(

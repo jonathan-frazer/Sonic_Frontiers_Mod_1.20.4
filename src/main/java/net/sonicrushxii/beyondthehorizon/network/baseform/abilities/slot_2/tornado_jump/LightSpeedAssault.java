@@ -8,7 +8,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -64,12 +66,18 @@ public class LightSpeedAssault implements CustomPacketPayload
         for (int i = 0; i < 10; ++i) {
             //Increment Current Position Forward
             currentPos = currentPos.add(lookAngle);
-            AABB boundingBox = new AABB(currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3,
-                    currentPos.x() - 3, currentPos.y() - 3, currentPos.z() - 3);
+            AABB boundingBox = new AABB(currentPos.x() - 3, currentPos.y() - 3, currentPos.z() - 3,
+                    currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3);
 
             List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
                     LivingEntity.class, boundingBox,
-                    (enemy) -> !enemy.is(player) && enemy.isAlive());
+                    enemy -> {
+                        if (enemy.is(player) || !enemy.isAlive()) return false;
+                        return player.level().clip(new ClipContext(
+                            player.getEyePosition(), enemy.getEyePosition(),
+                            ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)
+                        ).getType() != HitResult.Type.BLOCK;
+                    });
 
             //If enemy is found then Target it
             if (!nearbyEntities.isEmpty()) {
@@ -92,7 +100,7 @@ public class LightSpeedAssault implements CustomPacketPayload
                     ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                         //Start Light Speed Assault
                         if(msg.enemyID != null)
@@ -102,7 +110,8 @@ public class LightSpeedAssault implements CustomPacketPayload
                             baseformProperties.meleeTarget = msg.enemyID;
 
                             //Remove Gravity
-                            player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
+                            var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                            if (gravAttr != null) gravAttr.setBaseValue(0.0);
 
                             //Play Sound
                             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);

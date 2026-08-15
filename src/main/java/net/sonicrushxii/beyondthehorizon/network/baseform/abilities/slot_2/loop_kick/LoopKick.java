@@ -9,7 +9,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -50,7 +52,7 @@ public class LoopKick implements CustomPacketPayload {
     public static void scanFoward(ServerPlayer player)
     {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
         //Get Position
         Vec3 currentPos = player.getPosition(0).add(0.0, 1.0, 0.0);
@@ -62,12 +64,18 @@ public class LoopKick implements CustomPacketPayload {
         for (int i = 0; i < 16; ++i) {
             //Increment Current Position Forward
             currentPos = currentPos.add(lookAngle);
-            AABB boundingBox = new AABB(currentPos.x() + 4, currentPos.y() + 4, currentPos.z() + 4,
-                    currentPos.x() - 4, currentPos.y() - 4, currentPos.z() - 4);
+            AABB boundingBox = new AABB(currentPos.x() - 4, currentPos.y() - 4, currentPos.z() - 4,
+                    currentPos.x() + 4, currentPos.y() + 4, currentPos.z() + 4);
 
             List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
                     LivingEntity.class, boundingBox,
-                    (enemy) -> !enemy.is(player) && enemy.isAlive());
+                    enemy -> {
+                        if (enemy.is(player) || !enemy.isAlive()) return false;
+                        return player.level().clip(new ClipContext(
+                            player.getEyePosition(), enemy.getEyePosition(),
+                            ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)
+                        ).getType() != HitResult.Type.BLOCK;
+                    });
 
             //If enemy is found then Target it
             if (!nearbyEntities.isEmpty()) {
@@ -92,7 +100,7 @@ public class LoopKick implements CustomPacketPayload {
     public static void performLoopKick(ServerPlayer player)
     {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
         //Set Motion
         player.setDeltaMovement(new Vec3(0,0,0));
@@ -117,7 +125,8 @@ public class LoopKick implements CustomPacketPayload {
         player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.LOOP_KICK.get(), SoundSource.MASTER, 0.75f, 1.0f);
 
         //Remove Gravity
-        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
+        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+        if (gravAttr != null) gravAttr.setBaseValue(0.0);
 
 
         PacketHandler.sendToALLPlayers(

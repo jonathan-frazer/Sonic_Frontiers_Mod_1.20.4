@@ -10,7 +10,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
@@ -58,12 +60,18 @@ public class QuickCyloop implements CustomPacketPayload {
         {
             //Increment Current Position Forward
             currentPos = currentPos.add(lookAngle);
-            AABB boundingBox = new AABB(currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3,
-                    currentPos.x() - 3, currentPos.y() - 3, currentPos.z() - 3);
+            AABB boundingBox = new AABB(currentPos.x() - 3, currentPos.y() - 3, currentPos.z() - 3,
+                    currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3);
 
             List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
                     LivingEntity.class, boundingBox,
-                    (enemy) -> !enemy.is(player) && enemy.isAlive());
+                    enemy -> {
+                        if (enemy.is(player) || !enemy.isAlive()) return false;
+                        return player.level().clip(new ClipContext(
+                            player.getEyePosition(), enemy.getEyePosition(),
+                            ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)
+                        ).getType() != HitResult.Type.BLOCK;
+                    });
 
             //If enemy is found then Target it
             if (!nearbyEntities.isEmpty())
@@ -84,7 +92,7 @@ public class QuickCyloop implements CustomPacketPayload {
     public static void performQkCyloop(ServerPlayer player)
     {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
         LivingEntity enemy = scanFoward(player);
 

@@ -60,16 +60,20 @@ public class PhantomRushActivate implements CustomPacketPayload {
             if (player == null) return;
 
             PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-            BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+            if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
-            if (msg.enemyID != null && baseformProperties.getCooldown(BaseformActiveAbility.PHANTOM_RUSH) == 0) {
+            if (msg.enemyID != null && baseformProperties.ultReady && baseformProperties.getCooldown(BaseformActiveAbility.PHANTOM_RUSH) == 0) {
                 baseformProperties.ultimateUse = 1;
                 baseformProperties.phantomRushOnly = true;
                 baseformProperties.ultTarget = msg.enemyID;
+                baseformProperties.ultimateAtkMeter = 0.0;
+                baseformProperties.ultReady = false;
                 baseformProperties.setCooldown(BaseformActiveAbility.PHANTOM_RUSH, (byte) 100);
 
-                player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
-                player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+                var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                if (gravAttr != null) gravAttr.setBaseValue(0.0);
+                var krAttr = player.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
+                if (krAttr != null) krAttr.setBaseValue(1.0);
 
                 player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                         ModSounds.ULTIMATE_MUSIC.get(), SoundSource.MASTER, 1.0f, 1.0f);

@@ -48,7 +48,7 @@ public class DoubleJump implements CustomPacketPayload {
                     ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null) {
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                         //Modify Tags
                         baseformProperties.hasDoubleJump = false;
@@ -58,13 +58,13 @@ public class DoubleJump implements CustomPacketPayload {
                                         playerSonicForm
                                 ));
 
-                        //Thrust
+                        //Thrust — normalized: magnitude 0.6 in all directions
+                        final double DOUBLE_JUMP_SPEED = 0.6;
                         if (player.isSprinting()) {
-                            Vec3 look = player.getLookAngle();
-                            player.setDeltaMovement(look.x * 2.0, 0.3, look.z * 2.0);
+                            Vec3 look = player.getLookAngle(); // already a unit vector
+                            player.setDeltaMovement(look.scale(DOUBLE_JUMP_SPEED));
                         } else {
-                            player.jumpFromGround();
-                            player.addDeltaMovement(new Vec3(0, 0.135, 0));
+                            player.setDeltaMovement(new Vec3(0, DOUBLE_JUMP_SPEED, 0));
                         }
                         player.connection.send(new ClientboundSetEntityMotionPacket(player));
 

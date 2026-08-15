@@ -130,6 +130,7 @@ public class BaseformHandler {
                         damageTaker.setDeltaMovement(Vec3.ZERO);
                         damageGiver.connection.send(new ClientboundSetEntityMotionPacket(damageTaker));
                         damageGiver.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, COMBO_TIME + 10, 0, false, false));
+                        baseformProperties.airComboHoverTimer = 10; // ~0.5s hover per hit
                     }
 
                     if (baseformProperties.meleeHitCount == 2)

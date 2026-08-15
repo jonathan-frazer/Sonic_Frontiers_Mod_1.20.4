@@ -9,7 +9,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -21,7 +23,6 @@ import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,32 +61,47 @@ public class HomingAttack implements CustomPacketPayload
     //Client-Side Method
     public static void scanFoward(Player player)
     {
-        Vec3 currentPos = player.getPosition(0).add(0.0, 1.0, 0.0);
-        Vec3 lookAngle = player.getLookAngle();
+        final double RANGE = 12.0;
+        // cos(60°) — targets must be within 60° of the look direction
+        final double COS_THRESHOLD = 0.5;
 
-        //Scan Forward for enemies
-        for (int i = 0; i < 10; ++i) {
-            //Increment Current Position Forward
-            currentPos = currentPos.add(lookAngle);
-            AABB boundingBox = new AABB(currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3,
-                    currentPos.x() - 3, currentPos.y() - 3, currentPos.z() - 3);
+        Vec3 eye = player.getEyePosition();
+        Vec3 look = player.getLookAngle(); // already a unit vector
 
-            List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
-                    LivingEntity.class, boundingBox,
-                    (enemy) -> !enemy.is(player) && enemy.isAlive());
+        List<LivingEntity> candidates = player.level().getEntitiesOfClass(
+            LivingEntity.class,
+            new AABB(eye.x - RANGE, eye.y - RANGE, eye.z - RANGE,
+                     eye.x + RANGE, eye.y + RANGE, eye.z + RANGE),
+            e -> !e.is(player) && e.isAlive()
+        );
 
-            //If enemy is found then Target it
-            if (!nearbyEntities.isEmpty()) {
-                //Select Closest target
-                BaseformClient.ClientOnlyData.homingAttackReticle = Collections.min(nearbyEntities, (e1, e2) -> {
-                    Vec3 e1Pos = new Vec3(e1.getX(), e1.getY(), e1.getZ());
-                    Vec3 e2Pos = new Vec3(e2.getX(), e2.getY(), e2.getZ());
+        LivingEntity best = null;
+        double bestDist = Double.MAX_VALUE;
 
-                    return (int) (e1Pos.distanceToSqr(player.getX(),player.getY(),player.getZ()) - e2Pos.distanceToSqr(player.getX(),player.getY(),player.getZ()));
-                }).getUUID();
-                break;
+        for (LivingEntity candidate : candidates) {
+            Vec3 toTarget = candidate.getEyePosition().subtract(eye);
+            double distSq = toTarget.lengthSqr();
+            if (distSq > RANGE * RANGE || distSq < 1e-8) continue;
+
+            double dist = Math.sqrt(distSq);
+
+            // Cone check: dot product of normalized direction with look vector
+            if (toTarget.scale(1.0 / dist).dot(look) < COS_THRESHOLD) continue;
+
+            // Line-of-sight check: skip if a solid block is between player and target
+            if (player.level().clip(new ClipContext(
+                    eye, candidate.getEyePosition(),
+                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)
+            ).getType() == HitResult.Type.BLOCK) continue;
+
+            if (dist < bestDist) {
+                bestDist = dist;
+                best = candidate;
             }
         }
+
+        if (best != null)
+            BaseformClient.ClientOnlyData.homingAttackReticle = best.getUUID();
     }
 
 
@@ -95,7 +111,7 @@ public class HomingAttack implements CustomPacketPayload
                     ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                         //Start Homing Attack
                         if(msg.enemyID != null)
@@ -106,7 +122,8 @@ public class HomingAttack implements CustomPacketPayload
                             baseformProperties.homingTarget = msg.enemyID;
 
                             //Remove Gravity
-                            player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
+                            var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                            if (gravAttr != null) gravAttr.setBaseValue(0.0);
 
                             //Play Sound
                             player.level().playSound(null,player.getX(),player.getY(),player.getZ(), ModSounds.HOMING_ATTACK.get(), SoundSource.MASTER, 1.0f, 1.0f);

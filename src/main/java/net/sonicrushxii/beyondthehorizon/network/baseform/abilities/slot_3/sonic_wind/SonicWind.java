@@ -44,13 +44,14 @@ public class SonicWind implements CustomPacketPayload
                     ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                         //Changed Data
                         baseformProperties.sonicWind = 1;
 
                         //Remove Gravity
-                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
+                        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                        if (gravAttr != null) gravAttr.setBaseValue(0.0);
 
                         //Set Motion to Zero
                         player.setDeltaMovement(0,0,0);

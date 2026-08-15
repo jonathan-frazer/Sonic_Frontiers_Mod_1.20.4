@@ -39,14 +39,14 @@ public class EndWindmillKick implements CustomPacketPayload {
 
     public static void finishWindmillKick(ServerPlayer player) {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
         if (baseformProperties.windmillKick <= 0) return;
 
         Vec3 playerPos = new Vec3(player.getX(), player.getY(), player.getZ());
         for (LivingEntity target : player.level().getEntitiesOfClass(LivingEntity.class,
-                new AABB(playerPos.x+3, playerPos.y+3, playerPos.z+3,
-                         playerPos.x-3, playerPos.y-3, playerPos.z-3),
+                new AABB(playerPos.x-3, playerPos.y-3, playerPos.z-3,
+                         playerPos.x+3, playerPos.y+3, playerPos.z+3),
                 e -> e != player && e.isAlive())) {
             Vec3 launchDir = new Vec3(target.getX()-player.getX(), 0.5, target.getZ()-player.getZ()).normalize();
             target.setDeltaMovement(launchDir.scale(2.0));
@@ -59,7 +59,8 @@ public class EndWindmillKick implements CustomPacketPayload {
                 SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.MASTER, 1.0f, 1.0f);
 
         baseformProperties.windmillKick = 0;
-        Objects.requireNonNull(player.getAttribute(Attributes.GRAVITY)).setBaseValue(0.08);
+        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+        if (gravAttr != null) gravAttr.setBaseValue(0.08);
         baseformProperties.setCooldown(BaseformActiveAbility.WINDMILL_KICK, (byte) 5);
 
         PacketHandler.sendToALLPlayers(new SyncPlayerFormS2C(player.getId(), playerSonicForm));

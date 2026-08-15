@@ -8,7 +8,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -43,7 +45,7 @@ public class QuickSonicWind implements CustomPacketPayload
     public static void scanFoward(ServerPlayer player)
     {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
         //Get Position
         Vec3 currentPos = player.getPosition(0).add(0.0, 1.0, 0.0);
@@ -55,12 +57,18 @@ public class QuickSonicWind implements CustomPacketPayload
         for (int i = 0; i < 12; ++i) {
             //Increment Current Position Forward
             currentPos = currentPos.add(lookAngle);
-            AABB boundingBox = new AABB(currentPos.x() + 4, currentPos.y() + 4, currentPos.z() + 4,
-                    currentPos.x() - 4, currentPos.y() - 4, currentPos.z() - 4);
+            AABB boundingBox = new AABB(currentPos.x() - 4, currentPos.y() - 4, currentPos.z() - 4,
+                    currentPos.x() + 4, currentPos.y() + 4, currentPos.z() + 4);
 
             List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
                     LivingEntity.class, boundingBox,
-                    (enemy) -> !enemy.is(player) && enemy.isAlive());
+                    enemy -> {
+                        if (enemy.is(player) || !enemy.isAlive()) return false;
+                        return player.level().clip(new ClipContext(
+                            player.getEyePosition(), enemy.getEyePosition(),
+                            ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)
+                        ).getType() != HitResult.Type.BLOCK;
+                    });
 
             //If enemy is found then Target it
             if (!nearbyEntities.isEmpty()) {
@@ -82,7 +90,7 @@ public class QuickSonicWind implements CustomPacketPayload
                     ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                         //Scan for targets
                         scanFoward(player);
@@ -98,18 +106,22 @@ public class QuickSonicWind implements CustomPacketPayload
                         {
                             //Get Target
                             LivingEntity qSonicWindTarget = (LivingEntity) player.serverLevel().getEntity(baseformProperties.rangedTarget);
-                            assert qSonicWindTarget != null;
-
-                            //Set to 0L for when data is serialized
+                            //Reset target regardless — entity may have despawned between scan and handle
                             baseformProperties.rangedTarget = new UUID(0L, 0L);
-                            baseformProperties.profanedWindCoords = new int[]{(int) qSonicWindTarget.getX(), (int) (qSonicWindTarget.getY()+qSonicWindTarget.getEyeHeight()/2), (int) qSonicWindTarget.getZ()};
+                            if (qSonicWindTarget != null) {
+                                baseformProperties.profanedWindCoords = new int[]{(int) qSonicWindTarget.getX(), (int) (qSonicWindTarget.getY()+qSonicWindTarget.getEyeHeight()/2), (int) qSonicWindTarget.getZ()};
+                            } else {
+                                Vec3 fallback = player.getLookAngle().scale(10.0).add(new Vec3(player.getX(),player.getY(),player.getZ()));
+                                baseformProperties.profanedWindCoords = new int[]{(int)fallback.x(),(int)fallback.y(),(int)fallback.z()};
+                            }
                         }
 
                         //Changed Data
                         baseformProperties.profanedWind = 1;
 
                         //Remove Gravity
-                        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
+                        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                        if (gravAttr != null) gravAttr.setBaseValue(0.0);
 
                         //Set Motion to Zero
                         player.setDeltaMovement(0,0,0);

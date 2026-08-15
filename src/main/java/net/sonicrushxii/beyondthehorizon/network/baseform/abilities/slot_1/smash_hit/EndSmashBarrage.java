@@ -36,15 +36,15 @@ public class EndSmashBarrage implements CustomPacketPayload {
 
     public static void finishSmashBarrage(ServerPlayer player) {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
         baseformProperties.smashBarrage = 0;
         baseformProperties.setCooldown(BaseformActiveAbility.SMASH_BARRAGE, (byte) 60);
 
         // Knockback burst on release
         for (LivingEntity enemy : player.level().getEntitiesOfClass(LivingEntity.class,
-                new AABB(player.getX() + 3.5, player.getY() + 2.0, player.getZ() + 3.5,
-                         player.getX() - 3.5, player.getY() - 1.0, player.getZ() - 3.5),
+                new AABB(player.getX() - 3.5, player.getY() - 1.0, player.getZ() - 3.5,
+                         player.getX() + 3.5, player.getY() + 2.0, player.getZ() + 3.5),
                 target -> !target.is(player))) {
             Vec3 knockDir = enemy.position().subtract(player.position()).normalize();
             enemy.hurt(ModDamageTypes.getDamageSource(player.level(),

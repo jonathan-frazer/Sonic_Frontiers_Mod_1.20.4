@@ -13,7 +13,9 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -68,12 +70,18 @@ public class SpinSlash implements CustomPacketPayload {
         for (int i = 0; i < 10; ++i) {
             //Increment Current Position Forward
             currentPos = currentPos.add(lookAngle);
-            AABB boundingBox = new AABB(currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3,
-                    currentPos.x() - 3, currentPos.y() - 3, currentPos.z() - 3);
+            AABB boundingBox = new AABB(currentPos.x() - 3, currentPos.y() - 3, currentPos.z() - 3,
+                    currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3);
 
             List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
                     LivingEntity.class, boundingBox,
-                    (enemy) -> !enemy.is(player) && enemy.isAlive());
+                    enemy -> {
+                        if (enemy.is(player) || !enemy.isAlive()) return false;
+                        return player.level().clip(new ClipContext(
+                            player.getEyePosition(), enemy.getEyePosition(),
+                            ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)
+                        ).getType() != HitResult.Type.BLOCK;
+                    });
 
             //If enemy is found then Target it
             if (!nearbyEntities.isEmpty()) {
@@ -92,7 +100,7 @@ public class SpinSlash implements CustomPacketPayload {
     public static void performSpinSlash(ServerPlayer player, UUID enemyID)
     {
         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
         //Check if target is real
         Entity target = player.serverLevel().getEntity(enemyID);
@@ -101,7 +109,7 @@ public class SpinSlash implements CustomPacketPayload {
         //Set Data
         if(player.hasEffect(MobEffects.GLOWING)) player.getEffect(MobEffects.GLOWING).update(new MobEffectInstance(MobEffects.GLOWING, 120, 1, false, false));
         else                                     player.addEffect(new MobEffectInstance(MobEffects.GLOWING, 120, 1, false, false));
-        baseformProperties.spinSlash = -60;
+        baseformProperties.spinSlash = -15;
         baseformProperties.meleeTarget = enemyID;
         baseformProperties.atkRotPhase = -player.getYRot()-135f;
 
@@ -114,7 +122,8 @@ public class SpinSlash implements CustomPacketPayload {
 
 
         //Remove Gravity
-        player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
+        var gravAttr = player.getAttribute(Attributes.GRAVITY);
+        if (gravAttr != null) gravAttr.setBaseValue(0.0);
 
         PacketHandler.sendToALLPlayers(
                 new SyncPlayerFormS2C(

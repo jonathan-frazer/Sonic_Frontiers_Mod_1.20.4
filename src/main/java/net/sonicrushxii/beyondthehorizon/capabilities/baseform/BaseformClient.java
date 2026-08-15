@@ -231,7 +231,7 @@ public class BaseformClient {
                                 minecraft.getSoundManager().stop(ModSounds.LIGHT_SPEED_IDLE.get().getLocation(), SoundSource.MASTER);
                                 PacketHandler.sendToServer(new LightspeedDecay());
                             },300);
-                        }, 66);
+                        }, 1);
                     }
 
                     //Cancel Light Speed Attack
@@ -499,7 +499,7 @@ public class BaseformClient {
                         SpinSlash.scanFoward(player);
                         if(ClientOnlyData.spinSlashReticle != null) {
                             PacketHandler.sendToServer(new SpinSlash(ClientOnlyData.spinSlashReticle));
-                            baseformProperties.spinSlash = -60;
+                            baseformProperties.spinSlash = -15;
                             VirtualSlotHandler.goToSlot(VirtualSlotHandler.SLOT_COMBO);
                         }
                     }
@@ -688,7 +688,7 @@ public class BaseformClient {
             //Ultimate Slot (slot 2)
             {
                 final boolean inUltSlot = VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_ULTIMATE;
-                if(!baseformProperties.isAttacking() && baseformProperties.getCooldown(BaseformActiveAbility.PHANTOM_RUSH) == 0 &&
+                if(!baseformProperties.isAttacking() && baseformProperties.ultReady && baseformProperties.getCooldown(BaseformActiveAbility.PHANTOM_RUSH) == 0 &&
                         player.isShiftKeyDown() && KeyBindings.INSTANCE.useUltimateAbility.isDown())
                 {
                     ClientOnlyData.ultTargetReticle = null;

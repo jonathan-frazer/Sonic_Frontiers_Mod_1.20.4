@@ -13,7 +13,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
@@ -71,12 +73,18 @@ public class UltimateActivate implements CustomPacketPayload
         for (int i = 0; i < 10; ++i) {
             //Increment Current Position Forward
             currentPos = currentPos.add(lookAngle);
-            AABB boundingBox = new AABB(currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3,
-                    currentPos.x() - 3, currentPos.y() - 3, currentPos.z() - 3);
+            AABB boundingBox = new AABB(currentPos.x() - 3, currentPos.y() - 3, currentPos.z() - 3,
+                    currentPos.x() + 3, currentPos.y() + 3, currentPos.z() + 3);
 
             List<LivingEntity> nearbyEntities = player.level().getEntitiesOfClass(
                     LivingEntity.class, boundingBox,
-                    (enemy) -> !enemy.is(player) && enemy.isAlive());
+                    enemy -> {
+                        if (enemy.is(player) || !enemy.isAlive()) return false;
+                        return player.level().clip(new ClipContext(
+                            player.getEyePosition(), enemy.getEyePosition(),
+                            ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)
+                        ).getType() != HitResult.Type.BLOCK;
+                    });
 
             //If enemy is found then Target it
             if (!nearbyEntities.isEmpty()) {
@@ -99,7 +107,7 @@ public class UltimateActivate implements CustomPacketPayload
                     ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        BaseformProperties baseformProperties = (BaseformProperties) playerSonicForm.getFormProperties();
+                        if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                         //Ultimate Target Reticle
                         if(msg.enemyID != null)
@@ -107,11 +115,14 @@ public class UltimateActivate implements CustomPacketPayload
                             baseformProperties.ultimateUse = 1;
                             baseformProperties.ultimateCooldown = 300;
                             baseformProperties.ultReady = false;
+                            baseformProperties.ultimateAtkMeter = 0.0;
                             baseformProperties.ultTarget = msg.enemyID;
 
                             //Attributes
-                            player.getAttribute(Attributes.GRAVITY).setBaseValue(0.0);
-                            player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+                            var gravAttr = player.getAttribute(Attributes.GRAVITY);
+                            if (gravAttr != null) gravAttr.setBaseValue(0.0);
+                            var krAttr = player.getAttribute(Attributes.KNOCKBACK_RESISTANCE);
+                            if (krAttr != null) krAttr.setBaseValue(1.0);
 
                             //Deactivate PowerBoost
                             {

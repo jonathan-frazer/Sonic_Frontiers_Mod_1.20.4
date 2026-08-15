@@ -152,7 +152,8 @@ public class SonicWind extends LinearMovingEntity {
                     float sonicWindDmg = BaseformServer.SONIC_WIND_DAMAGE;
                     if (this.getOwner() instanceof ServerPlayer owner) {
                         PlayerSonicForm psf = owner.getData(ModAttachments.PLAYER_SONIC_FORM);
-                        sonicWindDmg += ((BaseformProperties) psf.getFormProperties()).boostLvl * 10.0f;
+                        if (psf.getFormProperties() instanceof BaseformProperties bp)
+                            sonicWindDmg += bp.boostLvl * 10.0f;
                     }
                     for (LivingEntity enemy : enemies) {
                         enemy.hurt(

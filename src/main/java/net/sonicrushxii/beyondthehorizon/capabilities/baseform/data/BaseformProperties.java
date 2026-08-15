@@ -150,6 +150,10 @@ public class BaseformProperties extends FormProperties {
     public UUID qkCyloopTarget;
     public double qkCyloopMeter;
 
+    //Slot 0
+    public byte airDashCount;
+    public byte airComboHoverTimer;
+
     //Slot 2
     public byte ballFormState;
     public short spinDashChargeTime;
@@ -245,6 +249,10 @@ public class BaseformProperties extends FormProperties {
         qkCyloopTarget = new UUID(0L,0L);
         qkCyloopMeter = 0.0;
 
+        //Slot 0
+        airDashCount = 0;
+        airComboHoverTimer = 0;
+
         //Slot 2
         ballFormState = (byte)0;
         spinDashChargeTime = 0;
@@ -326,6 +334,10 @@ public class BaseformProperties extends FormProperties {
         sprintFlag = nbt.getBoolean("isSprinting");
         dangerSenseActive = nbt.getBoolean("dangerSenseActive");
         dangerSensePlaying = nbt.getBoolean("dangerSensePlaying");
+
+        //Slot 0
+        airDashCount = nbt.getByte("airDashCount");
+        airComboHoverTimer = nbt.getByte("airComboHoverTimer");
 
         //Slot 1
         airBoosts = nbt.getByte("AirBoosts");
@@ -422,6 +434,10 @@ public class BaseformProperties extends FormProperties {
         nbt.putBoolean("isSprinting",sprintFlag);
         nbt.putBoolean("dangerSenseActive",dangerSenseActive);
         nbt.putBoolean("dangerSensePlaying",dangerSensePlaying);
+
+        //Slot 0
+        nbt.putByte("airDashCount", airDashCount);
+        nbt.putByte("airComboHoverTimer", airComboHoverTimer);
 
         //Slot 1
         nbt.putByte("AirBoosts",airBoosts);
