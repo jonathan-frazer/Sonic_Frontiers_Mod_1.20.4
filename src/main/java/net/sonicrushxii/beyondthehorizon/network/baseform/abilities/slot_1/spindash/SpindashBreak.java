@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.ModUtils;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
+import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
 import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -42,6 +43,21 @@ public class SpindashBreak implements CustomPacketPayload {
                     ServerPlayer player = (ServerPlayer) ctx.player();
                     if(player != null){
                         PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
+
+                        //Record that left-click is held; a stomp breaks blocks on impact
+                        //rather than continuously, so it only needs the flag.
+                        if(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)
+                        {
+                            baseformProperties.blockBreakHold = 3;
+
+                            if(baseformProperties.stomp > 0)
+                            {
+                                PacketHandler.sendToALLPlayers(
+                                        new SyncPlayerFormS2C(player.getId(), playerSonicForm));
+                                return;
+                            }
+                        }
+
                         //Define Player Positions
                         Vec3 lookAngle = player.getLookAngle().scale(1.0);
                         BlockPos playerPos = new BlockPos(

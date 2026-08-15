@@ -14,8 +14,10 @@ import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.sonicrushxii.beyondthehorizon.capabilities.PlayerSonicForm;
 import net.sonicrushxii.beyondthehorizon.capabilities.baseform.data.BaseformProperties;
+import net.sonicrushxii.beyondthehorizon.entities.baseform.mirage.MirageEntity;
 import net.sonicrushxii.beyondthehorizon.modded.ModAttachments;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
+import net.sonicrushxii.beyondthehorizon.modded.ModEntityTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
@@ -23,6 +25,9 @@ import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import java.util.Objects;
 
 public class Afterimage implements CustomPacketPayload {
+    /** Three seconds, matching the invisibility window and the decoy's lifetime. */
+    public static final int AFTERIMAGE_DURATION = 60;
+
     public static final CustomPacketPayload.Type<Afterimage> TYPE =
         new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "afterimage"));
 
@@ -36,6 +41,23 @@ public class Afterimage implements CustomPacketPayload {
     public Afterimage(FriendlyByteBuf buffer) {}
     public void encode(FriendlyByteBuf buffer) {}
 
+    /**
+     * Drops the afterimage: the player becomes visible again and the decoy it left behind
+     * is dismissed. Called when the three seconds run out and when another ability is used.
+     */
+    public static void endAfterimage(ServerPlayer player, BaseformProperties baseformProperties) {
+        baseformProperties.afterimage = 0;
+
+        if (player.hasEffect(MobEffects.INVISIBILITY))
+            player.removeEffect(MobEffects.INVISIBILITY);
+
+        for (MirageEntity decoy : player.level().getEntitiesOfClass(MirageEntity.class,
+                new AABB(player.getX() - 32, player.getY() - 32, player.getZ() - 32,
+                         player.getX() + 32, player.getY() + 32, player.getZ() + 32),
+                d -> player.getUUID().equals(d.getOwnerUUID())))
+            decoy.discard();
+    }
+
     public static void handle(Afterimage msg, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             ServerPlayer player = (ServerPlayer) ctx.player();
@@ -46,6 +68,22 @@ public class Afterimage implements CustomPacketPayload {
             if (baseformProperties.afterimage > 0) return;
 
             baseformProperties.afterimage = 1;
+
+            //Leave a decoy behind: it stands where the ability was used, or keeps punching
+            //whatever the player was attacking, and fades once the afterimage runs out.
+            {
+                MirageEntity decoy = new MirageEntity(ModEntityTypes.SONIC_BASEFORM_MIRAGE.get(), player.level());
+                decoy.setPos(player.getX(), player.getY(), player.getZ());
+                decoy.setYRot(player.getYRot());
+                decoy.setDuration(AFTERIMAGE_DURATION);
+                decoy.setOwner(player.getUUID());
+
+                LivingEntity lastAttacked = player.getLastHurtMob();
+                if (lastAttacked != null && lastAttacked.isAlive())
+                    decoy.setTarget(lastAttacked.getUUID());
+
+                player.level().addFreshEntity(decoy);
+            }
 
             if (player.hasEffect(MobEffects.INVISIBILITY))
                 Objects.requireNonNull(player.getEffect(MobEffects.INVISIBILITY))

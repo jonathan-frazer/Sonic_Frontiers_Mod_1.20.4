@@ -49,6 +49,7 @@ import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_0.base_
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.humming_top.HummingTop;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.stomp.Stomp;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_1.smash_hit.EndSmashBarrage;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.afterimage.Afterimage;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.spin_kick.EndWindmillKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.loop_kick.LoopKick;
 import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.wild_rush.WildRushParticleS2C;
@@ -250,6 +251,20 @@ public class BaseformServer
                     //Air dash count reset on landing
                     if (baseformProperties.airDashCount > 0 && player.onGround())
                         baseformProperties.airDashCount = 0;
+
+                    //Universal Dash pose. The routine form sync only runs once a second,
+                    //so push one the moment the pose ends or it would linger.
+                    if (baseformProperties.universalDashTimer > 0) {
+                        baseformProperties.universalDashTimer--;
+                        if (baseformProperties.universalDashTimer == 0) {
+                            baseformProperties.universalDashDown = false;
+                            PacketHandler.sendToALLPlayers(new SyncPlayerFormS2C(player.getId(), playerSonicForm));
+                        }
+                    }
+
+                    //Held left-click, for stomp/spindash block breaking
+                    if (baseformProperties.blockBreakHold > 0)
+                        baseformProperties.blockBreakHold--;
 
                     //Air combo hover — maintain Y position for ~0.5s per hit
                     if (baseformProperties.airComboHoverTimer > 0) {
@@ -755,6 +770,9 @@ public class BaseformServer
                                     BALLFORM_DAMAGE + baseformProperties.boostLvl * 10.0f);
                             player.addDeltaMovement(new Vec3(0.0,0.3,0.0));
                             player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                            //Hitting an enemy earns another air spindash without landing first
+                            baseformProperties.airSpindashUsed = false;
                         }
 
                         //Go back to normal
@@ -951,7 +969,7 @@ public class BaseformServer
                                 Stomp.performEndStomp(player);
                             } else if(player.onGround()) {
                                 if(baseformProperties.ballFormState > 0 && baseformProperties.bounceCount < 3) {
-                                    if(baseformProperties.bounceWindowTimer == 0)
+                                    if(baseformProperties.bounceWindowTimer == 0 && baseformProperties.blockBreakHold > 0)
                                         stompImpactBreakBlocks(player, level);
                                     baseformProperties.bounceWindowTimer++;
                                     baseformProperties.stomp = 1;
@@ -961,7 +979,7 @@ public class BaseformServer
                                         Stomp.performEndStomp(player);
                                     }
                                 } else {
-                                    if(baseformProperties.bounceWindowTimer == 0)
+                                    if(baseformProperties.bounceWindowTimer == 0 && baseformProperties.blockBreakHold > 0)
                                         stompImpactBreakBlocks(player, level);
                                     baseformProperties.bounceCount = 0;
                                     baseformProperties.bounceWindowTimer = 0;
@@ -1522,10 +1540,10 @@ public class BaseformServer
                     {
                         if (baseformProperties.afterimage > 0) {
                             baseformProperties.afterimage += 1;
-                            if (baseformProperties.afterimage > 60) {
-                                baseformProperties.afterimage = 0;
-                                if (player.hasEffect(MobEffects.INVISIBILITY))
-                                    player.removeEffect(MobEffects.INVISIBILITY);
+                            //Ends after three seconds, or as soon as another ability is used
+                            if (baseformProperties.afterimage > Afterimage.AFTERIMAGE_DURATION
+                                    || baseformProperties.isAttacking()) {
+                                Afterimage.endAfterimage(player, baseformProperties);
                                 PacketHandler.sendToALLPlayers(new SyncPlayerFormS2C(player.getId(), playerSonicForm));
                             }
                         }
@@ -2506,7 +2524,9 @@ public class BaseformServer
                 }
                 if (baseformProperties.ultimateCooldown > 0)
                     baseformProperties.ultimateCooldown--;
-                baseformProperties.ultReady = (baseformProperties.ultimateCooldown == 0 && baseformProperties.ultimateAtkMeter >= 100.0);
+                // Ultimate is gated purely on its five-minute cooldown; the attack meter
+                // belongs to Phantom Rush now (see BaseformProperties#phantomRushReady).
+                baseformProperties.ultReady = (baseformProperties.ultimateCooldown == 0);
             }
 
             //Data

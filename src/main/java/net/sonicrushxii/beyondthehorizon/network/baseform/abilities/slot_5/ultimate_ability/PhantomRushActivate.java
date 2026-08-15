@@ -62,12 +62,13 @@ public class PhantomRushActivate implements CustomPacketPayload {
             PlayerSonicForm playerSonicForm = player.getData(ModAttachments.PLAYER_SONIC_FORM);
             if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
-            if (msg.enemyID != null && baseformProperties.ultReady && baseformProperties.getCooldown(BaseformActiveAbility.PHANTOM_RUSH) == 0) {
+            // Phantom Rush spends its own built-up meter and leaves the Ultimate's
+            // cooldown untouched — the two are separate abilities now.
+            if (msg.enemyID != null && baseformProperties.phantomRushReady() && baseformProperties.getCooldown(BaseformActiveAbility.PHANTOM_RUSH) == 0) {
                 baseformProperties.ultimateUse = 1;
                 baseformProperties.phantomRushOnly = true;
                 baseformProperties.ultTarget = msg.enemyID;
                 baseformProperties.ultimateAtkMeter = 0.0;
-                baseformProperties.ultReady = false;
                 baseformProperties.setCooldown(BaseformActiveAbility.PHANTOM_RUSH, (byte) 100);
 
                 var gravAttr = player.getAttribute(Attributes.GRAVITY);

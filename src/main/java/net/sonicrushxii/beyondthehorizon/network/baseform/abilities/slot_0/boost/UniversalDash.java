@@ -24,6 +24,11 @@ import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import java.util.List;
 
 public class UniversalDash implements CustomPacketPayload {
+    /** How long the dash pose is held for. */
+    public static final byte DASH_ANIMATION_TICKS = 8;
+    /** Pitch past which the dash is treated as downward-angled and uses the dive pose. */
+    private static final float DOWNWARD_DASH_PITCH = 30.0f;
+
     public static final CustomPacketPayload.Type<UniversalDash> TYPE =
         new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath("beyondthehorizon", "universal_dash"));
 
@@ -56,6 +61,10 @@ public class UniversalDash implements CustomPacketPayload {
 
             Vec3 look = player.getLookAngle();
             double speed = player.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
+
+            //Drives the dash pose; a downward-angled dash uses a different animation
+            props.universalDashTimer = DASH_ANIMATION_TICKS;
+            props.universalDashDown = player.getXRot() > DOWNWARD_DASH_PITCH;
 
             player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
             player.addDeltaMovement(look.scale(2 * speed));

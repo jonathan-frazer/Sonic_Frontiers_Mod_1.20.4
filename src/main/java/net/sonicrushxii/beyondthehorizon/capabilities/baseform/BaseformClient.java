@@ -312,8 +312,8 @@ public class BaseformClient {
                         PacketHandler.sendToServer(new LaunchSpindash());
                     }
 
-                    //Break blocks with Spindash
-                    if(holdingLeftClick && baseformProperties.ballFormState == (byte)2)
+                    //Break blocks with Spindash, or beneath you when stomping
+                    if(holdingLeftClick && (baseformProperties.ballFormState == (byte)2 || baseformProperties.stomp > 0))
                     {
                         PacketHandler.sendToServer(new SpindashBreak());
                     }
@@ -688,7 +688,7 @@ public class BaseformClient {
             //Ultimate Slot (slot 2)
             {
                 final boolean inUltSlot = VirtualSlotHandler.getCurrAbility() == VirtualSlotHandler.SLOT_ULTIMATE;
-                if(!baseformProperties.isAttacking() && baseformProperties.ultReady && baseformProperties.getCooldown(BaseformActiveAbility.PHANTOM_RUSH) == 0 &&
+                if(!baseformProperties.isAttacking() && baseformProperties.phantomRushReady() && baseformProperties.getCooldown(BaseformActiveAbility.PHANTOM_RUSH) == 0 &&
                         player.isShiftKeyDown() && KeyBindings.INSTANCE.useUltimateAbility.isDown())
                 {
                     ClientOnlyData.ultTargetReticle = null;

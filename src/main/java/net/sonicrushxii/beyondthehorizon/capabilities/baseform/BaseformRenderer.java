@@ -350,6 +350,25 @@ public class BaseformRenderer
             poseStack.popPose();
             event.setCanceled(true);
         }
+        //Universal Dash, downward angle — dive pose along the direction of travel
+        else if(baseformProperties.universalDashTimer > 0 && baseformProperties.universalDashDown)
+        {
+            poseStack.pushPose();
+
+            // Scale
+            poseStack.scale(1.0f, 1.0f, 1.0f);
+
+            //Apply Rotation & Translation
+            poseStack.mulPose(Axis.YP.rotationDegrees(-player.getYRot()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(-90.0F + player.getXRot()));
+
+            //Render The Custom Model
+            ModModelRenderer.renderPlayerModel(SonicFlatPlayerModel.class,event,poseStack,baseformProperties,null);
+
+            poseStack.popPose();
+            event.setCanceled(true);
+        }
+
         //Peelout
         else if(baseformProperties.boostLvl == 2 && player.isSprinting())
         {

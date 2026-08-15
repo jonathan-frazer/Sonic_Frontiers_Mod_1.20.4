@@ -153,6 +153,11 @@ public class BaseformProperties extends FormProperties {
     //Slot 0
     public byte airDashCount;
     public byte airComboHoverTimer;
+    public byte universalDashTimer;
+    public boolean universalDashDown;
+
+    //Held left-click, for abilities that break blocks while active
+    public byte blockBreakHold;
 
     //Slot 2
     public byte ballFormState;
@@ -229,6 +234,10 @@ public class BaseformProperties extends FormProperties {
         sprintFlag = false;
         dangerSenseActive = true;
         dangerSensePlaying = false;
+        momentumTimer = 0;
+        momentumSpeed = 0.0f;
+        bounceWindowTimer = 0;
+        wallRunSurface = 0;
         sprintTimer = 0;
         stopTimer = 0;
         overSpeedLevel = 0;
@@ -252,6 +261,9 @@ public class BaseformProperties extends FormProperties {
         //Slot 0
         airDashCount = 0;
         airComboHoverTimer = 0;
+        universalDashTimer = 0;
+        universalDashDown = false;
+        blockBreakHold = 0;
 
         //Slot 2
         ballFormState = (byte)0;
@@ -334,10 +346,21 @@ public class BaseformProperties extends FormProperties {
         sprintFlag = nbt.getBoolean("isSprinting");
         dangerSenseActive = nbt.getBoolean("dangerSenseActive");
         dangerSensePlaying = nbt.getBoolean("dangerSensePlaying");
+        momentumTimer = nbt.getByte("momentumTimer");
+        momentumSpeed = nbt.getFloat("momentumSpeed");
+        bounceWindowTimer = nbt.getByte("bounceWindowTimer");
+        wallRunSurface = nbt.getByte("wallRunSurface");
+        sprintTimer = nbt.getShort("sprintTimer");
+        stopTimer = nbt.getShort("stopTimer");
+        overSpeedLevel = nbt.getByte("overSpeedLevel");
+        boost3PushTimer = nbt.getShort("boost3PushTimer");
+        blockBreakHold = nbt.getByte("blockBreakHold");
 
         //Slot 0
         airDashCount = nbt.getByte("airDashCount");
         airComboHoverTimer = nbt.getByte("airComboHoverTimer");
+        universalDashTimer = nbt.getByte("universalDashTimer");
+        universalDashDown = nbt.getBoolean("universalDashDown");
 
         //Slot 1
         airBoosts = nbt.getByte("AirBoosts");
@@ -434,10 +457,21 @@ public class BaseformProperties extends FormProperties {
         nbt.putBoolean("isSprinting",sprintFlag);
         nbt.putBoolean("dangerSenseActive",dangerSenseActive);
         nbt.putBoolean("dangerSensePlaying",dangerSensePlaying);
+        nbt.putByte("momentumTimer",momentumTimer);
+        nbt.putFloat("momentumSpeed",momentumSpeed);
+        nbt.putByte("bounceWindowTimer",bounceWindowTimer);
+        nbt.putByte("wallRunSurface",wallRunSurface);
+        nbt.putShort("sprintTimer",sprintTimer);
+        nbt.putShort("stopTimer",stopTimer);
+        nbt.putByte("overSpeedLevel",overSpeedLevel);
+        nbt.putShort("boost3PushTimer",boost3PushTimer);
+        nbt.putByte("blockBreakHold",blockBreakHold);
 
         //Slot 0
         nbt.putByte("airDashCount", airDashCount);
         nbt.putByte("airComboHoverTimer", airComboHoverTimer);
+        nbt.putByte("universalDashTimer", universalDashTimer);
+        nbt.putBoolean("universalDashDown", universalDashDown);
 
         //Slot 1
         nbt.putByte("AirBoosts",airBoosts);
@@ -450,7 +484,7 @@ public class BaseformProperties extends FormProperties {
         nbt.putByte("PowerBoostLevel",powerBoostLevel);
         nbt.putBoolean("BoostAura",boostAura);
         nbt.putShort("cyloopTime",cylooping);
-        nbt.putByte("QuickCyloop",quickCyloop);
+        nbt.putByte("quickCyloop",quickCyloop);
         nbt.putUUID("QkCyloopTarget",qkCyloopTarget);
         nbt.putDouble("QkCyloopMeter",qkCyloopMeter);
 
@@ -514,6 +548,12 @@ public class BaseformProperties extends FormProperties {
 
         return nbt;
     }
+
+    /**
+     * Phantom Rush is built up by dealing damage; the Ultimate is on a flat cooldown
+     * instead (see {@link #ultReady}). The two are no longer the same resource.
+     */
+    public boolean phantomRushReady() {return ultimateAtkMeter >= 100.0;}
 
     public byte[] getAllCooldowns() {return abilityCooldowns;}
     public byte getCooldown(BaseformActiveAbility ability){return abilityCooldowns[ability.ordinal()];}

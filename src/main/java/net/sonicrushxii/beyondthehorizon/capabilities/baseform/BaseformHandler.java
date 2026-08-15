@@ -23,6 +23,7 @@ import net.sonicrushxii.beyondthehorizon.modded.ModDamageTypes;
 import net.sonicrushxii.beyondthehorizon.modded.ModEffects;
 import net.sonicrushxii.beyondthehorizon.modded.ModSounds;
 import net.sonicrushxii.beyondthehorizon.network.PacketHandler;
+import net.sonicrushxii.beyondthehorizon.network.baseform.abilities.slot_2.afterimage.Afterimage;
 import net.sonicrushxii.beyondthehorizon.network.sync.SyncPlayerFormS2C;
 import net.sonicrushxii.beyondthehorizon.network.sync.ParticleDirPacketS2C;
 import net.sonicrushxii.beyondthehorizon.scheduler.ScheduledTask;
@@ -78,7 +79,7 @@ public class BaseformHandler {
                 receiver.teleportTo(receiver.serverLevel(), behindX, damageGiver.getY(), behindZ,
                         Collections.emptySet(), facingYaw, 0);
                 baseformProperties.afterimageCounter = 0;
-                baseformProperties.afterimage = 0;
+                Afterimage.endAfterimage(receiver, baseformProperties);
                 PlayerSonicForm playerSonicForm = receiver.getData(ModAttachments.PLAYER_SONIC_FORM);
                 receiver.level().playSound(null, receiver.getX(), receiver.getY(), receiver.getZ(),
                         SoundEvents.ENDERMAN_TELEPORT, SoundSource.MASTER, 1.0f, 1.0f);

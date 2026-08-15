@@ -110,12 +110,12 @@ public class UltimateActivate implements CustomPacketPayload
                         if (!(playerSonicForm.getFormProperties() instanceof BaseformProperties baseformProperties)) return;
 
                         //Ultimate Target Reticle
-                        if(msg.enemyID != null)
+                        // Five-minute cooldown, independent of the Phantom Rush meter
+                        if(msg.enemyID != null && baseformProperties.ultimateCooldown == 0)
                         {
                             baseformProperties.ultimateUse = 1;
                             baseformProperties.ultimateCooldown = 300;
                             baseformProperties.ultReady = false;
-                            baseformProperties.ultimateAtkMeter = 0.0;
                             baseformProperties.ultTarget = msg.enemyID;
 
                             //Attributes

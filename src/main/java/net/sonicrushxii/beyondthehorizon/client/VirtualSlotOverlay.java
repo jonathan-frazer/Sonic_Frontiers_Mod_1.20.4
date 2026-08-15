@@ -105,6 +105,16 @@ public class VirtualSlotOverlay {
     //Helper Methods and Records
     private record Ability(ResourceLocation texture, @Nullable String sideinfo, byte cooldown, @Nullable Double chargePercent, @Nullable Integer barAlphaColor) {}
 
+    /** Matches the cooldown UltimateActivate sets, for drawing the recovery bar. */
+    private static final double ULTIMATE_COOLDOWN_SECONDS = 300.0;
+
+    /** The Ultimate's cooldown runs to five minutes, past what the two-digit slot counter can show. */
+    private static String formatUltCooldown(short secondsLeft)
+    {
+        if(secondsLeft <= 0) return "Ult";
+        return String.format("%d:%02d", secondsLeft / 60, secondsLeft % 60);
+    }
+
     private static final int SLOT_BAR_WIDTH = 15;
     private static final int SLOT_BAR_HEIGHT = 1;
 
@@ -236,12 +246,18 @@ public class VirtualSlotOverlay {
 
                     case 2: // SLOT_ULTIMATE
                         slotName = "Ultimate";
+                        // The Ultimate runs on its own five-minute cooldown; Phantom Rush is a
+                        // separate ability that spends the built-up attack meter.
                         iconTextures = (List.of(
-                                new Ability(PHANTOM_RUSH_SLOT, null, cooldownArray[BaseformActiveAbility.PHANTOM_RUSH.ordinal()],
+                                new Ability(PHANTOM_RUSH_SLOT, formatUltCooldown(baseformProperties.ultimateCooldown),
+                                        (byte) 0,
+                                        100.0 * (ULTIMATE_COOLDOWN_SECONDS - baseformProperties.ultimateCooldown) / ULTIMATE_COOLDOWN_SECONDS,
+                                        (baseformProperties.ultReady) ? 0xFF0033DD : 0xFF00DDDD),
+                                new Ability(PHANTOM_RUSH_SLOT, "Rush", cooldownArray[BaseformActiveAbility.PHANTOM_RUSH.ordinal()],
                                         baseformProperties.ultimateAtkMeter,
-                                        (baseformProperties.ultReady) ? 0xFF0033DD : 0xFF00DDDD)
+                                        (baseformProperties.phantomRushReady()) ? 0xFF0033DD : 0xFF00DDDD)
                         ));
-                        keyBindings.set(0, KeyBindings.INSTANCE.useUltimateAbility.getKey());
+                        keyBindings.set(1, KeyBindings.INSTANCE.useUltimateAbility.getKey());
                         break;
 
                     case 3: // SLOT_TRANSFORMATION
@@ -319,7 +335,7 @@ public class VirtualSlotOverlay {
                 int barWidth = (int) (0.01*baseformProperties.ultimateAtkMeter*ULT_BAR_WIDTH);
                 guiComponent.fill(barX+1,barY+1, barX+ULT_BAR_WIDTH+1, barY-ULT_BAR_HEIGHT,0xFF000000);
                 guiComponent.fill(barX,barY, barX+ULT_BAR_WIDTH, barY-ULT_BAR_HEIGHT,0xFF444444);
-                guiComponent.fill(barX,barY, barX+barWidth, barY-ULT_BAR_HEIGHT,(baseformProperties.ultReady)?0xFF0033DD:0xFF00DDDD);
+                guiComponent.fill(barX,barY, barX+barWidth, barY-ULT_BAR_HEIGHT,(baseformProperties.phantomRushReady())?0xFF0033DD:0xFF00DDDD);
 
                 // Draw the image (Assuming you have a method to draw the image)
                 int imageX = barX - imageWidth - 5; // Image is to the left of the bar
@@ -328,7 +344,7 @@ public class VirtualSlotOverlay {
                 guiComponent.blit(PHANTOM_RUSH_SLOT,imageX,imageY,
                         0,0,imageWidth,imageHeight,imageWidth,imageHeight);
 
-                if(baseformProperties.ultReady)
+                if(baseformProperties.phantomRushReady())
                 {
                     int keyX = imageX - shortenName(KeyBindings.INSTANCE.useUltimateAbility.getKey().getDisplayName().getString()).length()*4 - 4;
                     int keyY = imageY + imageHeight/3;
